@@ -91,7 +91,7 @@ buttonSaveClose:
   message: Zapisz i zamknij
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Zapisano
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Pokaż określenia edytora
@@ -118,7 +118,9 @@ buttonVacuuming:
   message: Czyszczenie danych...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Automatyczna aktualizacja jest wyłączona dla tego skryptu!
+    Kliknij OK, aby mimo to zaktualizować.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -246,7 +248,7 @@ headerRecycleBin:
   message: Kosz
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Pokaż instrukcję dotyczącą przeciągania i upuszczania lokalnych skryptów
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Wprowadź adres URL:'
@@ -263,7 +265,7 @@ hintVacuum:
     podręcznej.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Zainstaluj
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Zainstaluj z $1
@@ -566,7 +568,7 @@ labelXhrInjectHint:
     ukryć na dobre, klikając je prawym przyciskiem myszy.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (z wyjątkiem okna prywatnego i witryn z wyłączonymi ciasteczkami)
 lastSync:
   description: Label for last sync timestamp.
   message: Ostatnia synchronizacja o $1
@@ -696,7 +698,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Brakuje wymaganych zasobów.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -833,22 +835,24 @@ optionUpdate:
   message: Aktualizacja
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Tylko odczyt
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Automatycznie aktualizowany skrypt jest tylko do odczytu, chyba że wyłączysz
+    aktualizacje lub zezwolisz na edycję.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Zezwól na edycję
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (następna aktualizacja je zastąpi)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Zainstaluj ponownie
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Odśwież kartę
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: ''
@@ -869,7 +873,7 @@ sideMenuSettings:
   message: Ustawienia
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Odśwież stronę pomijając skrypty
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: ''
@@ -899,7 +903,7 @@ updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Zaktualizuj skrypty ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Klucz (string)
