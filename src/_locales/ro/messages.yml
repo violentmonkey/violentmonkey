@@ -91,7 +91,7 @@ buttonSaveClose:
   message: Salvează și închide
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Salvat
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Afișează starea editorului
@@ -100,7 +100,7 @@ buttonSupport:
   message: Pagină de asistență
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Revocă
+  message: Anulează
 buttonUpdate:
   description: Button to update a script.
   message: Actualizează
@@ -206,7 +206,14 @@ failureReasonNoninjectable:
     via politici, un site al unui motor de căutare în Opera)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Există mai multe metode de instalare sau de urmărire a editărilor într-un
+    fișier local: <1> Trage și plasează fișierul într-o pagină Violentmonkey
+    deschisă sau într-o fereastră pop-up, inclusiv aceasta. <2> Instalează un
+    server HTTP local pentru acest fișier și deschide-l prin http://localhost.
+    <3> Activează „Permite accesul la adresele URL de fișiere” în detaliile
+    pentru Violentmonkey din pagina chrome://extensions. Acest lucru este
+    periculos, deoarece orice userscript poate citi orice fișier local.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordinea alfabetică
@@ -245,7 +252,7 @@ headerRecycleBin:
   message: Coș de reciclare
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Afișează instrucțiunile pentru scripturile locale trase și plasate
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Introdu URL-ul:'
@@ -262,7 +269,7 @@ hintVacuum:
     cache.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Instalează
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Instalează de pe $1
@@ -838,22 +845,22 @@ optionUpdate:
   message: Actualizare
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Numai citire
 readonlyNote:
   description: Warning when trying to type in the editor.
   message: ''
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Permite editările
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (următoarea actualizare le va suprascrie)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Reinstalează
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Reîncarcă fila
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: ''
@@ -874,13 +881,15 @@ sideMenuSettings:
   message: Setări
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Reîncarcă pagina fără userscripturi
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Ai dezactivat userscripturile pentru această pagină. Pentru a le rula,
+    reîncarcă sau navighează în filă.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Oprește urmărirea
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Culoare normală a insignei
@@ -896,15 +905,15 @@ titleSearchHint:
     * Sintaxa RegExp este suportată: /re/ și /re/flags
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Urmărește editările externe
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Ține această pagină deschisă pentru a-ți urmări editările în fișierul local
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Actualizează scripturile ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Cheie (șir de caractere)
