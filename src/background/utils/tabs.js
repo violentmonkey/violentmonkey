@@ -58,7 +58,7 @@ addOwnCommands({
    */
   async OpenEditor(pathId, src) {
     return openDashboard(`${SCRIPTS}/${
-      pathId || `_new/${src?.tab.id || (await getActiveTab()).id}`
+      pathId || `_new/${src?.tab?.id || (await getActiveTab()).id}`
     }`, src);
   },
   OpenDashboard: openDashboard,
