@@ -553,14 +553,24 @@ export default {
       return this.extras?.id === item.id || this.focusedItem?.id === item.id || this.focusBug;
     },
   },
-  mounted() {
-    focusMe(this.$el);
+  async mounted() {
+    const $el = this.$el;
+    const $elStyle = $el.style;
+    const oldDocH = IS_FIREFOX && document.documentElement.clientHeight;
+    const oldH = innerHeight;
+    // Can't rely on devicePixelRatio because Chrome's page zoom doesn't change popup's real height
+    const newH = (
+      $elStyle.height = screen.availHeight - screenY - 8 + 'px',
+      $el.clientHeight /* forcing layout re-calc */,
+      IS_FIREFOX && await new Promise(requestAnimationFrame),
+      innerHeight
+    );
+    // Firefox may take more than one RAF to change the size of the popup,
+    // so we'll use a hardcoded height, which can be bigger than 600px in Android
+    $elStyle.maxHeight = (newH !== oldH && newH !== oldDocH ? newH : Math.max(600, newH)) + 'px';
+    $elStyle.height = '';
+    focusMe($el);
     keyboardService.enable();
-    this.$el.style.maxHeight = Math.min(
-      // innerHeight may exceed 600px in a mobile browser which displays the popup as a fullscreen page
-      Math.max(600, innerHeight),
-      screen.availHeight - screenY - 8
-    ) + 'px';
     this.disposeList = [
       keyboardService.register('escape', () => {
         const item = this.extras || this.topExtras;

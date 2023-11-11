@@ -41,8 +41,6 @@ a {
 }
 
 .page-popup {
-  /* hardcoded popup height in Chrome */
-  max-height: 600px;
   overflow: hidden;
   .incognito {
     padding: $padding $padding 0 $leftPaneWidth;
