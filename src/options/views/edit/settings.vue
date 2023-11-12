@@ -1,6 +1,12 @@
 <template>
   <div class="edit-settings">
     <h4 v-text="i18n('editLabelSettings')"></h4>
+    <div class="mb-2">
+      <label>
+        <input type="checkbox" v-model="config.enabled">
+        <span v-text="i18n('buttonEnable')"/>
+      </label>
+    </div>
     <VMSettingsUpdate v-bind="{script}"/>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <!-- Using tables to auto-adjust width, which differs substantially between languages -->
@@ -101,6 +107,7 @@ const props = defineProps({
 const KII = shallowRef(KNOWN_INJECT_INTO);
 
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
+const config = computed(() => props.script.config);
 const custom = computed(() => props.script.custom);
 const placeholders = computed(() => {
   const { script } = props;
