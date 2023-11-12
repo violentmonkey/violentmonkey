@@ -274,6 +274,7 @@ async function save() {
       id,
       code: $codeComp.getRealContent(),
       config: {
+        enabled: +config.enabled,
         notifyUpdates: notifyUpdates ? +notifyUpdates : null, // 0, 1, null
         shouldUpdate: collectShouldUpdate(config), // 0, 1, 2
       },
@@ -343,6 +344,7 @@ function onScript(scr) {
   const { shouldUpdate } = config;
   // Matching Vue model types, so deepEqual can work properly
   config._editable = shouldUpdate === 2;
+  config.enabled = !!config.enabled;
   config.shouldUpdate = !!shouldUpdate;
   config.notifyUpdates = nullBool2string(config.notifyUpdates);
   custom.noframes = nullBool2string(custom.noframes);
