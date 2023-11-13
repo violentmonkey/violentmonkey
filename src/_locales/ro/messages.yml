@@ -30,9 +30,7 @@ buttonEdit:
   message: Editează
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: >-
-    Poți și să faci clic dreapta, Ctrl+clic, clic cu rotița pe numele
-    scriptului.
+  message: Poți și să dai clic dreapta, Ctrl+clic, clic cu rotița pe numele scriptului.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Golește coșul de reciclare acum!
@@ -118,12 +116,14 @@ buttonVacuuming:
   message: Se curăță datele...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Actualizarea automată este dezactivată pentru acest script!
+    Dă clic pe OK pentru a-l actualiza oricum.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     Modificările nu sunt salvate!
-    Clic pe OK pentru a le ignora sau Anulează pentru a rămâne.
+    Dă clic pe OK pentru a le ignora sau Anulează pentru a rămâne.
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Scripturile nu vor fi injectate în URL-urile corespondente acestei liste.
@@ -575,7 +575,7 @@ labelXhrInjectHint:
     avertismentele dând clic dreapta pe una.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (cu excepția incognito și a site-urilor cu cookie-uri dezactivate)
 lastSync:
   description: Label for last sync timestamp.
   message: Ultima sincronizare în $1
@@ -731,7 +731,7 @@ msgNoUpdate:
   message: Nu au fost găsite actualizări.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: Eroare la actualizarea scripturilor. Click pentru a le deschide.
+  message: Eroare la actualizarea scripturilor. Dă click pentru a le deschide.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -845,10 +845,12 @@ optionUpdate:
   message: Actualizare
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: Numai citire
+  message: Numai pentru citire
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Scriptul actualizat automat este numai pentru citire, cu excepția cazului în
+    care dezactivezi actualizările sau permiți editarea.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
   message: Permite editările
@@ -863,7 +865,9 @@ reloadTab:
   message: Reîncarcă fila
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Dacă opțiunea este activată, fila activă va fi reîncărcată atunci când sunt
+    detectate modificări și acest script coincide cu URL-ul filei.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sensibil la scrierea cu litere mari și mici

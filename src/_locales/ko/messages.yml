@@ -39,7 +39,7 @@ buttonEnable:
   message: 활성화
 buttonExportData:
   description: Button to open the data export dialog.
-  message: zip파일로 내보내기
+  message: ZIP 파일로 내보내기
 buttonFilter:
   description: Button to show filters menu.
   message: 필터
@@ -49,7 +49,7 @@ buttonHome:
   message: 홈페이지
 buttonImportData:
   description: Button to choose a file for data import.
-  message: zip에서 불러오기
+  message: ZIP 파일에서 불러오기
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: URL에서 설치
@@ -89,7 +89,7 @@ buttonSaveClose:
   message: 저장하고 닫기
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: 저장 완료
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: 편집기 상태 보기
@@ -98,7 +98,7 @@ buttonSupport:
   message: 지원 페이지
 buttonUndo:
   description: Button to undo removement of a script.
-  message: 되돌리기
+  message: 실행 취소
 buttonUpdate:
   description: Button to update a script.
   message: 업데이트
@@ -113,10 +113,12 @@ buttonVacuumed:
   message: 데이터 청소됨
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: 데이터를 청소하는 중...
+  message: 데이터 청소 중...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    이 스크립트의 자동 업데이트가 꺼져 있습니다!
+    업데이트를 진행하려면 '확인'을 누르세요.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -152,12 +154,12 @@ editLabelSettings:
   message: 스크립트 설정
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: Line is too long
+  message: 줄이 너무 깁니다
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: |-
-    이 줄은 너무 길기 때문에 편집 중 지연을 피하기 위해 텍스트가 접혀 있습니다.
-    예를 들어 고급 설정에서 제한을 조정할 수 있습니다.:
+    줄이 너무 길어서 편집 중 지연을 피하기 위해 텍스트가 접혀 있습니다.
+    고급 설정에서 제한을 조정할 수 있습니다. 예시:
     "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
@@ -190,10 +192,14 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: |-
     Violentmonkey가 이 페이지의 유저스크립트를 실행하지 못했습니다
-    (대표적인 예: 브라우저 UI 또는 확장 기능)
+    (대표적인 원인 예시: 브라우저 UI, 확장 기능, 정책, Opera 내 검색엔진 사이트)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    로컬 파일의 변경사항을 적용하거나 추적하는 방법이 몇 가지 있습니다. <1> 파일을 이 페이지처럼 열려 있는 Violentmonkey
+    페이지나 팝업으로 끌어다 놓습니다. <2> 이 파일의 로컬 HTTP 서버를 설치한 뒤 http://localhost 주소로 파일을
+    엽니다. <3> chrome://extensions 페이지의 확장 세부정보에서 "파일 URL에 대한 액세스 허용"을 켭니다. 이 방식은
+    모든 유저스크립트에서 모든 파일에 접근할 수 있게 되므로 위험합니다.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 가나다 순
@@ -214,10 +220,10 @@ filterScopeName:
   message: 이름
 filterSize:
   description: Label for option to sort scripts by size.
-  message: size
+  message: 크기 순
 genericError:
   description: Label for generic error.
-  message: Error
+  message: 오류
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
   message: 끄기
@@ -232,7 +238,7 @@ headerRecycleBin:
   message: 휴지통
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: 끌어다 놓은 로컬 스크립트에 대한 지침 표시
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL 입력:'
@@ -247,7 +253,7 @@ hintVacuum:
   message: 불필요한 중복 데이터를 버리고 캐시에 없는 리소스를 다시 불러오도록 시도합니다.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: 설치
 installFrom:
   description: Label for button to install script from a userscript site.
   message: $1에서 설치
@@ -284,13 +290,13 @@ labelAutoReloadCurrentTabDisabled:
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 매 $1 일마다 업데이트합니다. (0 = 비활성화)
+  message: $1일마다 업데이트를 확인합니다. (0 = 비활성화)
 labelBackup:
   description: Label of the import/export section in settings.
   message: 백업
 labelBadge:
   description: Label for option to show number on badge.
-  message: 배지에 보일 숫자
+  message: '배지 표시: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: '배지 색상: '
@@ -335,7 +341,7 @@ labelEditValue:
   message: 스크립트 변수 수정
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: 스크립트 스토리지 수정
+  message: 스크립트 저장소 수정
 labelEditor:
   description: Label for Editor settings
   message: 편집기
@@ -356,16 +362,18 @@ labelExposeStatus:
   message: '유저스크립트 카탈로그 사이트에 설치된 버전 표시: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Firefox 에서 대체 $1 모드
+  message: Firefox에서 대체 $1 모드
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Firefox 59 이후 <document-start> 스크립트를 기본 모드보다 빠르게 인젝션하는 방식이 도입되었습니다. "페이지 동기화
+    모드"처럼 메모리 사용량이 증가하므로, 이 옵션 없이도 스크립트가 올바르게 동작한다면 끄실 수 있습니다.
 labelFeedback:
   description: Label of link to feedback page.
   message: 피드백
 labelFilterSort:
   description: Label for sort filter.
-  message: $1에 따라 정렬
+  message: '정렬: $1'
 labelGeneral:
   description: Label for general settings.
   message: 일반
@@ -465,13 +473,13 @@ labelSearch:
   message: '찾을 내용: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: 스크립트를 검색해보세요...
+  message: 스크립트 검색...
 labelSettings:
   description: Label shown on the top of settings page
   message: 설정
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: 실행 순서 위치 표시
+  message: 실행 순서 표시
 labelSync:
   description: Label for sync options.
   message: 동기화
@@ -523,15 +531,15 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: 단일 열
+  message: 1열 형식
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: 테이블 보기
+  message: 표 형식
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: Synchronous $1 mode
+  message: $1 동기화 모드
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
@@ -541,7 +549,7 @@ labelXhrInjectHint:
     있습니다.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (시크릿 모드 및 쿠키를 끈 사이트 제외)
 lastSync:
   description: Label for last sync timestamp.
   message: $1에 마지막으로 동기화됨
@@ -573,7 +581,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: 피드백하기
+  message: 피드백
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: 이 사이트를 위한 스크립트 찾기
@@ -587,22 +595,22 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: Matched disabled scripts
+  message: 일치하는 비활성화된 스크립트
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: 하위 프레임 스크립트들
+  message: 하위 프레임 전용 스크립트
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: 일치하는 스크립트들
+  message: 일치하는 스크립트
 menuNewScript:
   description: Menu item to create a new script.
   message: 새 스크립트 만들기
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: 스크립트들 비활성화됨
+  message: 스크립트 비활성화됨
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: 스크립트들 활성화됨
+  message: 스크립트 활성화됨
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: 업데이트 확인중...
@@ -717,13 +725,13 @@ msgScriptUpdated:
   message: 스크립트 [$1]이(가) 업데이트됨!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: 표시/숨기기
+  message: 표시/숨김
 msgSyncError:
   description: Message shown when sync failed.
   message: 동기화 오류!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: 초기화중...
+  message: 초기화 중...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: 초기화 오류!
@@ -735,7 +743,7 @@ msgSyncReady:
   message: 동기화가 곧 시작합니다....
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: 동기화 진행중...
+  message: 동기화 진행 중...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: 구문 오류?
@@ -744,7 +752,7 @@ msgUpdated:
   message: 스크립트 업데이트됨.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: 업데이트중...
+  message: 업데이트 중...
 noValues:
   description: Label shown when there is no value for current script.
   message: 저장된 값이 없습니다.
@@ -767,16 +775,16 @@ optionPopupEnabledFirst:
   message: 활성화된 것 먼저
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: Group disabled scripts
+  message: 비활성화된 스크립트 묶기
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: '@run-at stage로 묶기'
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: 비활성화된 것 숨기기
+  message: 비활성화된 스크립트 숨김
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: Show disabled scripts
+  message: 비활성화된 스크립트 표시
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 활성화된 스크립트 먼저 보여주기
@@ -799,31 +807,31 @@ optionUpdate:
   message: 업데이트
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: 읽기 전용
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: 자동 업데이트된 스크립트는 업데이트를 끄거나 편집을 허용하기 전까지 읽기 전용 상태입니다.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: 편집 허용
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (다음 업데이트에서 편집 사항을 덮어씀)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: 재설치
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: 탭 새로고침
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: 켜진 경우, 활성화된 탭의 URL에 해당하는 스크립트가 바뀌면 탭을 새로고침합니다.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: 대소문자 확인하기
+  message: 대소문자 확인
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: 정규표현식 사용하기
+  message: 정규표현식 사용
 sideMenuAbout:
   description: 'Side menu: About'
   message: 정보
@@ -835,13 +843,13 @@ sideMenuSettings:
   message: 설정
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: 유저스크립트를 끄고 페이지 새로고침
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: 이 페이지에서 유저스크립트를 비활성화했습니다. 스크립트를 실행하려면 탭을 새로고침하거나 탐색하세요.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: 추적 중단
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: 일반 배지 색상
@@ -855,15 +863,15 @@ titleSearchHint:
     * 정규표현식을 지원합니다: /re/ 또는 /re/flags
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: 외부 편집 추적
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: 로컬 파일의 편집을 추적하려면 이 페이지를 계속 열어두세요
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: 스크립트 업데이트 ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: 키 (문자열)

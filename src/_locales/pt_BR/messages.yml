@@ -91,7 +91,7 @@ buttonSaveClose:
   message: Salvar & Fechar
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Salvo
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Mostrar editor de estado
@@ -118,7 +118,9 @@ buttonVacuuming:
   message: Otimizando os dados...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Atualização automática está desativada para este script!
+    Clique em OK para atualizá-lo mesmo assim.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -246,7 +248,7 @@ headerRecycleBin:
   message: Lixeira
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Mostrar as instruções para scripts locais arrastados e soltos
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Inserir URL:'
