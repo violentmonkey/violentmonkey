@@ -678,7 +678,10 @@ export async function fetchResources(script, resourceCache, reqOptions) {
   const errors = await Promise.all([
     ...meta.require.map(url => snatch(url, S_REQUIRE)),
     ...Object.values(meta.resources).map(url => snatch(url, S_CACHE)),
-    isRemote(meta.icon) && snatch(meta.icon, S_CACHE, validateImage),
+    isRemote(meta.icon) && Promise.race([
+      makePause(1000), // ensures slow icons don't prevent installation/update
+      snatch(meta.icon, S_CACHE, validateImage),
+    ]),
   ]);
   if (!resourceCache?.ignoreDepsErrors) {
     const error = errors.map(formatHttpError)::trueJoin('\n');
