@@ -83,11 +83,12 @@
             <setting-check
                 name="trackLocalFile" ref="$track" class="btn-ghost" v-show="!tracking"
                 @change="trackLocalFile" :title="labelDefault"/>
-            <setting-check name="autoReloadTracked" v-show="tracking">
-              <tooltip :content="i18n('reloadTabTrackHint')">
-                {{i18n('reloadTab')}}
-              </tooltip>
-            </setting-check>
+            <tooltip :content="i18n('reloadTabTrackHint')" v-show="tracking">
+              <label class="setting-check">
+                <input type="checkbox" v-model="reloadTab">
+                <span v-text="i18n('reloadTab')" />
+              </label>
+            </tooltip>
           </template>
           <button v-text="i18n('buttonClose')" @click="closeTab"/>
           <div v-text="message" v-if="message" :title="error"
@@ -125,7 +126,6 @@ import VmExternals from '@/common/ui/externals';
 import SettingCheck from '@/common/ui/setting-check';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { deepEqual, objectPick } from '@/common/object';
-import options from '@/common/options';
 import { route } from '@/common/router';
 import { externalEditorInfoUrl } from '@/common/ui';
 
@@ -160,6 +160,7 @@ const listsShown = ref(true);
 const message = ref('');
 const scriptName = ref('...');
 const reinstall = ref(false);
+const reloadTab = ref(false);
 const safeIcon = ref();
 const sameCode = ref(false);
 const script = ref();
@@ -424,7 +425,7 @@ async function installScript(evt, parsedMeta) {
       from: infoVal.from,
       require: requireCache,
       cache: resourceCache,
-      reloadTab: options.get('autoReloadTracked'),
+      reloadTab: reloadTab.value,
     });
     const time = new Date().toLocaleTimeString(['fr']);
     const time0 = confirmedTime || (confirmedTime = time);

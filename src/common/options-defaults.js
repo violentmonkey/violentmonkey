@@ -20,7 +20,6 @@ export default {
   helpForLocalFile: true,
   trackLocalFile: false,
   autoReload: false,
-  autoReloadTracked: false,
   features: null,
   blacklist: null,
   syncScriptStatus: true,
