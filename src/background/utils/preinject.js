@@ -621,7 +621,7 @@ function detectStrictCsp(info, bag) {
     // Registering only without nonce, otherwise FF will incorrectly reuse it on tab reload
     return Promise.all([
       m,
-      registerScriptDataFF(bag[INJECT], info.url),
+      bag[CSAPI_REG] = registerScriptDataFF(bag[INJECT], info.url),
     ]);
   }
 }
