@@ -137,6 +137,12 @@
 
       <section>
         <h3 v-text="i18n('labelScriptTemplate')"/>
+        <p>
+          <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
+          <component v-for="(str, i) in i18n('descScriptTemplate').split(/<(\S+?)>/)" v-text="str"
+                     :key="i" :is="i % 2 ? 'code' : 'span'"
+          /> <vm-date-info/><!--DANGER! Using the same line to preserve the space-->
+        </p>
         <setting-text name="scriptTemplate" has-reset/>
       </section>
 
@@ -170,6 +176,7 @@ import VmExport from './vm-export';
 import VmSync from './vm-sync';
 import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
+import VmDateInfo from './vm-date-info';
 
 const badgeColorEnum = {
   badgeColor: i18n('titleBadgeColor'),
@@ -245,6 +252,7 @@ export default {
     VmSync,
     VmEditor,
     VmBlacklist,
+    VmDateInfo,
     SettingCheck,
     SettingText,
     LocaleGroup,
@@ -325,6 +333,11 @@ export default {
   }
   ruby {
     color: var(--fill-8);
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--fg);
   }
 }
 </style>

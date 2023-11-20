@@ -5,6 +5,7 @@ import {
   __CODE,
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
 } from '@/common/consts';
+import { formatDate } from '@/common/date';
 import { mapEntry } from '@/common/object';
 import { addOwnCommands, commands } from './init';
 import { getOption } from './options';
@@ -101,14 +102,14 @@ export function newScript(data) {
   const state = {
     url: '*://*/*',
     name: '',
-    date: new Date().toLocaleString(),
     ...data,
   };
   const code = getOption('scriptTemplate')
-  .replace(/{{(\w+)}}/g, (str, name) => {
-    const value = state[name];
-    return value == null ? str : value;
-  });
+  .replace(/{{(\w+)(?::(.+?))?}}/g, (str, name, format) => state[name] ?? (
+    name !== 'date' ? str
+      : format ? formatDate(format)
+        : new Date().toLocaleString()
+  ));
   const script = {
     custom: getDefaultCustom(),
     config: {

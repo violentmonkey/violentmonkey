@@ -4,11 +4,7 @@
       <button v-text="i18n('buttonExportData')" @click="handleExport" :disabled="exporting"/>
       <setting-text name="exportNameTemplate" ref="tpl" has-reset :has-save="false" :rows="1"
                     class="tpl flex flex-1 center-items ml-1c"/>
-      <tooltip :content="i18n('msgDateFormatInfo', dateTokens)" placement="left">
-        <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank">
-          <icon name="info"/>
-        </a>
-      </tooltip>
+      <vm-date-info/>
       <span hidden v-text="fileName"/>
     </div>
     <div class="mt-1">
@@ -32,21 +28,19 @@
 <script setup>
 import { computed, ref } from 'vue';
 import Modal from 'vueleton/lib/modal';
-import Tooltip from 'vueleton/lib/tooltip';
-import Icon from '@/common/ui/icon';
 import { getScriptName, sendCmdDirectly } from '@/common';
-import { formatDate, DATE_FMT } from '@/common/date';
+import { formatDate } from '@/common/date';
 import { objectGet } from '@/common/object';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
 import { downloadBlob } from '@/common/download';
 import loadZip from '@/common/zip';
+import VmDateInfo from './vm-date-info';
 
 let ua;
 
 const tpl = ref();
-const dateTokens = Object.keys(DATE_FMT).join(', ');
 const exporting = ref(false);
 const ffDownload = ref(IS_FIREFOX && {});
 const fileName = computed(() => {
@@ -148,11 +142,6 @@ async function exportData() {
 .export {
   .modal-content {
     width: 13rem;
-  }
-  .icon {
-    width: 16px;
-    height: 16px;
-    fill: var(--fg);
   }
   .tpl {
     max-width: 30em;
