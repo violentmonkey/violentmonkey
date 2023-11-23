@@ -3,7 +3,7 @@ name: Download AMO signed unlisted package
 on:
   workflow_dispatch:
     inputs:
-      ref:
+      version:
         required: true
   repository_dispatch:
     types:
@@ -11,12 +11,10 @@ on:
 
 jobs:
   amo-download:
-    if: ${{ github.event.client_payload.ref || github.event.inputs.ref }}
+    if: ${{ github.event.client_payload.version || github.event.inputs.version }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.client_payload.ref || github.event.inputs.ref }}
 
       - uses: actions/setup-node@v3
         with:
@@ -27,6 +25,7 @@ jobs:
         env:
           ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
+          VERSION: ${{ github.event.client_payload.version || github.event.inputs.version }}
 
       - name: Download signed file and upload to GitHub release
         run: |

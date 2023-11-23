@@ -1,4 +1,4 @@
-import { rename, writeFile } from 'fs/promises';
+import { rename, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { signAddon } from 'amo-upload';
 import { readManifest, buildUpdatesList } from './manifest-helper.js';
@@ -53,6 +53,7 @@ ${releaseUrl}
   });
 
   const xpiFile = join(process.env.ASSETS_DIR, fileName);
+  await mkdir(process.env.ASSETS_DIR, { recursive: true });
   await rename(tempFile, xpiFile);
 
   const updates = await buildUpdatesList(version, url);

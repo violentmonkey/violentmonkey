@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const { getVersion, isBeta } = require('./version-helper');
 const { exec } = require('./common');
 
-const version = getVersion();
+const version = process.env.VERSION || getVersion();
 const beta = isBeta();
 const ci = process.argv.includes('ci');
 
