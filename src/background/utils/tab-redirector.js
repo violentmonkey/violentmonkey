@@ -31,10 +31,10 @@ addPublicCommands({
     /** @namespace VM.ConfirmCache */
     cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, fs, ff: FIREFOX });
     const confirmUrl = CONFIRM_URL_BASE + confirmKey;
-    const { windowId } = canReplaceCurTab
+    const { [kWindowId]: windowId } = canReplaceCurTab
       ? await browser.tabs.update(tabId, { url: confirmUrl })
       : await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
-    if (active && windowId !== tab.windowId) {
+    if (active && windowId !== tab[kWindowId]) {
       await browserWindows?.update(windowId, { focused: true });
     }
   },

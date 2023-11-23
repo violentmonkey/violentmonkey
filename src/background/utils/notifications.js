@@ -65,7 +65,10 @@ function notifyOpener(id, isClick) {
   } else if (op > 0) {
     if (isClick) clearZombieTimer(op);
   } else if (op[kZombie]) {
-    if (isClick) commands.TabOpen({ url: op[kZombieUrl] }, op);
+    if (isClick) {
+      commands.TabOpen({ url: op[kZombieUrl] }, op);
+      removeNotification(id); // Chrome doesn't auto-remove it on click
+    }
   } else {
     sendTabCmd(op.tab.id, isClick ? 'NotificationClick' : 'NotificationClose', id, {
       [kFrameId]: op[kFrameId],
@@ -73,7 +76,7 @@ function notifyOpener(id, isClick) {
   }
 }
 
-export function clearNotifications(tabId, frameId) {
+export function clearNotifications(tabId, frameId, tabRemoved) {
   for (const nid in openers) {
     const op = openers[nid];
     if (isObject(op)
@@ -83,6 +86,7 @@ export function clearNotifications(tabId, frameId) {
       if (op[kZombieTimeout]) {
         op[kZombie] = setTimeout(removeNotification, op[kZombieTimeout], nid);
         if (!op[kZombieUrl]) openers[nid] = op[kZombie];
+        if (tabRemoved) op._removed = true;
       } else {
         removeNotification(nid);
       }

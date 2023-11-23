@@ -260,17 +260,17 @@ export function decodeFilename(filename) {
   return filename.replace(/-([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(parseInt(g, 16)));
 }
 
-export async function getActiveTab() {
+export async function getActiveTab(windowId = -2 /*chrome.windows.WINDOW_ID_CURRENT*/) {
   return (
     await browser.tabs.query({
       active: true,
-      currentWindow: true,
+      [kWindowId]: windowId,
     })
   )[0] || browserWindows && (
     // Chrome bug workaround when an undocked devtools window is focused
     await browser.tabs.query({
       active: true,
-      windowId: (await browserWindows.getCurrent()).id,
+      [kWindowId]: (await browserWindows.getCurrent()).id,
     })
   )[0];
 }

@@ -73,13 +73,16 @@ addPublicCommands({
     insert = true,
     pinned,
   }, src = {}) {
+    const isRemoved = src._removed;
     // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
-    const srcTab = src.tab || await getActiveTab() || {};
+    const srcTab = !isRemoved && src.tab
+      || await getActiveTab(isRemoved && src.tab[kWindowId])
+      || {};
     // src.url may be absent when invoked directly as commands.TabOpen
     const srcUrl = src.url;
     const isInternal = !srcUrl || srcUrl.startsWith(extensionRoot);
     // only incognito storeId may be specified when opening in an incognito window
-    const { incognito, windowId } = srcTab;
+    const { incognito, [kWindowId]: windowId } = srcTab;
     const canOpenIncognito = !incognito || IS_FIREFOX || !/^(chrome[-\w]*):/.test(url);
     const tabOpts = {
       // normalizing as boolean because the API requires strict types
@@ -88,6 +91,7 @@ addPublicCommands({
     };
     let newTab;
     // Chrome can't open chrome-xxx: URLs in incognito windows
+    // TODO: for src._removed maybe create a new window if cookieStoreId of active tab is different
     let storeId = srcTab.cookieStoreId;
     if (storeId && !incognito) {
       if (!cookieStorePrefix) {
@@ -135,16 +139,16 @@ addPublicCommands({
         ...tabOpts,
         ...storeId,
         ...canOpenIncognito && {
-          windowId,
+          [kWindowId]: windowId,
           ...insert && { index: srcTab.index + 1 },
           ...openerTabIdSupported && { openerTabId: srcTab.id },
         },
       });
     }
-    if (active && newTab.windowId !== windowId) {
-      await browserWindows?.update(newTab.windowId, { focused: true });
+    if (active && newTab[kWindowId] !== windowId) {
+      await browserWindows?.update(newTab[kWindowId], { focused: true });
     }
-    if (!isInternal) {
+    if (!isInternal && srcTab.id != null) {
       openers[newTab.id] = srcTab.id;
     }
     return isInternal ? newTab : { id: newTab.id };
@@ -156,7 +160,7 @@ addPublicCommands({
   },
   TabFocus(_, src) {
     browser.tabs.update(src.tab.id, { active: true }).catch(noop);
-    browserWindows?.update(src.tab.windowId, { focused: true }).catch(noop);
+    browserWindows?.update(src.tab[kWindowId], { focused: true }).catch(noop);
   },
 });
 
@@ -204,7 +208,7 @@ export async function openDashboard(route, src) {
     const tabUrl = tab.url;
     // query() can't handle #hash so it returns tabs both with #hash and without it
     if (tabUrl === url || !route && tabUrl === url + ROUTE_SCRIPTS) {
-      browserWindows?.update(tab.windowId, { focused: true });
+      browserWindows?.update(tab[kWindowId], { focused: true });
       return browser.tabs.update(tab.id, { active: true });
     }
   }

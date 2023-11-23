@@ -632,7 +632,7 @@ function isPageRealmScript(scr) {
 }
 
 function onTabRemoved(id /* , info */) {
-  clearFrameData(id);
+  clearFrameData(id, 0, true);
   delete skippedTabs[id];
 }
 
@@ -640,10 +640,10 @@ function onTabReplaced(addedId, removedId) {
   onTabRemoved(removedId);
 }
 
-function clearFrameData(tabId, frameId) {
+function clearFrameData(tabId, frameId, tabRemoved) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
-  clearNotifications(tabId, frameId);
+  clearNotifications(tabId, frameId, tabRemoved);
 }
 
 function checkVivaldi(tab) {
