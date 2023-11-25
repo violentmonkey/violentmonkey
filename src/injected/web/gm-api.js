@@ -95,9 +95,10 @@ export const GM_API = {
     /** @this {GMContext} */
     GM_registerMenuCommand(text, cb, opts) {
       opts = nullObjFrom(opts);
-      opts.text = text;
+      opts.text = text = `${text}`;
+      if (!text) throw new SafeError('Menu caption text is required!');
       const { id } = this;
-      const key = opts.id || (opts.id = safeGetUniqId());
+      const key = opts.id || text;
       const cmd = ensureNestedProp(commands, id, key);
       cmd.cb = cb;
       cmd.text = text;
