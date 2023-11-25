@@ -9,7 +9,7 @@ const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
   || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
-const NEWTAB_URL_RE = re`/
+export const NEWTAB_URL_RE = re`/
 ^(
   about:(home|newtab) # Firefox
   | (chrome|edge):\/\/(

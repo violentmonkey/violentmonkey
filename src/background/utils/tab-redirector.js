@@ -3,7 +3,7 @@ import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { parseMeta, isUserScript } from './script';
-import { fileSchemeRequestable, getTabUrl, tabsOnUpdated } from './tabs';
+import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
@@ -27,7 +27,7 @@ addPublicCommands({
     const canReplaceCurTab = (!incognito || IS_FIREFOX) && (
       url === from
       || cache.has(`autoclose:${tabId}`)
-      || /^(chrome:\/\/(newtab|startpage)\/|about:(home|newtab))$/.test(from));
+      || NEWTAB_URL_RE.test(from));
     /** @namespace VM.ConfirmCache */
     cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, fs, ff: FIREFOX });
     const confirmUrl = CONFIRM_URL_BASE + confirmKey;
