@@ -146,6 +146,9 @@ descEditorOptions:
     href="https://github.com/codemirror/CodeMirror/tree/master/theme"
     target="_blank" rel="noopener noreferrer">CSS du thème en lui-même</a> dans
     le champ « Style personnalisé » ci-dessous.
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'

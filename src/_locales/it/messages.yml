@@ -143,6 +143,9 @@ descEditorOptions:
     Violentmonkey. Vedi l'<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">elenco completo</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentazione sul blocco di metadati userscript e <code>GM</code> API:'

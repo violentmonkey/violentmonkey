@@ -142,6 +142,9 @@ descEditorOptions:
     alguns deles podem não funcionar no Violentmonkey. Consulte à <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -209,7 +212,14 @@ failureReasonNoninjectable:
     políticas, motor de pesquisa de site no Opera)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Existem vários métodos para instalar ou rastrear edições em um arquivo
+    local: <1> Arraste e solte o arquivo em uma página ou pop-up aberto do
+    Violentmonkey, incluindo este. <2> Instale um servidor HTTP local para este
+    arquivo e abra-o via http://localhost. <3> Habilite "Permitir acesso a URLs
+    de arquivos" nos detalhes do Violentmonkey na página chrome://extensions.
+    Isto é perigoso porque qualquer script de usuário pode ler qualquer arquivo
+    local.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: Ordem alfabética
