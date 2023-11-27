@@ -140,6 +140,12 @@ descEditorOptions:
     werken gegarandeerd in Violentmonkey. Bekijk de <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">volledige lijst</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: >-
+    Ondersteunde variabelen: <{{name}}>, <{{url}}>, <{{date}}>,
+    <{{date:format}}> met een met MomentJS compatibel formaat, bijvoorbeeld
+    <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-

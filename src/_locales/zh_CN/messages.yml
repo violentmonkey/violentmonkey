@@ -137,6 +137,9 @@ descEditorOptions:
     "smartIndent":true}</code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完整列表</a>。
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：

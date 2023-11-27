@@ -143,6 +143,9 @@ descEditorOptions:
     Violentmonkey'de çalışmayabililir. Tüm listeyi görmek için <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">tıklayın</a>
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Kullanıcı betiği üstveri bloğu  ve <code>GM</code> API dökümanları:'

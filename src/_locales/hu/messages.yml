@@ -146,6 +146,12 @@ descEditorOptions:
     hogy van amelyik nem működik a Violentmonkey-n belül. Itt a <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">teljes lista</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: >-
+    Támogatott változók: <{{name}}>, <{{url}}>, <{{date}}> és
+    <{{date:formátum}}>, ami a MomentJS formátumaival kompatibilis, pl.
+    <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentáció a userscript metaadat blokkjához és a <code>GM</code> API-hoz:'

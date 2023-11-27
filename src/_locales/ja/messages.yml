@@ -137,6 +137,11 @@ descEditorOptions:
     "smartIndent":true}</code> のように指定します。 一部の設定はViolentmonkeyでは動作しないことがあります。<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完全な解説</a>をご覧ください。
+descScriptTemplate:
+  description: Description of script template section.
+  message: >-
+    使用可能な変数: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}> はMomentJS互換、例
+    <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'ユーザースクリプトのメタデータ部分と <code>GM</code> API の説明文書:'
@@ -192,7 +197,7 @@ failureReasonNoninjectable:
     failureBlacklistedUrl)
   message: |-
     このページでユーザースクリプトを実行できません
-    (よくある例: ブラウザーのUI、拡張機能、ポリシーによるブロック済み、Operaの検索サイト)
+    (一般例: ブラウザーのUI、拡張機能、ポリシーにてブロック済み、Operaの検索サイト)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -373,7 +378,7 @@ labelFeedback:
   message: 意見や報告
 labelFilterSort:
   description: Label for sort filter.
-  message: $1 で並べ替え
+  message: $1 に並べ替え
 labelGeneral:
   description: Label for general settings.
   message: 基本設定
@@ -441,7 +446,7 @@ labelNotifyUpdatesGlobal:
   message: スクリプトごとの通知を無視 (エディタの「設定」タブ内)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ポップアップ内のスクリプトを $1 で並べ替え
+  message: ポップアップ内のスクリプトを $1 に並べ替え
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: 個人情報保護方針
@@ -604,10 +609,10 @@ menuNewScript:
   message: スクリプトを新規作成
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: スクリプトは無効
+  message: スクリプト無効
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: スクリプトは有効
+  message: スクリプト有効
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: 更新を確認中…
@@ -857,7 +862,7 @@ titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
     * <Enter> キーで自動補完の履歴に文字列を追加
-    * 対応する正規表現の構文: /条件/ また /条件/フラグ
+    * 使用できる正規表現の構文: /条件/ や /条件/フラグ
 trackEdits:
   description: Button in a script installation dialog.
   message: 外部での編集を追跡

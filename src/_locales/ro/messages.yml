@@ -141,6 +141,9 @@ descEditorOptions:
     că unele dintre ele pot să nu funcționeze în Violentmonkey. Vezi <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completă</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-

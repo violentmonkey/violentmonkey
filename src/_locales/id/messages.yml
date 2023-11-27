@@ -145,6 +145,9 @@ descEditorOptions:
     href="https://github.com/codemirror/CodeMirror/tree/master/theme"
     target="_blank" rel="noopener noreferrer">kode CSS tema</a> di dalam kotak
     "Gaya Khusus" di bawah.
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentasi tentang blok data meta skrip dan API <code>GM</code>:'

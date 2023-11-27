@@ -137,6 +137,9 @@ descEditorOptions:
     "smartIndent":true}</code>）進行個人化設定。然而，請留意，某些自定義選項可能在暴力猴中無法正常使用。詳細的選項列表，請參考<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完整清單</a>。
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 使用者腳本詮釋資料區塊和 <code>GM</code> API 的文件：

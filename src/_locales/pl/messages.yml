@@ -142,6 +142,11 @@ descEditorOptions:
     że niektóre z nich mogą nie działać w Violentmonkey. Zobacz <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">pełną listę</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: >-
+    Obsługiwane zmienne: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}> w
+    formacie zgodnym z MomentJS, np <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -806,7 +811,7 @@ optionPopupGroupDisabled:
   message: Grupuj wyłączone skrypty
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Grupuj wg metadanych @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ukryj wyłączone skrypty
@@ -846,7 +851,7 @@ readonlyOpt:
   message: Zezwól na edycję
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: (następna aktualizacja je zastąpi)
+  message: (następna aktualizacja ją zastąpi)
 reinstall:
   description: Button to reinstall a script
   message: Zainstaluj ponownie
@@ -876,7 +881,9 @@ skipScripts:
   message: Odśwież stronę pomijając skrypty
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Wyłączyłeś skrypty użytkownika dla tej strony. Aby je uruchomić, załaduj
+    ponownie lub nawiguj w karcie.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: ''

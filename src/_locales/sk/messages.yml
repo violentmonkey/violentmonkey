@@ -142,6 +142,11 @@ descEditorOptions:
     nemusia byť funkčné vo Violentmonkey. Pozri <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">celý zoznam</a>.
+descScriptTemplate:
+  description: Description of script template section.
+  message: >-
+    Podporované premenné: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    formát kompatibilný s MomentJS, napríklad <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentácia k bloku metadát požívateľského skriptu a <code>GM</code> API:'

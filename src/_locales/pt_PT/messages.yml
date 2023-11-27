@@ -137,6 +137,9 @@ descEditorOptions:
     como: {"indentUnit":2, "smartIndent":true}. No entanto, tenha em atenção que
     algumas poderão não funcionar com o Violentmonkey. Lista completa:
     https://codemirror.net/doc/manual.html#config
+descScriptTemplate:
+  description: Description of script template section.
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
