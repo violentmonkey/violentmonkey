@@ -7,6 +7,7 @@ import { popupTabs } from './popup-tracker';
 import storage from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
+import { FIREFOX } from './ua';
 
 /** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
 const SIZES = [16, 32];
@@ -133,7 +134,7 @@ tabsOnUpdated.addListener((tabId, { url }, tab) => {
     const [title] = getFailureReason(url);
     if (title) updateState(tab, resetBadgeData(tabId), title);
   }
-}, ...IS_FIREFOX >= 61 ? [{ properties: ['status'] }] : []);
+}, ...FIREFOX >= 61 ? [{ properties: ['status'] }] : []);
 
 function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js

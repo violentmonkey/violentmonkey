@@ -10,6 +10,9 @@ global.browser = {
       },
     },
   },
+  extension: {
+    isAllowedFileSchemeAccess: () => false,
+  },
   runtime: {
     getURL: path => path,
     getManifest: () => ({

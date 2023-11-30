@@ -82,8 +82,8 @@ async function maybeInstallUserJs(tabId, url) {
 if (virtualUrlRe) {
   tabsOnUpdated.addListener(
     (tabId, { url }) => url && maybeRedirectVirtualUrlFF(tabId, url),
-    ...IS_FIREFOX >= 61
-      ? [{ properties: [IS_FIREFOX >= 88 ? 'url' : 'status'] }]
+    ...FIREFOX >= 61
+      ? [{ properties: [FIREFOX >= 88 ? 'url' : 'status'] }]
       : []
   );
 }

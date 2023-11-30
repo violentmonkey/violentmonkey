@@ -62,6 +62,6 @@ export const isPromise = (proto => val => isInstance(val, proto))(SafePromise[PR
 const { document } = global;
 export const { getElementsByTagName } = document;
 export const REIFY = 'reify';
-export let IS_FIREFOX = !chrome.app;
+export let IS_FIREFOX = global !== window; // true in Firefox content script context
 /** @type {VMTopRenderMode} */
 export let topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
