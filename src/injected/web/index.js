@@ -105,7 +105,9 @@ addHandlers({
     else if (IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
   },
   Expose(allowGetScriptVer) {
-    external[VIOLENTMONKEY] = {
+    const key = 'external';
+    const obj = window[key];
+    (isObject(obj) ? obj : (window[key] = {}))[VIOLENTMONKEY] = {
       version: process.env.VM_VER,
       isInstalled: (name, namespace) => (
         allowGetScriptVer
