@@ -139,6 +139,10 @@ function inferScriptHome(script) {
   if (u) {
     u = u.split('/', 6);
     switch (u[2]) {
+    case 'update.greasyfork.org':
+    case 'update.sleazyfork.org':
+      u[2] = u[2].slice(7);
+      // fallthrough
     case 'greasyfork.org':
     case 'sleazyfork.org':
       if (u[3] !== 'scripts') u.splice(3, 1);
