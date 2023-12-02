@@ -217,11 +217,13 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
     iconData[n] = iconDataCache[url]
       || await (iconCache[url] || (iconCache[url] = loadIcon(url))) && iconDataCache[url];
   }
+  // Caching own icon to improve dashboard loading speed, as well as browserAction API
+  // (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab).
   // imageData doesn't work in Firefox Android, so we also set path here
   browserAction.setIcon({
     tabId,
     path: pathData,
-    imageData: iconData,
+    imageData: IS_ORION ? null : iconData, // temporary fix is required for Orion to display the correct icons.
   });
 }
 
