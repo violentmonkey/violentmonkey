@@ -1,0 +1,5 @@
+[codespell]
+skip = .git,*.pdf,*.svg,*.lock,*.css,.codespellrc
+check-hidden = true
+# ignore-regex = 
+# ignore-words-list =
