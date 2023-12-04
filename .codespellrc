@@ -1,5 +1,5 @@
 [codespell]
-skip = .git,*.pdf,*.svg,*.lock,*.css,.codespellrc
+skip = .git,*.pdf,*.svg,*.lock,*.css,.codespellrc,_locales
 check-hidden = true
-# ignore-regex = 
+ignore-regex = \buseRe\b|.*_RE =.*|\bte\|
 # ignore-words-list =
