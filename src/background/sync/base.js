@@ -23,9 +23,9 @@ let working = Promise.resolve();
 let syncConfig;
 
 export function getItemFilename({ name, uri }) {
-  // When get or remove, current name should be prefered
+  // When get or remove, current name should be preferred
   if (name) return name;
-  // otherwise uri derived name should be prefered
+  // otherwise uri derived name should be preferred
   // uri is already encoded by `encodeFilename`
   return `vm@2-${uri}`;
 }
