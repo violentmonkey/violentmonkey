@@ -12,6 +12,9 @@ const {
 } = global;
 const { createElementNS } = document;
 const tdDecode = SafeTextDecoder[PROTO].decode;
+const kTextContent = 'textContent';
+// required in FF to circumvent CSP style-src https://bugzil.la/1706787
+const setTextContent = describeProperty(Node[PROTO], kTextContent).set;
 const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
 const { createObjectURL } = URL;
 
@@ -39,10 +42,10 @@ export const onElement = (tag, cb, arg) => new SafePromise(resolve => {
 export const makeElem = (tag, attrs) => {
   const el = document::createElementNS('http://www.w3.org/1999/xhtml', tag);
   if (attrs && isString(attrs)) {
-    el::append(attrs);
+    el::setTextContent(attrs);
   } else if (attrs) {
     objectKeys(attrs)::forEach(key => {
-      if (key === 'textContent') el::append(attrs[key]);
+      if (key === kTextContent) el::setTextContent(attrs[key]);
       else el::setAttribute(key, attrs[key]);
     });
   }
