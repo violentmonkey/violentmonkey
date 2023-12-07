@@ -63,7 +63,7 @@ addBackgroundHandlers({
       return;
     }
     let response = data?.[kResponse];
-    if (response) {
+    if (response != null) {
       if (msg.blobbed) {
         response = await importBlob(req, response);
       } else if (msg.chunked) {
