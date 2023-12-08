@@ -28,6 +28,10 @@ async function main() {
     addonId: manifest.browser_specific_settings.gecko.id,
     addonVersion: version,
     channel: beta ? 'unlisted' : 'listed',
+    compatibility: {
+      android: { min: '121.0a1' },
+      firefox: { min: '57.0' },
+    },
     ...(process.env.AMO_PUBLISH
       ? {
           distFile: beta
