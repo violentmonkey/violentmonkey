@@ -6,7 +6,7 @@ class GroupAssetsPlugin {
       HtmlWebpackPlugin.getHooks(compilation).alterAssetTagGroups.tapAsync(
         'GroupAssetsPlugin', (data, callback) => {
           this.groupAssets(data);
-          console.log('grouped', data);
+          // console.log('grouped', data);
           callback(null, data);
         }
       );

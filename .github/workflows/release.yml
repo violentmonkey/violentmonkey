@@ -102,4 +102,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node -e 'import("./scripts/release-helper.mjs").then(({ ensureRelease }) => ensureRelease())';
+          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';

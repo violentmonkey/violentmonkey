@@ -2620,10 +2620,10 @@ ajv@^8.0.0, ajv@^8.9.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-amo-upload@^0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/amo-upload/-/amo-upload-0.5.4.tgz#47b5a5a599ae3be1bf74a9485767fc45d5d060d3"
-  integrity sha512-43VQ1ewDjfNuulUeT6XqCQCOyXA99B2j904mnqIlCp6RiziM/i03UMN/LAnBZPBAF/9MgZxSBIB0XEWABCpE2Q==
+amo-upload@^0.5.5:
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/amo-upload/-/amo-upload-0.5.5.tgz#b2bdbc135ba70dc2997b0402630a844d1e186623"
+  integrity sha512-WqkbKXWWzKq9x3wVNMnJDOE5U5qh5s0HXsbqAqZlBHd4Xe4Wl4XFjGnKklyr1JLaYMAs6pRz2uF/mL5j77qq8w==
   dependencies:
     "@babel/runtime" "^7.22.15"
     commander "^11.0.0"
