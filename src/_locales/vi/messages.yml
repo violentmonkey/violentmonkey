@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Áp dụng
 buttonCancel:
   description: Cancel button on dialog.
   message: Hủy
@@ -89,7 +89,7 @@ buttonSaveClose:
   message: Lưu & Đóng
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Đã lưu
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Các cài đặt mẫu
@@ -101,7 +101,7 @@ buttonUndo:
   message: Hoàn tác
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Cập nhật
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Kiểm tra cập nhật tất cả
@@ -116,7 +116,9 @@ buttonVacuuming:
   message: Làm trống dữ liệu...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Tự động cập nhật bị vô hiệu hóa cho kịch bản này!
+    Nhấp Đồng ý để cập nhật nó.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -140,7 +142,9 @@ descEditorOptions:
     rel="noopener noreferrer">Xem chi tiết.</a>
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Các biến được hỗ trợ: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    với định dạng tương thích MomentJS, ví dụ như <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Các tài liệu về API đọc ở đây:'
@@ -158,7 +162,7 @@ editLabelSettings:
   message: Cài đặt Script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Dòng quá dài
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: >-
@@ -200,7 +204,13 @@ failureReasonNoninjectable:
   message: Violentmonkey không hoạt động ở đây.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Có một số phương pháp để cài đặt hoặc theo dõi chỉnh sửa trong một tệp cục
+    bộ: <1> Kéo và thả tệp vào một trang hoặc cửa sổ Violentmonkey đang mở, bao
+    gồm cả trang này. <2> Cài đặt một máy chủ HTTP cục bộ cho tệp này và mở nó
+    qua http://localhost. <3> Bật "Cho phép truy cập vào URL tệp" trong chi tiết
+    cho Violentmonkey trong trang chrome://extensions. Điều này nguy hiểm vì bất
+    kỳ tập lệnh người dùng nào cũng có thể đọc bất kỳ tệp cục bộ nào.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: thứ tự bảng chứ cái
@@ -221,7 +231,7 @@ filterScopeName:
   message: Tên
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: kích thước
 genericError:
   description: Label for generic error.
   message: Lỗi
@@ -239,7 +249,7 @@ headerRecycleBin:
   message: Thùng rác
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Hiển thị hướng dẫn cho việc kéo và thả các tập lệnh cục bộ.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
@@ -254,7 +264,7 @@ hintVacuum:
   message: Bỏ qua dữ liệu thừa và cố gắng tải lại nguồn dữ liệu thiếu từ bộ nhớ đệm.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Cài đặt
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Cài đặt từ $1
@@ -365,7 +375,7 @@ labelExposeStatus:
     dùng: $1
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Chế độ $1 thay thế trong Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: ''
@@ -555,7 +565,7 @@ labelXhrInjectHint:
     chuột phải vào một cảnh báo.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (trừ chế độ ẩn danh và các trang web với cookie bị vô hiệu hóa)
 lastSync:
   description: Label for last sync timestamp.
   message: Đồng bộ cuối lúc $1

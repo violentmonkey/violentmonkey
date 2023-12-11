@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Применить
 buttonCancel:
   description: Cancel button on dialog.
   message: Отмена
@@ -20,17 +20,17 @@ buttonConfirmReinstallation:
   touched: false
 buttonDisable:
   description: Button to disable a script.
-  message: Выключить
+  message: Отключить
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Скачать темы
   touched: false
 buttonEdit:
   description: Button to edit a script.
-  message: Редактировать
+  message: Править
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: Вы также можете щелкнуть ПКМ, Ctrl+ЛКМ или СКМ на имени скрипта.
+  message: Вы также можете щёлкнуть ПКМ, Ctrl+ЛКМ или СКМ по имени скрипта.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Очистить корзину!
@@ -62,7 +62,7 @@ buttonNew:
   message: Создать
 buttonOK:
   description: OK button on dialog.
-  message: OK
+  message: ОК
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Корзина
@@ -89,7 +89,7 @@ buttonSaveClose:
   message: Сохранить и закрыть
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Сохранено
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Показать настройки редактора
@@ -98,10 +98,10 @@ buttonSupport:
   message: Страница поддержки
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Отменить
+  message: Откатить
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Обновить
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Проверить обновления скриптов
@@ -116,15 +116,17 @@ buttonVacuuming:
   message: Очистка и сжатие кэша...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Автообновление отключено для этого скрипта!
+    Щёлкните ОК, чтобы обновить его в любом случае.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     Изменения не сохранены!
-    Нажмите OK, чтобы выйти или Отмена, чтобы вернуться.
+    Нажмите ОК, чтобы выйти, или Отмена, чтобы вернуться.
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: URL из этого списка не будут обрабатываться скриптами.
+  message: URL-адреса из этого списка не будут обрабатываться скриптами.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -140,7 +142,10 @@ descEditorOptions:
     rel="noopener noreferrer">полный список</a>.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Поддерживаемые переменные: <{{name}}>, <{{url}}>, <{{date}}>,
+    <{{date:format}}> с совместимым с MomentJS форматом, например,
+    <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Документация по блоку метаданных скриптов и <code>GM</code> API:'
@@ -149,7 +154,7 @@ editHelpKeyboard:
   message: 'Сочетания клавиш:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: Использовать другой редактор?
+  message: Как сменить редактор?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Пользовательские метаданные
@@ -161,11 +166,13 @@ editLongLine:
   message: Слишком длинная строка
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: |-
-    Эта строка слишком длинная и ее текст свернут,
-    чтобы избежать задержек при редактировании.
-    Вы можете настроить лимит в доп. настройках,
-    например:\"maxDisplayLength\": 20000
+  message: >-
+    Слишком длинная строка, её текст свёрнут, чтобы избежать задержек при
+    правке.
+
+    Вы можете настроить ограничение в доп. настройках, например:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Код
@@ -181,18 +188,18 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: Показать/отредактировать хранилище значений скрипта
+  message: Показать/править всё хранилище значений скрипта
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: >-
-    Violentmonkey - менеджер пользовательских скриптов для множества браузеров,
-    с открытым исходным кодом.
+    Менеджер пользовательских скриптов с открытым исходным кодом для различных
+    браузеров
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Черный список Violentmonkey
+  message: Чёрный список Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
@@ -200,11 +207,18 @@ failureReasonNoninjectable:
   message: >-
     Violentmonkey не может запускать скрипты на этой странице
 
-    (например: UI браузера, расширение, блокировка настройками политики,
-    поисковой сайт в Opera)
+    (частые случаи: интерфейс браузера, расширение, заблокировано политикой,
+    сайт поисковой системы в Opera)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Существует несколько способов установки или отслеживания правок в локальном
+    файле: <1>Перетащите файл на открытую страницу Violentmonkey или во
+    всплывающее окно, включая это. <2>Установите локальный HTTP-сервер для этого
+    файла и откройте его через http://localhost. <3>Включите «Разрешить
+    открывать локальные файлы по ссылкам» в сведениях Violentmonkey на странице
+    chrome://extensions. Это опасно, так как любой пользовательский скрипт может
+    прочитать любой локальный файл.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавитному порядку
@@ -231,7 +245,7 @@ genericError:
   message: Ошибка
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: выключено
+  message: отключено
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
   message: включено
@@ -243,13 +257,13 @@ headerRecycleBin:
   message: Корзина
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Показать инструкцию по перетаскиванию локальных скриптов
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введите URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Удаленные скрипты просуществуют еще 7 дней в этом списке.
+  message: Удалённые скрипты представлены здесь и хранятся в течение 7 дней.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Использовать @downloadURL
@@ -258,7 +272,7 @@ hintVacuum:
   message: Сбросить избыточный кэш и попробовать подгрузить недостающие ресурсы.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Установить
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Установить с $1
@@ -316,7 +330,7 @@ labelBadgeUnique:
   message: кол-во уникальных запущенных скриптов
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Черный список
+  message: Чёрный список
 labelContributors:
   description: Label for link to contributors.
   message: Участники
@@ -343,16 +357,16 @@ labelDownloadURL:
   message: 'URL загрузки:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: Редактировать скрипт
+  message: Правка значения скрипта
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: Редактирование хранилища скриптов
+  message: Правка хранилища скрипта
 labelEditor:
   description: Label for Editor settings
   message: Редактор
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: только включённые скрипты
 labelExclude:
   description: Label of @exclude rules.
   message: '@exclude правила исключения'
@@ -367,10 +381,14 @@ labelExposeStatus:
   message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Альтернативный режим $1 в Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Альтернативный способ внедрения для скриптов <document-start> с Firefox 59,
+    более быстрый, чем режим по умолчанию. Как и «Режим синхронных страниц», он
+    также увеличивает потребление памяти, поэтому вы можете отключить его, если
+    ваши скрипты работают верно без этого параметра.
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
@@ -382,7 +400,7 @@ labelGeneral:
   message: Общие настройки
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Помощь с переводом
+  message: Помочь переводу
 labelHomepage:
   description: Label for home page in about tab.
   message: Домашняя страница
@@ -402,7 +420,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: 'Режим инъекции: '
+  message: 'Режим внедрения: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Установка скрипта...
@@ -458,7 +476,7 @@ labelRelated:
   message: 'Ссылки по теме: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Удален в $1
+  message: Удалён в $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Заменить на: '
@@ -497,7 +515,7 @@ labelSyncAuthorizing:
   message: Авторизация...
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ничем
+  message: Нет
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Пароль: '
@@ -510,13 +528,13 @@ labelSyncRevoke:
   message: Выйти
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Синхронизировать статус скриптов.
+  message: Синхронизировать состояние скриптов.
 labelSyncServerUrl:
   description: Label for input to hold server URL.
   message: 'URL сервера:'
 labelSyncService:
   description: Label for sync service select.
-  message: Синхронизировать с
+  message: Синхронизация через
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Логин:'
@@ -546,25 +564,25 @@ labelXhrInject:
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
-    Включите только в случае, если у вас есть сценарий, который должен быть
+    Включите только в случае, если у вас есть скрипт, который должен быть
     запущен до начала загрузки страницы, и в настоящее время он выполняется
-    слишком поздно. Как и режим Instant injection в Tampermonkey, этот вариант
-    использует устаревший синхронный XHR, поэтому в Chrome/Chromium будут
-    предупреждения в консоли devtools, но вы можете игнорировать их, поскольку
-    негативные последствия незначительны. Скрыть предупреждения можно щелкнув
-    ПКМ на одном из них
+    слишком поздно. Как и режим мгновенного внедрения в Tampermonkey, этот
+    вариант использует устаревший синхронный XHR, поэтому в Chrome/Chromium
+    будут предупреждения в консоли devtools, но вы можете игнорировать их,
+    поскольку негативные последствия незначительны. Скрыть предупреждения можно,
+    щёлкнув ПКМ на одном из них
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (кроме инкогнито и сайтов с отключёнными куки)
 lastSync:
   description: Label for last sync timestamp.
   message: Последняя синхронизация в $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Подробнее о шаблонах черного списка
+  message: Подробнее о шаблонах чёрного списка.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: Подробнее о режимах инъекций
+  message: Подробнее о режимах внедрения.
 menuCommands:
   description: Menu item to list script commands.
   message: Команды скриптов
@@ -584,12 +602,12 @@ menuExcludeHint:
     если вы включили эту опцию в общих настройках.
     Чтобы применить изменения к остальным вкладкам,
     перезагрузите их вручную.
-    Настраивается в \"Настройки\" редактора.
+    Регулируется в «Настройках» редактора.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Обратная связь
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Найти скрипты для этого сайта
@@ -603,13 +621,13 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: Совпадающие отключенные скрипты
+  message: Подходящие отключённые скрипты
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Суб-фреймы скриптов
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Совпадающие скрипты
+  message: Подходящие скрипты
 menuNewScript:
   description: Menu item to create a new script.
   message: Создать новый скрипт
@@ -625,8 +643,8 @@ msgCheckingForUpdate:
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
-    Нажмите, чтобы открыть документацию MomentJS. Разрешенные маркеры:
-    $1Используйте [квадратные скобки] для защиты буквального текста.
+    Щёлкните, чтобы открыть документацию MomentJS. Разрешённые маркеры: $1.
+    Используйте [квадратные скобки] для защиты буквального текста.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -637,7 +655,7 @@ msgErrorFetchingScript:
   message: Ошибка при загрузке скрипта!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Не удается проверить наличие обновлений.
+  message: Не удалось получить сведения об обновлениях.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
@@ -682,17 +700,19 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Не хватает необходимых ресурсов.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: Конфликт пространства имен скрипта. Измените @name и @namespace.
+  message: |-
+    Конфликт пространства имён скрипта. 
+    Пожалуйста, смените @name и @namespace здесь или исправьте этот скрипт.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Скрипт с такими же @name и @namespace уже установлен.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -703,12 +723,12 @@ msgNoUpdate:
   message: Обновления не найдены.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Ошибка при обновлении скриптов. Щёлкните, чтобы открыть их.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Пожалуйста, пересохраните или переустановите эти скрипты:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (код такой же)'
@@ -730,19 +750,19 @@ msgSavedScriptTemplate:
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: Скрипт [$1] обновлен!
+  message: Скрипт [$1] обновлён!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Показать/скрыть
 msgSyncError:
   description: Message shown when sync failed.
-  message: Ошибка синхронизации.
+  message: Ошибка синхронизации!
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: Инициализация...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Ошибка инициализации синхронизации!
+  message: Ошибка запуска синхронизации!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
   message: Еще не авторизован
@@ -754,10 +774,10 @@ msgSyncing:
   message: Синхронизация...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Ошибка синтаксиса?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Скрипт обновлен.
+  message: Скрипт обновлён.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Обновление...
@@ -782,34 +802,34 @@ optionPopup:
   message: Всплывающее меню и значок
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: Сначала включенные
+  message: Сначала включённые
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: Группировать отключенные скрипты
+  message: Группировать отключённые скрипты
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Группировать по стадии @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Скрыть отключенные скрипты
+  message: Скрыть отключённые скрипты
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: Показать отключенные скрипты
+  message: Показать отключённые скрипты
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Сначала показать включенные скрипты
+  message: Сначала показать включённые скрипты
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: 'Интерфейс:'
+  message: 'Тема интерфейса:'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: автоматически
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: темный
+  message: тёмная
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: светлый
+  message: светлая
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
@@ -817,28 +837,32 @@ optionUpdate:
   message: Обновление
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Только для чтения
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Автообновляемый скрипт доступен только для чтения, если вы не отключите
+    обновления или не разрешите правку.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Разрешить правку
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (следующее обновление перезапишет их)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Переустановить
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Обновить вкладку
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Если включено, активная вкладка будет перезагружаться при обнаружении
+    изменений и совпадении URL-адреса вкладки с этим скриптом.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: С учетом регистра
+  message: С учётом регистра
 searchUseRegex:
   description: Option to perform a regular expression search
   message: Регулярное выражение
@@ -853,21 +877,23 @@ sideMenuSettings:
   message: Настройки
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Перезагрузить страницу без скриптов
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Вы отключили пользовательские скрипты для этой страницы. Чтобы запустить их,
+    перезагрузите или перейдите на вкладку.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Прекратить отслеживание
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Цвет обычного значка
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: |-
-    Цвет значка, если скрипты не запустились
-    (страница в черном списке или вообще не скриптуемая)
+    Цвет значка, если скрипты не внедрились
+    (страница в чёрном списке или не поддерживается)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
@@ -875,15 +901,17 @@ titleSearchHint:
     * Поддерживается RegExp: /re/ и /re/flags
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Отслеживать внешние правки
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Держите эту страницу открытой, чтобы отслеживать свои правки в локальном
+    файле
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Обновить скрипты ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Ключ (строка)
