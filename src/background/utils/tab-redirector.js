@@ -51,8 +51,8 @@ const whitelistRe = re`/^https:\/\/(
   gist\.github\.com\/.*?
 )\/[^/]*?\.user\.js  ([?#]|$)  /ix`;
 const blacklistRe = re`/^https?:\/\/(
-  (gist\\.)?github\\.com|
-  ((greas|sleaz)yfork|openuserjs)\\.org
+  (gist\.)?github\.com|
+  ((greas|sleaz)yfork|openuserjs)\.org
 )\//ix`;
 const resolveVirtualUrl = url => (
   `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`
