@@ -297,8 +297,8 @@ export function tryUrl(str) {
 }
 
 /**
- * @param {string} url
  * @param {string} raw - raw value in storage.cache
+ * @param {string} [url]
  * @returns {?string}
  */
 export function makeDataUri(raw, url) {

@@ -43,6 +43,9 @@ function cacheOrFetch(handlers = {}) {
       if (res) {
         const result = transform ? await transform(res, ...args) : res.data;
         await this.setOne(url, result);
+        if (options === true) {
+          return result;
+        }
       }
     } finally {
       delete requests[url];

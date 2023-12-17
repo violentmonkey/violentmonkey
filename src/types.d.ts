@@ -308,7 +308,7 @@ declare interface VMRealmData {
 declare namespace VMReq {
   interface Options extends RequestInit {
     /** @implements XMLHttpRequestResponseType */
-    responseType: '' | 'arraybuffer' | 'blob' | 'json' | 'text';
+    responseType?: '' | 'arraybuffer' | 'blob' | 'json' | 'text';
   }
   interface Response {
     url: string;
@@ -328,7 +328,8 @@ declare type VMSearchOptions = {
 /** Throws on error */
 declare type VMStorageFetch = (
   url: string,
-  options?: VMReq.Options,
+  /** Resolves with the result if true, `undefined` otherwise */
+  options?: VMReq.Options | true,
   check?: (...args) => void // throws on error
 ) => Promise<void>
 

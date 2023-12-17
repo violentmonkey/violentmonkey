@@ -241,7 +241,7 @@ async function loadIcon(url) {
   const isOwn = url.startsWith(ICON_PREFIX);
   img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
     : url.startsWith('data:') ? url
-      : makeDataUri(url[0] === 'i' ? url : await storage.cache.getOne(url));
+      : makeDataUri(url[0] === 'i' ? url : await storage.cache.getOne(url, true));
   await new Promise((resolve) => {
     img.onload = resolve;
     img.onerror = resolve;
