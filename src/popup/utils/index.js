@@ -4,7 +4,7 @@ export const emptyStore = () => ({
   scripts: [],
   frameScripts: [],
   idMap: {},
-  commands: [],
+  commands: {},
   domain: '',
   injectionFailure: null,
   injectable: true,

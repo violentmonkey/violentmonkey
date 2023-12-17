@@ -43,17 +43,13 @@ addHandlers({
   },
 
   RegisterMenu({ id, key, val }) {
-    if (window === top) {
-      (menus[id] || (menus[id] = createNullObj()))[key] = val;
-      sendSetPopup(true);
-    }
+    (menus[id] || (menus[id] = createNullObj()))[key] = val;
+    sendSetPopup(true);
   },
 
   UnregisterMenu({ id, key }) {
-    if (window === top) {
-      delete menus[id]?.[key];
-      sendSetPopup(true);
-    }
+    delete menus[id]?.[key];
+    sendSetPopup(true);
   },
 });
 

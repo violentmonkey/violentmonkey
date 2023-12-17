@@ -27,9 +27,10 @@ Object.assign(handlers, {
     const isTop = frameId === 0;
     if (!isTop) await mutex;
     else {
-      store.commands = data.menus;
       store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
     }
+    // Ensuring top script's menu wins over a per-frame menu with different commands
+    store.commands = Object.assign(data.menus, store.commands);
     const idMapAllFrames = store.idMap;
     const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
     const idMapOld = idMapAllFrames[frameId] || (idMapAllFrames[frameId] = {});

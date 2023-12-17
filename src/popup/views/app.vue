@@ -425,12 +425,14 @@ export default {
         evt.preventDefault();
       } else if (type === 'keydown' || mousedownElement === el) {
         const [id, key, autoClose] = el.cmd;
+        const idMap = store.idMap;
+        const frameId = +Object.keys(idMap).find(frameIdStr => id in idMap[frameIdStr]);
         sendTabCmd(store.tab.id, 'Command', {
           id,
           key,
           evt: objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey',
             'key', 'keyCode', 'code']),
-        }).then(autoClose && close);
+        }, { [kFrameId]: frameId }).then(autoClose && close);
       }
     },
     onToggleScript(item) {
