@@ -328,8 +328,8 @@ declare type VMSearchOptions = {
 /** Throws on error */
 declare type VMStorageFetch = (
   url: string,
-  /** Resolves with the result if true, `undefined` otherwise */
-  options?: VMReq.Options | true,
+  /** 'res' makes the function resolve with the result */
+  options?: VMReq.Options | 'res',
   check?: (...args) => void // throws on error
 ) => Promise<void>
 

@@ -43,7 +43,7 @@ function cacheOrFetch(handlers = {}) {
       if (res) {
         const result = transform ? await transform(res, ...args) : res.data;
         await this.setOne(url, result);
-        if (options === true) {
+        if (options === 'res') {
           return result;
         }
       }

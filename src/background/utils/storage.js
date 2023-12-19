@@ -32,7 +32,9 @@ class StorageArea {
   async getOne(id, fetchMissing) {
     const key = this.toKey(id);
     const {
-      [key]: val = fetchMissing ? await this.fetch(id, true).catch(console.warn) : undefined,
+      [key]: val = fetchMissing
+        ? await this.fetch(id, 'res').catch(console.warn)
+        : undefined,
     } = await api.get([key]);
     return val;
   }
