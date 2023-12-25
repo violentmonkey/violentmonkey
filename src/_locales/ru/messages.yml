@@ -315,7 +315,7 @@ labelBackup:
   message: Резервная копия
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Счётчик на значке:'
+  message: 'Счётчик на значке: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Цвета значка: '
