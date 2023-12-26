@@ -1,11 +1,6 @@
 **/*.js
 !src/**
 !test/**
-!scripts/action-helper.js
-!scripts/fake-dep-loader.js
-!scripts/manifest-helper.js
-!scripts/webpack.conf.js
-!scripts/webpack-protect-bootstrap-plugin.js
-!scripts/webpack-util.js
+!scripts/*
 !gulpfile.js
 src/public/**

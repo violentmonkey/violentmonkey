@@ -56,6 +56,7 @@ class Locale {
     if (extension === '.json') {
       if (stripDescriptions) {
         data = Object.entries(data).reduce((res, [key, value]) => {
+          // eslint-disable-next-line no-unused-vars
           const { description, ...stripped } = value;
           res[key] = stripped;
           return res;
@@ -142,7 +143,7 @@ function extract(options) {
     default: ['\\b(?:i18n\\(\'|i18n-key=")(\\w+)[\'"]', 1],
     json: ['__MSG_(\\w+)__', 1],
   };
-  const types = {
+  const typePatternMap = {
     '.js': 'default',
     '.json': 'json',
     '.html': 'default',
@@ -158,7 +159,7 @@ function extract(options) {
       const pattern = new RegExp(patternData[0], 'g');
       const groupId = patternData[1];
       let groups;
-      while (groups = pattern.exec(data)) {
+      while ((groups = pattern.exec(data))) {
         keys.add(groups[groupId]);
       }
     });
@@ -168,7 +169,7 @@ function extract(options) {
     if (file.isNull()) return cb();
     if (file.isStream()) return this.emit('error', new PluginError('VM-i18n', 'Stream is not supported.'));
     const extname = path.extname(file.path);
-    const type = types[extname];
+    const type = typePatternMap[extname];
     if (type) extractFile(file.contents, type);
     cb();
   }
