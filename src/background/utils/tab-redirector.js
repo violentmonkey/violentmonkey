@@ -45,7 +45,7 @@ const whitelistRe = re`/^https:\/\/(
   openuserjs\.org\/install\/[^/]*|
   github\.com\/[^/]*\/[^/]*\/(
     raw\/[^/]*|
-    releases\/[^/]*\/download
+    releases\/download\/[^/]*
   )|
   raw\.githubusercontent\.com(\/[^/]*){3}|
   gist\.github\.com\/.*?
