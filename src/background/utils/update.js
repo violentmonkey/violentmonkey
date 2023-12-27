@@ -46,7 +46,9 @@ addOwnCommands({
     const notes = results.filter(r => r?.text);
     if (notes.length) {
       notifyToOpenScripts(
-        notes.some(n => n.err) ? i18n('msgOpenUpdateErrors') : i18n('optionUpdate'),
+        notes.some(n => n.err) ? i18n('msgOpenUpdateErrors')
+          : IS_FIREFOX ? i18n('optionUpdate')
+            : '', // Chrome confusingly shows the title next to message using the same font
         notes.map(n => `* ${n.text}\n`).join(''),
         notes.map(n => n.script.props.id),
       );
