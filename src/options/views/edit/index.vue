@@ -27,7 +27,7 @@
                 :class="{'has-error': $fe = fatal || errors}" :title="$fe"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose"
                 v-show="canSave || !frozen" :disabled="!canSave"/>
-        <button v-text="i18n('buttonClose')" @click="close"/>
+        <button v-text="i18n('buttonClose')" @click="close(true)"/>
       </div>
     </div>
 
@@ -303,8 +303,8 @@ async function save() {
     fatal.value = err.message.split('\n');
   }
 }
-function close() {
-  if (nav.value !== 'code') {
+function close(entirely) {
+  if (!entirely && nav.value !== 'code') {
     nav.value = 'code';
   } else {
     emit('close');
@@ -312,8 +312,9 @@ function close() {
     if (IS_FIREFOX) document.activeElement?.blur();
   }
 }
-function saveClose() {
-  save().then(close);
+async function saveClose() {
+  await save();
+  close(true);
 }
 function switchPanel(step) {
   const keys = Object.keys(navItems.value);
