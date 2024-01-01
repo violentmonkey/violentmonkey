@@ -106,7 +106,7 @@ buttonUpdate:
   message: Güncelle
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: Yeni güncellemeleri kontrol et
+  message: Güncellemeleri denetle
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Verileri al
