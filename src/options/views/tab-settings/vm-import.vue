@@ -2,9 +2,6 @@
   <div>
     <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"
             :disabled="store.importing"/>
-    <tooltip :content="i18n('hintVacuum')">
-      <button @click="vacuum" :disabled="vacuuming" v-text="labelVacuum" />
-    </tooltip>
     <div class="mt-1">
       <setting-check name="importScriptData" :label="labelImportScriptData" />
       <br>
@@ -21,7 +18,6 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
 import { ensureArray, i18n, isEmpty, sendCmdDirectly, trueJoin } from '@/common';
 import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
@@ -32,10 +28,8 @@ import { store } from '../../utils';
 
 const reports = reactive([]);
 const buttonImport = ref();
-const vacuuming = ref(false);
 const labelImportScriptData = i18n('labelImportScriptData');
 const labelImportSettings = i18n('labelImportSettings');
-const labelVacuum = ref(i18n('buttonVacuum'));
 
 onMounted(() => {
   const toggleDragDrop = initDragDrop(buttonImport.value);
@@ -49,18 +43,6 @@ function pickBackup() {
   input.accept = '.zip';
   input.onchange = () => importBackup(input.files?.[0]);
   input.click();
-}
-
-async function vacuum() {
-  vacuuming.value = true;
-  labelVacuum.value = i18n('buttonVacuuming');
-  const { fixes, errors } = await sendCmdDirectly('Vacuum');
-  const errorText = errors?.join('\n');
-  vacuuming.value = false;
-  labelVacuum.value = i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
-  if (errorText) {
-    showConfirmation(i18n('msgErrorFetchingResource') + '\n\n' + errorText, { cancel: false });
-  }
 }
 
 async function importBackup(file) {
@@ -98,8 +80,7 @@ async function doImportBackup(file) {
     sendCmdDirectly('SetValueStores', values);
   }
   if (importSettings) {
-    sendCmdDirectly('SetOptions',
-      toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
+    sendCmdDirectly('SetOptions', vm.settings);
   }
   sendCmdDirectly('CheckPosition');
   await reader.close();

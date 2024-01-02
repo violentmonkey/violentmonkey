@@ -74,9 +74,11 @@
       </div>
     </section>
     <section class="mb-2c">
-      <h3 v-text="i18n('labelBackup')" />
+      <h3 v-text="i18n('labelBackupMaintenance')" />
       <vm-import></vm-import>
       <vm-export></vm-export>
+      <hr>
+      <vm-maintenance/>
     </section>
     <vm-sync></vm-sync>
     <details v-for="(obj, key) in {showAdvanced: settings}" :key="key" :open="obj[key]">
@@ -173,6 +175,7 @@ import LocaleGroup from '@/common/ui/locale-group';
 import SettingText from '@/common/ui/setting-text';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
+import VmMaintenance from './vm-maintenance';
 import VmSync from './vm-sync';
 import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
@@ -249,6 +252,7 @@ export default {
   components: {
     VmImport,
     VmExport,
+    VmMaintenance,
     VmSync,
     VmEditor,
     VmBlacklist,

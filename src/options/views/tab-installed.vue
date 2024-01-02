@@ -156,7 +156,7 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { store } from '../utils';
+import { markRemove, store } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -469,12 +469,6 @@ function selectScript(index) {
   if (index !== state.focusedIndex) {
     state.focusedIndex = index;
   }
-}
-function markRemove(script, removed) {
-  return sendCmdDirectly('MarkRemoved', {
-    id: script.props.id,
-    removed,
-  });
 }
 function handleActionRemove(script) {
   if (!script.config.removed) {

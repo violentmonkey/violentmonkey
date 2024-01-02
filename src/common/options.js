@@ -20,7 +20,7 @@ export default {
     // the updated options object will be propagated from the background script after a pause
     // so meanwhile the local code should be able to see the new value using options.get()
     objectSet(options, key, value);
-    return sendCmdDirectly('SetOptions', { key, value, reply: true });
+    return sendCmdDirectly('SetOptions', { [key]: value });
   },
   update(data) {
     // Keys in `data` may be { flattened.like.this: 'foo' }

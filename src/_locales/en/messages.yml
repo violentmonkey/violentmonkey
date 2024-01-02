@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Reset
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: Reset settings
 buttonRestore:
   description: Button to restore a removed script.
   message: Restore
@@ -306,6 +309,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: Backup and maintenance
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Display on badge: '
@@ -853,6 +860,16 @@ reloadTabTrackHint:
   message: >-
     If enabled, the active tab will be reloaded when changes are detected and
     this script matches the tab's URL.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: Remove all scripts
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: >-
+    Move all scripts to "Recycle Bin"?
+
+    It will be emptied automatically after a while. You can also open it and
+    empty it explicitly.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Case sensitive
