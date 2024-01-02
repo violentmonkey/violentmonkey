@@ -127,6 +127,13 @@ confirmNotSaved:
   message: |-
     Modifications are not saved!
     Click OK to discard them or cancel to stay.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: >-
+    Revert all changes made to the database (importing, updating, editing,
+    customizing)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL matched in this list will not be injected by scripts.
