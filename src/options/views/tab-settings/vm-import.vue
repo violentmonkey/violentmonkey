@@ -80,7 +80,7 @@ async function doImportBackup(file) {
   const values = vm.values || {};
   let now;
   if (!undoPort) {
-    now = ' => ' + new Date().toLocaleTimeString();
+    now = ' ⯈ ' + new Date().toLocaleTimeString();
     undoPort = chrome.runtime.connect({ name: 'undoImport' });
     await new Promise(resolveOnUndoMessage);
   }
