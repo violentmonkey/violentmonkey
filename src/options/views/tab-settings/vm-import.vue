@@ -66,7 +66,6 @@ async function doImportBackup(file) {
   if (!file) return;
   reports.length = 0;
   const importScriptData = options.get('importScriptData');
-  const importSettings = options.get('importSettings');
   const zip = await loadZipLibrary();
   const reader = new zip.ZipReader(new zip.BlobReader(file));
   const entries = await reader.getEntries().catch(report) || [];
@@ -76,6 +75,7 @@ async function doImportBackup(file) {
   const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
   const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
   const vm = vmEntry && await readContents(vmEntry) || {};
+  const importSettings = options.get('importSettings') && vm.settings;
   const scripts = vm.scripts || {};
   const values = vm.values || {};
   let now;
@@ -90,8 +90,9 @@ async function doImportBackup(file) {
     await processAll(readScriptStorage, '.storage.json');
     sendCmdDirectly('SetValueStores', values);
   }
-  if (importSettings) {
-    sendCmdDirectly('SetOptions', vm.settings);
+  if (isObject(importSettings)) {
+    delete importSettings.sync;
+    sendCmdDirectly('SetOptions', importSettings);
   }
   sendCmdDirectly('CheckPosition');
   await reader.close();

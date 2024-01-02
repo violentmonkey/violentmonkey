@@ -57,7 +57,6 @@ function resetSettings() {
     'lastModified',
     'lastUpdate',
     'sync',
-    'version',
   ];
   const diff = defaults::mapEntry(null, (key, defVal) => !ignoredKeys.includes(key)
     && !deepEqual(defVal, options.get(key))
