@@ -392,6 +392,7 @@ $removedItemHeight: calc(
     align-items: center;
     line-height: $itemLineHeight;
     margin-left: 8px;
+    overflow: hidden; /* e.g. in recycle bin with a long author/version and multi-column */
     .removed & {
       order: 2;
     }
