@@ -100,9 +100,8 @@ export default {
   &-body {
     > p {
       margin-bottom: 1em;
-      &:first-child {
+      &:nth-last-child(2) { /* matches the first <p> when there are two <p> in multiline mode */
         font-weight: bold;
-        text-decoration: underline;
       }
       &:not(:first-child) {
         text-align: left;
