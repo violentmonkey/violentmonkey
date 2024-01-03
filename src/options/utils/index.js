@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { sendCmdDirectly } from '@/common';
 import { route } from '@/common/router';
 
 export const store = reactive({
@@ -15,3 +16,10 @@ export const store = reactive({
   sync: [],
   title: null,
 });
+
+export function markRemove(script, removed) {
+  return sendCmdDirectly('MarkRemoved', {
+    id: script.props.id,
+    removed,
+  });
+}

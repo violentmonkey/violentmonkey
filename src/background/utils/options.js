@@ -1,4 +1,4 @@
-import { debounce, ensureArray, initHooks, normalizeKeys, sendCmd } from '@/common';
+import { debounce, initHooks, normalizeKeys, sendCmd } from '@/common';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
 import defaults from '@/common/options-defaults';
 import { addOwnCommands, init } from './init';
@@ -12,13 +12,11 @@ addOwnCommands({
     return Object.assign({}, defaults, options); // eslint-disable-line no-use-before-define
   },
   /**
-   * @param {{key:string, value?:PlainJSONValue, reply?:boolean}|Array} data
+   * @param {{ [key:string]: PlainJSONValue }} data
    * @return {void}
    * @throws {?} hooks can throw after the option was set */
   SetOptions(data) {
-    for (const { key, value, reply } of ensureArray(data)) {
-      setOption(key, value, reply);
-    }
+    for (const key in data) setOption(key, data[key], true);
     callHooks(); // exceptions will be sent to the caller
   },
 });

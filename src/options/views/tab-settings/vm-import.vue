@@ -2,9 +2,9 @@
   <div>
     <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"
             :disabled="store.importing"/>
-    <tooltip :content="i18n('hintVacuum')">
-      <button @click="vacuum" :disabled="vacuuming" v-text="labelVacuum" />
-    </tooltip>
+    <button v-text="i18n('buttonUndo') + undoTime" @click="undoImport" class="has-error"
+            :title="i18nConfirmUndoImport"
+            v-if="undoTime" />
     <div class="mt-1">
       <setting-check name="importScriptData" :label="labelImportScriptData" />
       <br>
@@ -21,8 +21,7 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
-import { ensureArray, i18n, isEmpty, sendCmdDirectly, trueJoin } from '@/common';
+import { ensureArray, i18n, sendCmdDirectly } from '@/common';
 import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
@@ -32,10 +31,12 @@ import { store } from '../../utils';
 
 const reports = reactive([]);
 const buttonImport = ref();
-const vacuuming = ref(false);
+const undoTime = ref('');
+const i18nConfirmUndoImport = i18n('confirmUndoImport');
 const labelImportScriptData = i18n('labelImportScriptData');
 const labelImportSettings = i18n('labelImportSettings');
-const labelVacuum = ref(i18n('buttonVacuum'));
+
+let undoPort;
 
 onMounted(() => {
   const toggleDragDrop = initDragDrop(buttonImport.value);
@@ -49,18 +50,6 @@ function pickBackup() {
   input.accept = '.zip';
   input.onchange = () => importBackup(input.files?.[0]);
   input.click();
-}
-
-async function vacuum() {
-  vacuuming.value = true;
-  labelVacuum.value = i18n('buttonVacuuming');
-  const { fixes, errors } = await sendCmdDirectly('Vacuum');
-  const errorText = errors?.join('\n');
-  vacuuming.value = false;
-  labelVacuum.value = i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
-  if (errorText) {
-    showConfirmation(i18n('msgErrorFetchingResource') + '\n\n' + errorText, { cancel: false });
-  }
 }
 
 async function importBackup(file) {
@@ -77,7 +66,6 @@ async function doImportBackup(file) {
   if (!file) return;
   reports.length = 0;
   const importScriptData = options.get('importScriptData');
-  const importSettings = options.get('importSettings');
   const zip = await loadZipLibrary();
   const reader = new zip.ZipReader(new zip.BlobReader(file));
   const entries = await reader.getEntries().catch(report) || [];
@@ -87,41 +75,30 @@ async function doImportBackup(file) {
   const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
   const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
   const vm = vmEntry && await readContents(vmEntry) || {};
-  const undoPort = chrome.runtime.connect({ name: 'undoImport' });
+  const importSettings = options.get('importSettings') && vm.settings;
   const scripts = vm.scripts || {};
   const values = vm.values || {};
-  await new Promise(resolveOnUndoMessage);
+  let now;
+  if (!undoPort) {
+    now = ' ⯈ ' + new Date().toLocaleTimeString();
+    undoPort = chrome.runtime.connect({ name: 'undoImport' });
+    await new Promise(resolveOnUndoMessage);
+  }
   await processAll(readScriptOptions, '.options.json');
   await processAll(readScript, '.user.js');
   if (importScriptData) {
     await processAll(readScriptStorage, '.storage.json');
     sendCmdDirectly('SetValueStores', values);
   }
-  if (importSettings) {
-    sendCmdDirectly('SetOptions',
-      toObjectArray(vm.settings, ([key, value]) => key !== 'sync' && { key, value }));
+  if (isObject(importSettings)) {
+    delete importSettings.sync;
+    sendCmdDirectly('SetOptions', importSettings);
   }
   sendCmdDirectly('CheckPosition');
   await reader.close();
-  if (await showConfirmation([
-    reportProgress(),
-    importScriptData && !isEmpty(values) ? '✔' + labelImportScriptData : '',
-    importSettings ? '✔' + labelImportSettings : '',
-  ]::trueJoin('\n'), {
-    cancel: { text: i18n('buttonUndo'), class: 'has-error' },
-  })) {
-    undoPort.disconnect();
-  } else {
-    undoPort.postMessage(true);
-    await new Promise(resolveOnUndoMessage);
-  }
+  reportProgress();
+  if (now) undoTime.value = now;
 
-  function resolveOnUndoMessage(resolve) {
-    undoPort.onMessage.addListener(function fn() {
-      undoPort.onMessage.removeListener(fn);
-      resolve();
-    });
-  }
   function parseJson(text, entry) {
     try {
       return JSON.parse(text);
@@ -215,12 +192,23 @@ async function doImportBackup(file) {
     reports[0].text = filename;
     return text;
   }
-  function toObjectArray(obj, transform) {
-    return Object.entries(obj || {}).map(transform).filter(Boolean);
-  }
   function toStringArray(data) {
     return ensureArray(data).filter(item => typeof item === 'string');
   }
+}
+
+async function undoImport() {
+  if (!await showConfirmation(i18nConfirmUndoImport)) return;
+  undoTime.value = '';
+  undoPort.postMessage(true);
+  await new Promise(resolveOnUndoMessage);
+}
+
+function resolveOnUndoMessage(resolve) {
+  undoPort.onMessage.addListener(function fn() {
+    undoPort.onMessage.removeListener(fn);
+    resolve();
+  });
 }
 
 function initDragDrop(targetElement) {
