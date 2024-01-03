@@ -36,7 +36,7 @@ function setBusy(val) {
 }
 
 async function confirmDanger(fn, title) {
-  if (!await showConfirmation(title, {ok: {className: 'has-error'}})) {
+  if (!await showConfirmation(title, { ok: { className: 'has-error' } })) {
     return;
   }
   try {
