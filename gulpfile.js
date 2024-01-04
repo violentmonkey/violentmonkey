@@ -173,8 +173,7 @@ const pack = gulp.parallel(createIcons, copyI18n, copyZip);
 
 exports.clean = clean;
 exports.manifest = manifest;
-// Making sure `manifest` finishes before its `version` is used by webpack.conf.js
-exports.dev = gulp.series(gulp.parallel(pack, jsDev), watch);
+exports.dev = gulp.parallel(gulp.series(pack, watch), jsDev);
 exports.build = gulp.series(clean, gulp.parallel(pack, jsProd));
 exports.i18n = updateI18n;
 exports.check = checkI18n;
