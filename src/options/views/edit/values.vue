@@ -65,7 +65,7 @@
                   :class="{'has-error': current.error, 'save-beacon': !idx}"
                   :title="current.error"
                   :disabled="current.error || !current.dirty"/>
-          <button v-text="i18n('buttonCancel')" @click="onCancel"></button>
+          <button v-text="i18n('buttonCancel')" @click="onCancel" title="Esc"/>
         </div>
       </div>
       <label v-show="!current.isAll">

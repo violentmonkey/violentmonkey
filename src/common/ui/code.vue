@@ -46,7 +46,9 @@
           <toggle-button v-model="search.options.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
-      <button @click="clearSearch">&times;</button>
+      <tooltip content="Esc">
+        <button @click="clearSearch">&times;</button>
+      </tooltip>
     </div>
   </div>
 </template>
@@ -248,6 +250,8 @@ export default {
       this.placeholderId = 0;
       maxDisplayLength = cm.options.maxDisplayLength;
       watchEffect(() => cm.setOption('readOnly', this.readOnly));
+      /** Using space prefix to show the command at the top of Help list */
+      const Esc = ' back / cancel / close / singleSelection';
       this.customCommands = Object.assign({
         // call own methods explicitly to strip `cm` parameter passed by CodeMirror
         find: () => this.find(),
@@ -258,7 +262,7 @@ export default {
         autocomplete() {
           cm.showHint({ hint: CodeMirror.hint.autoHintWithFallback });
         },
-        cancel: () => {
+        [Esc]: () => {
           if (this.search.show) {
             this.clearSearch();
           } else {
@@ -275,7 +279,7 @@ export default {
       }, this.commands);
       // these are active in all nav tabs
       cm.setOption('extraKeys', {
-        Esc: 'cancel',
+        Esc,
         F1: 'showHelp',
         'Ctrl-Space': 'autocomplete',
       });
@@ -487,7 +491,7 @@ export default {
       maps.forEach((map) => {
         if (typeof map === 'string') map = CodeMirror.keyMap[map];
         map::forEachEntry(([key, value]) => {
-          if (!res[key] && /^[a-z]+$/i.test(value) && CodeMirror.commands[value]) {
+          if (!res[key] && CodeMirror.commands[value]) {
             res[key] = value;
           }
         });

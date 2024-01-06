@@ -27,7 +27,7 @@
                 :class="{'has-error': $fe = fatal || errors}" :title="$fe"/>
         <button v-text="i18n('buttonSaveClose')" @click="saveClose"
                 v-show="canSave || !frozen" :disabled="!canSave"/>
-        <button v-text="i18n('buttonClose')" @click="close(true)"/>
+        <button v-text="i18n('buttonClose')" @click="close(true)" title="Esc"/>
       </div>
     </div>
 
