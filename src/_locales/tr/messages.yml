@@ -80,6 +80,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Sıfırla
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
   message: Geri Yükle
@@ -127,6 +130,11 @@ confirmNotSaved:
   message: |-
     Değişiklikler kaydedilmedi!
     Göz ardı etmek için Tamam'a, düzenlemeye devam etmek için İptal'e tıklayın.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: ''
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Listede eşleşen URL girişleri betik tarafından eklenmeyecek.
@@ -315,6 +323,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Yedekle
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Simge üzerinde göster:'
@@ -866,6 +878,12 @@ reloadTabTrackHint:
   message: >-
     Etkinleştirilirse, değişiklikler algılandığında ve bu kod sekmenin URL'siyle
     eşleştiğinde etkin sekme yeniden yüklenir.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: ''
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Büyük/küçük harfe duyarlı

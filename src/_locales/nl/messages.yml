@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Standaardwaarden
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: Standaardwaarden
 buttonRestore:
   description: Button to restore a removed script.
   message: Herstellen
@@ -124,6 +127,13 @@ confirmNotSaved:
   message: |-
     De aanpassingen zijn niet opgeslagen!
     Klik op oké om ze te verwerpen of annuleren om door te gaan.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: >-
+    Herstel alle wijzigingen aan de databank (importeren, bijwerken, bewerken en
+    aanpassen)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Scripts worden niet uitgevoerd op url's die op deze lijst staan.
@@ -313,6 +323,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Back-ups
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: Reservekopie en onderhoud
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Tonen op embleem: '
@@ -860,6 +874,16 @@ reloadTabTrackHint:
   message: >-
     Schakel in om het actieve tabblad te herladen als er wijzigingen zijn
     aangetroffen en het script overeenkomt met de url.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: Alle scripts verwijderen
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: >-
+    Weet je zeker dat je alle scripts in de prullenbak wilt zetten?
+
+    Na verloop van tijd wordt de prullenbak geleegd. Ook kun je handmatig de
+    prullenbak legen.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Hoofdlettergevoelig

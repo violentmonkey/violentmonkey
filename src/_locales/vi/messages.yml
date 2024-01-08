@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Thiết lập lại
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
   message: Khôi phục
@@ -124,6 +127,11 @@ confirmNotSaved:
   message: |-
     Thay đổi chưa được lưu!
     Bấm Đồng ý để không lưu hoặc Huỷ để quay lại và sửa.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: ''
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL trong danh sách này sẽ không bị bỏ qua.
@@ -305,6 +313,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Sao lưu
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Hiển thị ở huy hiệu: '
@@ -849,6 +861,12 @@ reloadTab:
   message: ''
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: ''
+removeAllScripts:
+  description: Button to remove all scripts
+  message: ''
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
   message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search

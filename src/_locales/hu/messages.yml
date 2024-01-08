@@ -80,6 +80,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Visszaállít
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: Beállítások alaphelyzetbe állítása
 buttonRestore:
   description: Button to restore a removed script.
   message: Helyreállít
@@ -128,6 +131,13 @@ confirmNotSaved:
 
     Kattints az "Oké"-ra, hogy elvesd őket, vagy a "Mégse"-re, ha maradni akarsz
     a szerkesztőben.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: >-
+    Az adatbázisban végzett összes módosítás visszaállítása (importálás,
+    frissítés, szerkesztés, testreszabás)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: >-
@@ -320,6 +330,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Biztonsági mentés
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: Visszaállítás és karbantartás
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Jelvényen mutat: '
@@ -879,6 +893,15 @@ reloadTabTrackHint:
   message: >-
     Ha engedélyezve van, akkor az aktív lap frissülni fog változások
     észlelésekor, hogyha az URL-e összeillik a szkripttel.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: Összes szkript eltávolítása
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: >-
+    Az összes szkriptet a Kukába helyezed? A Kuka automatikusan ki lesz ürítve
+    bizonyos idő elteltével, illetve te is megnyithatod és kiürítheted
+    közvetlenül.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Kis- és nagybetűk megkülönböztetése

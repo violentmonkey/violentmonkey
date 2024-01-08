@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: 초기화
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
   message: 복구
@@ -124,6 +127,11 @@ confirmNotSaved:
   message: |-
     변경사항이 저장되지 않았습니다!
     무시하려면 확인 버튼을, 계속 머무르려면 취소 버튼을 눌러주세요.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: ''
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: 이 목록과 일치하는 URL에는 스크립트가 삽입되지 않습니다.
@@ -297,6 +305,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: 백업
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: '배지 표시: '
@@ -829,6 +841,12 @@ reloadTab:
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: 켜진 경우, 활성화된 탭의 URL에 해당하는 스크립트가 바뀌면 탭을 새로고침합니다.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: ''
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 대소문자 확인

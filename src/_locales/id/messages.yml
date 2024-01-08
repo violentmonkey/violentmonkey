@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Setel ulang
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
   message: Pulihkan
@@ -124,6 +127,11 @@ confirmNotSaved:
   message: |-
     Modifikasi belum disimpan!
     Klik OKE untuk menghapusnya atau batal untuk tinggal.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: ''
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL yang cocok di dalam daftar ini tidak akan diinjeksi skrip.
@@ -307,6 +315,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Cadangkan
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Ditampilkan pada lencana: '
@@ -854,6 +866,12 @@ reloadTab:
   message: Muat ulang tab
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: ''
+removeAllScripts:
+  description: Button to remove all scripts
+  message: ''
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
   message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search

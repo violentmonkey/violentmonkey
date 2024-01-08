@@ -80,6 +80,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Obnoviť
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: Resetovať nastavenia
 buttonRestore:
   description: Button to restore a removed script.
   message: Obnoviť
@@ -126,6 +129,13 @@ confirmNotSaved:
   message: |-
     Úpravy nie sú uložené!
     Kliknite na OK pre ich zrušenie alebo zrušiť pre ich ponechanie.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: >-
+    Vrátiť všetky zmeny vykonané v databáze (import, aktualizácia, úprava,
+    prispôsobenie)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Webové adresy v tomto zozname nebudú injektované skriptami.
@@ -316,6 +326,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Záloha
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: Zálohovanie a údržba
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Zobraziť počítadlo: '
@@ -862,6 +876,16 @@ reloadTabTrackHint:
   message: >-
     Ak je povolené, aktívna karta sa znovu načíta, keď sa zistia zmeny a tento
     skript sa zhoduje s adresou URL karty.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: Odstrániť všetky skripty.
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: >-
+    Presunúť všetky skripty do "Koša"?
+
+    Po nejakej dobe sa automaticky vyprázdni. Môžete ho tiež otvoriť a
+    vyprázdniť manuálne.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozlišovať veľké a malé písmená

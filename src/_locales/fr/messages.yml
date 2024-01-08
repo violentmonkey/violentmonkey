@@ -80,6 +80,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Réinitialiser
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
   message: Restaurer
@@ -124,6 +127,11 @@ confirmNotSaved:
   message: |-
     Les modifications n’ont pas étés sauvegardées !
     Cliquez sur OK pour les rejeter ou annuler pour rester
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: ''
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Les scripts se seront pas injectés dans les URL filtrées par cette liste.
@@ -313,6 +321,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: "Montrer sur le badge\_: "
@@ -861,6 +873,12 @@ reloadTab:
   message: ''
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
+  message: ''
+removeAllScripts:
+  description: Button to remove all scripts
+  message: ''
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
   message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
