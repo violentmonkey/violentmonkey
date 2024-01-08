@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: リセット
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: 設定を初期化
 buttonRestore:
   description: Button to restore a removed script.
   message: 復元
@@ -124,6 +127,11 @@ confirmNotSaved:
   message: |-
     変更内容が保存されていません!
     OKで変更を破棄、キャンセルで編集を続けます。
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: データベースへのすべての変更を元に戻します (インポート、更新、編集、カスタマイズ)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: リストのURLに一致するページでは、スクリプトを実行しません。
@@ -299,6 +307,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: バックアップ
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: バックアップと管理
 labelBadge:
   description: Label for option to show number on badge.
   message: 'バッジの表示: '
@@ -828,6 +840,14 @@ reloadTab:
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: このスクリプトがタブのURLに一致すると、変更が検出されたアクティブなタブを再読込します。
+removeAllScripts:
+  description: Button to remove all scripts
+  message: すべてのスクリプトを削除
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: |-
+    すべてのスクリプトを「ごみ箱」に移動しますか？
+    一定期間後に自動で空になります。またいつでも空にできます。
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 大文字と小文字を区別

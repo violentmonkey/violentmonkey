@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Zurücksetzen
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: Einstellungen zurücksetzen
 buttonRestore:
   description: Button to restore a removed script.
   message: Wiederherstellen
@@ -124,6 +127,13 @@ confirmNotSaved:
   message: |-
     Die Änderungen sind nicht gespeichert!
     Zum Verwerfen 'OK' drücken oder 'Abbrechen' um zurückzukehren.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: >-
+    Alle an der Datenbank gemachten Veränderungen zurücksetzen (importieren,
+    aktualisieren, editieren, anpassen)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URLs in dieser Liste bleiben von Skripten unberührt.
@@ -318,6 +328,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: Backup und Wartung
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Auf dem Symbol anzeigen: '
@@ -874,6 +888,16 @@ reloadTabTrackHint:
   message: >-
     Falls aktiviert, wird der aktive Tab bei erkannten Veränderungen neu
     geladen, wenn dieses Skript mit der Tab-URL übereinstimmt.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: Alle Skripte entfernen
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: >-
+    Alle Skripte in den Papierkorb verschieben?
+
+    Dieser wird nach einer Weile automatisch geleert. Sie können ihn auch öffnen
+    und explizit leeren.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Groß- und Kleinschreibung beachtend

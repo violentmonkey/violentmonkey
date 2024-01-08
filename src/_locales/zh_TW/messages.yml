@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: 重設
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
   message: 還原
@@ -124,6 +127,11 @@ confirmNotSaved:
   message: |-
     修改尚未儲存！
     點選確定放棄修改或點選取消停留此頁面。
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: ''
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: 出現在此清單裡的網址將不會受到暴力猴用戶腳本的影響。這意味著，這些網址不會運行任何暴力猴腳本。
@@ -296,6 +304,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: 備份
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
   message: 在徽章上顯示：
@@ -827,6 +839,12 @@ reloadTab:
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: 如果您啟用此選項，當系統偵測到與目前分頁網址相符的腳本有所變更時，該分頁將自動重新載入。
+removeAllScripts:
+  description: Button to remove all scripts
+  message: ''
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: ''
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 區分大小寫

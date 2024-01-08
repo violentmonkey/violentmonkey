@@ -78,6 +78,9 @@ buttonReplaceAll:
 buttonReset:
   description: Button to reset to default values.
   message: Сброс
+buttonResetSettings:
+  description: Button in settings page to reset all settings
+  message: Сбросить настройки
 buttonRestore:
   description: Button to restore a removed script.
   message: Восстановить
@@ -124,18 +127,25 @@ confirmNotSaved:
   message: |-
     Изменения не сохранены!
     Нажмите ОК, чтобы выйти, или Отмена, чтобы вернуться.
+confirmUndoImport:
+  description: >-
+    Tooltip of the Undo button after importing a zip in settings. The same text
+    is also shown as a confirmation dialog after clicking this button.
+  message: >-
+    Отменить все изменения, внесённые в базу данных (импорт, обновление,
+    редактирование, настройка)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL-адреса из этого списка не будут обрабатываться скриптами.
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Пользовательский CSS для страницы настроек и страницы установки скриптов.
-    Если вы не знаете для чего это необходимо, не редактируйте это.
+    Пользовательский CSS для страниц настроек и установки скриптов. Если вы не
+    знаете зачем это нужно, пожалуйста, не редактируйте.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    Опции для редактора CodeMirror и его дополнений в формате JSON, например
+    Опции для редактора CodeMirror и его дополнений в формате JSON, например,
     <code>{"indentUnit":2, "smartIndent":true}</code>. Имейте в виду, что
     некоторые опции могут не работать в Violentmonkey. См. <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
@@ -260,10 +270,10 @@ helpForLocalFile:
   message: Показать инструкцию по перетаскиванию локальных скриптов
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Введите URL:'
+  message: 'Введите URL-адрес:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Удалённые скрипты представлены здесь и хранятся в течение 7 дней.
+  message: Удалённые скрипты отображаются здесь и хранятся в течение 7 дней.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Использовать @downloadURL
@@ -300,7 +310,7 @@ labelAuthor:
   message: 'Автор: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Обновить текущую вкладку после включения или отключения скрипта из меню.
+  message: Обновить текущую вкладку при включении или отключении скрипта из меню
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -313,6 +323,10 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Резервная копия
+  touched: false
+labelBackupMaintenance:
+  description: Label of the import/export/maintenance section in settings.
+  message: Резервное копирование и обслуживание
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Счётчик на значке: '
@@ -354,7 +368,7 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL загрузки:'
+  message: 'URL-адрес загрузки:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Правка значения скрипта
@@ -386,7 +400,7 @@ labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
     Альтернативный способ внедрения для скриптов <document-start> с Firefox 59,
-    более быстрый, чем режим по умолчанию. Как и «Режим синхронных страниц», он
+    более быстрый, чем режим по умолчанию. Как и «Режим синхронизации page», он
     также увеличивает потребление памяти, поэтому вы можете отключить его, если
     ваши скрипты работают верно без этого параметра.
 labelFeedback:
@@ -400,13 +414,13 @@ labelGeneral:
   message: Общие настройки
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Помочь переводу
+  message: Улучшить перевод
 labelHomepage:
   description: Label for home page in about tab.
   message: Домашняя страница
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'URL страницы скрипта:'
+  message: 'URL-адрес домашней страницы:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Импорт данных скрипта
@@ -473,7 +487,7 @@ labelReinstall:
   message: Повторная установка скрипта
 labelRelated:
   description: Label of related links.
-  message: 'Ссылки по теме: '
+  message: 'Справочные ссылки: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
   message: Удалён в $1
@@ -500,7 +514,7 @@ labelSettings:
   message: Настройки
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: Показывать позиции порядка выполнения
+  message: Показывать номера порядка выполнения
 labelSync:
   description: Label for sync options.
   message: Синхронизация
@@ -531,7 +545,7 @@ labelSyncScriptStatus:
   message: Синхронизировать состояние скриптов.
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'URL сервера:'
+  message: 'URL-адрес сервера:'
 labelSyncService:
   description: Label for sync service select.
   message: Синхронизация через
@@ -547,7 +561,7 @@ labelTranslator:
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'URL обновления:'
+  message: 'URL-адрес обновления:'
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
@@ -570,7 +584,7 @@ labelXhrInjectHint:
     вариант использует устаревший синхронный XHR, поэтому в Chrome/Chromium
     будут предупреждения в консоли devtools, но вы можете игнорировать их,
     поскольку негативные последствия незначительны. Скрыть предупреждения можно,
-    щёлкнув ПКМ на одном из них
+    щёлкнув ПКМ на одном из них.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
   message: (кроме инкогнито и сайтов с отключёнными куки)
@@ -594,7 +608,7 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: Исключать...
+  message: Исключить...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: |-
@@ -624,7 +638,7 @@ menuMatchedDisabledScripts:
   message: Подходящие отключённые скрипты
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Суб-фреймы скриптов
+  message: Скрипты только субфреймов
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Подходящие скрипты
@@ -765,13 +779,13 @@ msgSyncInitError:
   message: Ошибка запуска синхронизации!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: Еще не авторизован
+  message: Ещё не авторизован.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Ожидание синхронизации...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Синхронизация...
+  message: Выполняется синхронизация...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: Ошибка синтаксиса?
@@ -841,11 +855,11 @@ readonly:
 readonlyNote:
   description: Warning when trying to type in the editor.
   message: >-
-    Автообновляемый скрипт доступен только для чтения, если вы не отключите
+    Автообновляемый скрипт доступен только для чтения, пока вы не отключите
     обновления или не разрешите правку.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: Разрешить правку
+  message: Разрешить правки
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
   message: (следующее обновление перезапишет их)
@@ -860,6 +874,16 @@ reloadTabTrackHint:
   message: >-
     Если включено, активная вкладка будет перезагружаться при обнаружении
     изменений и совпадении URL-адреса вкладки с этим скриптом.
+removeAllScripts:
+  description: Button to remove all scripts
+  message: Удалить все скрипты
+removeAllScriptsConfirm:
+  description: Confirmation shown after clicking the `Remove all scripts` button.
+  message: >-
+    Убрать все скрипты в «Корзину»?
+
+    Она будет автоматически очищена через некоторое время. Вы также можете
+    открыть её и очистить самостоятельно.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: С учётом регистра
