@@ -134,7 +134,7 @@ tabsOnUpdated.addListener((tabId, { url }, tab) => {
     const [title] = getFailureReason(url);
     if (title) updateState(tab, resetBadgeData(tabId), title);
   }
-}, ...FIREFOX >= 61 ? [{ properties: ['status'] }] : []);
+}, FIREFOX && { properties: ['status'] });
 
 function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js

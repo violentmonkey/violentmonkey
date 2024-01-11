@@ -7,7 +7,7 @@ import { CHROME, FIREFOX } from './ua';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
-  || !!(window.AbortSignal && browser.windows); // and FF57+ except mobile
+  || !!(window.AbortSignal && browserWindows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
 export const NEWTAB_URL_RE = re`/
 ^(
@@ -42,6 +42,12 @@ export const tabsOnRemoved = browser.tabs.onRemoved;
 export let injectableRe = /^(https?|file|ftps?):/;
 export let fileSchemeRequestable;
 let cookieStorePrefix;
+
+if (!FIREFOX || FIREFOX < 61 || !hasOwnProperty(chrome, 'geckoProfiler')) {
+  // onUpdated is filterable only in desktop FF 61+
+  const { addListener } = tabsOnUpdated;
+  tabsOnUpdated.addListener = fn => tabsOnUpdated::addListener(fn);
+}
 
 addOwnCommands({
   GetTabDomain(url) {
