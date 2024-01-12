@@ -17,7 +17,7 @@ const FAST_CHECK = {
   headers: { Accept: 'text/x-userscript-meta,*/*' },
 };
 
-init.then(() => setTimeout(autoUpdate, 20e3));
+init.then(autoUpdate);
 hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
 
 addOwnCommands({
@@ -148,7 +148,8 @@ function autoUpdate() {
   if (!interval) return;
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
-    commands.CheckUpdate();
+    // Wait on startup for things to settle and after unsuspend for network reconnection
+    setTimeout(commands.CheckUpdate, 20e3);
     elapsed = 0;
   }
   clearTimeout(autoUpdate.timer);
