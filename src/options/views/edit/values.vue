@@ -256,7 +256,7 @@ function setData(data = {}) {
 }
 function calcSize() {
   store.storageSize = keys.value.reduce((sum, key) => sum
-    + key.length + 4 + values.value[key].length + 2, 2);
+    + key.length + 4 + values.value[key].length + 2, 0);
 }
 async function updateValue({
   key,
