@@ -1,14 +1,15 @@
-import { rename, writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import { signAddon } from 'amo-upload';
-import { readManifest, buildUpdatesList } from './manifest-helper.js';
-import { getVersion, isBeta } from './version-helper.js';
+import { mkdir, rename, writeFile } from 'fs/promises';
+import { join } from 'path';
+import { buildUpdatesList, readManifest } from './manifest-helper.js';
 import { hasAsset, notifyReleaseStatus } from './release-helper.mjs';
+import { getVersion, isBeta } from './version-helper.js';
 
-async function main() {
+const version = getVersion();
+const beta = isBeta();
+
+async function handleAddon() {
   const manifest = await readManifest();
-  const version = getVersion();
-  const beta = isBeta();
   const fileName = `violentmonkey-${version}${beta ? 'b' : ''}.xpi`;
   const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${version}/${fileName}`;
 
@@ -66,6 +67,20 @@ ${releaseUrl}
     JSON.stringify(updates, null, 2),
     'utf8',
   );
+}
+
+async function main() {
+  let error;
+  try {
+    await handleAddon();
+  } catch (err) {
+    if (err?.message === 'Polling skipped') {
+      error = beta ? new Error('Pending review') : undefined;
+    } else {
+      error = err;
+    }
+  }
+  if (error) throw error;
 }
 
 main().then(

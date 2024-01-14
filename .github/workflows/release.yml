@@ -67,7 +67,6 @@ jobs:
           mkdir -p $TEMP_DIR/updates
           if [ "$PRERELEASE" != "true" ]; then
             echo Publish listed version
-            # Ignore error since we don't need to download it
             node scripts/amo-upload.mjs
           else
             echo Publish unlisted version
