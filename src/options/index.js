@@ -38,7 +38,7 @@ function initScript(script, sizes) {
     getLocaleString(meta, 'description'),
     script.custom.name,
     script.custom.description,
-  ]::trueJoin('\n');
+  ]::trueJoin('\n').toLowerCase();
   const name = script.custom.name || localeName;
   const lowerName = name.toLowerCase();
   let total = 0;
@@ -51,6 +51,7 @@ function initScript(script, sizes) {
     search,
     name,
     lowerName,
+    tags: script.custom.tags || '',
     size: formatByteLength(total, true).replace(' ', ''),
     sizes: str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B'),
     sizeNum: total,

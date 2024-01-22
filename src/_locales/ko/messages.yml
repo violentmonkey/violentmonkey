@@ -223,12 +223,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: 전체
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: 코드
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: 이름
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: 크기 순
@@ -532,6 +535,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: '사용자: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: '테마: '
@@ -882,6 +888,12 @@ titleSearchHint:
   message: |-
     * <Enter>키로 자동완성 내역에 추가할 수 있습니다.
     * 정규표현식을 지원합니다: /re/ 또는 /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: 외부 편집 추적

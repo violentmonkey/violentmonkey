@@ -210,12 +210,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: ''
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: ''
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: ''
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: ''
@@ -516,6 +519,9 @@ labelSyncService:
   message: Synkronoi
 labelSyncUsername:
   description: Label for input to hold username.
+  message: ''
+labelTags:
+  description: Label for custom tags.
   message: ''
 labelTheme:
   description: Label for the visual theme option.
@@ -857,6 +863,12 @@ titleBadgeColorBlocked:
   message: ''
 titleSearchHint:
   description: Hover title for search icon in dashboard.
+  message: ''
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
   message: ''
 trackEdits:
   description: Button in a script installation dialog.

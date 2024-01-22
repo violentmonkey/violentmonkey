@@ -268,6 +268,7 @@ async function save() {
   const { config, custom } = scr;
   const { notifyUpdates } = config;
   const { noframes } = custom;
+  const tags = custom.tags?.split(/\s+/).map(s => s.replace(/[^\w.-]/g, '')).filter(Boolean).join(' ').toLowerCase();
   try {
     const id = scr.props.id;
     const res = await sendCmdDirectly('ParseScript', {
@@ -282,6 +283,7 @@ async function save() {
         ...objectPick(custom, Object.keys(CUSTOM_PROPS), toProp),
         ...objectPick(custom, CUSTOM_LISTS, toList),
         ...objectPick(custom, CUSTOM_ENUM, toEnum),
+        tags,
         noframes: noframes ? +noframes : null,
       },
       // User created scripts MUST be marked `isNew` so that

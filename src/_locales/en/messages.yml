@@ -234,12 +234,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: All
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Code
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: size
@@ -545,6 +548,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Username: '
+labelTags:
+  description: Label for custom tags.
+  message: 'Tags (space separated):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Theme: '
@@ -914,6 +920,21 @@ titleSearchHint:
   message: |-
     * <Enter> key adds the text to autocomplete history
     * RegExp syntax is supported: /re/ and /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: |-
+    * <kbd>Enter</kbd> key adds the text to autocomplete history
+    * All conditions are case-insensitive
+    * Space separated conditions can be combined
+    * Search by metadata: <code>"Awesome Script" "Description"</code>
+    * Search by tags: <code>#tag1 #tag2</code>
+    * Search by script name: <code>name:"awesome name"</code>
+    * Search by script code: <code>code:"awesome code"</code>
+    * Negative search: <code>!#tag2 !name:"unwanted"</code>
+    * Regular expressions: <code>/\w+?/</code>, <code>/\w+?/gi</code>, <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Track external edits

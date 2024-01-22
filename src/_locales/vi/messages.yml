@@ -231,12 +231,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Hiện tất cả
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Cách viết mã
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Tên
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: kích thước
@@ -542,6 +545,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Tài khoản:'
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Giao diện: '
@@ -903,6 +909,12 @@ titleBadgeColorBlocked:
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: Nhập chính xác hoặc gần giống nội dung cần tìm
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: ''

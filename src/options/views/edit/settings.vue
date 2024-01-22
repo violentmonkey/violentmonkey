@@ -8,6 +8,14 @@
       </label>
     </div>
     <VMSettingsUpdate v-bind="{script}"/>
+    <table>
+      <tr>
+        <td v-text="i18n('labelTags')"></td>
+        <td>
+          <input type="text" v-model="custom.tags" :disabled="readOnly">
+        </td>
+      </tr>
+    </table>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <!-- Using tables to auto-adjust width, which differs substantially between languages -->
     <table>

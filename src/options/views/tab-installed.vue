@@ -2,7 +2,7 @@
   <div class="tab-installed" ref="scroller">
     <div v-if="store.canRenderScripts">
       <header class="flex">
-        <div class="flex flex-auto" v-if="!showRecycle">
+        <div class="flex" v-if="!showRecycle">
           <Dropdown
             :closeAfterClick="true"
             :class="{active: state.menuNewActive}"
@@ -35,7 +35,8 @@
             </a>
           </Tooltip>
         </div>
-        <div class="flex-auto" v-else v-text="i18n('headerRecycleBin')" />
+        <div v-else v-text="i18n('headerRecycleBin')" />
+        <div class="flex-auto"></div>
         <LocaleGroup i18n-key="labelFilterSort">
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
@@ -67,31 +68,29 @@
           </template>
         </Dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
-        <form class="filter-search hidden-xs flex" @submit.prevent>
-          <Tooltip placement="bottom">
-            <label>
-              <input
-                type="search"
-                :class="{'has-error': state.searchError}"
-                :placeholder="i18n('labelSearchScript')"
-                v-model="state.search"
-                ref="refSearch"
-                id="installed-search">
-              <Icon name="search" />
-            </label>
-            <template #content>
-              <pre
-                class="filter-search-tooltip"
-                v-text="state.searchError || i18n('titleSearchHint')"
-              />
-            </template>
-          </Tooltip>
-          <select v-model="filters.searchScope" @change="handleOnScopeChange">
-            <option value="name" v-text="i18n('filterScopeName')"/>
-            <option value="code" v-text="i18n('filterScopeCode')"/>
-            <option value="all" v-text="i18n('filterScopeAll')"/>
-          </select>
+        <form class="filter-search hidden-xs" @submit.prevent>
+          <label>
+            <input
+              type="search"
+              :class="{'has-error': state.search.error}"
+              :placeholder="i18n('labelSearchScript')"
+              v-model="state.search.value"
+              ref="refSearch"
+              id="installed-search">
+            <Icon name="search" />
+          </label>
         </form>
+        <Dropdown align="right">
+          <a class="btn-ghost" tabindex="0" :class="{'has-error': state.search.error}">
+            <Icon name="question"></Icon>
+          </a>
+          <template #content>
+            <div class="filter-search-tooltip">
+              <div class="has-error" v-if="state.search.error" v-text="state.search.error" />
+              <div v-html="i18n('titleSearchHintV2')" />
+            </div>
+          </template>
+        </Dropdown>
       </header>
       <div v-if="showRecycle" class="hint mx-1 my-1 flex flex-col">
         <span v-text="i18n('hintRecycleBin')"/>
@@ -106,9 +105,9 @@
         :data-columns="state.numColumns"
         :data-show-order="filters.showOrder || null"
         :data-table="filters.viewTable || null">
-        <script-item
+        <ScriptItem
           v-for="(script, index) in state.sortedScripts"
-          v-show="!state.search || script.$cache.show !== false"
+          v-show="!state.search.rules.length || script.$cache.show !== false"
           :key="script.props.id"
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
@@ -122,6 +121,7 @@
           @toggle="handleActionToggle"
           @update="handleActionUpdate"
           @scrollDelta="handleSmoothScroll"
+          @clickTag="handleClickTag"
         />
       </div>
     </div>
@@ -140,7 +140,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref } from 'vue';
 import { i18n, sendCmdDirectly, debounce, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
@@ -156,7 +156,7 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { markRemove, store } from '../utils';
+import { markRemove, store, createSearchRules, testSearchRule } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -240,8 +240,11 @@ const state = reactive({
   focusedIndex: -1,
   menuNewActive: false,
   showHotkeys: false,
-  search: '',
-  searchError: null,
+  search: {
+    value: '',
+    rules: [],
+    error: null,
+  },
   sortedScripts: [],
   filteredScripts: [],
   script: null,
@@ -266,12 +269,11 @@ const message = computed(() => {
   }
   return null;
 });
-const searchNeedsCodeIds = computed(() => state.search
-        && ['code', 'all'].includes(filters.searchScope)
+const searchNeedsCodeIds = computed(() => state.search.rules.some(rule => !rule.scope || rule.scope === 'code')
         && store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id));
 const getCurrentList = () => showRecycle.value ? store.removedScripts : store.scripts;
 
-const debouncedUpdate = debounce(onUpdate, 100);
+const debouncedSearch = debounce(scheduleSearch, 200);
 const debouncedRender = debounce(renderScripts);
 
 function resetList() {
@@ -338,10 +340,6 @@ async function moveScript(from, to) {
 function handleOrderChange(e) {
   options.set('filters.sort', e.target.value);
 }
-function handleOnScopeChange(e) {
-  if (state.search) scheduleSearch();
-  options.set('filters.searchScope', e.target.value);
-}
 function handleStateChange(active) {
   state.menuNewActive = active;
 }
@@ -404,40 +402,37 @@ async function renderScripts() {
     if (step && limit < length) await makePause();
   }
 }
-function performSearch(scripts) {
-  let searchRE;
+function performSearch() {
   let count = 0;
-  const [,
-  expr = state.search.replace(/[.+^*$?|\\()[\]{}]/g, '\\$&'),
-  flags = 'i',
-] = state.search.match(/^\/(.+?)\/(\w*)$|$/);
-  const scope = filters.searchScope;
-  const scopeName = scope === 'name' || scope === 'all';
-  const scopeCode = scope === 'code' || scope === 'all';
-  try {
-    searchRE = expr && new RegExp(expr, flags);
-    scripts.forEach(({ $cache }) => {
-      $cache.show = !expr
-        || scopeName && searchRE.test($cache.search)
-        || scopeCode && searchRE.test($cache.code);
-      count += $cache.show;
-    });
-    state.searchError = null;
-  } catch (err) {
-    state.searchError = err.message;
-  }
+  store.scripts.forEach(({ $cache }) => {
+    const dataMap = {
+      name: $cache.lowerName,
+      code: $cache.code,
+      tags: $cache.tags,
+      '': $cache.search,
+    };
+    $cache.show = state.search.rules.every(rule => testSearchRule(rule, dataMap[rule.scope]));
+    count += $cache.show;
+  });
   return count;
 }
-async function scheduleSearch() {
+function scheduleSearch() {
+  try {
+    state.search.rules = createSearchRules(state.search.value);
+    state.search.error = null;
+  } catch (err) {
+    state.search.error = err.message;
+  }
   const ids = searchNeedsCodeIds.value;
-  if (ids?.length) await getCodeFromStorage(ids);
-  debouncedUpdate();
+  if (ids?.length) getCodeFromStorage(ids);
+  onUpdate();
 }
 async function getCodeFromStorage(ids) {
   const data = await sendCmdDirectly('GetScriptCode', ids);
   store.scripts.forEach(({ $cache, props: { id } }) => {
     if (id in data) $cache.code = data[id];
   });
+  onUpdate();
 }
 async function handleEmptyRecycleBin() {
   if (await showConfirmation(i18n('buttonEmptyRecycleBin'))) {
@@ -500,6 +495,9 @@ function handleActionToggle(script) {
 }
 function handleActionUpdate(script) {
   sendCmdDirectly('CheckUpdate', script.props.id);
+}
+function handleClickTag(tag) {
+  state.search.value = [state.search.value.trim(), `#${tag} `].filter(Boolean).join(' ');
 }
 function handleSmoothScroll(delta) {
   if (!delta) return;
@@ -629,100 +627,51 @@ function bindKeys() {
   });
 }
 
-export default {
-  components: {
-    Dropdown,
-    Tooltip,
-    SettingCheck,
-    Icon,
-    LocaleGroup,
-    ScriptItem,
-    Edit,
-  },
-  directives: {
-    focus: vFocus,
-  },
-  setup() {
-    resetList();
-    watch(showRecycle, resetList);
-    watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
-      dr => toggleDragging(refList.value, moveScript, dr));
-    watch(() => state.search, scheduleSearch);
-    watch(() => [filters.sort, filters.showEnabledFirst], debouncedUpdate);
-    if (screen.availWidth > 767) {
-      watch(() => filters.viewSingleColumn, adjustScriptWidth);
-      watch(() => filters.viewTable, adjustNarrowWidth);
-    }
-    watch(getCurrentList, refreshUI);
-    watch(() => store.route.paths[1], onHashChange);
-    watch(selectedScript, script => {
-      keyboardService.setContext('selectedScript', script);
-    });
-    watch(() => state.showHotkeys, value => {
-      keyboardService.setContext('showHotkeys', value);
-    });
+resetList();
+watch(showRecycle, resetList);
+watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
+  dr => toggleDragging(refList.value, moveScript, dr));
+watch(() => state.search.value, debouncedSearch);
+watch(() => [filters.sort, filters.showEnabledFirst], debouncedSearch);
+if (screen.availWidth > 767) {
+  watch(() => filters.viewSingleColumn, adjustScriptWidth);
+  watch(() => filters.viewTable, adjustNarrowWidth);
+}
+watch(getCurrentList, refreshUI);
+watch(() => store.route.paths[1], onHashChange);
+watch(selectedScript, script => {
+  keyboardService.setContext('selectedScript', script);
+});
+watch(() => state.showHotkeys, value => {
+  keyboardService.setContext('showHotkeys', value);
+});
 
-    onMounted(() => {
-      // Ensure the correct UI is shown when mounted:
-      // * on subsequent navigation via history back/forward;
-      // * on first initialization in some weird case the scripts got loaded early.
-      if (!store.loading) refreshUI();
-      // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
-      if (!columnsForCardsMode.length) {
-        const style = customCssElem?.textContent.match(/--columns-(cards|table)\b/)
-          && getComputedStyle(document.documentElement);
-        if (style) {
-          for (const [type, arr] of [
-            ['cards', columnsForCardsMode],
-            ['table', columnsForTableMode],
-          ]) {
-            const val = style.getPropertyValue(`--columns-${type}`);
-            if (val) arr.push(...val.split(',').map(Number).filter(Boolean));
-          }
-        } else {
-          columnsForCardsMode.push(1300, 1900, 2500); // 1366x768, 1920x1080, 2560x1440
-          columnsForTableMode.push(1600, 2500, 3400); // 1680x1050, 2560x1440, 3440x1440
-        }
-        addEventListener('resize', adjustScriptWidth);
+onMounted(() => {
+  // Ensure the correct UI is shown when mounted:
+  // * on subsequent navigation via history back/forward;
+  // * on first initialization in some weird case the scripts got loaded early.
+  if (!store.loading) refreshUI();
+  // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
+  if (!columnsForCardsMode.length) {
+    const style = customCssElem?.textContent.match(/--columns-(cards|table)\b/)
+      && getComputedStyle(document.documentElement);
+    if (style) {
+      for (const [type, arr] of [
+        ['cards', columnsForCardsMode],
+        ['table', columnsForTableMode],
+      ]) {
+        const val = style.getPropertyValue(`--columns-${type}`);
+        if (val) arr.push(...val.split(',').map(Number).filter(Boolean));
       }
-      adjustScriptWidth();
-      return bindKeys();
-    });
-
-    return {
-      // Refs
-      refSearch,
-      refList,
-      scroller,
-
-      // Values
-      store,
-      state,
-      filters,
-      filterOptions,
-      currentSortCompare,
-      selectedScript,
-      draggable,
-      scriptHotkeys,
-      showRecycle,
-      message,
-
-      // Methods
-      handleStateChange,
-      handleOrderChange,
-      handleEditScript,
-      handleEmptyRecycleBin,
-      handleInstallFromURL,
-      handleUpdateAll,
-      handleOnScopeChange,
-      handleActionRemove,
-      handleActionRestore,
-      handleActionToggle,
-      handleActionUpdate,
-      handleSmoothScroll,
-    };
-  },
-};
+    } else {
+      columnsForCardsMode.push(1300, 1900, 2500); // 1366x768, 1920x1080, 2560x1440
+      columnsForTableMode.push(1600, 2500, 3400); // 1680x1050, 2560x1440, 3440x1440
+    }
+    addEventListener('resize', adjustScriptWidth);
+  }
+  adjustScriptWidth();
+  return bindKeys();
+});
 </script>
 
 <style>
@@ -800,6 +749,7 @@ $iconSize: 2rem; // from .icon in ui/style.css
   }
 }
 .filter-search {
+  min-width: 14rem;
   label {
     position: relative;
   }
@@ -810,13 +760,16 @@ $iconSize: 2rem; // from .icon in ui/style.css
     right: .5rem;
   }
   input {
-    width: 14rem;
-    max-width: calc(100vw - 16rem);
+    width: 100%;
+    height: 2rem;
     padding-left: .5rem;
     padding-right: 2rem;
-    height: 100%;
   }
   &-tooltip {
+    width: 24rem;
+    max-width: 100vw;
+    font-size: 14px;
+    line-height: 1.5;
     white-space: pre-wrap;
   }
 }

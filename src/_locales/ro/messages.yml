@@ -237,12 +237,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Toate
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Cod
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nume
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: dimensiune
@@ -555,6 +558,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Nume de utilizator: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Temă:'
@@ -928,6 +934,12 @@ titleSearchHint:
   message: |-
     * Tasta <Enter> adaugă textul în istoricul completării automate
     * Sintaxa RegExp este suportată: /re/ și /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Urmărește editările externe
