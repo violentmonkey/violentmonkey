@@ -324,7 +324,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Kopia zapasowa i konserwacja
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Wyświetl na plakietce: '
