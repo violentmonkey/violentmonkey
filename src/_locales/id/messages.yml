@@ -80,7 +80,7 @@ buttonReset:
   message: Setel ulang
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Setel ulang pengaturan
 buttonRestore:
   description: Button to restore a removed script.
   message: Pulihkan
@@ -92,7 +92,7 @@ buttonSaveClose:
   message: Simpan & Tutup
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Tersimpan
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Tampilkan status penyunting
@@ -101,7 +101,7 @@ buttonSupport:
   message: Halaman dukungan
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Urung
 buttonUpdate:
   description: Button to update a script.
   message: Perbarui
@@ -155,7 +155,9 @@ descEditorOptions:
     "Gaya Khusus" di bawah.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variabel yang didukung: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    dengan format yang kompatibel dengan MomentJS, contoh <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentasi tentang blok data meta skrip dan API <code>GM</code>:'
@@ -272,7 +274,7 @@ hintVacuum:
     cache.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Pasang
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Pasang dari $1
@@ -318,7 +320,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Pencadangan dan Pemeliharaan
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Ditampilkan pada lencana: '
@@ -579,7 +581,7 @@ labelXhrInjectHint:
     peringatan ini memlalui klik kanan pada teks tersebut.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (kecuali mode privat dan situs dengan kuki yang dinonaktifkan)
 lastSync:
   description: Label for last sync timestamp.
   message: Sinkron terakhir pada $1
@@ -848,19 +850,21 @@ optionUpdate:
   message: Perbarui
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Hanya-baca
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Skrip yang diperbarui otomatis dikunci dalam mode hanya-baca, kecuali Anda
+    menonaktifkan pembaruan skrip dan mengizinkan penyuntingan.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Izinkan penyuntingan
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (pembaruan berikutnya akan menimpanya)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Pasang ulang
 reloadTab:
   description: Label of action to reload the tab
   message: Muat ulang tab
@@ -869,10 +873,14 @@ reloadTabTrackHint:
   message: ''
 removeAllScripts:
   description: Button to remove all scripts
-  message: ''
+  message: Hapus semua skrip
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
-  message: ''
+  message: >-
+    Hapus semua skrip ke "Keranjang Sampah"?
+
+    Keranjang Sampah akan dikosongkan secara permanen setelah beberapa saat.
+    Anda juga bisa membukanya dan mengosongkannya sekarang juga.
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sesuai besar kecil huruf
@@ -896,7 +904,7 @@ skipScriptsMsg:
   message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Setop pelacakan
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Warna lencana normal
@@ -912,10 +920,12 @@ titleSearchHint:
     * Sintaksis RegExp didukung: /re/ dan /re/flags
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Lacak penyuntingan eksternal
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Biarkan halaman ini tetap terbuka untuk melacak perubahan yang Anda buat
+    dalam berkas lokal
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
