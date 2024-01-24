@@ -116,6 +116,7 @@
           :visible="index < state.batchRender.limit"
           :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
+          :activeTags="activeTags"
           @remove="handleActionRemove"
           @restore="handleActionRestore"
           @toggle="handleActionToggle"
@@ -242,8 +243,8 @@ const state = reactive({
   showHotkeys: false,
   search: {
     value: '',
-    rules: [],
     error: null,
+    ...createSearchRules(''),
   },
   sortedScripts: [],
   filteredScripts: [],
@@ -264,13 +265,14 @@ const message = computed(() => {
   if (store.loading) {
     return null;
   }
-  if (state.search ? !state.sortedScripts.find(s => s.$cache.show !== false) : !state.sortedScripts.length) {
+  if (state.search.rules.length ? !state.sortedScripts.find(s => s.$cache.show !== false) : !state.sortedScripts.length) {
     return i18n('labelNoSearchScripts');
   }
   return null;
 });
 const searchNeedsCodeIds = computed(() => state.search.rules.some(rule => !rule.scope || rule.scope === 'code')
         && store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id));
+const activeTags = computed(() => state.search.tokens.filter(token => token.prefix === '#' && !token.negative).map(token => token.parsed));
 const getCurrentList = () => showRecycle.value ? store.removedScripts : store.scripts;
 
 const debouncedSearch = debounce(scheduleSearch, 200);
@@ -293,11 +295,11 @@ async function refreshUI() {
 }
 function onUpdate() {
   const scripts = [...getCurrentList()];
-  const numFound = state.search ? performSearch(scripts) : scripts.length;
+  const numFound = state.search.rules.length ? performSearch(scripts) : scripts.length;
   const cmp = currentSortCompare.value;
   if (cmp) scripts.sort(combinedCompare(cmp));
   state.sortedScripts = scripts;
-  state.filteredScripts = state.search ? scripts.filter(({ $cache }) => $cache.show) : scripts;
+  state.filteredScripts = state.search.rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
   selectScript(state.focusedIndex);
   if (!step || numFound < step) renderScripts();
   else debouncedRender();
@@ -386,7 +388,7 @@ async function renderScripts() {
   const startTime = performance.now();
   // If we entered a new loop of rendering, state.batchRender will no longer be batchRender
   while (limit < length && batchRender === state.batchRender) {
-    if (step && state.search) {
+    if (step && state.search.rules.length) {
       // Only visible items contribute to the batch size
       for (let vis = 0; vis < step && limit < length; limit += 1) {
         vis += state.sortedScripts[limit].$cache.show ? 1 : 0;
@@ -418,7 +420,10 @@ function performSearch() {
 }
 function scheduleSearch() {
   try {
-    state.search.rules = createSearchRules(state.search.value);
+    state.search = {
+      ...state.search,
+      ...createSearchRules(state.search.value),
+    };
     state.search.error = null;
   } catch (err) {
     state.search.error = err.message;
@@ -497,7 +502,14 @@ function handleActionUpdate(script) {
   sendCmdDirectly('CheckUpdate', script.props.id);
 }
 function handleClickTag(tag) {
-  state.search.value = [state.search.value.trim(), `#${tag} `].filter(Boolean).join(' ');
+  if (activeTags.value.includes(tag)) {
+    // remove tag
+    const tokens = state.search.tokens.filter(token => !(token.prefix === '#' && token.parsed === tag));
+    state.search.value = tokens.map(token => `${token.prefix}${token.raw}`).join(' ');
+  } else {
+    // add tag
+    state.search.value = [state.search.value.trim(), `#${tag} `].filter(Boolean).join(' ');
+  }
 }
 function handleSmoothScroll(delta) {
   if (!delta) return;

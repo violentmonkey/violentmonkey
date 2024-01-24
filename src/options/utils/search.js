@@ -1,22 +1,24 @@
-export function createSearchRules(search) {
-  const tagLists = [[], []];
+import { normalizeTag } from '@/common';
+
+export function parseSearch(search) {
   /**
    * @type Array<{
-   *   scope: string;
-   *   pattern: string | RegExp;
+   *   prefix: string;
+   *   raw: string;
    *   negative: boolean;
    * }>
    */
-  const rules = [];
+  const tokens = [];
   search = search.toLowerCase();
   let offset = 0;
   while (search[offset] === ' ') offset += 1;
   while (offset < search.length) {
     const negative = search[offset] === '!';
     if (negative) offset += 1;
-    let prefix =
+    const prefix =
       search.slice(offset).match(/^(#|re:|(?:name|code)(?:\+re)?:)/)?.[1] || '';
     if (prefix) offset += prefix.length;
+    const startOffset = offset;
     const quote =
       (!prefix || prefix.endsWith(':')) &&
       search.slice(offset).match(/^['"]/)?.[0];
@@ -40,45 +42,67 @@ export function createSearchRules(search) {
       if (offset < search.length) offset += 1;
       else throw new Error('Unmatched quotes');
     }
-    if (prefix === '#') {
-      tagLists[+negative].push(pattern);
+    tokens.push({
+      prefix,
+      raw: search.slice(startOffset, offset),
+      parsed: pattern,
+      negative,
+    });
+    while (search[offset] === ' ') offset += 1;
+  }
+  return tokens;
+}
+
+export function createSearchRules(search) {
+  const tokens = parseSearch(search);
+  /**
+   * @type Array<{
+   *   scope: string;
+   *   pattern: string | RegExp;
+   *   negative: boolean;
+   * }>
+   */
+  const rules = [];
+  const includeTags = [];
+  const excludeTags = [];
+  for (const token of tokens) {
+    if (token.prefix === '#') {
+      (token.negative ? excludeTags : includeTags).push(token.parsed);
     } else {
       // Strip ':'
-      prefix = prefix.slice(0, -1);
-      if (/(?:^|\+)re$/.test(prefix)) {
-        prefix = prefix.slice(0, -3);
-        rules.push({
-          scope: prefix,
-          pattern: new RegExp(pattern, 'i'),
-          negative,
-        });
+      let scope = token.prefix.slice(0, -1);
+      let pattern = token.parsed;
+      if (/(?:^|\+)re$/.test(scope)) {
+        scope = scope.slice(0, -3);
+        pattern = new RegExp(pattern, 'i');
       } else {
         const reMatches = pattern.match(/^\/(.*?)\/(\w*)$/);
         if (reMatches) pattern = new RegExp(reMatches[1], reMatches[2] || 'i');
-        rules.push({
-          scope: prefix,
-          pattern,
-          negative,
-        });
       }
+      rules.push({
+        scope,
+        pattern,
+        negative: token.negative,
+      });
     }
-    while (search[offset] === ' ') offset += 1;
   }
-  for (let negative = 0; negative < 2; negative += 1) {
-    const tags = tagLists[negative];
-    if (tags.length) {
-      const sanitizedTags = tags
-        .map((tag) => tag.replace(/[^\w.-]/g, '').replace(/\./g, '\\.'))
-        .filter(Boolean)
-        .join('|');
+  [includeTags, excludeTags].forEach((tags, negative) => {
+    const sanitizedTags = tags
+      .map((tag) => normalizeTag(tag).replace(/\./g, '\\.'))
+      .filter(Boolean)
+      .join('|');
+    if (sanitizedTags) {
       rules.unshift({
         scope: 'tags',
         pattern: new RegExp(`(?:^|\\s)(${sanitizedTags})(\\s|$)`),
         negative: !!negative,
       });
     }
-  }
-  return rules;
+  });
+  return {
+    tokens,
+    rules,
+  };
 }
 
 export function testSearchRule(rule, data) {

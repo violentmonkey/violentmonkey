@@ -23,11 +23,11 @@
          :data-order="script.config.removed ? null : script.props.position"
          class="script-name ellipsis" />
       <div class="script-tags" v-if="canRender">
-        <a v-for="(item, i) in tags.slice(0, 2)" :key="i" v-text="`#${item}`" @click.prevent="onTagClick(item)"></a>
+        <a v-for="(item, i) in tags.slice(0, 2)" :key="i" v-text="`#${item}`" @click.prevent="onTagClick(item)" :class="{ active: activeTags?.includes(item) }"></a>
         <Dropdown v-if="tags.length > 2">
           <a>...</a>
           <template #content>
-            <a v-for="(item, i) in tags.slice(2)" :key="i" class="dropdown-menu-item" v-text="`#${item}`" @click.prevent="onTagClick(item)"></a>
+            <a v-for="(item, i) in tags.slice(2)" :key="i" class="dropdown-menu-item" v-text="`#${item}`" @click.prevent="onTagClick(item)" :class="{ active: activeTags?.includes(item) }"></a>
           </template>
         </Dropdown>
       </div>
@@ -151,6 +151,7 @@ export default {
     'focused',
     'hotkeys',
     'showHotkeys',
+    'activeTags',
   ],
   components: {
     Dropdown,
@@ -385,10 +386,14 @@ $removedItemHeight: calc(
     a {
       margin-right: 4px;
       cursor: pointer;
-      color: #999;
+      color: var(--fill-4);
       &:hover {
-        color: #666;
+        color: var(--fill-6);
       }
+    }
+    .active {
+      color: var(--fill-6);
+      font-weight: bold;
     }
   }
   &-buttons {

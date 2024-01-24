@@ -338,3 +338,7 @@ export function dumpScriptValue(value, jsonDump = JSON.stringify) {
     return `${simple || 'o'}${simple ? value : jsonDump(value)}`;
   }
 }
+
+export function normalizeTag(tag) {
+  return tag.replace(/[^\w.-]/g, '');
+}
