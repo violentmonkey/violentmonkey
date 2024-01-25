@@ -18,11 +18,19 @@
     </div>
     <!-- We disable native dragging on name to avoid confusion with exec re-ordering.
     Users who want to open a new tab via dragging the link can drag the icon. -->
-    <div class="script-name ellipsis">
-      <!-- Using a nested element to center the text vertically AND apply text-ellipsis -->
+    <div class="script-info-1">
       <a v-text="script.$cache.name" v-bind="viewTable && { draggable: false, href: url, tabIndex }"
          :data-order="script.config.removed ? null : script.props.position"
-         class="ellipsis" />
+         class="script-name ellipsis" />
+      <div class="script-tags" v-if="canRender">
+        <a v-for="(item, i) in tags.slice(0, 2)" :key="i" v-text="`#${item}`" @click.prevent="onTagClick(item)" :class="{ active: activeTags?.includes(item) }"></a>
+        <Dropdown v-if="tags.length > 2">
+          <a>...</a>
+          <template #content>
+            <a v-for="(item, i) in tags.slice(2)" :key="i" class="dropdown-menu-item" v-text="`#${item}`" @click.prevent="onTagClick(item)" :class="{ active: activeTags?.includes(item) }"></a>
+          </template>
+        </Dropdown>
+      </div>
     </div>
     <div class="script-info flex ml-1c">
       <template v-if="canRender">
@@ -122,6 +130,7 @@
 </template>
 
 <script>
+import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import {
   getLocaleString, getScriptHome, formatTime,
@@ -142,8 +151,10 @@ export default {
     'focused',
     'hotkeys',
     'showHotkeys',
+    'activeTags',
   ],
   components: {
+    Dropdown,
     Icon,
     Tooltip,
   },
@@ -164,6 +175,9 @@ export default {
         email: matches && matches[2],
         name: matches ? matches[1] : text,
       };
+    },
+    tags() {
+      return this.script.custom.tags?.split(' ').filter(Boolean) || [];
     },
     labelEnable() {
       return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
@@ -251,6 +265,9 @@ export default {
     },
     onBlur() {
       keyboardService.setContext('scriptFocus', false);
+    },
+    onTagClick(item) {
+      this.$emit('clickTag', item);
     },
     toggleTip(e) {
       toggleTip(e.target);
@@ -347,19 +364,36 @@ $removedItemHeight: calc(
       color: #f00;
     }
   }
-  &-name {
+  &-info-1 {
+    display: flex;
+    gap: 8px;
     min-width: 100px;
   }
-  &-name a {
+  &-name {
     font-weight: 500;
     font-size: $nameFontSize;
     color: inherit;
     padding-left: .5rem;
-    .removed & {
+    &.removed {
       margin-right: 8px;
     }
-    .disabled & {
+    &.disabled {
       color: var(--fill-8);
+    }
+  }
+  &-tags {
+    white-space: nowrap;
+    a {
+      margin-right: 4px;
+      cursor: pointer;
+      color: var(--fill-4);
+      &:hover {
+        color: var(--fill-6);
+      }
+    }
+    .active {
+      color: var(--fill-6);
+      font-weight: bold;
     }
   }
   &-buttons {

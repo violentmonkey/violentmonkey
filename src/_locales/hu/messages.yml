@@ -246,12 +246,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Mindenhol
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Kódban
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Névben
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: méret alapján
@@ -561,6 +564,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Felhasználónév: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Téma: '
@@ -943,6 +949,12 @@ titleSearchHint:
     történethez
 
     * RegExp szintaxis támogatott: /re/ és /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Külső módosítások nyomon követése

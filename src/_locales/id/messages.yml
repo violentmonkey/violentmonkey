@@ -231,12 +231,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Semua
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Kode
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Nama
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: ukuran
@@ -546,6 +549,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Nama pengguna: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema:'
@@ -918,6 +924,12 @@ titleSearchHint:
   message: |-
     * <Enter> menambahkan teks ke riwayat autocomplete
     * Sintaksis RegExp didukung: /re/ dan /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Lacak penyuntingan eksternal

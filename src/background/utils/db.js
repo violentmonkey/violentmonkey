@@ -1,7 +1,7 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps,
+  getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps, normalizeTag,
 } from '@/common';
 import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -628,6 +628,7 @@ export async function parseScript(src) {
     script.custom.homepageURL = src.from;
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
+  script.custom.tags = script.custom.tags?.split(/\s+/).map(normalizeTag).filter(Boolean).join(' ').toLowerCase();
   if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);

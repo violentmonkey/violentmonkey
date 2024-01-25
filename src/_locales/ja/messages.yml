@@ -225,12 +225,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: すべて
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: コード
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: 名前
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: サイズ
@@ -534,6 +537,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'ユーザ名: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'テーマ:'
@@ -883,6 +889,12 @@ titleSearchHint:
   message: |-
     * <Enter> キーで自動補完の履歴に文字列を追加
     * 使用できる正規表現の構文: /条件/ や /条件/フラグ
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: 外部での編集を追跡

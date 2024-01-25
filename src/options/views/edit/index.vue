@@ -180,6 +180,7 @@ const CUSTOM_PROPS = {
   homepageURL: '',
   updateURL: '',
   downloadURL: '',
+  tags: '',
   origInclude: true,
   origExclude: true,
   origMatch: true,

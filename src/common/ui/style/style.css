@@ -143,6 +143,7 @@ input[type=password],
 textarea {
   padding: 0 .2em;
 }
+kbd,
 code {
   padding: 0 .2em;
   background: hsla(45, 75%, 75%, .25);
@@ -403,7 +404,8 @@ body .vl-tooltip {
   box-shadow: 0 0 40px #000;
 }
 
-.has-error {
+.has-error,
+input[type].has-error {
   // reminder: make sure all colors are readable in light/dark schemes
   border-color: #8008;
   background: #f002;

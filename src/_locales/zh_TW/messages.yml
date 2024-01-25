@@ -222,12 +222,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: 全部
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: 程式碼
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: 名稱
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: 大小
@@ -531,6 +534,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 使用者名稱：
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: '主題:'
@@ -880,6 +886,12 @@ titleSearchHint:
   message: |-
     * 按 <Enter> 鍵會將文字加到自動完成記錄中
     * 支援正規表示式語法：/re/ 和 /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: 追蹤外部編輯

@@ -241,12 +241,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Tümü
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Kod
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: İsim
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: boyut
@@ -554,6 +557,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Kullanıcı adı:'
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema:'
@@ -923,6 +929,12 @@ titleSearchHint:
   message: |-
     * <Enter> tuşu metni otomatik tamamlama geçmişine ekler
     * RegExp sözdizimi desteklenmektedir: /re/ ve /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Harici düzenlemeleri takip edin

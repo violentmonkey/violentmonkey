@@ -242,12 +242,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Všetko
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Kód
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Názov
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: veľkosť
@@ -555,6 +558,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Používateľské meno: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Motív:'
@@ -925,6 +931,12 @@ titleSearchHint:
   message: |-
     * kláves <Enter> pridá text do histórie automatického dopĺňania
     * je podporovaná syntax RegExp: /re/ a /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Sledovať externé úpravy

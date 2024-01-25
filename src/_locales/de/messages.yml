@@ -242,12 +242,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Alles
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Code
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Name
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: Größe
@@ -560,6 +563,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Benutzername: '
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: 'Theme: '
@@ -937,6 +943,12 @@ titleSearchHint:
   message: |-
     * <Enter>-Taste fügt den Text zum Autovervollständigungs-Verlauf hinzu
     * RegExp-Syntax wird unterstützt: /re/ und /re/flags
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Externe Bearbeitungen tracken

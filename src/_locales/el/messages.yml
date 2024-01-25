@@ -222,12 +222,15 @@ filterLastUpdateOrder:
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Όλα
+  touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
   message: Κώδικας
+  touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
   message: Όνομ
+  touched: false
 filterSize:
   description: Label for option to sort scripts by size.
   message: ''
@@ -535,6 +538,9 @@ labelSyncService:
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Όνομα χρήστη:'
+labelTags:
+  description: Label for custom tags.
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
   message: ''
@@ -877,6 +883,12 @@ titleBadgeColorBlocked:
   message: ''
 titleSearchHint:
   description: Hover title for search icon in dashboard.
+  message: ''
+  touched: false
+titleSearchHintV2:
+  description: >-
+    Hover title for search icon in dashboard. Do not translate content between
+    <code>...</code>.
   message: ''
 trackEdits:
   description: Button in a script installation dialog.

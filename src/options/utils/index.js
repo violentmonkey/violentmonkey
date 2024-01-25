@@ -2,6 +2,8 @@ import { reactive } from 'vue';
 import { sendCmdDirectly } from '@/common';
 import { route } from '@/common/router';
 
+export * from './search';
+
 export const store = reactive({
   route,
   /** Speedup and deflicker initial page load by not rendering an invisible script list */
