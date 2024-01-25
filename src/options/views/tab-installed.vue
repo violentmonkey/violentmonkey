@@ -729,9 +729,6 @@ $iconSize: 2rem; // from .icon in ui/style.css
   text-align: center;
   color: var(--fill-8);
 }
-.scripts {
-  overflow-y: auto;
-}
 .backdrop > *,
 .backdrop::after {
   display: inline-block;
