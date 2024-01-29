@@ -551,7 +551,7 @@ labelSyncUsername:
   message: 'Nama pengguna: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Tag (dipisah spasi):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema:'
@@ -907,7 +907,9 @@ skipScripts:
   message: Muat ulang halaman tanpa userscript
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Anda menonaktifkan userscript untuk halaman ini. Untuk menjalankannya, muat
+    ulang atau kunjungi tab tersebut.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Setop pelacakan

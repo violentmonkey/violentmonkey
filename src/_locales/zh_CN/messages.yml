@@ -80,7 +80,7 @@ buttonReset:
   message: 重置
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: 重置设置
 buttonRestore:
   description: Button to restore a removed script.
   message: 还原
@@ -131,7 +131,7 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: 撤销所有数据变更（导入、更新、编辑、自定义）
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: 此列表匹配的URL将不会被注入脚本。
@@ -147,7 +147,9 @@ descEditorOptions:
     rel="noopener noreferrer">完整列表</a>。
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    支持的变量：<{{name}}>、<{{url}}>、<{{date}}>、<{{date:format}}> 使用 MomentJS 支持的格式，如
+    <{{date:YYYY-MM-DD}}>。
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
@@ -310,7 +312,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: 备份和维护
 labelBadge:
   description: Label for option to show number on badge.
   message: 在扩展图标上显示：
@@ -536,7 +538,7 @@ labelSyncUsername:
   message: 用户名：
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 标签（空格分隔）：
 labelTheme:
   description: Label for the visual theme option.
   message: '主题:'
@@ -845,10 +847,12 @@ reloadTabTrackHint:
   message: 如果勾选，则在检测到脚本更新且匹配当前标签页的 URL 时，将自动刷新当前标签页。
 removeAllScripts:
   description: Button to remove all scripts
-  message: ''
+  message: 删除所有脚本
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
-  message: ''
+  message: |-
+    移动所有脚本到回收站？
+    它在一段时间后会自动清空。你也可以打开它并主动清空。
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 区分大小写
@@ -889,7 +893,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * <kbd>Enter</kbd> 键会将搜索内容加入自动补全历史
+
+    * 所有条件不区分大小写
+
+    * 多个条件可以通过空格分开组合使用
+
+    * 搜索元数据：<code>"Awesome Script" "Description"</code>
+
+    * 搜索标签：<code>#tag1 #tag2</code>
+
+    * 搜索脚本名称：<code>name:"awesome name"</code>
+
+    * 搜索脚本代码：<code>code:"awesome code"</code>
+
+    * 排除搜索：<code>!#tag2 !name:"unwanted"</code>
+
+    * 正则表达式：<code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: 跟踪外部编辑

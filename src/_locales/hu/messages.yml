@@ -566,7 +566,7 @@ labelSyncUsername:
   message: 'Felhasználónév: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Címkék (szóközzel tagolva):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Téma: '
@@ -954,7 +954,26 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * Az <kbd>Enter</kbd> billentyűvel hozzáadódik a keresés az
+    automata-kiegészítés előzményekhez
+
+    * Minden keresési feltétel kis- és nagybetű érzékeny
+
+    * A szóközzel elválasztott feltételek kombinálhatóak
+
+    * Keresés metadatokra: <code>"Lenyűgöző szkript" "Leírás"</code>
+
+    * Keresés címkékre: <code>#címke1 #címke2</code>
+
+    * Keresés szkript nevére: <code>name:"lenyűgöző név"</code>
+
+    * Keresés szkript kódra: <code>code:"lenyűgöző kód"</code>
+
+    * Kizáró keresés: <code>!#címke2 !name:"nemkívánt"</code>
+
+    * Reguláris kifejezések: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? szóközzel elválasztva"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Külső módosítások nyomon követése

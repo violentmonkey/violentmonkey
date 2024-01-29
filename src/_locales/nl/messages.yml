@@ -557,7 +557,7 @@ labelSyncUsername:
   message: 'Gebruikersnaam: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Labels (spatiegescheiden):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Thema:'
@@ -934,7 +934,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * <kbd>Enter</kbd>toets om tekst toe te voegen aan automatisch aanvullen 
+
+    * Alle omstandigheden zijn hoofdletterongevoelig
+
+    * Spatiegescheiden omstandigheden kunnen worden gecombineerd
+
+    * Zoeken op metagegevens: <code>"Geweldig script" "Beschrijving"</code>
+
+    * Zoeken op labels: <code>#label1 #label2</code>
+
+    * Zoeken op scriptnaam: <code>name:"geweldige naam"</code>
+
+    * Zoeken op scriptcode: <code>code:"geweldige code"</code>
+
+    * Negatief zoeken: <code>!#label2 !name:"ongewenst"</code>
+
+    * Reguliere uitdrukkingen: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? met spatie"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Externe bewerkingen bijhouden
