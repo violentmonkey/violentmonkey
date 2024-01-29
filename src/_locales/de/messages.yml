@@ -565,7 +565,7 @@ labelSyncUsername:
   message: 'Benutzername: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Tags (leerzeichen-separiert):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Theme: '
@@ -948,7 +948,26 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * <kbd>Enter</kbd>-Taste fügt den Text zur Autovervollständigungs-Chronik
+    hinzu
+
+    * Alle Bedingungen sind Groß- und Kleinschreibung beachtend
+
+    * Leerzeichen-separierte Bedingungen können kombiniert werden
+
+    * Suche nach Metadaten: <code>"Awesome Script" "Description"</code>
+
+    * Suche nach Tags: <code>#tag1 #tag2</code>
+
+    * Suche nach Skriptnamen: <code>name:"awesome name"</code>
+
+    * Suche nach Skriptcode: <code>code:"awesome code"</code>
+
+    * Negativsuche: <code>!#tag2 !name:"unwanted"</code>
+
+    * Reguläre Ausdrücke: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re::"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Externe Bearbeitungen tracken

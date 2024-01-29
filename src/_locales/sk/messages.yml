@@ -560,7 +560,7 @@ labelSyncUsername:
   message: 'Používateľské meno: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: Značka (oddelené medzerou)
 labelTheme:
   description: Label for the visual theme option.
   message: 'Motív:'
@@ -936,7 +936,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * Kláves <kbd>Enter</kbd> pridáva text do histórie automatického dopĺňania
+
+    * Všetky podmienky nerozlišujú veľkosť písmen
+
+    * Podmienky oddelené medzerou môžu byť kombinované
+
+    * Vyhľadávanie podľa metadát: <code>"Úžasný skript" "Popis"</code>
+
+    * Vyhľadávanie podľa značiek: <code>#znacka1 #znacka2</code>
+
+    * Vyhľadávanie podľa názvu skriptu: <code>name:"úžasný názov"</code>
+
+    * Vyhľadávanie podľa kódu skriptu: <code>code:"úžasný kód"</code>
+
+    * Záporné vyhľadávanie: <code>!#znacka2 !name:"nechcené"</code>
+
+    * Regulárne výrazy: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? s medzerou"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Sledovať externé úpravy
