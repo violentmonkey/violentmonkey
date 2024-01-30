@@ -4,10 +4,10 @@
       <header class="flex">
         <div class="flex" v-if="!showRecycle">
           <Dropdown
-            :closeAfterClick="true"
-            :class="{active: state.menuNewActive}"
-            @stateChange="handleStateChange">
-            <Tooltip :content="i18n('buttonNew')" placement="bottom" align="start">
+            v-model="state.menuNew"
+            :class="{active: state.menuNew}"
+            :closeAfterClick="true">
+            <Tooltip :content="i18n('buttonNew')" placement="bottom" align="start" :disabled="state.menuNew">
               <a class="btn-ghost" tabindex="0">
                 <Icon name="plus" />
               </a>
@@ -239,7 +239,7 @@ const scroller = ref();
 
 const state = reactive({
   focusedIndex: -1,
-  menuNewActive: false,
+  menuNew: false,
   showHotkeys: false,
   search: {
     value: '',
@@ -708,9 +708,6 @@ $iconSize: 2rem; // from .icon in ui/style.css
   }
   .vl-dropdown-menu {
     white-space: nowrap;
-  }
-  .vl-dropdown.active .vl-tooltip-wrap {
-    display: none;
   }
   @media (max-width: 500px) { // same size as `hidden-sm` in @/common/ui/style/style.css
     .vl-dropdown-right .vl-dropdown-menu {
