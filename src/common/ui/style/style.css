@@ -194,9 +194,9 @@ button {
 }
 
 button,
-.btn-ghost,
-.sep {
-  display: inline-block;
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
   padding: 0 .5rem;
   font-size: 1rem;
   line-height: 1.5;
@@ -236,8 +236,14 @@ a:not([href]):hover {
 }
 
 .sep {
+  display: inline-block;
+  padding: 0 .5rem;
+  font-size: 1rem;
+  line-height: 1;
   &::after {
     content: '';
+    display: inline-block;
+    height: 1em;
     border-right: 1px solid var(--fill-4);
   }
 }
@@ -405,6 +411,7 @@ body .vl-tooltip {
 }
 
 .has-error,
+.btn-ghost.has-error,
 input[type].has-error {
   // reminder: make sure all colors are readable in light/dark schemes
   border-color: #8008;
