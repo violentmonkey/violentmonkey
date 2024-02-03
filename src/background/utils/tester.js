@@ -86,19 +86,17 @@ export class MatchTest {
    * @throws {string}
    */
   static try(rule) {
-    const parts = rule.match(RE_MATCH_PARTS);
+    let parts = rule.match(RE_MATCH_PARTS);
     if (parts) return new MatchTest(...parts);
     if (rule === '<all_urls>') return matchAlways; // checking it second as it's super rare
-    throw `Bad pattern: ${MatchTest.fail(rule)} in ${rule}`;
-  }
-
-  static fail(rule) {
-    const parts = rule.match(RE_MATCH_BAD);
-    return (
+    // Report failed parts in detail
+    parts = rule.match(RE_MATCH_BAD);
+    parts = !parts ? '' : (
       (parts[3] != null ? `${parts[3] ? 'unknown' : 'missing'} scheme, ` : '')
       + (parts[4] !== '://' ? 'missing "://", ' : '')
       || (parts[6] == null ? 'missing "/" for path, ' : '')
-    ).slice(0, -2);
+    ).slice(0, -2) + ' in ';
+    throw `Bad pattern: ${parts}${rule}`;
   }
 }
 
