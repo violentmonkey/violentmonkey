@@ -2,6 +2,7 @@ import { isDataUri, makeRaw, request } from '@/common';
 import { NO_CACHE } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import storage from './storage';
+import { getUpdateInterval } from './update';
 
 const requestLimited = limitConcurrency(request, 4);
 
@@ -58,6 +59,9 @@ export async function requestNewer(url, opts, force) {
     return;
   }
   const modOld = !force && await storage.mod.getOne(url);
+  if (!force && modOld?.[1] > Date.now() - getUpdateInterval()) {
+    return;
+  }
   for (const get of force ? [1] : [0, 1]) {
     if (modOld || get) {
       const req = await requestLimited(url,
@@ -69,11 +73,11 @@ export async function requestNewer(url, opts, force) {
         || +new Date(headers.get('last-modified'))
         || +new Date(headers.get('date'))
       );
-      if (mod && mod === modOld) {
+      if (mod && modOld && mod === (modOld[1] || modOld)) {
         return;
       }
       if (get) {
-        if (mod) storage.mod.setOne(url, mod);
+        if (mod) storage.mod.setOne(url, [mod, Date.now()]);
         else if (modOld) storage.mod.remove(url);
         return req;
       }

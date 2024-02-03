@@ -144,7 +144,7 @@ function canNotify(script) {
 }
 
 function autoUpdate() {
-  const interval = (+getOption('autoUpdate') || 0) * TIMEOUT_24HOURS;
+  const interval = getUpdateInterval();
   if (!interval) return;
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
@@ -154,4 +154,8 @@ function autoUpdate() {
   }
   clearTimeout(autoUpdate.timer);
   autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
+}
+
+export function getUpdateInterval() {
+  return (+getOption('autoUpdate') || 0) * TIMEOUT_24HOURS;
 }
