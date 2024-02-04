@@ -267,6 +267,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: Afișează instrucțiunile pentru scripturile locale trase și plasate
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Introdu URL-ul:'
