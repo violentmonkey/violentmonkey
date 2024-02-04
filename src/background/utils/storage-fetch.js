@@ -59,7 +59,8 @@ export async function requestNewer(url, opts, force) {
     return;
   }
   const modOld = !force && await storage.mod.getOne(url);
-  if (!force && modOld?.[1] > Date.now() - getUpdateInterval()) {
+  const modDate = isObject(modOld) && modOld[1];
+  if (!force && modDate > Date.now() - getUpdateInterval()) {
     return;
   }
   for (const get of force ? [1] : [0, 1]) {
@@ -73,7 +74,7 @@ export async function requestNewer(url, opts, force) {
         || +new Date(headers.get('last-modified'))
         || +new Date(headers.get('date'))
       );
-      if (mod && modOld && mod === (modOld[1] || modOld)) {
+      if (mod && mod === (modDate || modOld)) {
         return;
       }
       if (get) {
