@@ -253,6 +253,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: 끌어다 놓은 로컬 스크립트에 대한 지침 표시
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL 입력:'

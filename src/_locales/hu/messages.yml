@@ -276,6 +276,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: Az oldalra húzott helyi szkriptekre vonatkozó instrukciók mutatása
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Add meg az URL-t:'

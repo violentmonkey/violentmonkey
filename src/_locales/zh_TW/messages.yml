@@ -252,6 +252,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: 顯示如何透過「拖放」來新增本機腳本的詳細步驟指導
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 請輸入網址：

@@ -270,6 +270,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: Mostrar as instruções para scripts locais arrastados e soltos
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Inserir URL:'

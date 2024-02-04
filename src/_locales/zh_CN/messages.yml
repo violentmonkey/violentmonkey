@@ -254,6 +254,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: 显示拖放本地脚本的详细说明
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：
