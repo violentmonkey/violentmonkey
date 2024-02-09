@@ -1,4 +1,4 @@
-import { isEmpty, sendTabCmd } from '@/common';
+import { isEmpty, makePause, sendTabCmd } from '@/common';
 import { forEachEntry, forEachValue, nest, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
 import { addOwnCommands, addPublicCommands } from './init';
@@ -19,7 +19,6 @@ addOwnCommands({
   },
   /**
    * @param {Object} data - key can be an id or a uri
-   * @return {Promise<void>}
    */
   SetValueStores(data) {
     const toWrite = {};
@@ -31,21 +30,16 @@ addOwnCommands({
       }
     });
     commit(toWrite, cachedStorageApi);
-    return chain;
   },
 });
 
 addPublicCommands({
-  /**
-   * @return {?Promise<void>}
-   */
   UpdateValue({ id, key, raw }, src) {
     const values = objectGet(openers, [id, src.tab.id, getFrameDocIdFromSrc(src)]);
     if (values) { // preventing the weird case of message arriving after the page navigated
       if (raw) values[key] = raw; else delete values[key];
       nest(toSend, id)[key] = raw || null;
       commit({ [id]: values });
-      return chain;
     }
   },
 });
@@ -105,19 +99,19 @@ function commit(data, api) {
 }
 
 async function broadcast() {
-  const tasks = [];
   const toTabs = {};
+  let num = 0;
   toSend::forEachEntry(groupByTab, toTabs);
   toSend = {};
   for (const [tabId, frames] of Object.entries(toTabs)) {
     for (const [frameId, toFrame] of Object.entries(frames)) {
       if (!isEmpty(toFrame)) {
-        tasks.push(sendToFrame(tabId, frameId, toFrame));
-        if (tasks.length === 20) await Promise.all(tasks.splice(0)); // throttling
+        // Not awaiting because the tab may be busy/sleeping
+        sendTabCmd(+tabId, 'UpdatedValues', toFrame, getFrameDocIdAsObj(frameId));
+        if (!(++num % 20)) await makePause(); // throttling
       }
     }
   }
-  await Promise.all(tasks);
   chain = null;
 }
 
@@ -137,9 +131,4 @@ function groupByTab([id, valuesToSend]) {
       });
     });
   });
-}
-
-function sendToFrame(tabId, frameId, data) {
-  return sendTabCmd(+tabId, 'UpdatedValues', data, getFrameDocIdAsObj(frameId)).catch(console.warn);
-  // must use catch() to keep Promise.all going
 }
