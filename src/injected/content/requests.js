@@ -1,4 +1,4 @@
-import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
+import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import { makeElem, sendCmd } from './util';
 
 const {
@@ -22,6 +22,15 @@ const PROPS_TO_COPY = [
 /** @type {GMReq.Content} */
 const requests = createNullObj();
 let downloadChain = promiseResolve();
+/** @type {()=>string} */
+let getTabUserAgent;
+
+onScripts.push(data => {
+  if (data.xhr) {
+    // The tab may have a different UA due to a devtools override or about:config
+    getTabUserAgent = describeProperty(Navigator[PROTO], 'userAgent').get.bind(navigator);
+  }
+});
 
 // TODO: extract all prop names used across files into consts.js to ensure sameness
 addHandlers({
@@ -41,6 +50,7 @@ addHandlers({
       data = await encodeBody(data[0], data[1]);
       msg.data = cloneInto ? cloneInto(data, msg) : data;
     }
+    msg.ua = getTabUserAgent();
     return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,

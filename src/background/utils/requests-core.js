@@ -15,7 +15,6 @@ export const FORBIDDEN_HEADER_RE = re`/
   sec-
 )|^(
   # whole name matches
-  user-agent|
   # https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name
   # https://cs.chromium.org/?q=file:cc+symbol:IsForbiddenHeader%5Cb
   accept-(charset|encoding)|

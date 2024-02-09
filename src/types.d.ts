@@ -97,6 +97,7 @@ declare namespace GMReq {
       password?: string;
       responseType: XMLHttpRequestResponseType;
       timeout?: number;
+      ua: string;
       url: string;
       user?: string;
       /** responseType to use in the actual XHR */
@@ -204,14 +205,18 @@ declare interface VMInjectionDisabled {
   expose: string | false;
 }
 
+declare interface VMInjectionFlags {
+  clipFF?: boolean;
+  forceContent?: boolean;
+  xhr?: boolean;
+}
+
 /**
  * Injection data sent to the content bridge when injection is enabled
  */
-declare interface VMInjection extends VMInjectionDisabled {
+declare interface VMInjection extends VMInjectionDisabled, VMInjectionFlags {
   cache: StringMap;
-  clipFF?: boolean;
   errors: string[];
-  forceContent?: boolean;
   /** content bridge adds the actually running ids and sends via SetPopup */
   ids: number[];
   info: VMInjection.Info;
@@ -244,10 +249,8 @@ declare namespace VMInjection {
     value: { [scriptId: string]: StringMap };
     valueIds: number[];
   }
-  interface EnvStart extends Env {
+  interface EnvStart extends Env, VMInjectionFlags {
     allIds: { [id: string]: NumBool };
-    clipFF?: boolean;
-    forceContent?: boolean;
     more: EnvDelayed;
     /** `null` = env was processed and contains data now */
     promise: Promise<EnvStart>;
