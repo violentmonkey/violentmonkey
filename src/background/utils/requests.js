@@ -212,17 +212,25 @@ async function httpRequest(opts, events, src, cb) {
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   const shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
+  let uaHeader;
   req.noNativeCookie = shouldSendCookies || anonymous;
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   if (contentType) xhr.setRequestHeader('Content-Type', contentType);
   opts.headers::forEachEntry(([name, value]) => {
-    if (FORBIDDEN_HEADER_RE.test(name)) {
-      vmHeaders.push({ name, value });
+    if (FORBIDDEN_HEADER_RE.test(name)
+    || !uaHeader && (uaHeader = name.toLowerCase() === 'user-agent')) {
+      pushWebRequestHeader(vmHeaders, name, value);
     } else {
       xhr.setRequestHeader(name, value);
     }
   });
+  if (!uaHeader) {
+    uaHeader = navigator.userAgent;
+    if (uaHeader !== opts.ua) {
+      pushWebRequestHeader(vmHeaders, 'User-Agent', opts.ua);
+    }
+  }
   xhr[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
@@ -244,10 +252,8 @@ async function httpRequest(opts, events, src, cb) {
       ...FIREFOX >= 59 && { firstPartyDomain: null },
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
-      vmHeaders.push({
-        name: 'cookie',
-        value: cookies.map(c => `${c.name}=${c.value};`).join(' '),
-      });
+      pushWebRequestHeader(vmHeaders, 'cookie',
+        cookies.map(c => `${c.name}=${c.value};`).join(' '));
     }
   }
   toggleHeaderInjector(id, vmHeaders);
@@ -306,4 +312,13 @@ function decodeBody([body, type, wasBlob]) {
     body = res;
   }
   return [body, type];
+}
+
+/**
+ * @param {chrome.webRequest.HttpHeader[]} arr
+ * @param {string} name
+ * @param {string} value
+ */
+function pushWebRequestHeader(arr, name, value) {
+  arr.push({ name, value });
 }
