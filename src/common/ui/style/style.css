@@ -219,6 +219,10 @@ button,
     background: var(--fill-1);
     border-color: var(--fill-4);
   }
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 .btn-danger {
   color: #f00;

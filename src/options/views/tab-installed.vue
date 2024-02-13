@@ -40,7 +40,7 @@
             <a
               v-for="item in batchActions" :key="item.action"
               class="btn-ghost"
-              :class="{ 'has-error': state.batchAction.action === item.action }"
+              :class="{ 'has-error': state.batchAction.action === item.action, disabled: store.importing }"
               :data-batch-action="item.action"
               tabindex="0"
               @click.prevent="handleBatchAction"
@@ -178,7 +178,7 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { markRemove, store, createSearchRules, testSearchRule } from '../utils';
+import { markRemove, store, createSearchRules, testSearchRule, removeScripts, restoreScripts, runInBatch } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -307,9 +307,9 @@ const batchActions = computed(() => [
     handle: () => {
       const enabled = +anyDisabled.value;
       const scripts = state.filteredScripts.filter(item => +item.config.enabled !== enabled);
-      scripts.forEach(handleActionToggle);
+      runInBatch(() => scripts.map(handleActionToggle));
       return () => {
-        scripts.forEach(handleActionToggle);
+        runInBatch(() => scripts.map(handleActionToggle));
       };
     },
   },
@@ -318,9 +318,9 @@ const batchActions = computed(() => [
     icon: 'trash',
     handle: () => {
       const { filteredScripts } = state;
-      filteredScripts.forEach(script => markRemove(script, 1));
+      removeScripts(filteredScripts);
       return () => {
-        filteredScripts.forEach(script => markRemove(script, 0));
+        restoreScripts(filteredScripts);
       };
     },
   },
@@ -539,7 +539,7 @@ ${err.message || err}
   }
 }
 function handleActionToggle(script) {
-  sendCmdDirectly('UpdateScriptInfo', {
+  return sendCmdDirectly('UpdateScriptInfo', {
     id: script.props.id,
     config: {
       enabled: script.config.enabled ? 0 : 1,
@@ -547,7 +547,7 @@ function handleActionToggle(script) {
   });
 }
 function handleActionUpdate(script) {
-  sendCmdDirectly('CheckUpdate', script.props.id);
+  return sendCmdDirectly('CheckUpdate', script.props.id);
 }
 function handleClickTag(tag) {
   if (activeTags.value.includes(tag)) {
@@ -568,6 +568,7 @@ function handleSmoothScroll(delta) {
   });
 }
 function handleBatchAction(e) {
+  if (store.importing) return;
   const action = e.target.closest('[data-batch-action]')?.dataset.batchAction;
   if (state.batchAction.action === action) {
     // Confirmed
