@@ -56,7 +56,7 @@
             </Tooltip>
           </div>
         </template>
-        <div v-else v-text="i18n('headerRecycleBin')" />
+        <div v-else class="ml-2" v-text="i18n('headerRecycleBin')" />
         <div class="flex-auto"></div>
         <LocaleGroup i18n-key="labelFilterSort" class="ml-1">
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
