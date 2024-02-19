@@ -557,7 +557,7 @@ labelSyncUsername:
   message: 'Логин:'
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Метки (через пробел):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Тема:'
