@@ -98,6 +98,9 @@ a {
     text-decoration: underline;
   }
 }
+span:focus {
+  text-decoration: underline;
+}
 hr {
   margin: .5rem 0;
   border-style: solid;
@@ -201,6 +204,11 @@ button,
   font-size: 1rem;
   line-height: 1.5;
   vertical-align: bottom;
+  &,
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
 }
 .btn-ghost {
   color: inherit;
@@ -228,10 +236,6 @@ button,
   color: #f00;
 }
 
-span:focus,
-a:focus {
-  text-decoration: underline;
-}
 a[tabindex="0"] {
   cursor: pointer;
 }

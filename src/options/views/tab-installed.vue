@@ -569,7 +569,8 @@ function handleSmoothScroll(delta) {
 }
 function handleBatchAction(e) {
   if (store.importing) return;
-  const action = e.target.closest('[data-batch-action]')?.dataset.batchAction;
+  const button = e.target.closest('[data-batch-action]');
+  const action = button?.dataset.batchAction;
   if (state.batchAction.action === action) {
     // Confirmed
     const undo = batchActions.value.find(item => item.action === action)?.handle();
@@ -578,6 +579,7 @@ function handleBatchAction(e) {
       state.batchAction.undo = null;
     });
     state.batchAction.action = null;
+    button.blur();
   } else {
     // Show "Confirm"
     state.batchAction.action = action;
