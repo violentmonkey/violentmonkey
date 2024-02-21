@@ -272,6 +272,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: Anleitung für per Drag-and-Drop hinzugefügte lokale Skripte anzeigen
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL eingeben:'

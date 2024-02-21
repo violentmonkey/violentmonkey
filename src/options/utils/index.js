@@ -25,3 +25,25 @@ export function markRemove(script, removed) {
     removed,
   });
 }
+
+export async function runInBatch(fn) {
+  try {
+    store.importing = true;
+    await fn();
+  } finally {
+    store.importing = false;
+  }
+}
+
+export function removeScripts(scripts) {
+  return runInBatch(async () => {
+    await Promise.all(scripts.map(s => markRemove(s, true)));
+    store.scripts = []; // nuking the ghosts because the user's intent was already confirmed
+  });
+}
+
+export function restoreScripts(scripts) {
+  return runInBatch(async () => {
+    await Promise.all(scripts.map(s => markRemove(s, false)));
+  });
+}

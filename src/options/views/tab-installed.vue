@@ -2,42 +2,63 @@
   <div class="tab-installed" ref="scroller">
     <div v-if="store.canRenderScripts">
       <header class="flex">
-        <div class="flex" v-if="!showRecycle">
-          <Dropdown
-            :closeAfterClick="true"
-            :class="{active: state.menuNewActive}"
-            @stateChange="handleStateChange">
-            <Tooltip :content="i18n('buttonNew')" placement="bottom" align="start">
-              <a class="btn-ghost" tabindex="0">
-                <Icon name="plus" />
+        <template v-if="!showRecycle">
+          <div class="btn-group">
+            <Dropdown
+              v-model="state.menuNew"
+              :class="{active: state.menuNew}"
+              :closeAfterClick="true">
+              <Tooltip :content="i18n('buttonNew')" placement="bottom" align="start" :disabled="state.menuNew">
+                <a class="btn-ghost" tabindex="0">
+                  <Icon name="plus" />
+                </a>
+              </Tooltip>
+              <template #content>
+                <a
+                  class="dropdown-menu-item"
+                  v-text="i18n('buttonNew')"
+                  tabindex="0"
+                  @click.prevent="handleEditScript('_new')"
+                />
+                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
+                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
+                <a
+                  class="dropdown-menu-item"
+                  v-text="i18n('buttonInstallFromURL')"
+                  tabindex="0"
+                  @click.prevent="handleInstallFromURL"
+                />
+              </template>
+            </Dropdown>
+            <Tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
+              <a class="btn-ghost" tabindex="0" @click="handleUpdateAll">
+                <Icon name="refresh" />
               </a>
             </Tooltip>
-            <template #content>
-              <a
-                class="dropdown-menu-item"
-                v-text="i18n('buttonNew')"
-                tabindex="0"
-                @click.prevent="handleEditScript('_new')"
-              />
-              <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
-              <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
-              <a
-                class="dropdown-menu-item"
-                v-text="i18n('buttonInstallFromURL')"
-                tabindex="0"
-                @click.prevent="handleInstallFromURL"
-              />
-            </template>
-          </Dropdown>
-          <Tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
-            <a class="btn-ghost" tabindex="0" @click="handleUpdateAll">
-              <Icon name="refresh" />
+          </div>
+          <div v-if="state.filteredScripts.length" class="btn-group">
+            <a
+              v-for="item in batchActions" :key="item.action"
+              class="btn-ghost"
+              :class="{ 'has-error': state.batchAction.action === item.action, disabled: store.importing }"
+              :data-batch-action="item.action"
+              tabindex="0"
+              @click.prevent="handleBatchAction"
+            >
+              <Icon :name="item.icon" />
+              <span class="ml-1" v-if="state.batchAction.action === item.action">❗</span>
             </a>
-          </Tooltip>
-        </div>
-        <div v-else v-text="i18n('headerRecycleBin')" />
+            <div class="btn-hint subtle" v-text="i18n('hintForBatchAction', `${state.filteredScripts.length}`)"></div>
+            <Tooltip :content="i18n('buttonUndo')" placement="bottom" align="start">
+              <a v-if="state.batchAction.undo" class="btn-ghost" tabindex="0" @click.prevent="state.batchAction.undo">
+                <Icon name="undo" />
+              </a>
+            </Tooltip>
+          </div>
+        </template>
+        <div v-else class="ml-2" v-text="i18n('headerRecycleBin')" />
         <div class="flex-auto"></div>
-        <LocaleGroup i18n-key="labelFilterSort">
+        <LocaleGroup i18n-key="labelFilterSort" class="ml-1">
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
               v-for="(option, name) in filterOptions.sort"
@@ -142,7 +163,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, nextTick, onMounted, watch, ref } from 'vue';
+import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
 import { i18n, sendCmdDirectly, debounce, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
 import { isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
@@ -157,7 +178,7 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { markRemove, store, createSearchRules, testSearchRule } from '../utils';
+import { markRemove, store, createSearchRules, testSearchRule, removeScripts, restoreScripts, runInBatch } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -239,7 +260,7 @@ const scroller = ref();
 
 const state = reactive({
   focusedIndex: -1,
-  menuNewActive: false,
+  menuNew: false,
   showHotkeys: false,
   search: {
     value: '',
@@ -253,6 +274,10 @@ const state = reactive({
   numColumns: 1,
   batchRender: {
     limit: step,
+  },
+  batchAction: {
+    action: null,
+    undo: null,
   },
 });
 
@@ -274,6 +299,32 @@ const searchNeedsCodeIds = computed(() => state.search.rules.some(rule => !rule.
         && store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id));
 const activeTags = computed(() => state.search.tokens.filter(token => token.prefix === '#' && !token.negative).map(token => token.parsed));
 const getCurrentList = () => showRecycle.value ? store.removedScripts : store.scripts;
+const anyDisabled = computed(() => state.filteredScripts.some(item => !item.config.enabled));
+const batchActions = computed(() => [
+  {
+    action: 'toggle',
+    icon: anyDisabled.value ? 'toggle-on' : 'toggle-off',
+    handle: () => {
+      const enabled = +anyDisabled.value;
+      const scripts = state.filteredScripts.filter(item => +item.config.enabled !== enabled);
+      runInBatch(() => scripts.map(handleActionToggle));
+      return () => {
+        runInBatch(() => scripts.map(handleActionToggle));
+      };
+    },
+  },
+  {
+    action: 'remove',
+    icon: 'trash',
+    handle: () => {
+      const { filteredScripts } = state;
+      removeScripts(filteredScripts);
+      return () => {
+        restoreScripts(filteredScripts);
+      };
+    },
+  },
+]);
 
 const debouncedSearch = debounce(scheduleSearch, 200);
 const debouncedRender = debounce(renderScripts);
@@ -341,9 +392,6 @@ async function moveScript(from, to) {
 }
 function handleOrderChange(e) {
   options.set('filters.sort', e.target.value);
-}
-function handleStateChange(active) {
-  state.menuNewActive = active;
 }
 function handleEditScript(id) {
   const pathname = [showRecycle.value ? TAB_RECYCLE : SCRIPTS, id]::trueJoin('/');
@@ -491,7 +539,7 @@ ${err.message || err}
   }
 }
 function handleActionToggle(script) {
-  sendCmdDirectly('UpdateScriptInfo', {
+  return sendCmdDirectly('UpdateScriptInfo', {
     id: script.props.id,
     config: {
       enabled: script.config.enabled ? 0 : 1,
@@ -499,7 +547,7 @@ function handleActionToggle(script) {
   });
 }
 function handleActionUpdate(script) {
-  sendCmdDirectly('CheckUpdate', script.props.id);
+  return sendCmdDirectly('CheckUpdate', script.props.id);
 }
 function handleClickTag(tag) {
   if (activeTags.value.includes(tag)) {
@@ -518,6 +566,24 @@ function handleSmoothScroll(delta) {
     top: el.scrollTop + delta,
     behavior: 'smooth',
   });
+}
+function handleBatchAction(e) {
+  if (store.importing) return;
+  const button = e.target.closest('[data-batch-action]');
+  const action = button?.dataset.batchAction;
+  if (state.batchAction.action === action) {
+    // Confirmed
+    const undo = batchActions.value.find(item => item.action === action)?.handle();
+    state.batchAction.undo = undo && (() => {
+      undo();
+      state.batchAction.undo = null;
+    });
+    state.batchAction.action = null;
+    button.blur();
+  } else {
+    // Show "Confirm"
+    state.batchAction.action = action;
+  }
 }
 function bindKeys() {
   const handleFocus = () => {
@@ -639,6 +705,12 @@ function bindKeys() {
   });
 }
 
+function handleCancelBatchAction(e) {
+  if (!e.target.closest('[data-batch-action]')) {
+    state.batchAction.action = null;
+  }
+}
+
 resetList();
 watch(showRecycle, resetList);
 watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
@@ -657,6 +729,8 @@ watch(selectedScript, script => {
 watch(() => state.showHotkeys, value => {
   keyboardService.setContext('showHotkeys', value);
 });
+
+const disposables = [];
 
 onMounted(() => {
   // Ensure the correct UI is shown when mounted:
@@ -682,7 +756,14 @@ onMounted(() => {
     addEventListener('resize', adjustScriptWidth);
   }
   adjustScriptWidth();
-  return bindKeys();
+  disposables.push(bindKeys());
+
+  document.addEventListener('mousedown', handleCancelBatchAction);
+  disposables.push(() => document.removeEventListener('mousedown', handleCancelBatchAction));
+});
+
+onBeforeUnmount(() => {
+  disposables.forEach(dispose => dispose());
 });
 </script>
 
@@ -699,7 +780,6 @@ $iconSize: 2rem; // from .icon in ui/style.css
     background: var(--fill-0-5);
     height: 4rem;
     align-items: center;
-    padding: 0 1rem;
     line-height: 1;
     border-bottom: 1px solid var(--fill-5);
     .btn-ghost, select {
@@ -708,9 +788,6 @@ $iconSize: 2rem; // from .icon in ui/style.css
   }
   .vl-dropdown-menu {
     white-space: nowrap;
-  }
-  .vl-dropdown.active .vl-tooltip-wrap {
-    display: none;
   }
   @media (max-width: 500px) { // same size as `hidden-sm` in @/common/ui/style/style.css
     .vl-dropdown-right .vl-dropdown-menu {
@@ -789,6 +866,18 @@ $iconSize: 2rem; // from .icon in ui/style.css
       margin-bottom: .5rem;
     }
   }
+}
+
+.btn-group {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  border-right: 1px solid var(--fill-5);
+  padding: 0 0.5rem;
+}
+.btn-hint {
+  margin: 0 0.5rem;
+  cursor: default;
 }
 
 .trash-button {

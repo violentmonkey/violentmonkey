@@ -271,6 +271,9 @@ headerRecycleBin:
 helpForLocalFile:
   description: Label of the checkbox.
   message: Instructies tonen voor slepen-en-neerzetten van lokale scripts
+hintForBatchAction:
+  description: Hint shown next to the buttons for batch actions.
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Invoer-url:'
