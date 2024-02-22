@@ -585,6 +585,8 @@ export async function parseScript(src) {
     message: src.message == null ? i18n('msgUpdated') : src.message || '',
   };
   const result = { errors, update };
+  const { code } = src;
+  const now = Date.now();
   let { id } = src;
   let script;
   let oldScript = getScript({ id, meta });
@@ -608,7 +610,7 @@ export async function parseScript(src) {
     }
     delete script[INFERRED];
   }
-  props.lastModified = props.lastUpdated = src.lastModified || Date.now();
+  props.lastModified = now;
   props.uuid = props.uuid || getUUID();
   // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
   for (const key of ['config', 'custom', 'props']) {
@@ -639,11 +641,14 @@ export async function parseScript(src) {
   if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);
+  // DANGER! Awaiting here when all props are set to avoid modifications made by a "concurrent" call
+  const codeChanged = !oldScript || code !== await storage[S_CODE].getOne(id);
+  if (codeChanged) props.lastUpdated = now;
   // Installer has all the deps, so we'll put them in storage first
   if (src.cache) await depsPromise;
   await storage.base.set({
-    [storage[S_SCRIPT].toKey(props.id)]: script,
-    [storage[S_CODE].toKey(props.id)]: src.code,
+    [S_SCRIPT_PRE + id]: script,
+    ...codeChanged && { [S_CODE_PRE + id]: code },
   });
   Object.assign(update, script, src.update);
   result.where = { id };
