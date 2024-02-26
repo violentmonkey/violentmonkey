@@ -20,7 +20,7 @@ buttonConfirmReinstallation:
   touched: false
 buttonDisable:
   description: Button to disable a script.
-  message: Disabilita
+  message: Disattiva
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Scarica temi
@@ -38,10 +38,10 @@ buttonEmptyRecycleBin:
   message: Svuota il cestino ora!
 buttonEnable:
   description: Button to enable a script.
-  message: Abilita
+  message: Attiva
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Esporta zip
+  message: Esporta in formato zip
 buttonFilter:
   description: Button to show filters menu.
   message: Filtri
@@ -79,10 +79,10 @@ buttonReplaceAll:
   message: Tutti
 buttonReset:
   description: Button to reset to default values.
-  message: Inizializza
+  message: Ripristina
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Ripristina le impostazioni
 buttonRestore:
   description: Button to restore a removed script.
   message: Ripristina
@@ -94,13 +94,13 @@ buttonSaveClose:
   message: Salva e chiudi
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Salvato
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: Mostra stato editor
+  message: Mostra lo stato dell'editor
 buttonSupport:
   description: Button to open support page.
-  message: Pagina di supporto
+  message: Pagina di assistenza
 buttonUndo:
   description: Button to undo removement of a script.
   message: Annulla
@@ -118,20 +118,26 @@ buttonVacuumed:
   message: Dati eliminati
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Eliminando dati...
+  message: Eliminanzione dei dati in corso...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    L'aggiornamento automatico è disattivato per questo script!
+    Cliccando su OK verrà aggiornato comunque.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: |-
-    Modifiche non salvate!
-    Clicca OK per scartarle o annulla per rimanere.
+  message: >-
+    Ci sono modifiche non salvate!
+
+    Cliccando OK non verranno salvate. Cliccando Annulla tornerai alle
+    modifiche.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Ripristina tutte le modifiche eseguite al database (importazioni,
+    aggiornamenti, modifiche e personalizzazioni)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: >-
@@ -140,8 +146,9 @@ descBlacklist:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personalizzato per le pagine opzioni e installazione script. Se non sai
-    a cosa serve, non modificarlo.
+    CSS personalizzato per la pagina delle opzioni e per la pagina
+    dell'installazione di script. Se non sai a cosa serve, non modificare questo
+    valore.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
@@ -153,22 +160,24 @@ descEditorOptions:
     rel="noopener noreferrer">elenco completo</a>.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variabili supportate: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    con un formato compatibile con MomentJS, ad esempio <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: 'Documentazione sul blocco di metadati userscript e <code>GM</code> API:'
+  message: 'Documentazione sul blocco di metadati userscript e API <code>GM</code>:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Scorciatoie da tastiera:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: Usa un altro editor?
+  message: Vuoi usare un altro editor?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Metadati personalizzati
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Impostazioni script
+  message: Impostazioni dello script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
   message: Riga troppo lunga
@@ -214,10 +223,17 @@ failureReasonNoninjectable:
     Violentmonkey non può eseguire script utente in questa pagina
 
     (esempi comuni: interfaccia utente del browser, un'estensione, bloccato da
-    politiche, un sito motore di ricerca in Opera)
+    criteri di gruppo locali, un sito motore di ricerca in Opera)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Esistono diversi metodi per installare o tenere traccia delle modifiche in
+    un file locale: <1> Trascina il file in una pagina o in un popup di
+    Violentmonkey aperto, incluso questo. <2> Installa un server HTTP locale per
+    questo file e aprilo tramite http://localhost. <3> Abilita "Consenti accesso
+    a URL di file" nei dettagli di Violentmonkey nella pagina
+    chrome://extensions. Questo è pericoloso perché qualsiasi userscript può
+    leggere qualsiasi file locale.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: ordine alfabetico
@@ -259,13 +275,15 @@ headerRecycleBin:
   message: Cestino
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: >-
+    Mostra le istruzioni per gli script locali che vengono trascinati nella
+    finestra di Violentmonkey
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: per $1 script corrispondenti
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL in input:'
+  message: 'URL dello script:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Gli script rimossi sono elencati qui e verranno conservati per 7 giorni.
@@ -277,7 +295,7 @@ hintVacuum:
   message: Scarta le ridondanze e prova a ricaricare le risorse mancanti in cache.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Installa
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installa da $1
@@ -307,7 +325,9 @@ labelAuthor:
   message: 'Autore: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Ricarica la scheda corrente dopo aver acceso/spento uno script dal menu
+  message: >-
+    Ricarica la scheda attuale dopo aver attivato/disattivato uno script dal
+    menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -319,15 +339,15 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
-    Controlla gli aggiornamenti degli script ogni $1 giorno/i, usa 0 per non
-    controllare
+    Controlla gli aggiornamenti degli script ogni $1 giorni, imposta 0 per
+    disattivare il controllo
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Backup e manutenzione
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostra sull''icona:'
@@ -336,7 +356,7 @@ labelBadgeColors:
   message: 'Colori icona:'
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: nessuno
+  message: niente
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
   message: numero di script in esecuzione
@@ -348,10 +368,10 @@ labelBlacklist:
   message: Lista nera
 labelContributors:
   description: Label for link to contributors.
-  message: Contributori
+  message: Collaboratori allo sviluppo
 labelCurrentLang:
   description: Label of current language.
-  message: 'Lingua corrente: '
+  message: 'Lingua attuale: '
 labelCustomCSS:
   description: Label for custom CSS section.
   message: Stile personalizzato
@@ -406,7 +426,7 @@ labelFastFirefoxInjectHint:
     disattivare se i tuoi script funzionano bene senza questa opzione.
 labelFeedback:
   description: Label of link to feedback page.
-  message: Feedback
+  message: Segnala problemi o invia un tuo parere
 labelFilterSort:
   description: Label for sort filter.
   message: Ordina per $1
@@ -438,7 +458,7 @@ labelInjectionMode:
   message: 'Modalità di iniezione:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Installando script
+  message: Installazione dello script
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Mantieni originale
@@ -474,7 +494,7 @@ labelNotifyUpdates:
   message: Notifica aggiornamenti script
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ignora notifica per singoli script  (scheda "impostazioni" dell'editor)
+  message: ignora notifica per singoli script (scheda "impostazioni" dell'editor)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
   message: Ordina script nella finestra a comparsa per $1
@@ -485,13 +505,13 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: Installo script di nuovo
+  message: Reinstallazione dello script
 labelRelated:
   description: Label of related links.
   message: 'Link correlati: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Rimosso a $1
+  message: Rimosso il giorno $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Sostituisci con: '
@@ -527,7 +547,7 @@ labelSyncAuthorize:
   message: Autorizza
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Autorizzando
+  message: Autorizzazione in corso
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Nessuno
@@ -555,7 +575,7 @@ labelSyncUsername:
   message: 'Nome utente: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Etichette (separate da uno spazio):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema:'
@@ -591,7 +611,7 @@ labelXhrInjectHint:
     sempre gli avvisi cliccando con il tasto destro su uno di essi.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (eccetto la modalità in incognito e siti con i cookie disattivati)
 lastSync:
   description: Label for last sync timestamp.
   message: Ultima sincronizzazione alle $1
@@ -640,25 +660,25 @@ menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: Script corrispondenti disabilitati
+  message: Script disattivati
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: Script solo per sub-frame
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Script corrispondenti
+  message: Script
 menuNewScript:
   description: Menu item to create a new script.
   message: Crea un nuovo script
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: Script disabilitati
+  message: Script disattivati
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: Script abilitati
+  message: Script attivati
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Controllo aggiornamenti...
+  message: Controllo aggiornamenti in corso...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
@@ -671,7 +691,7 @@ msgErrorFetchingResource:
   message: Errore nel recupero della risorsa!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Errore nel recupero degli script!
+  message: Errore nel recupero dello script!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
   message: Recupero informazioni di aggiornamento fallito.
@@ -679,7 +699,7 @@ msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Errore nel caricamento dei dati script.
+  message: Errore nel caricamento dei dati dello script.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
   message: Errore nel caricamento delle dipendenze.
@@ -687,7 +707,7 @@ msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 elemento/i importati.
+  message: $1 elementi importati.
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
@@ -713,10 +733,10 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Caricamento dati script...
+  message: Caricamento dati script in corso...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Caricamento dipendenze... ($1/$2)
+  message: Caricamento dipendenze in corso... ($1/$2)
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
@@ -726,9 +746,11 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: |-
+  message: >-
     Uno script come questo è già installato.
-    Usa un @name e @namespace diverso qui o modifica quello script.
+
+    Usa un @name e @namespace diverso qui o modifica l'altro script con gli
+    stessi valori.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
@@ -780,7 +802,7 @@ msgSyncError:
   message: Errore di sincronizzazione!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Inizializzando...
+  message: Inizializzazione in corso...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Errore di inizializzazione!
@@ -789,7 +811,7 @@ msgSyncNoAuthYet:
   message: Non ancora autorizzato.
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: La sincronizzazione partirà a breve...
+  message: La sincronizzazione inizierà a breve...
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sincronizzazione in corso...
@@ -801,7 +823,7 @@ msgUpdated:
   message: Script aggiornato.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Aggiornamento...
+  message: Aggiornamento in corso...
 noValues:
   description: Label shown when there is no value for current script.
   message: Nessun valore salvato
@@ -823,22 +845,22 @@ optionPopup:
   message: Menu a comparsa e icona
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: Abilitati prima
+  message: Mostra quelli attivati per primi
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: Raggruppa script disabilitati
+  message: Raggruppa script disattivati
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Raggruppa per stadio @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: Nascondi script disabilitati
+  message: Nascondi script disattivati
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: Mostra script disabilitati
+  message: Mostra script disattivati
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Mostra script abilitati per primi
+  message: Mostra per primi gli script attivati
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
   message: 'Tema interfaccia utente:'
@@ -858,31 +880,42 @@ optionUpdate:
   message: Aggiorna
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Modalità solo lettura
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Questo script è in modalità di sola lettura perché sono attivi gli
+    aggiornamenti automatici. Per poterlo modificare devi disattivare gli
+    aggiornamenti o consentire le modifiche.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Consenti le modifiche
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (il prossimo aggiornamento sovrascriverà le tue modifiche)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Reinstalla
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Ricarica la scheda
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Se attivato, la scheda attiva sarà ricaricata quando vengono rilevate delle
+    modifiche e quando lo script corrisponde all'URL della scheda.
 removeAllScripts:
   description: Button to remove all scripts
-  message: ''
+  message: Rimuovi tutti gli script
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
-  message: ''
+  message: >-
+    Vuoi spostare tutti gli script nel cestino?
+
+    Dopo un po' di tempo verrà svuotato automaticamente. Volendo, puoi aprirlo e
+    svuotarlo manualmente.
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Discrimina maiuscole
@@ -900,20 +933,22 @@ sideMenuSettings:
   message: Impostazioni
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Ricarica la pagina senza gli script
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Hai momentaneamente disattivato gli script per questa pagina. Ricaricando la
+    scheda o navigando tra i link, gli script verranno riattivati.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Smetti di rilevare modifiche
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: Colore badge normale
+  message: Colore predefinito
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: >-
-    Colore del badge quando il sito non è iniettabile (nella lista nera o non
+    Colore quando il sito non è iniettabile (è nella lista nera o non è
     supportato)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
@@ -925,18 +960,40 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * il tasto<kbd>Invio</kbd> aggiunge il testo alla cronologia di
+    autocompletamento
+
+    * tutte le condizioni non fanno diffierenze tra maiuscole e minuscole
+
+    * le condizioni separate da uno spazio possono essere combinate
+
+    * puoi cercare i metadati: <code>"Awesome Script" "Description"</code>
+
+    * puoi cercare le etichette: <code>#tag1 #tag2</code>
+
+    * puoi cercare il nome dello script: <code>name:"awesome name"</code>
+
+    * puoi cercare il codice dello script: <code>code:"awesome code"</code>
+
+    * puoi escludere dei risultati: <code>!#tag2 !name:"unwanted"</code>
+
+    * puoi usare espressioni regolari: <code>/\w+?/</code>,
+    <code>/\w+?/gi</code>, <code>name:/\w+?/</code>, <code>name+re:"\w+? with
+    space"</code>
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Rileva modifiche esterne
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Lascia questa pagina aperta per poter rilevare le modifiche in un file
+    salvato localmente
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Aggiorna script ($1)
 valueLabelKey:
   description: Label for key of a script value.
   message: Chiave (stringa)

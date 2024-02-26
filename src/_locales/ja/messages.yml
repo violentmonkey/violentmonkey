@@ -852,11 +852,13 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: すべてのスクリプトを削除
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: |-
     すべてのスクリプトを「ごみ箱」に移動しますか？
     一定期間後に自動で空になります。またいつでも空にできます。
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 大文字と小文字を区別

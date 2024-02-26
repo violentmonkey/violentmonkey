@@ -132,7 +132,7 @@ confirmUndoImport:
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
   message: >-
-    Alle an der Datenbank gemachten Veränderungen zurücksetzen (importieren,
+    Alle an der Datenbank gemachten Änderungen zurücksetzen (importieren,
     aktualisieren, editieren, anpassen)
 descBlacklist:
   description: HTML Description for the global blacklist.
@@ -274,7 +274,7 @@ helpForLocalFile:
   message: Anleitung für per Drag-and-Drop hinzugefügte lokale Skripte anzeigen
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: für $1 gematchte Skripte
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL eingeben:'
@@ -895,11 +895,12 @@ reloadTab:
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: >-
-    Falls aktiviert, wird der aktive Tab bei erkannten Veränderungen neu
-    geladen, wenn dieses Skript mit der Tab-URL übereinstimmt.
+    Falls aktiviert, wird der aktive Tab neu geladen, wenn Änderungen erkannt
+    werden und das Skript mit der Tab-URL matcht.
 removeAllScripts:
   description: Button to remove all scripts
   message: Alle Skripte entfernen
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: >-
@@ -907,6 +908,7 @@ removeAllScriptsConfirm:
 
     Dieser wird nach einer Weile automatisch geleert. Sie können ihn auch öffnen
     und explizit leeren.
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Groß- und Kleinschreibung beachtend
