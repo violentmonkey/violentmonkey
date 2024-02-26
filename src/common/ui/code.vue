@@ -414,6 +414,7 @@ export default {
       this.cm.focus();
     },
     replace(all) {
+      if (this.readOnly) return; // in case this was invoked via hotkey
       const { cm, search } = this;
       const { replace, query } = search;
       if (!query || !search.show) {
