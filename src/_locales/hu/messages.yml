@@ -905,12 +905,14 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: Összes szkript eltávolítása
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: >-
     Az összes szkriptet a Kukába helyezed? A Kuka automatikusan ki lesz ürítve
     bizonyos idő elteltével, illetve te is megnyithatod és kiürítheted
     közvetlenül.
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Kis- és nagybetűk megkülönböztetése

@@ -274,7 +274,7 @@ helpForLocalFile:
   message: Zobraziť pokyny pre pretiahnuté lokálne skripty
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: pre zodpovedajúce skripty ($1)
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Vložte adresu:'
@@ -888,6 +888,7 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: Odstrániť všetky skripty.
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: >-
@@ -895,6 +896,7 @@ removeAllScriptsConfirm:
 
     Po nejakej dobe sa automaticky vyprázdni. Môžete ho tiež otvoriť a
     vyprázdniť manuálne.
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozlišovať veľké a malé písmená

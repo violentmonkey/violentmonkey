@@ -885,9 +885,11 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: Usuń wszystkie skrypty
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: ''
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Rozróżnianie wielkości liter

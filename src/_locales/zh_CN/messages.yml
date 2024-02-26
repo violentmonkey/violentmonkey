@@ -851,11 +851,13 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: 删除所有脚本
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: |-
     移动所有脚本到回收站？
     它在一段时间后会自动清空。你也可以打开它并主动清空。
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: 区分大小写

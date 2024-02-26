@@ -883,6 +883,7 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: Hapus semua skrip
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: >-
@@ -890,6 +891,7 @@ removeAllScriptsConfirm:
 
     Keranjang Sampah akan dikosongkan secara permanen setelah beberapa saat.
     Anda juga bisa membukanya dan mengosongkannya sekarang juga.
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Sesuai besar kecil huruf

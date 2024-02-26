@@ -273,7 +273,7 @@ helpForLocalFile:
   message: Instructies tonen voor slepen-en-neerzetten van lokale scripts
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: voor $1 overeenkomende scripts
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Invoer-url:'
@@ -886,6 +886,7 @@ reloadTabTrackHint:
 removeAllScripts:
   description: Button to remove all scripts
   message: Alle scripts verwijderen
+  touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
   message: >-
@@ -893,6 +894,7 @@ removeAllScriptsConfirm:
 
     Na verloop van tijd wordt de prullenbak geleegd. Ook kun je handmatig de
     prullenbak legen.
+  touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
   message: Hoofdlettergevoelig
