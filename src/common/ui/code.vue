@@ -31,22 +31,22 @@
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
         <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
-        <tooltip :content="tooltip.replace">
+        <tooltip :content="tooltip.replace" align="end">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
-        <tooltip :content="tooltip.replaceAll">
+        <tooltip :content="tooltip.replaceAll" align="end">
           <button type="button" v-text="i18n('buttonReplaceAll')" @click="replace(1)"></button>
         </tooltip>
       </form>
       <div>
-        <tooltip :content="i18n('searchUseRegex')">
+        <tooltip :content="i18n('searchUseRegex')" align="end">
           <toggle-button v-model="search.options.useRegex">.*</toggle-button>
         </tooltip>
-        <tooltip :content="i18n('searchCaseSensitive')">
+        <tooltip :content="i18n('searchCaseSensitive')" align="end">
           <toggle-button v-model="search.options.caseSensitive">Aa</toggle-button>
         </tooltip>
       </div>
-      <tooltip content="Esc">
+      <tooltip content="Esc" align="end">
         <button @click="clearSearch">&times;</button>
       </tooltip>
     </div>
