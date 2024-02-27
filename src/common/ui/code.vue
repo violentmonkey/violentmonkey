@@ -20,10 +20,10 @@
             v-model="search.query"
           />
         </tooltip>
-        <tooltip :content="tooltip.findPrev">
+        <tooltip :content="tooltip.findPrev" align="end">
           <button type="button" @click="findNext(1)">&lt;</button>
         </tooltip>
-        <tooltip :content="tooltip.findNext">
+        <tooltip :content="tooltip.findNext" align="end">
           <button type="submit">&gt;</button>
         </tooltip>
       </form>
