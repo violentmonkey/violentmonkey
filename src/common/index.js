@@ -26,11 +26,7 @@ export const nullBool2string = v => v ? '1' : v == null ? '' : '0';
 const BAD_URL_CHAR = /[#/?]/g;
 /** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */
 const replaceWithFullWidthForm = s => String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
-const PORT_ERROR_RE = re`/
-  (Receiving end does not exist)|
-  The message port closed before|
-  moved into back\/forward cache|
-$/x`;
+const PORT_ERROR_RE = /(Receiving end does not exist)|The message port closed before|moved into back\/forward cache|$/;
 
 export function initHooks() {
   const hooks = new Set();
