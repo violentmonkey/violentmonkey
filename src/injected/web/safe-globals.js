@@ -36,6 +36,7 @@ export let
   defineProperty,
   describeProperty,
   getPrototypeOf,
+  setPrototypeOf,
   objectKeys,
   objectValues,
   /** Array.prototype can be eavesdropped via setters like '0','1',...
@@ -123,6 +124,7 @@ export const VAULT = (() => {
     describeProperty = res[i += 1] || SafeObject.getOwnPropertyDescriptor,
     getOwnPropertyNames = res[i += 1] || SafeObject.getOwnPropertyNames,
     getPrototypeOf = res[i += 1] || SafeObject.getPrototypeOf,
+    setPrototypeOf = res[i += 1] || SafeObject.setPrototypeOf,
     assign = res[i += 1] || SafeObject.assign,
     objectKeys = res[i += 1] || SafeObject.keys,
     objectValues = res[i += 1] || SafeObject.values,

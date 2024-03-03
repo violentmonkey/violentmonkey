@@ -30,7 +30,7 @@ export function makeGmApiWrapper(script) {
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
   const { id, meta } = script;
   const { grant } = meta;
-  const resources = nullObjFrom(meta.resources);
+  const resources = setPrototypeOf(meta.resources, null);
   /** @type {GMContext} */
   const context = {
     __proto__: null, // necessary for optional props like `async`

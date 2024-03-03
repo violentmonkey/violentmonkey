@@ -52,9 +52,7 @@ export const nullObjFrom = src => process.env.TEST
 
 /** If `dst` has a proto, it'll be copied into a new proto:null object */
 export const safePickInto = (dst, src, keys) => {
-  if (getPrototypeOf(dst)) {
-    dst = nullObjFrom(dst);
-  }
+  setPrototypeOf(dst, null);
   if (src) {
     keys::forEach(key => {
       if (hasOwnProperty(src, key)) {
@@ -89,15 +87,6 @@ export const log = (level, ...args) => {
   args[0] = s;
   safeApply(logging[level], logging, args);
 };
-
-/**
- * Object.defineProperty seems to be inherently broken: it reads inherited props from desc
- * (even though the purpose of this API is to define own props) and then complains when it finds
- * invalid props like an inherited setter when you only provide `{value}`.
- */
-export const safeDefineProperty = (obj, key, desc) => (
-  defineProperty(obj, key, getPrototypeOf(desc) ? nullObjFrom(desc) : desc)
-);
 
 /** Unlike ::push() this one doesn't call possibly spoofed Array.prototype setters */
 export const safePush = (arr, val) => (

@@ -86,7 +86,7 @@ addHandlers({
     for (const script of items) {
       const { key } = script;
       toRun[key.data] = script;
-      storages[script.id] = nullObjFrom(script[VALUES]);
+      storages[script.id] = setPrototypeOf(script[VALUES] || {}, null);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;
         const data = window[winKey];
@@ -94,7 +94,8 @@ addHandlers({
           safePush(toRunNow, data);
           delete window[winKey];
         } else {
-          safeDefineProperty(window, winKey, {
+          defineProperty(window, winKey, {
+            __proto__: null,
             configurable: true,
             set: onCodeSet,
           });

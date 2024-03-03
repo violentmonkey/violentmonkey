@@ -122,7 +122,7 @@ export const GM_API = {
     GM_download(opts, name) {
       let onload;
       if (isString(opts)) {
-        opts = nullObjFrom({ url: opts, name });
+        opts = { url: opts, name, __proto__: null };
       } else if (opts) {
         opts = nullObjFrom(opts);
         name = opts.name;

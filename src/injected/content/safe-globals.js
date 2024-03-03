@@ -39,6 +39,7 @@ export const {
   defineProperty,
   getOwnPropertyDescriptor: describeProperty,
   getPrototypeOf,
+  setPrototypeOf,
   keys: objectKeys,
 } = Object;
 export const { random: mathRandom } = Math;
