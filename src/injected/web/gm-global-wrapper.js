@@ -1,6 +1,9 @@
 import { FastLookup, safeConcat } from './util';
 
 const scopeSym = SafeSymbol.unscopables;
+/** Original ~50 global functions such as setTimeout that some sites override.
+ * Not saving all globals because it would waste a lot of time on each page and frame. */
+const globalFunctionDesc = createNullObj();
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
@@ -9,6 +12,7 @@ const globalKeys = (function makeGlobalKeys() {
   const numFrames = window::getWindowLength();
   // True if `names` is usable as is, but FF is bugged: its names have duplicates
   let ok = !IS_FIREFOX;
+  let desc;
   for (const key of names) {
     if (+key >= 0 && key < numFrames
       || isContentMode && (
@@ -18,13 +22,19 @@ const globalKeys = (function makeGlobalKeys() {
       ok = false;
     } else {
       globalKeysSet.set(key, 1);
+      if (key >= 'a' && key <= 'z'
+      && (desc = describeProperty(window, key))
+      && desc.enumerable && isFunction(desc.value)) {
+        globalFunctionDesc[key] = desc;
+      }
     }
   }
   /* Chrome and FF page mode: `global` is `window`
      FF content mode: `global` is different, some props e.g. `isFinite` are defined only there */
   if (global !== window) {
     builtinGlobals[1]::forEach(key => {
-      if (!(+key >= 0 && key < numFrames)) { // keep the `!` inversion to avoid safe-guarding isNaN
+      if (!(+key >= 0 && key < numFrames)) {
+        // Using `!` to avoid the need to use and safe-guard isNaN
         globalKeysSet.set(key, -1);
         ok = false;
       }
@@ -45,20 +55,25 @@ const globalDesc = createNullObj();
 const updateGlobalDesc = name => {
   let src;
   let desc;
-  let fn;
-  if ((src = inheritedKeys[name])
+  let descFn;
+  if ((descFn = globalFunctionDesc[name]) && (src = window)
+  || (src = inheritedKeys[name])
   || (src = globalKeysSet.get(name)) && (src = src > 0 ? window : global)) {
-    if ((desc = describeProperty(src, name))) {
+    if ((desc = descFn || describeProperty(src, name))) {
       desc = nullObjFrom(desc);
       /* ~45 enumerable action functions belong to `window` and need to be bound to it,
        * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
-      if (name >= 'a' && desc.enumerable && isFunction(fn = desc.value)) {
+      if (descFn) {
         // TODO: switch to SafeProxy and preserve thisArg when it's not our wrapper or its cache?
-        fn = safeBind(fn, src === global ? global : window);
-        desc.value = defineProperty(fn, 'name', { __proto__: null, value: name });
-      }
-      // Using `!` to avoid the need to use and safe-guard isNaN
-      if (!(+name >= 0 && name < window::getWindowLength())) {
+        desc.value = defineProperty(
+          safeBind(desc.value, src === global ? global : window),
+          'name',
+          { __proto__: null, value: name }
+        );
+        globalFunctionDesc[name] = undefined;
+        globalDesc[name] = desc;
+      } else if (!(+name >= 0 && name < window::getWindowLength())) {
+        // Using `!` to avoid the need to use and safe-guard isNaN
         globalDesc[name] = desc;
       }
       return desc;
@@ -66,9 +81,11 @@ const updateGlobalDesc = name => {
   }
 };
 [SafeEventTarget, Object]::forEach(src => {
-  reflectOwnKeys(src = src[PROTO])::forEach(key => {
-    inheritedKeys[key] = src;
-  });
+  src = src[PROTO];
+  for (const key of reflectOwnKeys(src)) {
+    const desc = describeProperty(src, key);
+    (isFunction(desc.value) ? globalFunctionDesc : inheritedKeys)[key] = desc;
+  }
 });
 builtinGlobals = null; // eslint-disable-line no-global-assign
 
