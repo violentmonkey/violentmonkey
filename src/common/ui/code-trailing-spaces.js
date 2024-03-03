@@ -1,12 +1,11 @@
 import CodeMirror from 'codemirror';
+import defaults, {
+  kKillTrailingSpaceOnSave as KILL_OPT,
+  kShowTrailingSpace as SHOW_OPT,
+} from '@/common/options-defaults';
 
-const KILL_OPT = 'killTrailingSpaceOnSave';
-const SHOW_OPT = 'showTrailingSpace';
 const OVERLAY = 'trailingspace';
-const DEFAULTS = {
-  [KILL_OPT]: true,
-  [SHOW_OPT]: true,
-};
+const DEFAULTS = defaults.editor;
 if (!''.trimEnd) {
   // TODO: remove when min_chrome_version>=66, strict_min_version>=61
   String.prototype.trimEnd = function _() {
@@ -64,4 +63,6 @@ CodeMirror.defineOption(SHOW_OPT, DEFAULTS[SHOW_OPT], (cm, val, prev) => {
   }
 });
 
-Object.assign(CodeMirror.defaults, DEFAULTS);
+for (const key of [KILL_OPT, SHOW_OPT]) {
+  CodeMirror.defaults[key] = DEFAULTS[key];
+}

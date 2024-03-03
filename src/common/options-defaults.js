@@ -1,3 +1,7 @@
+export const kAutocompleteOnTyping = 'autocompleteOnTyping';
+export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
+export const kShowTrailingSpace = 'showTrailingSpace';
+
 export default {
   [IS_APPLIED]: true,
   autoUpdate: 1, // days, 0 = disable
@@ -55,6 +59,9 @@ export default {
     hideDisabled: '',
   },
   editor: {
+    [kAutocompleteOnTyping]: 100,
+    [kKillTrailingSpaceOnSave]: true,
+    [kShowTrailingSpace]: true,
     lineWrapping: false,
     indentWithTabs: false,
     indentUnit: 2,

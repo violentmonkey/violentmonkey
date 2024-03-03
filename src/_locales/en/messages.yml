@@ -150,6 +150,21 @@ descEditorOptions:
     them may not work in Violentmonkey. See <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full list</a>.
+descEditorOptionsGeneric:
+  description: Description of editor options in VM settings.
+  message: >-
+    Boolean options may be toggled by double-clicking on the value:
+    <code>true</code> = enabled, <code>false</code> = disabled. Numeric options
+    ending with <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
+    <code>Time</code> are in milliseconds.
+descEditorOptionsVM:
+  description: Description of nonstandard editor options in VM settings.
+  message: >-
+    Nonstandard options: <code>autocompleteOnTyping</code> is a delay in
+    milliseconds to display autocomplete hints after typing (<code>0</code> =
+    disable), <code>killTrailingSpaceOnSave</code> automatically removes
+    trailing spaces in each line when saving, <code>showTrailingSpace</code>
+    shows the trailing spaces as dots.
 descScriptTemplate:
   description: Description of script template section.
   message: >-

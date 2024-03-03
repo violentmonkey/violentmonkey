@@ -11,7 +11,12 @@
       <a :href="ghURL" target="_blank">&nearr;</a>
       <p v-text="error"/>
     </div>
-    <p v-html="i18n('descEditorOptions')" class="my-1"/>
+    <p class="my-1">
+      <span v-html="i18n('descEditorOptions')"
+      /> <span v-html="i18n('descEditorOptionsGeneric')"
+      /> <span v-html="i18n('descEditorOptionsVM')"
+      />
+    </p>
     <setting-text name="editor" json has-reset @dblclick="toggleBoolean">
       <button v-text="i18n('buttonShowEditorState')" @click="toggleStateHint"/>
     </setting-text>
