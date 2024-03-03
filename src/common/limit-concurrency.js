@@ -1,35 +1,45 @@
 import { makePause } from '@/common/index';
 
-export default function limitConcurrency(fn, concurrency, delay) {
-  const all = [];
-  const processing = new Set();
-  let lastRun;
-  async function enqueue() {
-    let token;
-    let promise = new Promise(resolve => { token = resolve; });
-    all.push(token);
-    check();
-    await promise;
-    return token;
-  }
-  function check() {
-    while (all.length && processing.size < concurrency) {
-      const token = all.shift();
-      processing.add(token);
-      token();
+/**
+ * @param {function} fn
+ * @param {number} max
+ * @param {number} diffKeyDelay
+ * @param {number} sameKeyDelay
+ * @param {function(...args): string} getKey
+ * @return {function(...args): Promise}
+ */
+function limitConcurrency(fn, max, diffKeyDelay, sameKeyDelay, getKey) {
+  const keyPromise = {};
+  const keyTime = {};
+  const pool = new Set();
+  const maxDelay = Math.max(diffKeyDelay, sameKeyDelay);
+  let lastTime, lastKey;
+  return async function limiter(...args) {
+    // Looping because the oldest awaiting instance will immediately add to `pool`
+    while (pool.size === max) await Promise.race(pool);
+    let resolve, t;
+    const key = getKey(...args);
+    const old = keyPromise[key];
+    const promise = keyPromise[key] = new Promise(cb => { resolve = cb; }).catch(console.warn);
+    if (old) await old;
+    if (key === lastKey) {
+      t = keyTime[key];
+      t = maxDelay - (t ? performance.now() - t : 0);
+    } else if (lastTime) {
+      t = diffKeyDelay - (performance.now() - lastTime);
     }
-  }
-  return async function limitConcurrencyRunner(...args) {
-    const token = await enqueue();
-    if (delay > 0 && lastRun) {
-      await makePause(delay - (performance.now() - lastRun));
-    }
+    if (t > 0) await makePause(t);
     try {
+      pool.add(promise);
       return await fn(...args);
     } finally {
-      lastRun = performance.now();
-      processing.delete(token);
-      check();
+      pool.delete(promise);
+      delete keyPromise[key];
+      lastTime = keyTime[key] = performance.now();
+      lastKey = key;
+      resolve();
     }
   };
 }
+
+export default limitConcurrency;

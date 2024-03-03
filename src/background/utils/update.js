@@ -2,7 +2,6 @@ import {
   compareVersion, ensureArray, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
 import { __CODE, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX } from '@/common/consts';
-import limitConcurrency from '@/common/limit-concurrency';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { addOwnCommands, commands, init } from './init';
 import { parseMeta } from './script';
@@ -10,7 +9,6 @@ import { getOption, hookOptions, setOption } from './options';
 import { requestNewer } from './storage-fetch';
 
 const processes = {};
-const doCheckUpdateLimited = limitConcurrency(doCheckUpdate, 2, 250);
 const FAST_CHECK = {
   ...NO_CACHE,
   // Smart servers like OUJS send a subset of the metablock without code
@@ -38,7 +36,7 @@ addOwnCommands({
       const urls = getScriptUpdateUrl(script, urlOpts);
       return urls && (
         processes[curId] || (
-          processes[curId] = doCheckUpdateLimited(script, urls, !isAuto)
+          processes[curId] = doCheckUpdate(script, urls, !isAuto)
         )
       );
     }).filter(Boolean);

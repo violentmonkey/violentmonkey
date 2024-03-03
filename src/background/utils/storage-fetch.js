@@ -4,7 +4,9 @@ import limitConcurrency from '@/common/limit-concurrency';
 import storage from './storage';
 import { getUpdateInterval } from './update';
 
-const requestLimited = limitConcurrency(request, 4);
+const requestLimited = limitConcurrency(request, 4, 100, 1000,
+  url => url.split('/')[2] // simple extraction of the `host` part
+);
 
 storage.cache.fetch = cacheOrFetch({
   init(options) {
