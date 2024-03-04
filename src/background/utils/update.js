@@ -20,16 +20,17 @@ hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
 
 addOwnCommands({
   /**
-   * @param {number | number[]} [id] - when omitted, all scripts are checked
+   * @param {number | number[] | 'auto'} [id] - when omitted, all scripts are checked
    * @return {Promise<number>} number of updated scripts
    */
   async CheckUpdate(id) {
-    const isAuto = !id;
-    const scripts = isAuto ? getScripts() : ensureArray(id).map(getScriptById).filter(Boolean);
+    const isAuto = id === AUTO;
+    const isAll = isAuto || !id;
+    const scripts = isAll ? getScripts() : ensureArray(id).map(getScriptById).filter(Boolean);
     const urlOpts = {
       all: true,
-      auto: isAuto,
-      enabledOnly: isAuto && getOption('updateEnabledScriptsOnly'),
+      allowedOnly: isAll,
+      enabledOnly: isAll && getOption('updateEnabledScriptsOnly'),
     };
     const jobs = scripts.map(script => {
       const curId = script.props.id;
@@ -51,7 +52,7 @@ addOwnCommands({
         notes.map(n => n.script.props.id),
       );
     }
-    if (isAuto) setOption('lastUpdate', Date.now());
+    if (isAll) setOption('lastUpdate', Date.now());
     return results.reduce((num, r) => num + (r === true), 0);
   },
 });
@@ -147,7 +148,7 @@ function autoUpdate() {
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
     // Wait on startup for things to settle and after unsuspend for network reconnection
-    setTimeout(commands.CheckUpdate, 20e3);
+    setTimeout(commands.CheckUpdate, 20e3, AUTO);
     elapsed = 0;
   }
   clearTimeout(autoUpdate.timer);
