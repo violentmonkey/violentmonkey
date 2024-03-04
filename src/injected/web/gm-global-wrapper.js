@@ -50,41 +50,35 @@ const globalKeys = (function makeGlobalKeys() {
   }
   return ok ? names : globalKeysSet.toArray();
 }());
-const inheritedKeys = createNullObj();
+const inheritedDesc = createNullObj();
 const globalDesc = createNullObj();
 const updateGlobalDesc = name => {
   let src;
-  let desc;
-  let descFn;
-  if ((descFn = globalFunctionDesc[name]) && (src = window)
-  || (src = inheritedKeys[name])
-  || (src = globalKeysSet.get(name)) && (src = src > 0 ? window : global)) {
-    if ((desc = descFn || describeProperty(src, name))) {
-      desc = nullObjFrom(desc);
-      /* ~45 enumerable action functions belong to `window` and need to be bound to it,
-       * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
-      if (descFn) {
-        // TODO: switch to SafeProxy and preserve thisArg when it's not our wrapper or its cache?
-        desc.value = defineProperty(
-          safeBind(desc.value, src === global ? global : window),
-          'name',
-          { __proto__: null, value: name }
-        );
-        globalFunctionDesc[name] = undefined;
-        globalDesc[name] = desc;
-      } else if (!(+name >= 0 && name < window::getWindowLength())) {
-        // Using `!` to avoid the need to use and safe-guard isNaN
-        globalDesc[name] = desc;
-      }
-      return desc;
-    }
+  const descFn = globalFunctionDesc[name];
+  const desc = descFn
+    || inheritedDesc[name]
+    || (src = globalKeysSet.get(name)) && describeProperty(src = src > 0 ? window : global, name);
+  if (!desc) return;
+  setPrototypeOf(desc, null);
+  /* ~45 enumerable action functions belong to `window` and need to be bound to it,
+   * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
+  if (descFn) {
+    // TODO: switch to SafeProxy and preserve thisArg when it's not our wrapper or its cache?
+    const fn = safeBind(desc.value, src === global ? global : window);
+    desc.value = defineProperty(fn, 'name', { __proto__: null, value: name });
+    globalFunctionDesc[name] = undefined;
+    globalDesc[name] = desc;
+  } else if (!(+name >= 0 && name < window::getWindowLength())) {
+    // Using `!` to avoid the need to use and safe-guard isNaN
+    globalDesc[name] = desc;
   }
+  return desc;
 };
 [SafeEventTarget, Object]::forEach(src => {
   src = src[PROTO];
   for (const key of reflectOwnKeys(src)) {
     const desc = describeProperty(src, key);
-    (isFunction(desc.value) ? globalFunctionDesc : inheritedKeys)[key] = desc;
+    (isFunction(desc.value) ? globalFunctionDesc : inheritedDesc)[key] = desc;
   }
 });
 builtinGlobals = null; // eslint-disable-line no-global-assign
