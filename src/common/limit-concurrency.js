@@ -15,13 +15,14 @@ function limitConcurrency(fn, max, diffKeyDelay, sameKeyDelay, getKey) {
   const maxDelay = Math.max(diffKeyDelay, sameKeyDelay);
   let lastTime, lastKey;
   return async function limiter(...args) {
-    // Looping because the oldest awaiting instance will immediately add to `pool`
-    while (pool.size === max) await Promise.race(pool);
     let resolve, t;
     const key = getKey(...args);
     const old = keyPromise[key];
     const promise = keyPromise[key] = new Promise(cb => { resolve = cb; }).catch(console.warn);
     if (old) await old;
+    // Looping because the oldest awaiting instance will immediately add to `pool`
+    while (pool.size === max) await Promise.race(pool);
+    pool.add(promise);
     if (key === lastKey) {
       t = keyTime[key];
       t = maxDelay - (t ? performance.now() - t : 0);
@@ -30,13 +31,12 @@ function limitConcurrency(fn, max, diffKeyDelay, sameKeyDelay, getKey) {
     }
     if (t > 0) await makePause(t);
     try {
-      pool.add(promise);
+      lastKey = key;
       return await fn(...args);
     } finally {
       pool.delete(promise);
-      delete keyPromise[key];
+      if (keyPromise[key] === promise) delete keyPromise[key];
       lastTime = keyTime[key] = performance.now();
-      lastKey = key;
       resolve();
     }
   };
