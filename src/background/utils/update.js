@@ -32,12 +32,13 @@ addOwnCommands({
       allowedOnly: isAll,
       enabledOnly: isAll && getOption('updateEnabledScriptsOnly'),
     };
+    const opts = { [MULTI]: isAuto ? AUTO : isAll };
     const jobs = scripts.map(script => {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, urlOpts);
       return urls && (
         processes[curId] || (
-          processes[curId] = doCheckUpdate(script, urls, !isAuto)
+          processes[curId] = doCheckUpdate(script, urls, opts)
         )
       );
     }).filter(Boolean);
@@ -57,7 +58,7 @@ addOwnCommands({
   },
 });
 
-async function doCheckUpdate(script, urls, force) {
+async function doCheckUpdate(script, urls, opts) {
   const { id } = script.props;
   let res;
   let msgOk;
@@ -66,7 +67,7 @@ async function doCheckUpdate(script, urls, force) {
   try {
     const { update } = await parseScript({
       id,
-      code: await downloadUpdate(script, urls, force),
+      code: await downloadUpdate(script, urls, opts),
       update: { checking: false },
     });
     msgOk = i18n('msgScriptUpdated', [getScriptName(update)]);
@@ -79,6 +80,7 @@ async function doCheckUpdate(script, urls, force) {
     if (process.env.DEBUG) console.error(update);
   } finally {
     if (resourceOpts) {
+      Object.assign(resourceOpts, opts);
       msgErr = await fetchResources(script, null, resourceOpts);
       if (process.env.DEBUG && msgErr) console.error(msgErr);
     }
@@ -94,7 +96,7 @@ async function doCheckUpdate(script, urls, force) {
   return res;
 }
 
-async function downloadUpdate(script, urls, force) {
+async function downloadUpdate(script, urls, opts) {
   let errorMessage;
   const { meta, props: { id } } = script;
   const [downloadURL, updateURL] = urls;
@@ -102,7 +104,7 @@ async function downloadUpdate(script, urls, force) {
   const result = { update, where: { id } };
   announce(i18n('msgCheckingForUpdate'));
   try {
-    const { data } = await requestNewer(updateURL, FAST_CHECK, force) || {};
+    const { data } = await requestNewer(updateURL, { ...FAST_CHECK, ...opts }) || {};
     const { version, [__CODE]: metaStr } = data ? parseMeta(data, true) : {};
     if (compareVersion(meta.version, version) >= 0) {
       announce(i18n('msgNoUpdate'), { checking: false });
@@ -117,7 +119,7 @@ async function downloadUpdate(script, urls, force) {
       errorMessage = i18n('msgErrorFetchingScript');
       return downloadURL === updateURL && metaStr.trim() !== data.trim()
         ? data
-        : (await requestNewer(downloadURL, NO_CACHE, force)).data;
+        : (await requestNewer(downloadURL, { ...NO_CACHE, ...opts })).data;
     }
   } catch (error) {
     if (process.env.DEBUG) console.error(error);

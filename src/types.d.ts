@@ -313,6 +313,10 @@ declare namespace VMReq {
     /** @implements XMLHttpRequestResponseType */
     responseType?: '' | 'arraybuffer' | 'blob' | 'json' | 'text';
   }
+  interface OptionsMulti extends Options {
+    /** truthy = multi script update, 'auto' = autoUpdate, falsy = single */
+    multi?: boolean | 'auto';
+  }
   interface Response {
     url: string;
     status: number;

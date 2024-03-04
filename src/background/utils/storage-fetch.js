@@ -56,16 +56,23 @@ function cacheOrFetch(handlers = {}) {
   }
 }
 
-export async function requestNewer(url, opts, force) {
+/**
+ * @param {string} url
+ * @param {VMReq.OptionsMulti} [opts]
+ * @return {Promise<VMReq.Response> | void}
+ */
+export async function requestNewer(url, opts) {
   if (isDataUri(url)) {
     return;
   }
-  const modOld = !force && await storage.mod.getOne(url);
-  const modDate = isObject(modOld) && modOld[1];
-  if (!force && modDate > Date.now() - getUpdateInterval()) {
+  let multi, modOld, modDate;
+  if (opts && (multi = opts[MULTI]) && isObject(modOld = await storage.mod.getOne(url))) {
+    [modOld, modDate] = modOld;
+  }
+  if (multi === AUTO && modDate > Date.now() - getUpdateInterval()) {
     return;
   }
-  for (const get of force ? [1] : [0, 1]) {
+  for (const get of multi ? [0, 1] : [1]) {
     if (modOld || get) {
       const req = await requestLimited(url,
         get ? opts
@@ -76,7 +83,7 @@ export async function requestNewer(url, opts, force) {
         || +new Date(headers.get('last-modified'))
         || +new Date(headers.get('date'))
       );
-      if (mod && mod === (modDate || modOld)) {
+      if (mod && mod === modOld) {
         return;
       }
       if (get) {

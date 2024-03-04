@@ -38,4 +38,5 @@ export const BROWSER_ACTION = 'browser_action';
 export const kDocumentId = 'documentId';
 export const kFrameId = 'frameId';
 export const INJECT = 'inject';
+export const MULTI = 'multi';
 export const kWindowId = 'windowId';
