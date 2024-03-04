@@ -143,6 +143,12 @@ descCustomCSS:
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
+descEditorOptionsGeneric:
+  description: Description of editor options in VM settings.
+  message: ''
+descEditorOptionsVM:
+  description: Description of nonstandard editor options in VM settings.
+  message: ''
 descScriptTemplate:
   description: Description of script template section.
   message: ''

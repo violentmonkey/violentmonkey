@@ -145,6 +145,12 @@ descEditorOptions:
     como: {"indentUnit":2, "smartIndent":true}. No entanto, tenha em atenção que
     algumas poderão não funcionar com o Violentmonkey. Lista completa:
     https://codemirror.net/doc/manual.html#config
+descEditorOptionsGeneric:
+  description: Description of editor options in VM settings.
+  message: ''
+descEditorOptionsVM:
+  description: Description of nonstandard editor options in VM settings.
+  message: ''
 descScriptTemplate:
   description: Description of script template section.
   message: ''

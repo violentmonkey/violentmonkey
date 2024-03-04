@@ -145,6 +145,12 @@ descEditorOptions:
     "smartIndent":true}</code> のように指定します。 一部の設定はViolentmonkeyでは動作しないことがあります。<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完全な解説</a>をご覧ください。
+descEditorOptionsGeneric:
+  description: Description of editor options in VM settings.
+  message: ''
+descEditorOptionsVM:
+  description: Description of nonstandard editor options in VM settings.
+  message: ''
 descScriptTemplate:
   description: Description of script template section.
   message: >-

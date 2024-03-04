@@ -82,7 +82,7 @@ buttonReset:
   message: Resetar
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Redefinir configurações
 buttonRestore:
   description: Button to restore a removed script.
   message: Restaurar
@@ -133,7 +133,9 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Reverter todas as alterações feitas no banco de dados (importação,
+    atualização, edição, personalização)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL nesta lista não será injetado por scripts.
@@ -150,9 +152,17 @@ descEditorOptions:
     alguns deles podem não funcionar no Violentmonkey. Consulte à <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
+descEditorOptionsGeneric:
+  description: Description of editor options in VM settings.
+  message: ''
+descEditorOptionsVM:
+  description: Description of nonstandard editor options in VM settings.
+  message: ''
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variáveis suportadas: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    com formato compatível com MomentJS, por exemplo <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -272,7 +282,7 @@ helpForLocalFile:
   message: Mostrar as instruções para scripts locais arrastados e soltos
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: para $1 scripts correspondentes
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Inserir URL:'
@@ -287,7 +297,7 @@ hintVacuum:
   message: Descartar a redundância e tente recarregar os recursos perdidos em cache.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Instalar
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Instalar a partir do $1
@@ -335,7 +345,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Backup e manutenção
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Exibição do emblema: '
@@ -563,7 +573,7 @@ labelSyncUsername:
   message: 'Nome do usuário: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Tags (separados por espaço):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema: '
@@ -599,7 +609,7 @@ labelXhrInjectHint:
     para sempre clicando com o botão direito do mouse.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (exceto no modo anônimo e em sites com cookies desativados)
 lastSync:
   description: Label for last sync timestamp.
   message: Última sincronização em $1
@@ -866,13 +876,15 @@ optionUpdate:
   message: Atualizar
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Somente leitura
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    O script atualizado automaticamente é somente leitura, a menos que você
+    desative as atualizações ou permita ter edição.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Permitir edições
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
   message: ''

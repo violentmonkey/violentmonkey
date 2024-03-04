@@ -153,6 +153,12 @@ descEditorOptions:
     href="https://github.com/codemirror/CodeMirror/tree/master/theme"
     target="_blank" rel="noopener noreferrer">kode CSS tema</a> di dalam kotak
     "Gaya Khusus" di bawah.
+descEditorOptionsGeneric:
+  description: Description of editor options in VM settings.
+  message: ''
+descEditorOptionsVM:
+  description: Description of nonstandard editor options in VM settings.
+  message: ''
 descScriptTemplate:
   description: Description of script template section.
   message: >-
