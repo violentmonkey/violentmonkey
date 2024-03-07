@@ -246,7 +246,9 @@ function getValueAll() {
     .replace(/\n/g, '\n  ') // also handles nested linebreaks inside objects/arrays
   }\n}`;
 }
-function setData(data = {}) {
+function setData(data) {
+  // Note: default parameter doesn't work when data=null
+  data ??= {};
   if (!deepEqual(values.value, data)) {
     values.value = data;
     page.value = Math.min(page.value, totalPages.value) || 1;
