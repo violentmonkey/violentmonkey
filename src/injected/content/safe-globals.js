@@ -65,4 +65,8 @@ export const { getElementsByTagName } = document;
 export const REIFY = 'reify';
 export let IS_FIREFOX = global !== window; // true in Firefox content script context
 /** @type {VMTopRenderMode} */
-export let topRenderMode = window !== top ? 0 : document.prerendering ? 2 : 1;
+export let topRenderMode = window !== top ? 0
+  // TODO: revisit when link-preview is shipped in Chrome
+  : document.prerendering && document.visibilityState === 'hidden' ? 2
+    : 1;
+
