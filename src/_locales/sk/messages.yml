@@ -154,10 +154,19 @@ descEditorOptions:
     rel="noopener noreferrer">celý zoznam</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Boolovské možnosti môžu byť prepínané dvojitým kliknutím na hodnotu:
+    <code>true</code> = povolené, <code>false</code> = zakázané. Číselné
+    možnosti končiace na <code>Delay</code>, <code>Interval</code>,
+    <code>Rate</code>, <code>Time</code> sú v milisekundách.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Neštandardné možnosti: <code>autocompleteOnTyping</code> je oneskorenie v
+    milisekundách na zobrazenie návrhov automatického dopĺňania po písaní
+    (<code>0</code> = zakázať), <code>killTrailingSpaceOnSave</code> automaticky
+    odstraňuje medzery na konci každého riadka pri ukladaní,
+    <code>showTrailingSpace</code> zobrazuje medzery na konci riadkov ako bodky.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
