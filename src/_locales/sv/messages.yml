@@ -30,10 +30,10 @@ buttonEdit:
   message: Redigera
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: Du kan också högerklicka, CTRL-klicka eller hjulklicka på skriptnamnet.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Töm papperskorgen nu!
 buttonEnable:
   description: Button to enable a script.
   message: Aktivera
@@ -68,7 +68,7 @@ buttonRecycleBin:
   message: Papperskorg
 buttonRemove:
   description: Button to remove a script.
-  message: ''
+  message: Ta bort
 buttonReplace:
   description: Button to replace the current match.
   message: Ersätt
@@ -77,13 +77,13 @@ buttonReplaceAll:
   message: Alla
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Återställ
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Återställ inställningar
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Återställ
 buttonSave:
   description: Button to save modifications of a script.
   message: Spara
@@ -95,10 +95,10 @@ buttonSaved:
   message: Sparad
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Visa redigerarens tillstånd
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Supportsida
 buttonUndo:
   description: Button to undo removement of a script.
   message: Ångra
@@ -107,33 +107,41 @@ buttonUpdate:
   message: Uppdatera
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: ''
+  message: Sök efter uppdateringar för alla
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: ''
+  message: Dammsug databasen
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: ''
+  message: Data har dammsugits
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: ''
+  message: Dammsuger data...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Automatisk uppdatering är inaktiverad för detta skript
+    Klicka på OK för att uppdatera det ändå.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: ''
+  message: |-
+    Ändringar har inte sparats!
+    Klicka på OK för att förkasta dem eller avbryt för att stanna.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Återställ alla ändringar som gjorts i databasen (importering, uppdatering,
+    redigering, anpassning)
 descBlacklist:
   description: HTML Description for the global blacklist.
-  message: ''
+  message: Webbadress som matchas i den här listan kommer inte att injiceras av skript.
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    Anpassad CSS för alternativsidan och skriptinstallationssidan. Om du inte är
+    säker på vad detta är till för, ändra inget.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: ''
@@ -145,22 +153,24 @@ descEditorOptionsVM:
   message: ''
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variabler som stöds: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    med MomentJS-kompatibelt format, för exempel <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: ''
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Tangentbordsgenvägar:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Använd en annan redigerare?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: ''
+  message: Anpassad metadata
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Skriptinställningar
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
   message: Raden är för lång
@@ -185,30 +195,40 @@ editValueAllHint:
   message: ''
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: ''
+  message: En användarskripthanterare med öppen källkod som stöder många webbläsare
 extName:
   description: Name of this extension.
-  message: ''
+  message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: ''
+  message: Svartlistad i Violentmonkey's inställningar
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: >-
+    Violentmonkey kan inte köra användarskript på den här sidan
+
+    (vanliga exempel: webbläsar-UI, tillägg, blockerad via policyer, en
+    sökmotorsida i Opera)
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Det finns flera metoder för att installera eller spåra redigeringar i en
+    lokal fil: <1> Dra och släpp filen till en öppen Violentmonkey-sida eller
+    popup, inklusive denna. <2> Installera en lokal HTTP-server för denna fil
+    och öppna den via http://localhost. <3> Aktivera "Tillåt åtkomst till
+    filwebbadresser" i detaljer för Violentmonkey på sidan chrome://extensions.
+    Detta är farligt eftersom alla användarskript kan läsa alla lokala filer.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: alfabetisk ordning
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: exekutionsorder
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: senaste uppdateringstid
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: ''
@@ -235,7 +255,7 @@ genericOn:
   message: på
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: använd globala inställningar
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Papperskorg
@@ -244,13 +264,13 @@ helpForLocalFile:
   message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: för $1 matchande skript
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: ''
+  message: 'Ange webbadress:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Borttagna skript listas här och kommer att sparas i 7 dagar.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: ''
@@ -262,7 +282,7 @@ install:
   message: Installera
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Installera från $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: ''
@@ -284,10 +304,12 @@ labelAllowUpdate:
   message: Tillåt uppdatering
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: ''
+  message: 'Upphovsman: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: ''
+  message: >-
+    Ladda om aktuell flik efter att ha aktiverat/inaktiverat ett skript från
+    menyn
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -296,41 +318,41 @@ labelAutoReloadCurrentTabDisabled:
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: Sök efter skriptuppdateringar var $1 dag, ange 0 för att inaktivera
 labelBackup:
   description: Label of the import/export section in settings.
   message: ''
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Säkerhetskopiera och underhåll
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Visas på brickan: '
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Brickfärger: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: inga
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: antal skript som körs
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: antal unika skript som körs
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: Svartlista
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Bidragsgivare
 labelCurrentLang:
   description: Label of current language.
-  message: ''
+  message: 'Aktuellt språk: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: Anpassad stil
 labelDataExport:
   description: Section title of data export.
   message: ''
@@ -345,7 +367,7 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: ''
+  message: 'Nerladdningswebbadress:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
@@ -354,19 +376,19 @@ labelEditValueAll:
   message: ''
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Redigerare
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: endast aktiva skript
 labelExclude:
   description: Label of @exclude rules.
-  message: ''
+  message: '@uteslutna regler'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
   message: ''
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: ''
+  message: Exportera skriptdata
 labelExposeStatus:
   description: Option in advanced settings.
   message: ''
@@ -378,7 +400,7 @@ labelFastFirefoxInjectHint:
   message: ''
 labelFeedback:
   description: Label of link to feedback page.
-  message: ''
+  message: Återkoppling
 labelFilterSort:
   description: Label for sort filter.
   message: Sortera efter $1
@@ -396,54 +418,54 @@ labelHomepageURL:
   message: Hemsidans webbadress
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Importera skriptdata
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Importera inställningar
 labelInclude:
   description: Label of @include rules.
-  message: ''
+  message: '@inkluderade regler'
 labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: ''
+  message: 'Injektionsläge: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: ''
+  message: Installerar skript
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Behåll originalet
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Senast uppdaterad $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Radnr.: '
 labelMatch:
   description: Label of @match rules.
-  message: ''
+  message: '@matchande regler'
 labelName:
   description: Label of script name.
   message: 'Namn:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Kör i ramar: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Inget namn
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: Hittade inga skript.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', meddela sedan:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Visa meddelande om skriptuppdateringar
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ''
@@ -452,57 +474,57 @@ labelPopupSort:
   message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Integritetspolicy
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Återinstallera skriptet
 labelRelated:
   description: Label of related links.
-  message: ''
+  message: 'Ladda om länkarna: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: Borttagen vid $1
 labelReplace:
   description: Label for replace input in search box.
-  message: ''
+  message: 'Ersatt med: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: ''
+  message: 'Kör vid: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Standard)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Anpassad skriptmall
 labelSearch:
   description: Label for search input in search box.
   message: 'Sök efter: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Sök skript...
 labelSettings:
   description: Label shown on the top of settings page
-  message: ''
+  message: Inställningar
 labelShowOrder:
   description: Label for option in dashboard -> script list
   message: ''
 labelSync:
   description: Label for sync options.
-  message: ''
+  message: Synka
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Använd anonymt konto
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: Auktorisera
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: Auktoriserar
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: Inga
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Lösenord: '
@@ -512,22 +534,22 @@ labelSyncReauthorize:
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: Återkalla
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: Skriptstatus för synkronisering
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'Serverwebbadress: '
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: Synka till
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Användarnamn: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Taggar (separera med mellanslag):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema: '
@@ -537,15 +559,15 @@ labelTranslator:
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: ''
+  message: 'Uppdateringswebbadress:'
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Enkel kolumn
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Tabellvy
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -559,10 +581,10 @@ labelXhrInjectNote:
   message: ''
 lastSync:
   description: Label for last sync timestamp.
-  message: ''
+  message: Senaste synkronisering $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: Läs mer om svartlistade mönster.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: ''
@@ -605,19 +627,19 @@ menuMatchedFrameScripts:
   message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: Matchade skript
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Skapa ett nytt skript
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: ''
+  message: Skript inaktiverade
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: ''
+  message: Skript aktiverade
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: ''
+  message: Sök efter uppdateringar...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: ''
@@ -628,31 +650,31 @@ msgErrorFetchingResource:
   message: ''
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: ''
+  message: Det gick inte att hämta skriptet!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: ''
+  message: Det gick inte att hämta uppdateringsinformationen!
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: ''
+  message: Det gick inte att ladda skriptdata.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: ''
+  message: Fel vid laddning av behövande filer.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: ''
+  message: $1 objekt importerades.
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: Ändringar du gör i privatläget gäller även i din huvudprofil.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: ''
+  message: Skript installerat.
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: Ogiltigt skript!
@@ -668,15 +690,15 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: ''
+  message: Laddar skriptdata...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: ''
+  message: Laddar behövande filer... ($1/$2)
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Saknar nödvändiga resurser.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -686,23 +708,23 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Ett skript med samma @namn och @namnrymd är redan installerat.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: ''
+  message: Ny version hittades.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: ''
+  message: Ingen uppdatering hittades.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Fel vid uppdatering av skript. Klicka för att öppna dem.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Spara eller installera om dessa skript:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (koden är densamma)'
@@ -724,7 +746,7 @@ msgSavedScriptTemplate:
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: Skript [$1] är uppdaterad!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Visa/dölj
@@ -733,25 +755,25 @@ msgSyncError:
   message: Synkroniseringsfel!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: ''
+  message: Initierar...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: ''
+  message: Initieringsfel!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Inte auktoriserad ännu.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Synkroniseringen startar snart...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: ''
+  message: Synkronisering pågår...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: Syntaxfel?
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: ''
+  message: Skript uppdaterad.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Uppdaterar...
@@ -765,16 +787,18 @@ optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    Positionen på redigeringsfönstret kommer endast att kommas ihåg när du
+    ändrar storlek eller sparar
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Dölj omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
   message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Aktiverade först
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Gruppera inaktiverade skript
@@ -792,7 +816,7 @@ optionShowEnabledFirst:
   message: Visa aktiverade skript först
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'UI-tema: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: automatisk
@@ -829,7 +853,9 @@ reloadTab:
   message: Ladda om fliken
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Aktiverad kommer den aktiva fliken att laddas om när ändringar upptäcks och
+    det här skriptet matchar flikens webbadress.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -855,19 +881,21 @@ sideMenuSettings:
   message: Inställningar
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Ladda om sidan utan användarskript
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Du har inaktiverat användarskript för den här sidan. För att köra dem, ladda
+    om eller navigera på fliken.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Sluta spåra
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Normal brickfärg
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: Brickfärg när platsen är icke-injicerbar (svartlistad eller stöds inte)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''
@@ -887,10 +915,10 @@ updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Uppdatera skript ($1)
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Nyckel (sträng)
 valueLabelValue:
   description: Label for value of a script value.
   message: ''

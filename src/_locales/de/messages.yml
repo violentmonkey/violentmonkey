@@ -152,10 +152,20 @@ descEditorOptions:
     target="_blank" rel="noopener noreferrer">vollständige Liste</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Boole'sche Optionen können mit einem Doppelklick auf den Wert umgeschaltet
+    werden: <code>true</code> = aktiviert, <code>false</code> = deaktiviert.
+    Numerische Optionen endend mit <code>Delay</code>, <code>Interval</code>,
+    <code>Rate</code>, <code>Time</code> sind in Millisekunden.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Nicht übliche Optionen: <code>autocompleteOnTyping</code> ist eine
+    Verzögerung in Millisekunden um Autovervollständingungs-Vorschläge nach dem
+    Eintippen anzuzeigen (<code>0</code> = deaktivieren).
+    <code>killTrailingSpaceOnSave</code> entfernt automatisch überflüssige
+    Leerzeichen in Zeilen beim Speichern, <code>showTrailingSpace</code> zeigt
+    die überflüssigen Leerzeichen als Punkte.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
