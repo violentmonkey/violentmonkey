@@ -344,5 +344,5 @@ export function normalizeTag(tag) {
 }
 
 export function escapeStringForRegExp(str) {
-  return str.replace(/[.?+[\]{}()|^$]/g, '\\$&');
+  return str.replace(/[\\.?+[\]{}()|^$]/g, '\\$&');
 }
