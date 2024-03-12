@@ -94,6 +94,7 @@
             <input
               type="search"
               :class="{'has-error': state.search.error}"
+              :title="state.search.error"
               :placeholder="i18n('labelSearchScript')"
               v-model="state.search.value"
               ref="refSearch"
