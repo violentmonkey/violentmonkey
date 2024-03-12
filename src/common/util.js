@@ -342,3 +342,7 @@ export function dumpScriptValue(value, jsonDump = JSON.stringify) {
 export function normalizeTag(tag) {
   return tag.replace(/[^\w.-]/g, '');
 }
+
+export function escapeStringForRegExp(str) {
+  return str.replace(/[.?+[\]{}()|^$]/g, '\\$&');
+}

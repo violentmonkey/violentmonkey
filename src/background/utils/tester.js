@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { getScriptPrettyUrl } from '@/common';
+import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
 import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from '@/common/tld';
@@ -232,7 +232,7 @@ function testRules(url, script, ...list) {
 }
 
 function str2RE(str) {
-  return str.replace(/[.?+[\]{}()|^$]/g, '\\$&').replace(/\*/g, '.*?');
+  return escapeStringForRegExp(str).replace(/\*/g, '.*?');
 }
 
 function autoReg(str) {

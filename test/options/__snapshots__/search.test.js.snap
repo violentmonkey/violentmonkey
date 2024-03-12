@@ -12,17 +12,22 @@ exports[`createSearchRules 2`] = `
   "rules": [
     {
       "negative": true,
-      "pattern": /\\(\\?:\\^\\|\\\\s\\)\\(c\\)\\(\\\\s\\|\\$\\)/,
+      "re": /\\(\\?:\\^\\|\\\\s\\)\\(c\\)\\(\\\\s\\|\\$\\)/u,
       "scope": "tags",
     },
     {
       "negative": false,
-      "pattern": /\\(\\?:\\^\\|\\\\s\\)\\(a\\|b\\)\\(\\\\s\\|\\$\\)/,
+      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\|b\\)\\(\\\\s\\|\\$\\)/u,
       "scope": "tags",
     },
     {
       "negative": false,
-      "pattern": "hello",
+      "re": /hello/iu,
+      "scope": "",
+    },
+    {
+      "negative": false,
+      "re": /CaseSensitive/u,
       "scope": "",
     },
   ],
@@ -51,6 +56,12 @@ exports[`createSearchRules 2`] = `
       "prefix": "",
       "raw": "hello",
     },
+    {
+      "negative": false,
+      "parsed": "CaseSensitive",
+      "prefix": "",
+      "raw": "CaseSensitive",
+    },
   ],
 }
 `;
@@ -60,17 +71,17 @@ exports[`createSearchRules 3`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": /\\(\\?:\\^\\|\\\\s\\)\\(a-b\\|b\\)\\(\\\\s\\|\\$\\)/,
+      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a-b\\|b\\)\\(\\\\s\\|\\$\\)/u,
       "scope": "tags",
     },
     {
       "negative": false,
-      "pattern": "hello",
+      "re": /hello/iu,
       "scope": "name",
     },
     {
       "negative": false,
-      "pattern": "world",
+      "re": /world/iu,
       "scope": "",
     },
   ],
@@ -108,12 +119,12 @@ exports[`createSearchRules 4`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/,
+      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/u,
       "scope": "tags",
     },
     {
       "negative": false,
-      "pattern": "hello world",
+      "re": /hello world/iu,
       "scope": "name",
     },
   ],
@@ -145,12 +156,12 @@ exports[`createSearchRules 5`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/,
+      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/u,
       "scope": "tags",
     },
     {
       "negative": false,
-      "pattern": /hello world/i,
+      "re": /hello world/iu,
       "scope": "name",
     },
   ],
@@ -182,12 +193,12 @@ exports[`createSearchRules 6`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/,
+      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/u,
       "scope": "tags",
     },
     {
       "negative": true,
-      "pattern": /hello world/i,
+      "re": /hello world/iu,
       "scope": "name",
     },
   ],
@@ -219,12 +230,12 @@ exports[`createSearchRules 7`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": "#a.b",
+      "re": /#a\\\\\\.b/iu,
       "scope": "",
     },
     {
       "negative": true,
-      "pattern": "#b",
+      "re": /#b/iu,
       "scope": "",
     },
   ],
@@ -250,37 +261,37 @@ exports[`createSearchRules 8`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": /regexp/i,
+      "re": /\\\\d\\+\\\\D\\+/u,
       "scope": "",
     },
     {
       "negative": false,
-      "pattern": /regexp/u,
+      "re": /\\\\d\\+\\\\D\\+/u,
       "scope": "code",
     },
     {
       "negative": false,
-      "pattern": "/not",
+      "re": /\\\\/not/iu,
       "scope": "",
     },
     {
       "negative": false,
-      "pattern": "regexp/",
+      "re": /regexp\\\\//iu,
       "scope": "",
     },
   ],
   "tokens": [
     {
       "negative": false,
-      "parsed": "/regexp/",
+      "parsed": "/\\d+\\D+/",
       "prefix": "",
-      "raw": "/regexp/",
+      "raw": "/\\d+\\D+/",
     },
     {
       "negative": false,
-      "parsed": "/regexp/u",
+      "parsed": "/\\d+\\D+/u",
       "prefix": "code:",
-      "raw": "/regexp/u",
+      "raw": "/\\d+\\D+/u",
     },
     {
       "negative": false,
@@ -303,22 +314,22 @@ exports[`createSearchRules 9`] = `
   "rules": [
     {
       "negative": false,
-      "pattern": "foobar",
+      "re": /foobar/iu,
       "scope": "",
     },
     {
       "negative": false,
-      "pattern": /foobar/i,
+      "re": /foobar/iu,
       "scope": "",
     },
     {
       "negative": false,
-      "pattern": /foobar/i,
+      "re": /foobar/iu,
       "scope": "name",
     },
     {
       "negative": false,
-      "pattern": /foobar/i,
+      "re": /foobar/iu,
       "scope": "code",
     },
   ],

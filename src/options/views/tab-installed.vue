@@ -327,7 +327,7 @@ const batchActions = computed(() => [
   },
 ]);
 
-const debouncedSearch = debounce(scheduleSearch, 200);
+const debouncedSearch = debounce(scheduleSearch, 100);
 const debouncedRender = debounce(renderScripts);
 
 function resetList() {
@@ -454,18 +454,9 @@ async function renderScripts() {
   }
 }
 function performSearch() {
-  let count = 0;
-  store.scripts.forEach(({ $cache }) => {
-    const dataMap = {
-      name: $cache.lowerName,
-      code: $cache.code,
-      tags: $cache.tags,
-      '': $cache.search,
-    };
-    $cache.show = state.search.rules.every(rule => testSearchRule(rule, dataMap[rule.scope]));
-    count += $cache.show;
-  });
-  return count;
+  return store.scripts.reduce((num, { $cache }) => num + (
+    $cache.show = state.search.rules.every(testSearchRule, $cache)
+  ), 0);
 }
 function scheduleSearch() {
   try {

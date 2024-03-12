@@ -1,100 +1,78 @@
-import { normalizeTag } from '@/common';
+import { escapeStringForRegExp, normalizeTag } from '@/common';
 
-export function parseSearch(search) {
-  /**
-   * @type Array<{
-   *   prefix: string;
-   *   raw: string;
-   *   negative: boolean;
-   * }>
-   */
-  const tokens = [];
-  search = search.toLowerCase();
-  let offset = 0;
-  while (search[offset] === ' ') offset += 1;
-  while (offset < search.length) {
-    const negative = search[offset] === '!';
-    if (negative) offset += 1;
-    const prefix =
-      search.slice(offset).match(/^(#|re:|(?:name|code)(?:\+re)?:)/)?.[1] || '';
-    if (prefix) offset += prefix.length;
-    const startOffset = offset;
-    const quote =
-      (!prefix || prefix.endsWith(':')) &&
-      search.slice(offset).match(/^['"]/)?.[0];
-    if (quote) offset += 1;
-    let pattern = '';
-    const endChar = quote || ' ';
-    while (offset < search.length) {
-      const ch = search[offset];
-      if (quote && ch === quote && search[offset + 1] === quote) {
-        // escape quotes by double it
-        pattern += quote;
-        offset += 2;
-      } else if (ch !== endChar) {
-        pattern += ch;
-        offset += 1;
-      } else {
-        break;
-      }
-    }
-    if (quote) {
-      if (offset < search.length) offset += 1;
-      else throw new Error('Unmatched quotes');
-    }
-    tokens.push({
-      prefix,
-      raw: search.slice(startOffset, offset),
-      parsed: pattern,
-      negative,
-    });
-    while (search[offset] === ' ') offset += 1;
-  }
-  return tokens;
-}
+const reToken = re`/\s*
+  (!)?
+  (
+    \# |
+    (name|code|desc)(\+re)?: |
+    (re:) |
+  )
+  (
+    '((?:[^']+|'')*) ('|$) |
+    "((?:[^"]+|"")*) ("|$) |
+    \/(\S+?)\/([a-z]*) |
+    \S+
+  )
+  (?:\s+|$)
+/yx`;
+const reTwoSingleQuotes = /''/g;
+const reTwoDoubleQuotes = /""/g;
 
 export function createSearchRules(search) {
-  const tokens = parseSearch(search);
-  /**
-   * @type Array<{
-   *   scope: string;
-   *   pattern: string | RegExp;
-   *   negative: boolean;
-   * }>
-   */
+  /** @type {VMSearchRule[]} */
   const rules = [];
+  const tokens = [];
   const includeTags = [];
   const excludeTags = [];
-  for (const token of tokens) {
-    if (token.prefix === '#') {
-      (token.negative ? excludeTags : includeTags).push(token.parsed);
+  reToken.lastIndex = 0;
+  for (let m; (m = reToken.exec(search)); ) {
+    let [,
+      negative,
+      prefix, scope = '', re1, re2,
+      raw,
+      q1, q1end,
+      quoted = q1, quoteEnd = q1end,
+      reStr, flags = '',
+    ] = m;
+    let str;
+    if (quoted) {
+      if (!quoteEnd) throw new Error('Unmatched quotes');
+      str = quoted.replace(q1 ? reTwoSingleQuotes : reTwoDoubleQuotes, quoted[0]);
     } else {
-      // Strip ':'
-      let scope = token.prefix.slice(0, -1);
-      let pattern = token.parsed;
-      if (/(?:^|\+)re$/.test(scope)) {
-        scope = scope.slice(0, -3);
-        pattern = new RegExp(pattern, 'i');
+      str = raw;
+    }
+    negative = !!negative;
+    tokens.push({
+      negative,
+      prefix,
+      raw,
+      parsed: str,
+    });
+    if (prefix === '#') {
+      str = normalizeTag(str).replace(/\./g, '\\.');
+      if (str) (negative ? excludeTags : includeTags).push(str);
+    } else {
+      if (re1 || re2) {
+        flags = 'i';
+      } else if (reStr) {
+        str = reStr;
       } else {
-        const reMatches = pattern.match(/^\/(.*?)\/(\w*)$/);
-        if (reMatches) pattern = new RegExp(reMatches[1], reMatches[2] || 'i');
+        if (str === str.toLocaleLowerCase()) flags = 'i';
+        str = escapeStringForRegExp(str);
       }
+      /** @namespace VMSearchRule */
       rules.push({
+        negative,
         scope,
-        pattern,
-        negative: token.negative,
+        re: new RegExp(str, flags.includes('u') ? flags : flags + 'u'),
       });
     }
   }
   [includeTags, excludeTags].forEach((tags, negative) => {
-    const sanitizedTags = tags
-      .map((tag) => normalizeTag(tag).replace(/\./g, '\\.'))
-      .filter(Boolean)
-      .join('|');
-    if (sanitizedTags) {
+    if (tags.length) {
       rules.unshift({
         scope: 'tags',
-        pattern: new RegExp(`(?:^|\\s)(${sanitizedTags})(\\s|$)`),
+        re: new RegExp(`(?:^|\\s)(${tags.join('|').toLowerCase()})(\\s|$)`, 'u'),
         negative: !!negative,
       });
     }
@@ -105,11 +83,14 @@ export function createSearchRules(search) {
   };
 }
 
-export function testSearchRule(rule, data) {
-  const { pattern, negative } = rule;
-  const result =
-    typeof pattern.test === 'function'
-      ? pattern.test(data)
-      : data.includes(pattern);
-  return negative ^ result;
+/**
+ * @this {VMScriptItemCache}
+ * @param {VMSearchRule} rule
+ * @return {number}
+ */
+export function testSearchRule({ re, negative, scope }) {
+  return negative ^ (
+    re.test(this[scope || 'desc'])
+    || !scope && re.test(this.code)
+  );
 }
