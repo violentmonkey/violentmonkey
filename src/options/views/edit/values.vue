@@ -336,9 +336,11 @@ async function onSave(buttonIndex) {
     current.value = null;
   }
   if (cur.isAll) {
+    const newValues = cur.jsonValue::mapEntry(val => dumpScriptValue(val) || '');
     await sendCmdDirectly('SetValueStores', {
-      [props.script.props.id]: cur.jsonValue::mapEntry(val => dumpScriptValue(val) || ''),
+      [props.script.props.id]: newValues,
     });
+    setData(newValues);
   } else {
     await updateValue(cur);
   }
