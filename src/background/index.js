@@ -36,13 +36,14 @@ async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   // The `src` is omitted when invoked via sendCmdDirectly unless fakeSrc is set.
   // The `origin` is Chrome-only, it can't be spoofed by a compromised tab unlike `url`.
   if (src) {
-    if (func.isOwn && !src.fake
-    && (src.origin ? src.origin !== extensionOrigin : !`${src.url}`.startsWith(extensionRoot))) {
+    let me = src.origin;
+    me = me ? me === extensionOrigin : `${src.url}`.startsWith(extensionRoot);
+    if (!me && func.isOwn && !src.fake) {
       throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
     }
     // TODO: revisit when link-preview is shipped in Chrome to fix tabId-dependent functionality
     if (!src.tab) {
-      if (IS_FIREFOX ? !func.isOwn && !src.url.startsWith(extensionRoot) : !mode) {
+      if (!me && (IS_FIREFOX ? !func.isOwn : !mode)) {
         if (process.env.DEBUG) console.log('No src.tab, ignoring:', ...arguments);
         return;
       }
