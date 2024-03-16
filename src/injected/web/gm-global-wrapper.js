@@ -1,6 +1,8 @@
-import { FastLookup, safeConcat } from './util';
+import { FastLookup, safeAssign, safeConcat } from './util';
 
+const kConsole = 'console';
 const scopeSym = SafeSymbol.unscopables;
+const globalDesc = createNullObj();
 /** Original ~50 global functions such as setTimeout that some sites override.
  * Not saving all globals because it would waste a lot of time on each page and frame. */
 const globalFunctionDesc = createNullObj();
@@ -13,6 +15,7 @@ const globalKeys = (function makeGlobalKeys() {
   // True if `names` is usable as is, but FF is bugged: its names have duplicates
   let ok = !IS_FIREFOX;
   let desc;
+  let v;
   for (const key of names) {
     if (+key >= 0 && key < numFrames
       || isContentMode && (
@@ -22,10 +25,16 @@ const globalKeys = (function makeGlobalKeys() {
       ok = false;
     } else {
       globalKeysSet.set(key, 1);
-      if (key >= 'a' && key <= 'z'
-      && (desc = describeProperty(window, key))
-      && desc.enumerable && isFunction(desc.value)) {
-        globalFunctionDesc[key] = desc;
+      /* Saving built-in global descriptors except constructors and onXXX events,
+         checking length>=3 to prevent calling String.prototype index getters */
+      if (key >= 'a' && key <= 'z' && (key.length < 3 || key[0] !== 'o' || key[1] !== 'n')
+      && (desc = describeProperty(window, key))) {
+        setPrototypeOf(desc, null); // to read desc.XXX without calling Object.prototype getters
+        (desc.enumerable && isFunction(desc.value)
+          ? globalFunctionDesc
+          : globalDesc
+        )[key] = desc;
+        if (key === kConsole && isObject(v = desc.value)) desc.value = nullObjFrom(v);
       }
     }
   }
@@ -51,7 +60,6 @@ const globalKeys = (function makeGlobalKeys() {
   return ok ? names : globalKeysSet.toArray();
 }());
 const inheritedDesc = createNullObj();
-const globalDesc = createNullObj();
 const updateGlobalDesc = name => {
   let src;
   const descFn = globalFunctionDesc[name];
@@ -59,7 +67,8 @@ const updateGlobalDesc = name => {
     || inheritedDesc[name]
     || (src = globalKeysSet.get(name)) && describeProperty(src = src > 0 ? window : global, name);
   if (!desc) return;
-  setPrototypeOf(desc, null);
+  if (!descFn) setPrototypeOf(desc, null);
+  else if (process.env.DEV && getPrototypeOf(desc)) throw 'proto must be null';
   /* ~45 enumerable action functions belong to `window` and need to be bound to it,
    * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
   if (descFn) {
@@ -171,6 +180,7 @@ function proxyDescribe(local, name, wrapper, events) {
   } else {
     if (get) desc.get = safeBind(get, window);
     if (set) desc.set = safeBind(set, window);
+    if (value && name === kConsole) desc.value = safeAssign({}, value);
   }
   defineProperty(local, name, desc); /* proto is null */// eslint-disable-line no-restricted-syntax
   return desc;

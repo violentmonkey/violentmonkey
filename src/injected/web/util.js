@@ -112,3 +112,10 @@ export const makeComponentUtils = () => {
     ),
   };
 };
+
+export const safeAssign = (dst, src) => {
+  for (const key of objectKeys(src)) {
+    setOwnProp(dst, key, src[key]);
+  }
+  return dst;
+};

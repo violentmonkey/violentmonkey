@@ -1,7 +1,7 @@
 import bridge from './bridge';
 import { GM_API } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
-import { makeComponentUtils } from './util';
+import { makeComponentUtils, safeAssign } from './util';
 
 /** Name in Greasemonkey4 -> name in GM */
 const GM4_ALIAS = {
@@ -104,9 +104,3 @@ function makeGmInfo(gmInfo, meta, resources) {
   });
 }
 
-function safeAssign(dst, src) {
-  for (const key of objectKeys(src)) {
-    setOwnProp(dst, key, src[key]);
-  }
-  return dst;
-}
