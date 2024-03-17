@@ -87,6 +87,7 @@ const updateGlobalDesc = name => {
   src = src[PROTO];
   for (const key of reflectOwnKeys(src)) {
     const desc = describeProperty(src, key);
+    setPrototypeOf(desc, null); // to read desc.XXX without calling Object.prototype getters
     (isFunction(desc.value) ? globalFunctionDesc : inheritedDesc)[key] = desc;
   }
 });
