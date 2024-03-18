@@ -18,7 +18,7 @@
     </div>
     <!-- We disable native dragging on name to avoid confusion with exec re-ordering.
     Users who want to open a new tab via dragging the link can drag the icon. -->
-    <div class="script-info-1">
+    <div class="script-info-1 ellipsis">
       <a v-text="script.$cache.name" v-bind="viewTable && { draggable: false, href: url, tabIndex }"
          :data-order="script.config.removed ? null : script.props.position"
          class="script-name ellipsis" />
@@ -324,7 +324,6 @@ $removedItemHeight: calc(
   position: relative;
   display: grid;
   grid-template-columns: $iconSize 1fr auto;
-  align-items: center;
   margin: $itemMargin 0 0 $itemMargin;
   padding: $itemPadT 10px $itemPadB;
   border: 1px solid var(--fill-3);
@@ -381,8 +380,7 @@ $removedItemHeight: calc(
   }
   &-info-1 {
     display: flex;
-    gap: 8px;
-    min-width: 100px;
+    align-items: center;
   }
   &-name {
     font-weight: 500;
@@ -579,7 +577,7 @@ $removedItemHeight: calc(
         pointer-events: none;
         z-index: 2;
       }
-      &-name {
+      &-info-1 {
         display: flex;
         align-self: stretch;
         align-items: center;
