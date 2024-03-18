@@ -25,6 +25,11 @@ Object.assign(handlers, {
     /* SetPopup from a sub-frame may come first so we need to wait for the main page
      * because we only show the iframe menu for unique scripts that don't run in the main page */
     const isTop = frameId === 0;
+    let disabledIds;
+    if (!data.all) {
+      disabledIds = await sendCmdDirectly('GetDisabledIds', { url, [kTop]: isTop });
+      Object.assign(data[IDS], disabledIds);
+    }
     if (!isTop) await mutex;
     else {
       store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
@@ -67,6 +72,7 @@ Object.assign(handlers, {
       });
     }
     if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
+    return disabledIds;
   },
 });
 

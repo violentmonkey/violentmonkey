@@ -5,8 +5,10 @@ import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 const menus = createNullObj();
 const HEAD_TAGS = ['script', 'style', 'link', 'meta'];
 const { toLowerCase } = '';
+const { [IDS]: ids } = bridge;
 let setPopupThrottle;
 let isPopupShown;
+let hasAllIds;
 
 addBackgroundHandlers({
   async PopupShown(state) {
@@ -62,6 +64,12 @@ export async function sendSetPopup(isDelayed) {
       await setPopupThrottle;
       setPopupThrottle = null;
     }
-    sendCmd('SetPopup', safePickInto({ menus }, bridge, [IDS, INJECT_INTO]));
+    assign(ids, await sendCmd('SetPopup', {
+      [IDS]: ids,
+      [INJECT_INTO]: bridge[INJECT_INTO],
+      all: hasAllIds,
+      menus,
+    }));
+    hasAllIds = true;
   }
 }

@@ -74,7 +74,7 @@ async function requestData(ids) {
     sendCmdDirectly('GetData', { ids, sizes: true }, { retry: true }),
     options.ready,
   ]);
-  const { scripts: allScripts, sizes, ...auxData } = data;
+  const { [SCRIPTS]: allScripts, sizes, ...auxData } = data;
   Object.assign(store, auxData); // initScripts needs `cache` in store
   const scripts = [];
   const removedScripts = [];

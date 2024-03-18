@@ -47,6 +47,7 @@ addOwnCommands({
   CheckRemove: checkRemove,
   RemoveScripts: removeScripts,
   GetData: getData,
+  GetDisabledIds: getDisabledIds,
   /** @return {VMScript} */
   GetScript: getScript,
   GetSizes: getSizes,
@@ -276,35 +277,43 @@ const notifiedBadScripts = new Set();
  * @param {string} url
  * @param {boolean} isTop
  * @param {Array} [errors] - omit to enable EnvDelayed mode
- * @return {VMInjection.EnvStart|Promise<VMInjection.EnvDelayed>}
+ * @param {!boolean} [disabled] - only the disabled script ids (for the popup)
+ * @return {VMInjection.EnvStart | VMInjection.EnvDelayed | Object | void }
  */
-export function getScriptsByURL(url, isTop, errors) {
-  testerBatch(errors || true);
-  const allScripts = testBlacklist(url)
-    ? []
-    : aliveScripts.filter(script => (
-      (isTop || !(script.custom.noframes ?? script.meta.noframes))
-      && testScript(url, script)
-    ));
-  testerBatch();
-  if (!allScripts[0]) return;
-  let clipboardChecked = !IS_FIREFOX;
-  let xhrChecked;
+export function getScriptsByURL(url, isTop, errors, disabled = false) {
+  if (testBlacklist(url)) return;
   const allIds = {};
+  const disabledIds = disabled && {};
+  const isDelayed = !errors;
   /** @type {VMInjection.EnvStart} */
-  const envStart = makeEnv();
+  let envStart;
   /** @type {VMInjection.EnvDelayed} */
-  const envDelayed = makeEnv();
-  for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
-    envStart[areaName] = {}; envDelayed[areaName] = {};
-    envStart[listName] = []; envDelayed[listName] = [];
-  }
-  allScripts.forEach((script) => {
-    const { id } = script.props;
-    if (!(allIds[id] = +!!script.config.enabled)) {
-      return;
+  let envDelayed;
+  let clipboardChecked = isDelayed || !IS_FIREFOX;
+  let xhrChecked = isDelayed;
+  testerBatch(errors || true);
+  for (const script of aliveScripts) {
+    if (disabled !== !script.config.enabled) {
+      continue;
     }
     const { meta, custom } = script;
+    if (!((isTop || !(custom.noframes ?? meta.noframes)) && testScript(url, script))) {
+      continue;
+    }
+    const { id } = script.props;
+    if (disabled) {
+      disabledIds[id] = 0;
+      continue;
+    }
+    allIds[id] = 1;
+    if (!envStart) {
+      envStart = makeEnv();
+      envDelayed = makeEnv();
+      for (const [areaName, listName] of STORAGE_ROUTES_ENTRIES) {
+        envStart[areaName] = {}; envDelayed[areaName] = {};
+        envStart[listName] = []; envDelayed[listName] = [];
+      }
+    }
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = getScriptRunAt(script);
     const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
@@ -346,8 +355,15 @@ export function getScriptsByURL(url, isTop, errors) {
       }
     }
     env[SCRIPTS].push(script);
-  });
-  if (!errors) {
+  }
+  testerBatch();
+  if (disabled) {
+    return disabledIds;
+  }
+  if (!envStart) {
+    return;
+  }
+  if (isDelayed) {
     envDelayed[PROMISE] = readEnvironmentData(envDelayed);
     return envDelayed;
   }
@@ -431,15 +447,19 @@ export function notifyToOpenScripts(title, text, ids) {
 export async function getData({ ids, sizes }) {
   const isPopup = ids && !sizes;
   const scripts = isPopup // the popup may show a subsequently removed script
-    ? ids.map(id => scriptMap[id] || removedScripts.find(r => r.props.id === id)).filter(Boolean)
+    ? ids.map(id => scriptMap[id] || removedScripts.find(r => r.props.id === +id)).filter(Boolean)
     : getScriptsByIdsOrAll(ids);
   scripts.forEach(inferScriptProps);
   return {
-    scripts,
+    [SCRIPTS]: scripts,
     cache: await getIconCache(scripts),
     sizes: sizes && getSizes(ids),
     sync: sizes && commands.SyncGetStates(),
   };
+}
+
+export function getDisabledIds({ url, [kTop]: isTop }) {
+  return getScriptsByURL(url, isTop, null, true);
 }
 
 /**

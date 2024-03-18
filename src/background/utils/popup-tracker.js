@@ -1,14 +1,14 @@
 import { getActiveTab, isEmpty, sendTabCmd } from '@/common';
 import cache from './cache';
-import { getData } from './db';
+import { getData, getDisabledIds } from './db';
 import { badges, getFailureReason } from './icon';
-import { addPublicCommands, commands } from './init';
+import { addOwnCommands, addPublicCommands, commands } from './init';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
 export const popupTabs = {};
 const getCacheKey = tabId => 'SetPopup' + tabId;
 
-addPublicCommands({
+addOwnCommands({
   async InitPopup() {
     const tab = await getActiveTab() || {};
     const { url = '', id: tabId } = tab;
@@ -23,12 +23,26 @@ addPublicCommands({
     data[IS_APPLIED] = badgeData[INJECT] !== 'off'; // will be used by reloadHint in popup
     return [cachedSetPopup, data, failure];
   },
-  async SetPopup(data, src) {
+});
+
+addPublicCommands({
+  /** Must be synchronous for proper handling of `return;` inside */
+  SetPopup(data, src) {
     const tabId = src.tab.id;
     const key = getCacheKey(tabId);
-    if (popupTabs[tabId]) return;
-    Object.assign(data, await getData({ [IDS]: Object.keys(data[IDS]) }));
-    (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = [data, src];
+    if (popupTabs[tabId]) {
+      return; // allowing the visible popup's onMessage to handle this message
+    }
+    let disabledIds;
+    if (!data.all) {
+      disabledIds = getDisabledIds(src);
+      Object.assign(data[IDS], disabledIds);
+    }
+    getData({ [IDS]: Object.keys(data[IDS]) }).then(res => {
+      Object.assign(data, res);
+      (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = [data, src];
+    });
+    return disabledIds;
   }
 });
 
