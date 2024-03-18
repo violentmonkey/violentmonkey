@@ -101,10 +101,10 @@ buttonSupport:
   message: Страница подршке
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Опозови
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Ажурирај
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Провери ажурирања за све
@@ -282,7 +282,7 @@ labelAbout:
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Напредни
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Дозволи ажурирања
@@ -396,7 +396,7 @@ labelHelpTranslate:
   message: ''
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Почетна страница
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Адреса почетне странице:'
@@ -591,7 +591,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Повратне информације
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Пронађи скрипте за овај сајт

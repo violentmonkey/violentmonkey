@@ -80,7 +80,7 @@ buttonReset:
   message: 초기화
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: 설정 초기화
 buttonRestore:
   description: Button to restore a removed script.
   message: 복구
@@ -131,7 +131,7 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: 데이터베이스의 모든 변경 사항 되돌리기 (가져오기, 업데이트, 수정, 사용자 지정)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: 이 목록과 일치하는 URL에는 스크립트가 삽입되지 않습니다.
@@ -147,13 +147,22 @@ descEditorOptions:
     rel="noopener noreferrer">전체 목록</a>을 확인하세요.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    값을 더블 클릭하여 설정을 켜고 끌 수 있습니다.<code>true</code> = 활성화, <code>false</code> =
+    비활성화. <code>지연</code>, <code>주기</code>, <code>속도</code>, <code>시간</code> 등
+    수로 입력하는 설정의 단위는 밀리초입니다.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    비표준 설정: <code>autocompleteOnTyping</code>으로 입력 후 자동 완성 힌트를 표시할 때까지의 지연
+    시간(밀리초)을 설정할 수 있고 (<code>0</code> = 비활성화),
+    <code>killTrailingSpaceOnSave</code>는 저장할 때 후행 공백을 자동으로 제거하고,
+    <code>showTrailingSpace</code>는 후행 공백을 점으로 표시합니다.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    지원하는 변수: MomentJS와 호환되는 <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    형식. 예: <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: '유저스크립트의 메타데이터와 <code>GM</code> API 문서:'
@@ -261,7 +270,7 @@ helpForLocalFile:
   message: 끌어다 놓은 로컬 스크립트에 대한 지침 표시
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: 일치하는 스크립트 $1개
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL 입력:'
@@ -320,7 +329,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: 백업 및 유지보수
 labelBadge:
   description: Label for option to show number on badge.
   message: '배지 표시: '
@@ -546,7 +555,7 @@ labelSyncUsername:
   message: '사용자: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: '태그 (공백으로 구분):'
 labelTheme:
   description: Label for the visual theme option.
   message: '테마: '
@@ -904,7 +913,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * <kbd>Enter</kbd> 키를 누르면 텍스트가 자동 완성 내역에 추가됩니다
+
+    * 모든 조건은 대소문자를 구분하지 않습니다
+
+    * 조건은 공백으로 구분해 여러 개 입력할 수 있습니다
+
+    * 메타데이터 검색: <code>"Awesome Script" "Description"</code>
+
+    * 태그 검색: <code>#tag1 #tag2</code>
+
+    * 스크립트 이름 검색: <code>name:"awesome name"</code>
+
+    * 스크립트 코드 검색: <code>code:"awesome code"</code>
+
+    * 검색에서 제외: <code>!#tag2 !name:"unwanted"</code>
+
+    * 정규표현식: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: 외부 편집 추적

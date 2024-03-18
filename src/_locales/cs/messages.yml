@@ -101,10 +101,10 @@ buttonSupport:
   message: Support page
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Undo
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Update
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Zkontrolovat aktualizace
@@ -282,7 +282,7 @@ labelAbout:
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: Pokročilý
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Povolit aktualizace
@@ -394,7 +394,7 @@ labelHelpTranslate:
   message: ''
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Homepage
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Domovská stránka (URL):'
@@ -589,7 +589,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Zpětná vazba
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Najdi skripty pro tuto stránku
