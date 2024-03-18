@@ -89,7 +89,8 @@
           </template>
         </Dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
-        <form class="filter-search hidden-xs" @submit.prevent>
+        <form class="filter-search hidden-xs" @submit.prevent
+              :style="{ 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
           <label>
             <input
               type="search"
@@ -827,7 +828,7 @@ $iconSize: 2rem; // from .icon in ui/style.css
   }
 }
 .filter-search {
-  min-width: 14rem;
+  flex-grow: 10;
   label {
     position: relative;
   }
