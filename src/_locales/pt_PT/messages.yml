@@ -104,7 +104,7 @@ buttonUndo:
   message: Anular
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Atualização
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Procurar atualizações para todos
@@ -599,7 +599,7 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: Forneça comentários
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Procurar scripts para este site
