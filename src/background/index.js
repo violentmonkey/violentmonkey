@@ -25,14 +25,12 @@ addPublicCommands({
   },
 });
 
-async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
+function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   if (init) {
     return init.then(handleCommandMessage.bind(this, ...arguments));
   }
   const func = hasOwnProperty(commands, cmd) && commands[cmd];
-  if (!func) {
-    throw new SafeError(`Unknown command: ${cmd}`);
-  }
+  if (!func) return; // not responding to commands for popup/options
   // The `src` is omitted when invoked via sendCmdDirectly unless fakeSrc is set.
   // The `origin` is Chrome-only, it can't be spoofed by a compromised tab unlike `url`.
   if (src) {
@@ -51,11 +49,13 @@ async function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
     }
     if (mode) src[kTop] = mode;
   }
+  return handleCommandMessageAsync(func, data, src);
+}
+
+async function handleCommandMessageAsync(func, data, src) {
   try {
     // `await` is necessary to catch the error here
-    const res = await func(data, src);
-    // `undefined` is not transferable, but `null` is
-    return res ?? null;
+    return await func(data, src);
   } catch (err) {
     if (process.env.DEBUG) console.error(err);
     // Adding `stack` info + in FF a rejected Promise value is transferred only for an Error object

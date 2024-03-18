@@ -93,7 +93,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
   const wrapResponse = (result, error) => {
     if (process.env.DEBUG) console[error ? 'warn' : 'log']('sendResponse', error || result);
     return [
-      result,
+      result ?? null, // `undefined` is not transferable in Chrome, but `null` is
       error && (
         error[MESSAGE]
           ? [error[MESSAGE], error[STACK]]
@@ -153,9 +153,10 @@ if (!IS_FIREFOX && !browser?.runtime) {
           listener => {
             if (process.env.DEV
             && !process.env.IS_INJECTED
-            && listener !== global.handleCommandMessage
             && /^async/.test(listener)) {
-              throw new Error('onMessage listener cannot be async due to GetInjected interference!');
+              throw new Error('onMessage listener cannot be async');
+              // ...because it must be able to return `undefined` for unintended messages
+              // to allow onMessage of the intended context to handle this message
               // TODO: migrate to addRuntimeListener(fn, commands: object)
             }
             return onMessage::addListener(onMessageListener::bind(null, listener));
