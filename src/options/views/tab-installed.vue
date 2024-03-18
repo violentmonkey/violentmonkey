@@ -38,15 +38,19 @@
           </div>
           <div v-if="state.filteredScripts.length" class="btn-group">
             <a
-              v-for="item in batchActions" :key="item.action"
+              v-for="({ icon, num }, key) in batchActions" :key="key"
               class="btn-ghost"
-              :class="{ 'has-error': state.batchAction.action === item.action, disabled: store.importing }"
-              :data-batch-action="item.action"
+              :class="{
+                'has-error': state.batchAction.action === key,
+                 disabled: store.importing,
+              }"
+              :data-batch-action="key"
               tabindex="0"
               @click.prevent="handleBatchAction"
             >
-              <Icon :name="item.icon" />
-              <span class="ml-1" v-if="state.batchAction.action === item.action">❗</span>
+              <Icon :name="icon" />
+              <sub v-text="num" v-if="num" />
+              <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
             </a>
             <div class="btn-hint subtle" v-text="i18n('hintForBatchAction', `${state.filteredScripts.length}`)"></div>
             <Tooltip :content="i18n('buttonUndo')" placement="bottom" align="start">
@@ -180,11 +184,17 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { markRemove, store, createSearchRules, testSearchRule, removeScripts, restoreScripts, runInBatch } from '../utils';
+import { markRemove, store, createSearchRules, testSearchRule, runInBatch } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
 
+const EDIT = 'edit';
+const REMOVE = 'remove';
+const RESTORE = 'restore';
+const TOGGLE = 'toggle';
+const UNDO = 'undo';
+const UPDATE = 'update';
 const filterOptions = {
   sort: {
     exec: {
@@ -197,7 +207,7 @@ const filterOptions = {
         { $cache: { lowerName: b } },
       ) => (a < b ? -1 : a > b),
     },
-    update: {
+    [UPDATE]: {
       title: i18n('filterLastUpdateOrder'),
       compare: (
         { props: { lastUpdated: a } },
@@ -238,11 +248,11 @@ const conditionScriptFocusedRecycle = `${conditionNotSearch} && selectedScript &
 const conditionScriptFocusedWithoutButton = `${conditionNotSearch} && !buttonFocus`;
 const conditionHotkeys = `${conditionNotSearch} && selectedScript && showHotkeys`;
 const scriptHotkeys = {
-  edit: 'e',
-  toggle: 'space',
-  update: 'r',
-  restore: 'r',
-  remove: 'x',
+  [EDIT]: 'e',
+  [TOGGLE]: 'space',
+  [UPDATE]: 'r',
+  [RESTORE]: 'r',
+  [REMOVE]: 'x',
 };
 const registerHotkey = (callback, items) => items.map(([key, condition, caseSensitive]) => (
   keyboardService.register(key, callback, { condition, caseSensitive })
@@ -279,7 +289,7 @@ const state = reactive({
   },
   batchAction: {
     action: null,
-    undo: null,
+    [UNDO]: null,
   },
 });
 
@@ -301,32 +311,48 @@ const searchNeedsCodeIds = computed(() => state.search.rules.some(rule => !rule.
         && store.scripts.filter(s => s.$cache.code == null).map(s => s.props.id));
 const activeTags = computed(() => state.search.tokens.filter(token => token.prefix === '#' && !token.negative).map(token => token.parsed));
 const getCurrentList = () => showRecycle.value ? store.removedScripts : store.scripts;
-const anyDisabled = computed(() => state.filteredScripts.some(item => !item.config.enabled));
-const batchActions = computed(() => [
-  {
-    action: 'toggle',
-    icon: anyDisabled.value ? 'toggle-on' : 'toggle-off',
-    handle: () => {
-      const enabled = +anyDisabled.value;
-      const scripts = state.filteredScripts.filter(item => +item.config.enabled !== enabled);
-      runInBatch(() => scripts.map(handleActionToggle));
-      return () => {
-        runInBatch(() => scripts.map(handleActionToggle));
-      };
+const getDataBatchAction = evt => evt.target.closest('[data-batch-action]');
+const TOGGLE_ON = 'toggle-on';
+const ALL_BATCH_ACTIONS = {
+  [TOGGLE]: {
+    icon: TOGGLE_ON,
+    arg(scripts) {
+      const enabled = this.icon === TOGGLE_ON ? 1 : 0;
+      return scripts.filter(s => +s.config.enabled !== enabled);
     },
+    fn: scripts => Promise.all(scripts.map(handleActionToggle)),
   },
-  {
-    action: 'remove',
+  [UPDATE]: {
+    icon: 'refresh',
+    fn: scripts => sendCmdDirectly('CheckUpdate', scripts.map(s => s.props.id)),
+    [UNDO]: false,
+  },
+  [REMOVE]: {
     icon: 'trash',
-    handle: () => {
-      const { filteredScripts } = state;
-      removeScripts(filteredScripts);
-      return () => {
-        restoreScripts(filteredScripts);
-      };
+    async fn(scripts, undo) {
+      await Promise.all(scripts.map(s => markRemove(s, !undo)));
+      // nuking the ghosts because the user's intent was already confirmed
+      if (!undo) store.scripts = [];
     },
   },
-]);
+};
+const batchActions = computed(() => {
+  const scripts = state.filteredScripts;
+  const num = scripts.length;
+  const allShown = num === state.sortedScripts.length;
+  let res = ALL_BATCH_ACTIONS;
+  let toEnable = 0;
+  let toUpdate = 0;
+  for (const s of scripts) {
+    toEnable += !s.config.enabled;
+    if (!allShown) toUpdate += s.$canUpdate > 0;
+  }
+  res[TOGGLE].icon = toEnable ? TOGGLE_ON : 'toggle-off';
+  res[TOGGLE].num = toEnable < num ? toEnable : '';
+  if (!toUpdate) ({ [UPDATE]: toUpdate, ...res } = res);
+  else res[UPDATE].num = toUpdate < num ? toUpdate : '';
+  return res;
+});
 
 const debouncedSearch = debounce(scheduleSearch, 100);
 const debouncedRender = debounce(renderScripts);
@@ -562,21 +588,24 @@ function handleSmoothScroll(delta) {
 }
 function handleBatchAction(e) {
   if (store.importing) return;
-  const button = e.target.closest('[data-batch-action]');
-  const action = button?.dataset.batchAction;
-  if (state.batchAction.action === action) {
+  const button = getDataBatchAction(e);
+  const stateBA = state.batchAction;
+  let action = button?.dataset.batchAction;
+  if (stateBA.action === action) {
     // Confirmed
-    const undo = batchActions.value.find(item => item.action === action)?.handle();
-    state.batchAction.undo = undo && (() => {
-      undo();
-      state.batchAction.undo = null;
+    const baVal = batchActions.value[action] || {};
+    const scripts = state.filteredScripts;
+    const arg = baVal.arg?.(scripts) || scripts;
+    const fn = baVal.fn;
+    if (fn) runInBatch(fn, arg);
+    stateBA[UNDO] = fn && baVal[UNDO] !== false && (() => {
+      runInBatch(fn, arg, UNDO);
+      stateBA[UNDO] = null;
     });
-    state.batchAction.action = null;
+    action = '';
     button.blur();
-  } else {
-    // Show "Confirm"
-    state.batchAction.action = action;
   }
+  stateBA.action = action;
 }
 function bindKeys() {
   const handleFocus = () => {
@@ -661,7 +690,7 @@ function bindKeys() {
     ...registerHotkey(() => {
       handleEditScript(selectedScript.value.props.id);
     }, [
-        [scriptHotkeys.edit, conditionScriptFocused, true],
+        [scriptHotkeys[EDIT], conditionScriptFocused, true],
         // Enter should only work when no button is focused
         ['enter', conditionScriptFocusedWithoutButton],
       ]),
@@ -669,22 +698,22 @@ function bindKeys() {
       handleActionRemove(selectedScript.value);
     }, [
         ['delete', conditionScriptFocused],
-        [scriptHotkeys.remove, conditionScriptFocused, true],
+        [scriptHotkeys[REMOVE], conditionScriptFocused, true],
       ]),
     ...registerHotkey(() => {
       handleActionUpdate(selectedScript.value);
     }, [
-        [scriptHotkeys.update, conditionScriptFocused, true],
+        [scriptHotkeys[UPDATE], conditionScriptFocused, true],
       ]),
     ...registerHotkey(() => {
       handleActionToggle(selectedScript.value);
     }, [
-        [scriptHotkeys.toggle, conditionScriptFocused, true],
+        [scriptHotkeys[TOGGLE], conditionScriptFocused, true],
       ]),
     ...registerHotkey(() => {
       handleActionRestore(selectedScript.value);
     }, [
-        [scriptHotkeys.restore, conditionScriptFocusedRecycle, true],
+        [scriptHotkeys[RESTORE], conditionScriptFocusedRecycle, true],
       ]),
     ...registerHotkey(() => {
       state.showHotkeys = !state.showHotkeys;
@@ -699,7 +728,7 @@ function bindKeys() {
 }
 
 function handleCancelBatchAction(e) {
-  if (!e.target.closest('[data-batch-action]')) {
+  if (!getDataBatchAction(e)) {
     state.batchAction.action = null;
   }
 }
@@ -867,6 +896,14 @@ $iconSize: 2rem; // from .icon in ui/style.css
   align-items: center;
   border-right: 1px solid var(--fill-5);
   padding: 0 0.5rem;
+  sub {
+    position: absolute;
+    color: var(--fill-7);
+    margin-top: 1.5rem;
+    font-size: x-small;
+    text-align: center;
+    width: 1rem;
+  }
 }
 .btn-hint {
   margin: 0 0.5rem;

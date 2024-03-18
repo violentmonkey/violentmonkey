@@ -26,24 +26,11 @@ export function markRemove(script, removed) {
   });
 }
 
-export async function runInBatch(fn) {
+export async function runInBatch(fn, ...args) {
   try {
     store.importing = true;
-    await fn();
+    await fn(...args);
   } finally {
     store.importing = false;
   }
-}
-
-export function removeScripts(scripts) {
-  return runInBatch(async () => {
-    await Promise.all(scripts.map(s => markRemove(s, true)));
-    store.scripts = []; // nuking the ghosts because the user's intent was already confirmed
-  });
-}
-
-export function restoreScripts(scripts) {
-  return runInBatch(async () => {
-    await Promise.all(scripts.map(s => markRemove(s, false)));
-  });
 }
