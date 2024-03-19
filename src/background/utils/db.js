@@ -445,10 +445,10 @@ export function notifyToOpenScripts(title, text, ids) {
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
 export async function getData({ ids, sizes }) {
-  const isPopup = ids && !sizes;
-  const scripts = isPopup // the popup may show a subsequently removed script
-    ? ids.map(id => scriptMap[id] || removedScripts.find(r => r.props.id === +id)).filter(Boolean)
-    : getScriptsByIdsOrAll(ids);
+  const scripts = ids
+    // Some ids shown in popup/editor may have been hard-deleted
+    ? getScriptsByIdsOrAll(ids).filter(Boolean)
+    : getScriptsByIdsOrAll();
   scripts.forEach(inferScriptProps);
   return {
     [SCRIPTS]: scripts,
