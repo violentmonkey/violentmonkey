@@ -1,7 +1,7 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, getScriptRunAt, makePause, isHttpOrHttps, normalizeTag,
+  getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
 } from '@/common';
 import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -474,7 +474,7 @@ async function getIconCache(scripts) {
   const toPrime = [];
   const res = {};
   for (let { custom, meta: { icon } } of scripts) {
-    if (isHttpOrHttps(icon)) {
+    if (isValidHttpUrl(icon)) {
       icon = custom.pathMap[icon] || icon;
       toGet.push(icon);
       if (!storageCacheHas(S_CACHE_PRE + icon)) toPrime.push(icon);

@@ -2,7 +2,7 @@
 
 import { browser, HOMEPAGE_URL, INFERRED, RUN_AT_RE, SUPPORT_URL } from './consts';
 import { deepCopy } from './object';
-import { blob2base64, i18n, isDataUri } from './util';
+import { blob2base64, i18n, isDataUri, tryUrl } from './util';
 
 export { normalizeKeys } from './object';
 export * from './util';
@@ -283,17 +283,6 @@ export function makePause(ms) {
 
 export function trueJoin(separator) {
   return this.filter(Boolean).join(separator);
-}
-
-/** @returns {string|undefined} */
-export function tryUrl(str) {
-  try {
-    if (str && new URL(str)) {
-      return str; // throws on invalid urls
-    }
-  } catch (e) {
-    // undefined
-  }
 }
 
 /**

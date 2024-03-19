@@ -273,8 +273,19 @@ const isLocalUrlRe = re`/^(
     (:\d+|\/|$)
 )/ix`;
 export const isDataUri = url => /^data:/i.test(url);
-export const isHttpOrHttps = url => /^https?:\/\//i.test(url);
+export const isValidHttpUrl = url => /^https?:\/\//i.test(url) && tryUrl(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
+
+/** @returns {string|undefined} */
+export function tryUrl(str) {
+  try {
+    if (str && new URL(str)) {
+      return str; // throws on invalid urls
+    }
+  } catch (e) {
+    // undefined
+  }
+}
 
 /**
  * Make a request.
