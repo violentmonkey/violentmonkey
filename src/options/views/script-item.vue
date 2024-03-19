@@ -380,6 +380,7 @@ $removedItemHeight: calc(
   }
   &-info-1 {
     display: flex;
+    gap: 8px;
     align-items: center;
     align-self: flex-start;
   }
