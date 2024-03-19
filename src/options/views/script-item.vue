@@ -381,6 +381,7 @@ $removedItemHeight: calc(
   &-info-1 {
     display: flex;
     align-items: center;
+    align-self: flex-start;
   }
   &-name {
     font-weight: 500;
