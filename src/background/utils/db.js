@@ -463,6 +463,8 @@ export function getDisabledIds({ url, [kTop]: isTop }) {
 }
 
 /**
+ * Returns only own icon and the already cached icons.
+ * The rest are prefetched in background and will be used by loadScriptIcon.
  * @param {VMScript[]} scripts
  * @return {Promise<{}>}
  */
@@ -470,7 +472,6 @@ async function getIconCache(scripts) {
   // data uri for own icon to load it instantly in Chrome when there are many images
   const toGet = [`${ICON_PREFIX}38.png`];
   const toPrime = [];
-  const toResolve = [];
   const res = {};
   for (let { custom, meta: { icon } } of scripts) {
     if (isHttpOrHttps(icon)) {
@@ -482,15 +483,12 @@ async function getIconCache(scripts) {
   if (toPrime.length) {
     await storage[S_CACHE].getMulti(toPrime);
   }
-  for (const url of toGet) {
-    const d = getImageData(url);
-    if (isObject(d)) toResolve.push(d);
-    else { res[url] = d; toResolve.push(0); }
-  }
-  if (toResolve.some(Boolean)) {
-    (await Promise.all(toResolve)).forEach((dataUri, i) => {
-      if (dataUri) res[toGet[i]] = dataUri;
-    });
+  for (let i = 0, d, url; i < toGet.length; i++) {
+    url = toGet[i];
+    d = getImageData(url);
+    if (!isObject(d) || !i && (d = await d)) {
+      res[url] = d;
+    }
   }
   return res;
 }
