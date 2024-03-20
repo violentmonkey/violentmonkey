@@ -172,7 +172,7 @@
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
 import { i18n, sendCmdDirectly, debounce, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
-import { isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
+import { getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
@@ -609,7 +609,7 @@ function handleBatchAction(e) {
 }
 function bindKeys() {
   const handleFocus = () => {
-    keyboardService.setContext('buttonFocus', document.activeElement?.tabIndex >= 0);
+    keyboardService.setContext('buttonFocus', getActiveElement()?.tabIndex >= 0);
   };
   addEventListener('focus', handleFocus, true);
   const disposeList = [

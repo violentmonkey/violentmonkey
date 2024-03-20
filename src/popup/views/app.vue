@@ -208,7 +208,7 @@ import {
 } from '@/common';
 import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
-import { focusMe } from '@/common/ui';
+import { focusMe, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { store } from '../utils';
@@ -546,10 +546,10 @@ export default {
     },
     delegateMouseLeave(e) {
       const { target } = e;
-      if (target === document.activeElement && !isInput(target)) target.blur();
+      if (target === getActiveElement() && !isInput(target)) target.blur();
     },
     updateMessage() {
-      this.message = document.activeElement?.dataset.message || '';
+      this.message = getActiveElement()?.dataset.message || '';
     },
     showButtons(item) {
       return this.extras?.id === item.id || this.focusedItem?.id === item.id || this.focusBug;
@@ -579,8 +579,8 @@ export default {
         if (item) {
           this.extras = this.topExtras = null;
           this.focus(item);
-        } else if (document.activeElement?.value) {
-          document.activeElement.blur();
+        } else if (getActiveElement()?.value) {
+          getActiveElement().blur();
         } else {
           window.close();
         }

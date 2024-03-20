@@ -170,7 +170,7 @@ import options from '@/common/options';
 import optionsDefaults from '@/common/options-defaults';
 import hookSetting from '@/common/hook-setting';
 import { keyboardService } from '@/common/keyboard';
-import { focusMe } from '@/common/ui';
+import { focusMe, getActiveElement } from '@/common/ui';
 import LocaleGroup from '@/common/ui/locale-group';
 import SettingText from '@/common/ui/setting-text';
 import VmImport from './vm-import';
@@ -279,7 +279,7 @@ export default {
   },
   methods: {
     ctrlS() {
-      document.activeElement.dispatchEvent(new Event('ctrl-s'));
+      getActiveElement().dispatchEvent(new Event('ctrl-s'));
     },
     onResetBadgeColors() {
       badgeColorNames.forEach(name => {

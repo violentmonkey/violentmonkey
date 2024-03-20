@@ -156,6 +156,7 @@ function vFocusFactory() {
  */
 export const vFocus = vFocusFactory();
 export const isTouch = 'ontouchstart' in document;
+export const getActiveElement = () => document.activeElement;
 /** @param {MouseEvent|KeyboardEvent} e */
 export const hasKeyModifiers = e => e.shiftKey || e.ctrlKey || e.metaKey || e.altKey;
 export const externalEditorInfoUrl =

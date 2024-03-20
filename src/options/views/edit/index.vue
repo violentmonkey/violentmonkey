@@ -94,7 +94,7 @@ import {
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
-import { externalEditorInfoUrl, focusMe, showMessage } from '@/common/ui';
+import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
@@ -311,7 +311,7 @@ function close(entirely) {
   } else {
     emit('close');
     // FF doesn't emit `blur` when CodeMirror's textarea is removed
-    if (IS_FIREFOX) document.activeElement?.blur();
+    if (IS_FIREFOX) getActiveElement()?.blur();
   }
 }
 async function saveClose() {

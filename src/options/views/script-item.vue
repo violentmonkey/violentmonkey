@@ -151,7 +151,7 @@ import {
   getLocaleString, getScriptHome, formatTime,
   getScriptSupportUrl, i18n,
 } from '@/common';
-import { showConfirmation } from '@/common/ui';
+import { getActiveElement, showConfirmation } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
 import { store } from '../utils';
@@ -250,7 +250,7 @@ export default {
         } else if (rect.top < pRect.top + itemMargin) {
           delta -= pRect.top - rect.top + itemMargin;
         }
-        if (!isInput(document.activeElement)) {
+        if (!isInput(getActiveElement())) {
           // focus without scrolling, then scroll smoothly
           $el.focus({ preventScroll: true });
         }

@@ -102,7 +102,7 @@ import { deepCopy, deepEqual, mapEntry } from '@/common/object';
 import { WATCH_STORAGE } from '@/common/consts';
 import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
-import { showMessage } from '@/common/ui';
+import { getActiveElement, showMessage } from '@/common/ui';
 import { store } from '../../utils';
 
 const props = defineProps({
@@ -134,7 +134,6 @@ const reparseJson = (str) => {
     return str;
   }
 };
-const getActiveElement = () => document.activeElement;
 /** Uses a negative tabId which is recognized in bg::values.js */
 const fakeSender = () => ({ tab: { id: Math.random() - 2 }, [kFrameId]: 0 });
 const conditionNotEdit = { condition: '!edit' };
