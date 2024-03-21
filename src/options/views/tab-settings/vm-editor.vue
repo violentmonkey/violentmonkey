@@ -1,34 +1,35 @@
 <template>
-  <section>
+  <section ref="$el">
     <h3 v-text="i18n('labelEditor')"></h3>
-    <div class="mr-1c flex center-items">
+    <div class="mb-1 mr-1c flex center-items">
       <span v-text="i18n('labelTheme')"/>
-      <select v-model="theme" :disabled="busy" :title="css">
+      <select v-model="theme" :disabled="busy" :title="themeCss">
         <option :value="DEFAULT" v-text="i18n('labelRunAtDefault')"/>
         <option value="" v-text="i18n('labelBadgeNone')"/>
-        <option v-for="name in themes" :key="name" v-text="name"/>
+        <option v-for="name in THEMES" :key="name" v-text="name"/>
       </select>
       <a :href="ghURL" target="_blank">&nearr;</a>
       <p v-text="error"/>
     </div>
-    <p class="my-1">
-      <span v-html="i18n('descEditorOptions')"
-      /> <span v-html="i18n('descEditorOptionsGeneric')"
-      /> <span v-html="i18n('descEditorOptionsVM')"
-      />
-    </p>
+    <p class="my-1" v-html="i18n('descEditorOptions')"/>
     <setting-text name="editor" json has-reset @dblclick="toggleBoolean">
-      <button v-text="i18n('buttonShowEditorState')" @click="toggleStateHint"/>
+      <a class="ml-1" tabindex="0" @click="info = !info">
+        <icon name="info"/>
+      </a>
+      <label class="btn-ghost" style="border:none">
+        <input type="checkbox" v-model="hintShown">
+        <span v-text="i18n('buttonShowEditorState')"/>
+      </label>
     </setting-text>
+    <template v-if="info">
+      <p class="mt-1" v-html="i18n('descEditorOptionsGeneric')"/>
+      <p class="mt-1" v-html="i18n('descEditorOptionsVM')"/>
+    </template>
     <pre v-text="hint" class="monospace-font dim-hint" />
   </section>
 </template>
 
 <script>
-import options from '@/common/options';
-import hookSetting from '@/common/hook-setting';
-import SettingText from '@/common/ui/setting-text';
-
 const keyThemeCSS = 'editorTheme';
 const keyThemeNAME = 'editorThemeName';
 const THEMES = process.env.CODEMIRROR_THEMES;
@@ -51,111 +52,124 @@ const makeTextPreview = css => (
     )).join('\n')
     : null
 );
+</script>
 
-export default {
-  data() {
-    return {
-      hint: null,
-      busy: false,
-      error: null,
-      css: null,
-      theme: null,
-      themes: THEMES,
-      DEFAULT,
-      ghURL,
-    };
-  },
-  components: {
-    SettingText,
-  },
-  beforeUnmount() {
-    this.revokers.forEach(revoke => revoke());
-    this.revokers = null;
-  },
-  async mounted() {
-    if (!this.revokers) {
-      this.css = makeTextPreview(options.get(keyThemeCSS));
-      this.revokers = [
-        hookSetting(keyThemeNAME, val => { this.theme = val ?? DEFAULT; }),
-      ];
-      await options.ready; // Waiting for hookSetting to set the value before watching for changes
-      this.$watch('theme', async val => {
-        const url = val && val !== DEFAULT
-          && `https://raw.githubusercontent.com/${ghREPO}/${ghBRANCH}/${ghPATH}/${val}.css`;
-        const css = url && await this.fetch(url);
-        options.set(keyThemeNAME, !url || css ? val : DEFAULT);
-        options.set(keyThemeCSS, css || '');
-        this.css = makeTextPreview(css);
-      });
+<script setup>
+import options from '@/common/options';
+import hookSetting from '@/common/hook-setting';
+import { getActiveElement } from '@/common/ui';
+import SettingText from '@/common/ui/setting-text';
+import { nextTick, onMounted, ref, watch } from 'vue';
+import Icon from '@/common/ui/icon';
+
+const $el = ref();
+const hint = ref();
+const hintShown = ref(false);
+const info = ref();
+const busy = ref();
+const error = ref();
+const themeCss = ref();
+const theme = ref();
+
+onMounted(async () => {
+  await options.ready; // Waiting for hookSetting to set the value before watching for changes
+  let fromHook;
+  watch(hintShown, toggleStateHint);
+  watch(theme, async val => {
+    if (fromHook) { // Do nothing if triggered by a duplicate Violentmonkey tab or sync
+      fromHook = false;
+      return;
     }
-  },
-  methods: {
-    async fetch(url, method = 'text') {
-      const el = document.activeElement;
-      this.busy = true;
-      try {
-        const res = await (await fetch(url))[method]();
-        this.error = null;
-        return res;
-      } catch (e) {
-        this.error = e.message || e.code || `${e}`;
-      } finally {
-        this.busy = false;
-        this.$nextTick(() => el?.focus());
-      }
-    },
-    toggleBoolean(event) {
-      const el = /** @type {HTMLTextAreaElement} */ event.target;
-      const { selectionStart: start, selectionEnd: end, value } = el;
-      // Ignoring double-clicks outside of <textarea>
-      const toggled = end && { false: 'true', true: 'false' }[value.slice(start, end)];
-      // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24
-      if (toggled && !document.execCommand('insertText', false, toggled)) {
-        el.value = value.slice(0, start) + toggled + value.slice(end);
-        el.setSelectionRange(start + toggled.length, start + toggled.length);
-        el.dispatchEvent(new Event('input'));
-        el.onblur = () => el.dispatchEvent(new Event('change'));
-      }
-    },
-    async toggleStateHint() {
-      if (this.hint) {
-        this.hint = null;
-        return;
-      }
-      const HIDE_OPTS = [
-        // we activate only one mode: js
-        'mode',
-        // duh
-        'value',
-        // these accept only a function
-        'configureMouse',
-        'lineNumberFormatter',
-        'specialCharPlaceholder',
-      ];
-      const opts = {};
-      Object.entries({
-        ...(await import('codemirror')).default.defaults,
-        ...(await import('@/common/ui/code')).default.data().cmDefaults,
-        ...options.get('editor'),
-      })
-      // sort by keys alphabetically to make it more readable
-      .sort(([a], [b]) => (a < b ? -1 : a > b))
-      .filter(([key, val]) => !HIDE_OPTS.includes(key) && !isFunction(val))
-      .forEach(([key, val]) => { opts[key] = val; });
-      this.hint = JSON.stringify(opts, null, '  ');
-      setTimeout(() => {
-        if (this.$el.getBoundingClientRect().bottom > window.innerHeight) {
-          this.$el.scrollIntoView({ behavior: 'smooth' });
-        }
-      });
-    },
-  },
-};
+    const url = val && val !== DEFAULT
+        && `https://raw.githubusercontent.com/${ghREPO}/${ghBRANCH}/${ghPATH}/${val}.css`;
+    const css = url && await fetchUrl(url);
+    options.set(keyThemeNAME, !url || css ? val : DEFAULT);
+    options.set(keyThemeCSS, css || '');
+  });
+  hookSetting(keyThemeNAME, val => {
+    if (theme.value != (val ??= DEFAULT)) {
+      fromHook = true;
+      theme.value = val;
+    }
+  });
+  hookSetting(keyThemeCSS, val => {
+    themeCss.value = makeTextPreview(val);
+  });
+});
+
+async function fetchUrl(url, method = 'text') {
+  const el = getActiveElement();
+  busy.value = true;
+  try {
+    const res = await (await fetch(url))[method]();
+    error.value = null;
+    return res;
+  } catch (e) {
+    error.value = e.message || e.code || `${e}`;
+  } finally {
+    busy.value = false;
+    await nextTick();
+    el?.focus();
+  }
+}
+function toggleBoolean(event) {
+  const el = /** @type {HTMLTextAreaElement} */ event.target;
+  const { selectionStart: start, selectionEnd: end, value } = el;
+  // Ignoring double-clicks outside of <textarea>
+  const toggled = end && { false: 'true', true: 'false' }[value.slice(start, end)];
+  // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24
+  if (toggled && !document.execCommand('insertText', false, toggled)) {
+    el.value = value.slice(0, start) + toggled + value.slice(end);
+    el.setSelectionRange(start + toggled.length, start + toggled.length);
+    el.dispatchEvent(new Event('input'));
+    el.onblur = () => el.dispatchEvent(new Event('change'));
+  }
+}
+async function toggleStateHint(curValue) {
+  let res;
+  if (curValue) {
+    const HIDE_OPTS = [
+      // we activate only one mode: js
+      'mode',
+      // duh
+      'value',
+      // these accept only a function
+      'configureMouse',
+      'lineNumberFormatter',
+      'specialCharPlaceholder',
+    ];
+    const opts = {};
+    Object.entries({
+      ...(await import('codemirror')).default.defaults,
+      ...(await import('@/common/ui/code')).default.data().cmDefaults,
+      ...options.get('editor'),
+    })
+    // sort by keys alphabetically to make it more readable
+    .sort(([a], [b]) => (a < b ? -1 : a > b))
+    .filter(([key, val]) => !HIDE_OPTS.includes(key) && !isFunction(val))
+    .forEach(([key, val]) => { opts[key] = val; });
+    res = JSON.stringify(opts, null, '  ');
+  }
+  hint.value = res;
+  if (res) {
+    await nextTick();
+    if ($el.value.getBoundingClientRect().bottom > innerHeight) {
+      $el.value.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
 </script>
 
 <style>
   .dim-hint {
     font-size: .85rem;
     color: var(--fill-8);
+  }
+  .tldr:not(:focus) {
+    cursor: pointer;
+    white-space: nowrap;
+    max-width: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
