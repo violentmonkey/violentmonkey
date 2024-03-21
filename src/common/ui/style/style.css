@@ -134,6 +134,9 @@ input[type=password] {
     cursor: not-allowed;
   }
 }
+select {
+  field-sizing: content;
+}
 textarea {
   display: block;
   width: 100%;
