@@ -165,11 +165,4 @@ async function toggleStateHint(curValue) {
     font-size: .85rem;
     color: var(--fill-8);
   }
-  .tldr:not(:focus) {
-    cursor: pointer;
-    white-space: nowrap;
-    max-width: 25%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 </style>
