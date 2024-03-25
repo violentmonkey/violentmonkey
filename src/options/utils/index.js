@@ -19,6 +19,11 @@ export const store = reactive({
   title: null,
 });
 
+export const kInclude = 'include';
+export const kMatch = 'match';
+export const kExclude = 'exclude';
+export const kExcludeMatch = 'excludeMatch';
+
 export function markRemove(script, removed) {
   return sendCmdDirectly('MarkRemoved', {
     id: script.props.id,

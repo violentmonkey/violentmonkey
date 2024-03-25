@@ -86,8 +86,7 @@
   </div>
 </template>
 
-<script setup>
-import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
+<script>
 import {
   browserWindows,
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
@@ -96,10 +95,52 @@ import {
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
 import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
-import VmCode from '@/common/ui/code';
-import VmExternals from '@/common/ui/externals';
 import options from '@/common/options';
 import { getUnloadSentry } from '@/common/router';
+import { kExclude, kExcludeMatch, kInclude, kMatch } from '../../utils';
+
+const urlMatching = 'https://violentmonkey.github.io/api/matching/';
+const CUSTOM_PROPS = {
+  name: '',
+  homepageURL: '',
+  updateURL: '',
+  downloadURL: '',
+  tags: '',
+  origInclude: true,
+  origExclude: true,
+  origMatch: true,
+  origExcludeMatch: true,
+};
+const toProp = val => val !== '' ? val : null; // `null` removes the prop from script object
+const CUSTOM_LISTS = [
+  kInclude,
+  kMatch,
+  kExclude,
+  kExcludeMatch,
+];
+const toList = text => (
+  text.trim()
+    ? text.split('\n').map(line => line.trim()).filter(Boolean)
+    : null // `null` removes the prop from script object
+);
+const CUSTOM_ENUM = [
+  INJECT_INTO,
+  RUN_AT,
+];
+const toEnum = val => val || null; // `null` removes the prop from script object
+const K_PREV_PANEL = 'Alt-PageUp';
+const K_NEXT_PANEL = 'Alt-PageDown';
+const compareString = (a, b) => (a < b ? -1 : a > b);
+/** @param {VMScript.Config} config */
+const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
+  +shouldUpdate && (shouldUpdate + _editable)
+);
+</script>
+
+<script setup>
+import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
+import VmCode from '@/common/ui/code';
+import VmExternals from '@/common/ui/externals';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VMSettingsUpdate from './settings-update';
@@ -138,7 +179,6 @@ const errors = ref();
 const fatal = ref();
 const frozen = ref(false);
 const frozenNote = ref(false);
-const urlMatching = ref('https://violentmonkey.github.io/api/matching/');
 
 const navItems = computed(() => {
   const { meta, props: { id } } = script.value;
@@ -174,42 +214,6 @@ watch(() => props.initial.error, error => {
 });
 watch(codeDirty, onDirty);
 watch(script, onScript);
-
-const CUSTOM_PROPS = {
-  name: '',
-  homepageURL: '',
-  updateURL: '',
-  downloadURL: '',
-  tags: '',
-  origInclude: true,
-  origExclude: true,
-  origMatch: true,
-  origExcludeMatch: true,
-};
-const toProp = val => val !== '' ? val : null; // `null` removes the prop from script object
-const CUSTOM_LISTS = [
-  'include',
-  'match',
-  'exclude',
-  'excludeMatch',
-];
-const toList = text => (
-  text.trim()
-    ? text.split('\n').map(line => line.trim()).filter(Boolean)
-    : null // `null` removes the prop from script object
-);
-const CUSTOM_ENUM = [
-  INJECT_INTO,
-  RUN_AT,
-];
-const toEnum = val => val || null; // `null` removes the prop from script object
-const K_PREV_PANEL = 'Alt-PageUp';
-const K_NEXT_PANEL = 'Alt-PageDown';
-const compareString = (a, b) => (a < b ? -1 : a > b);
-/** @param {VMScript.Config} config */
-const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
-  +shouldUpdate && (shouldUpdate + _editable)
-);
 
 {
   // The eslint rule is bugged as this is a block scope, not a global scope.

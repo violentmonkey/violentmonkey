@@ -103,6 +103,7 @@ import { computed, shallowRef } from 'vue';
 import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
 import VMSettingsUpdate from './settings-update';
+import { kExclude, kExcludeMatch, kInclude, kMatch } from '../../utils';
 
 const kDownloadURL = 'downloadURL';
 const kHomepageURL = 'homepageURL';
@@ -134,10 +135,10 @@ const textInputs = [
   [kDownloadURL, i18n('labelDownloadURL')],
 ];
 const textAreas = [
-  ['include', 'origInclude', ...highlightMetaKeys(i18n('labelInclude'))],
-  ['match', 'origMatch', ...highlightMetaKeys(i18n('labelMatch'))],
-  ['exclude', 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
-  ['excludeMatch', 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
+  [kInclude, 'origInclude', ...highlightMetaKeys(i18n('labelInclude'))],
+  [kMatch, 'origMatch', ...highlightMetaKeys(i18n('labelMatch'))],
+  [kExclude, 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
+  [kExcludeMatch, 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
 ];
 </script>
 
