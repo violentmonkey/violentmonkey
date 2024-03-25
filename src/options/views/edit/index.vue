@@ -77,9 +77,12 @@
     />
     </keep-alive>
 
-    <div v-if="errors" class="errors shelf my-1c">
+    <div v-if="errors || hashPattern" class="errors shelf my-1c">
+      <locale-group v-if="hashPattern" i18n-key="hashPatternWarning">
+        <code v-text="hashPattern"/>
+      </locale-group>
       <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
-      <p class="my-1">
+      <p class="my-1" v-if="errors">
         <a :href="urlMatching" target="_blank" rel="noopener noreferrer" v-text="urlMatching"/>
       </p>
     </div>
@@ -135,12 +138,14 @@ const compareString = (a, b) => (a < b ? -1 : a > b);
 const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
   +shouldUpdate && (shouldUpdate + _editable)
 );
+const reHASH = /#/;
 </script>
 
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
+import LocaleGroup from '@/common/ui/locale-group';
 import { store } from '../../utils';
 import VmSettings from './settings';
 import VMSettingsUpdate from './settings-update';
@@ -176,6 +181,16 @@ const commands = {
 };
 const hotkeys = ref();
 const errors = ref();
+const hashPattern = computed(() => { // eslint-disable-line vue/return-in-computed-property
+  for (const sectionKey of ['meta', 'custom']) {
+    for (const key of CUSTOM_LISTS) {
+      let val = script.value[sectionKey][key];
+      if (val && (val = val.find(reHASH.test, reHASH))) {
+        return val.length > 100 ? val.slice(0, 100) + '...' : val;
+      }
+    }
+  }
+});
 const fatal = ref();
 const frozen = ref(false);
 const frozenNote = ref(false);
