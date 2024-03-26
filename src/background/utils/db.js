@@ -110,6 +110,7 @@ addOwnCommands({
   if (version !== lastVersion) storage.base.set({ version });
   const data = await storage.base.getMulti();
   const uriMap = {};
+  const defaultCustom = getDefaultCustom();
   data::forEachEntry(([key, script]) => {
     const id = +storage[S_SCRIPT].toId(key);
     if (id && script) {
@@ -133,10 +134,7 @@ addOwnCommands({
         id,
         uri,
       };
-      script.custom = {
-        ...getDefaultCustom(),
-        ...script.custom,
-      };
+      script.custom = Object.assign({}, defaultCustom, script.custom);
       maxScriptId = Math.max(maxScriptId, id);
       maxScriptPosition = Math.max(maxScriptPosition, getInt(script.props.position));
       (script.config.removed ? removedScripts : aliveScripts).push(script);

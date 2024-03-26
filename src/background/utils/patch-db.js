@@ -1,7 +1,8 @@
-import { parseMeta } from './script';
+import { getDefaultCustom, parseMeta } from './script';
 import storage, { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE } from './storage';
 
 export default () => new Promise((resolve, reject) => {
+  const defaultCustom = getDefaultCustom();
   console.info('Upgrade database...');
   init();
   function init() {
@@ -65,12 +66,7 @@ export default () => new Promise((resolve, reject) => {
   function transformScript(script) {
     return {
       meta: parseMeta(script.code),
-      custom: Object.assign({
-        origInclude: true,
-        origExclude: true,
-        origMatch: true,
-        origExcludeMatch: true,
-      }, script.custom),
+      custom: Object.assign({}, defaultCustom, script.custom),
       props: {
         id: script.id,
         uri: script.uri,
