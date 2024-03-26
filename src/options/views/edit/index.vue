@@ -138,6 +138,13 @@ const compareString = (a, b) => (a < b ? -1 : a > b);
 const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
   +shouldUpdate && (shouldUpdate + _editable)
 );
+const extractLine = (str, pos) => {
+  if (pos >= 0) {
+    const i = str.lastIndexOf('\n', pos) + 1;
+    const j = str.indexOf('\n', pos);
+    return str.slice(i, j > 0 ? j : undefined);
+  }
+};
 const reHASH = /#/;
 </script>
 
@@ -185,7 +192,11 @@ const hashPattern = computed(() => { // eslint-disable-line vue/return-in-comput
   for (const sectionKey of ['meta', 'custom']) {
     for (const key of CUSTOM_LISTS) {
       let val = script.value[sectionKey][key];
-      if (val && (val = val.find(reHASH.test, reHASH))) {
+      if (val && (
+        isObject(val)
+          ? val = val.find(reHASH.test, reHASH)
+          : val = extractLine(val, val.indexOf('#'), 100)
+      )) {
         return val.length > 100 ? val.slice(0, 100) + '...' : val;
       }
     }
