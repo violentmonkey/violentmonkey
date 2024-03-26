@@ -449,6 +449,7 @@ function setupSavePosition({ id: curWndId, tabs }) {
     padding: .5rem 1rem;
     // overflow: auto;
     background: var(--bg);
+    flex: 1;
   }
   &-nav-item {
     display: inline-block;
