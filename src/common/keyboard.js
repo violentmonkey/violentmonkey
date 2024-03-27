@@ -39,8 +39,7 @@ function bindKeys() {
   addEventListener('focus', handleFocus, true);
   addEventListener('blur', handleBlur, true);
   keyboardService.register('enter', () => {
-    const { activeElement } = document;
-    activeElement.click();
+    getActiveElement().click();
   }, {
     condition: '!inputFocus',
   });
