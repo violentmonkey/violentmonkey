@@ -83,6 +83,9 @@ export const decodeResource = (raw, isBlob) => {
  * @param {{retry?: boolean}} [options]
  * @return {Promise}
  */
-export const sendCmd = (cmd, data, options) => (
-  sendMessage({ cmd, data, [kTop]: topRenderMode }, options)
-);
+export const sendCmd = (cmd, data, options) => sendMessage({
+  cmd,
+  data,
+  url: location.href, // to replace MessageSender.url which doesn't change on soft navigation
+  [kTop]: topRenderMode,
+}, options);

@@ -25,7 +25,7 @@ addPublicCommands({
   },
 });
 
-function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
+function handleCommandMessage({ cmd, data, url, [kTop]: mode } = {}, src) {
   if (init) {
     return init.then(handleCommandMessage.bind(this, ...arguments));
   }
@@ -35,7 +35,8 @@ function handleCommandMessage({ cmd, data, [kTop]: mode } = {}, src) {
   // The `origin` is Chrome-only, it can't be spoofed by a compromised tab unlike `url`.
   if (src) {
     let me = src.origin;
-    me = me ? me === extensionOrigin : `${src.url}`.startsWith(extensionRoot);
+    if (url) src.url = url; // MessageSender.url doesn't change on soft navigation
+    me = me ? me === extensionOrigin : `${url || src.url}`.startsWith(extensionRoot);
     if (!me && func.isOwn && !src.fake) {
       throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
     }
