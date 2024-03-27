@@ -275,9 +275,11 @@ footer {
   line-height: 1.2; /* lower values cut descender in "g" */
   background: var(--fill-0-5);
   border: 1px solid var(--fill-2);
-  > div {
-    max-height: $footerHeight;
-    overflow: hidden;
+  max-height: $footerHeight;
+  overflow: hidden;
+  &[data-tall] {
+    overflow-y: auto;
+    max-height: 50vh;
   }
 }
 

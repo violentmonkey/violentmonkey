@@ -90,7 +90,7 @@
           <div
             class="menu-item menu-area"
             :tabIndex="tabIndex"
-            :data-message="item.name"
+            :data-message="item.data.more ? TARDY_MATCH : item.name"
             @focus="focusedItem = item"
             @keydown.enter.exact.stop="onEditScript(item)"
             @keydown.space.exact.stop="onToggleScript(item)"
@@ -172,9 +172,7 @@
       <a v-if="reloadHint" v-text="reloadHint" :tabIndex="tabIndex" @click="reloadTab" />
       <a v-else target="_blank" :href="'https://' + HOME" :tabIndex="tabIndex" v-text="HOME" />
     </footer>
-    <div class="message" v-show="message">
-      <div v-text="message"></div>
-    </div>
+    <div class="message" v-if="message" v-text="message" :data-tall="message === TARDY_MATCH"/>
     <div v-show="topExtras" ref="$topExtras" class="extras-menu">
       <div v-text="i18n('labelSettings')" @click="onManage(1)" tabindex="0"/>
       <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
@@ -218,6 +216,7 @@ let mousedownElement;
 let focusBug;
 const HOME = extensionManifest.homepage_url.split('/')[2];
 const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
+const TARDY_MATCH = i18n('msgTardyMatch');
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const kFiltersPopup = 'filtersPopup';

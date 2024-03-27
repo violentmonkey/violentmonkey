@@ -8,7 +8,6 @@ const { toLowerCase } = '';
 const { [IDS]: ids } = bridge;
 let setPopupThrottle;
 let isPopupShown;
-let hasAllIds;
 
 addBackgroundHandlers({
   async PopupShown(state) {
@@ -64,12 +63,10 @@ export async function sendSetPopup(isDelayed) {
       await setPopupThrottle;
       setPopupThrottle = null;
     }
-    assign(ids, await sendCmd('SetPopup', {
+    await sendCmd('SetPopup', {
       [IDS]: ids,
       [INJECT_INTO]: bridge[INJECT_INTO],
-      all: hasAllIds,
       menus,
-    }));
-    hasAllIds = true;
+    });
   }
 }

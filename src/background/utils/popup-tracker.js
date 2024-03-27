@@ -1,6 +1,6 @@
 import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
-import { getData, getDisabledIds } from './db';
+import { getData, getScriptsByURL } from './db';
 import { badges, getFailureReason } from './icon';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 
@@ -33,16 +33,14 @@ addPublicCommands({
     if (popupTabs[tabId]) {
       return; // allowing the visible popup's onMessage to handle this message
     }
-    let disabledIds;
-    if (!data.all) {
-      disabledIds = getDisabledIds(src);
-      Object.assign(data[IDS], disabledIds);
-    }
-    getData({ [IDS]: Object.keys(data[IDS]) }).then(res => {
+    data[MORE] = true;
+    const ids = data[IDS];
+    const moreIds = getScriptsByURL(src.url, src[kTop], null, ids);
+    Object.assign(ids, moreIds);
+    getData({ [IDS]: Object.keys(ids) }).then(res => {
       Object.assign(data, res);
       (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = [data, src];
     });
-    return disabledIds;
   }
 });
 

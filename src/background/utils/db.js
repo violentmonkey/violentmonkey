@@ -47,7 +47,9 @@ addOwnCommands({
   CheckRemove: checkRemove,
   RemoveScripts: removeScripts,
   GetData: getData,
-  GetDisabledIds: getDisabledIds,
+  GetMoreIds({ url, [kTop]: isTop, [IDS]: ids }) {
+    return getScriptsByURL(url, isTop, null, ids);
+  },
   /** @return {VMScript} */
   GetScript: getScript,
   GetSizes: getSizes,
@@ -275,13 +277,13 @@ const notifiedBadScripts = new Set();
  * @param {string} url
  * @param {boolean} isTop
  * @param {Array} [errors] - omit to enable EnvDelayed mode
- * @param {!boolean} [disabled] - only the disabled script ids (for the popup)
+ * @param {Object} [prevIds] - used by the popup to return an object with only new ids
+ *   (disabled, newly installed, non-matching due to SPA navigation)
  * @return {VMInjection.EnvStart | VMInjection.EnvDelayed | Object | void }
  */
-export function getScriptsByURL(url, isTop, errors, disabled = false) {
+export function getScriptsByURL(url, isTop, errors, prevIds) {
   if (testBlacklist(url)) return;
   const allIds = {};
-  const disabledIds = disabled && {};
   const isDelayed = !errors;
   /** @type {VMInjection.EnvStart} */
   let envStart;
@@ -291,16 +293,18 @@ export function getScriptsByURL(url, isTop, errors, disabled = false) {
   let xhrChecked = isDelayed;
   testerBatch(errors || true);
   for (const script of aliveScripts) {
-    if (disabled !== !script.config.enabled) {
+    const {
+      config: { enabled },
+      custom,
+      meta,
+      props: { id },
+    } = script;
+    if ((prevIds ? id in prevIds : !enabled)
+    || !((isTop || !(custom.noframes ?? meta.noframes)) && testScript(url, script))) {
       continue;
     }
-    const { meta, custom } = script;
-    if (!((isTop || !(custom.noframes ?? meta.noframes)) && testScript(url, script))) {
-      continue;
-    }
-    const { id } = script.props;
-    if (disabled) {
-      disabledIds[id] = 0;
+    if (prevIds) {
+      allIds[id] = enabled ? MORE : 0;
       continue;
     }
     allIds[id] = 1;
@@ -355,8 +359,8 @@ export function getScriptsByURL(url, isTop, errors, disabled = false) {
     env[SCRIPTS].push(script);
   }
   testerBatch();
-  if (disabled) {
-    return disabledIds;
+  if (prevIds) {
+    return allIds;
   }
   if (!envStart) {
     return;
@@ -454,10 +458,6 @@ export async function getData({ ids, sizes }) {
     sizes: sizes && getSizes(ids),
     sync: sizes && commands.SyncGetStates(),
   };
-}
-
-export function getDisabledIds({ url, [kTop]: isTop }) {
-  return getScriptsByURL(url, isTop, null, true);
 }
 
 /**

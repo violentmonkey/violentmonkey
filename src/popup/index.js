@@ -33,10 +33,12 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
   /* SetPopup from a sub-frame may come first so we need to wait for the main page
    * because we only show the iframe menu for unique scripts that don't run in the main page */
   const isTop = frameId === 0;
-  let disabledIds;
-  if (!data.all) {
-    disabledIds = await sendCmdDirectly('GetDisabledIds', { url, [kTop]: isTop });
-    Object.assign(data[IDS], disabledIds);
+  if (!data[MORE]) {
+    Object.assign(data[IDS], await sendCmdDirectly('GetMoreIds', {
+      url,
+      [kTop]: isTop,
+      [IDS]: data[IDS],
+    }));
   }
   if (!isTop) await mutex;
   else {
@@ -60,6 +62,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       loadScriptIcon(script, data);
       const { id } = script.props;
       const state = idMap[id];
+      const more = state === MORE;
       const badRealm = state === ID_BAD_REALM;
       const renderedScript = scope.find(({ props }) => props.id === id);
       if (renderedScript) script = renderedScript;
@@ -72,7 +75,8 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       }
       script.runs = state === CONTENT || state === PAGE;
       script.pageUrl = url; // each frame has its own URL
-      script.failed = badRealm || state === ID_INJECTING;
+      script.failed = badRealm || state === ID_INJECTING || more;
+      script[MORE] = more;
       script.syntax = state === ID_INJECTING;
       if (badRealm && !store.injectionFailure) {
         store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
@@ -80,7 +84,6 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     });
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
-  return disabledIds;
 }
 
 function initMutex(delay = 100) {
