@@ -90,7 +90,7 @@
           <div
             class="menu-item menu-area"
             :tabIndex="tabIndex"
-            :data-message="item.data.more ? TARDY_MATCH : item.name"
+            :data-message="!store.failure && item.data.more ? TARDY_MATCH : item.name"
             @focus="focusedItem = item"
             @keydown.enter.exact.stop="onEditScript(item)"
             @keydown.space.exact.stop="onToggleScript(item)"
