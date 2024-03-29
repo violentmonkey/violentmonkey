@@ -50,6 +50,9 @@ async function init() {
 
 addBackgroundHandlers({
   [VIOLENTMONKEY]: () => true,
+}, true);
+
+addBackgroundHandlers({
   Command: data => bridge.post('Command', data, ids[data.id]),
   Run: id => Run(id, CONTENT),
   UpdatedValues(data) {
