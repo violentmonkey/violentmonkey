@@ -153,6 +153,7 @@ addPublicCommands({
     let skip = skippedTabs[tabId];
     if (skip > 0) { // first time loading the tab after skipScripts was invoked
       if (isTop) skippedTabs[tabId] = -1; // keeping a phantom for future iframes in this page
+      if (popupTabs[tabId]) sendPopupShown(tabId, frameDoc);
       return { [INJECT_INTO]: SKIP_SCRIPTS };
     }
     if (skip) delete skippedTabs[tabId]; // deleting the phantom as we're in a new page
@@ -167,7 +168,7 @@ addPublicCommands({
       addValueOpener(scripts, tabId, frameDoc);
     }
     if (popupTabs[tabId]) {
-      setTimeout(sendTabCmd, 0, tabId, 'PopupShown', true, getFrameDocIdAsObj(frameDoc));
+      sendPopupShown(tabId, frameDoc);
     }
     return isApplied
       ? !done && inject
@@ -655,4 +656,8 @@ function checkVivaldi(tab) {
   if (tab.vivExtData/*new*/ || tab.extData/*old*/) {
     ua.brand = ua.browserBrand = 'Vivaldi';
   }
+}
+
+function sendPopupShown(tabId, frameDoc) {
+  setTimeout(sendTabCmd, 0, tabId, 'PopupShown', true, getFrameDocIdAsObj(frameDoc));
 }
