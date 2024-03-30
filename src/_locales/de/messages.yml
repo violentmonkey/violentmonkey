@@ -235,6 +235,11 @@ failureReasonNoninjectable:
 
     (gewöhnliche Beispiele: Browser-UI, eine Erweiterung, durch Richtlinien
     blockiert, eine Suchmaschinen-Seite in Opera)
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: >-
+    Violentmonkey wurde neu gestartet. Bitte laden Sie den Tab neu um
+    Benutzerskripte auszuführen.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -282,6 +287,11 @@ genericOn:
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: Globale Einstellung nutzen
+hashPatternWarning:
+  description: Warning shown in the editor, $1 is the pattern(s).
+  message: >-
+    "#"-Ausdrücke funktionieren nur bei erstmaligem Öffnen der Seite oder dem
+    Neuladen des Tabs: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Papierkorb
@@ -626,7 +636,7 @@ lastSync:
   message: Letzter Sync am $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Mehr Informationen zur Anwendung der Blacklist
+  message: Mehr Informationen zu Blacklist-Ausdrücken
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: Mehr Informationen zu den Injektionsmodi
@@ -828,6 +838,15 @@ msgSyncing:
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: Syntaxfehler?
+msgTardyMatch:
+  description: Shown in popup for scripts that missed their chance to run.
+  message: >-
+    Das Skript existierte nicht oder matchte nicht mit der URL als die Seite
+    geladen wurde, dies passiert in Single-Page-Webanwendungen wie Facebook oder
+    Instagram, die keine echte Seitennavigation nutzen. Sie können den Tab neu
+    laden um das Skript auszuführen. Um das Skript zu reparieren, nutzen Sie
+    @match für die gesamte Seite und dann zum Erkennen von Änderungen
+    MutationObserver oder die window.navigation-API.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Das Skript wurde aktualisiert.

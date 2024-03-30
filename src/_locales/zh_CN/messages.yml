@@ -212,6 +212,9 @@ failureReasonNoninjectable:
   message: |-
     暴力猴无法在当前页面执行用户脚本
     （常见原因：浏览器/扩展内置页面、被策略屏蔽、Opera 下的搜索页面需要特殊设置）
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: ''
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -254,6 +257,9 @@ genericOn:
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: 使用全局设置
+hashPatternWarning:
+  description: Warning shown in the editor, $1 is the pattern(s).
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 回收站
@@ -775,6 +781,9 @@ msgSyncing:
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: 语法错误？
+msgTardyMatch:
+  description: Shown in popup for scripts that missed their chance to run.
+  message: ''
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 脚本已更新。

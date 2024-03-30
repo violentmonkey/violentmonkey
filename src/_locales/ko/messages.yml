@@ -219,6 +219,9 @@ failureReasonNoninjectable:
   message: |-
     Violentmonkey가 이 페이지의 유저스크립트를 실행하지 못했습니다
     (대표적인 원인 예시: 브라우저 UI, 확장 기능, 정책, Opera 내 검색엔진 사이트)
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: ''
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -262,6 +265,9 @@ genericOn:
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: 전역 설정 사용
+hashPatternWarning:
+  description: Warning shown in the editor, $1 is the pattern(s).
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 휴지통
@@ -786,6 +792,9 @@ msgSyncing:
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: 구문 오류?
+msgTardyMatch:
+  description: Shown in popup for scripts that missed their chance to run.
+  message: ''
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 스크립트 업데이트됨.
