@@ -132,7 +132,7 @@ tabsOnRemoved.addListener(id => delete badges[id]);
 tabsOnUpdated.addListener((tabId, { url }, tab) => {
   if (url) {
     const [title] = getFailureReason(url);
-    if (title) updateState(tab, resetBadgeData(tabId), title);
+    if (title) updateState(tab, resetBadgeData(tabId, null), title);
   }
 }, FIREFOX && { properties: ['status'] });
 
@@ -140,10 +140,20 @@ function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js
   const data = nest(badges, tabId);
   data.icon = iconDefault;
-  data.idMap = new Set();
-  data.totalMap = {};
   data.total = 0;
   data.unique = 0;
+  /** all ids */
+  data[IDS] = new Set();
+  /** [frame id] = number of scripts */
+  data[kFrameId] = undefined;
+  /**
+   * undefined = after VM started (unknown injectability),
+   * null = after tab navigated (unknown injectability),
+   * false = without scripts,
+   * true = with some scripts,
+   * 'SkipScripts' = skip scripts mode,
+   * 'off' = loaded when isApplied was off
+   */
   data[INJECT] = isInjected;
   // Notify popup about non-injectable tab
   if (!isInjected) popupTabs[tabId]?.postMessage(null);
@@ -160,7 +170,10 @@ export function setBadge(ids, reset, { tab, [kFrameId]: frameId, [kTop]: isTop }
   const injectable = ids === SKIP_SCRIPTS || ids === 'off' ? ids : !!ids;
   const data = !(reset && isTop) && badges[tabId] || resetBadgeData(tabId, injectable);
   if (Array.isArray(ids)) {
-    const { idMap, totalMap } = data;
+    const {
+      [IDS]: idMap,
+      [kFrameId]: totalMap = data[kFrameId] = {},
+    } = data;
     // uniques
     ids.forEach(idMap.add, idMap);
     data.unique = idMap.size;
@@ -226,14 +239,14 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
 }
 
 /** Omitting `data` = check whether injection is allowed for `url` */
-export function getFailureReason(url, data) {
+export function getFailureReason(url, data, def = titleDefault) {
   return !injectableRe.test(url) ? [titleNoninjectable, INJECT_INTO]
     : ((url = testBlacklist(url))) ? [titleBlacklisted, 'blacklisted', url]
       : !isApplied || data?.[INJECT] === 'off' ? [titleDisabled, IS_APPLIED]
         : !data ? []
           : data[INJECT] === SKIP_SCRIPTS
             ? [titleSkipped, SKIP_SCRIPTS]
-            : [titleDefault];
+            : [def];
 }
 
 async function loadIcon(url) {

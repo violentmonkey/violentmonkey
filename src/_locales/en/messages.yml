@@ -228,6 +228,9 @@ failureReasonNoninjectable:
 
     (common examples: browser UI, an extension, blocked via policies, a search
     engine site in Opera)
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: Violentmonkey was restarted. Please reload the tab to run userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-

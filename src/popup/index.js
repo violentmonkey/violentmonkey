@@ -119,7 +119,7 @@ async function initialize() {
     for (const id in cached) handlers.SetPopup(...cached[id]);
   }
   if (!port) {
-    port = browser.runtime.connect({ name: `${data.tab.id}` });
+    port = browser.runtime.connect({ name: `Popup:${cached ? 'C' : ''}:${data.tab.id}` });
     port.onMessage.addListener(initialize); // for non-injectable tab
   }
 }
