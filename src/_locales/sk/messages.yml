@@ -235,6 +235,11 @@ failureReasonNoninjectable:
 
     (najčastejší prípad: rozhranie prehliadača alebo rozšírenia, blokované cez
     politiku, web vyhľadávača v Opere)
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: >-
+    Violentmonkey sa reštartoval. Ak chcete spustiť používateľské skripty, znova
+    načítajte kartu.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -281,6 +286,11 @@ genericOn:
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: použiť globálne nastavenie
+hashPatternWarning:
+  description: Warning shown in the editor, $1 is the pattern(s).
+  message: >-
+    Vzory „#“ fungujú iba pri prvom otvorení stránky alebo opätovnom načítaní
+    karty: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Kôš
@@ -817,6 +827,15 @@ msgSyncing:
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: Chyba syntaxe?
+msgTardyMatch:
+  description: Shown in popup for scripts that missed their chance to run.
+  message: >-
+    Skript pri načítaní stránky neexistoval alebo sa nezhodoval s URL adresou,
+    čo sa stáva na stránkach s jednostránkovou aplikáciou, ako je Facebook alebo
+    Instagram, ktoré používajú falošnú navigáciu. Ak chcete spustiť skript,
+    môžete kartu znova načítať. Ak chcete opraviť skript, použite @match pre
+    celú stránku, a potom zistite zmeny pomocou MutationObserver alebo API
+    window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skript aktualizovaný.

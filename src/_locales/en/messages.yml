@@ -278,7 +278,9 @@ genericUseGlobal:
   message: use global setting
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: '"#" patterns work only when initially opening the site or reloading the tab: $1'
+  message: >-
+    "#" patterns work only when initially opening the site or reloading the tab:
+    $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Recycle Bin

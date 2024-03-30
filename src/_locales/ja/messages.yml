@@ -212,6 +212,9 @@ failureReasonNoninjectable:
   message: |-
     このページでユーザースクリプトを実行できません
     (一般例: ブラウザーのUI、拡張機能、ポリシーにてブロック済み、Operaの検索サイト)
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: ''
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -255,6 +258,9 @@ genericOn:
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: グローバル設定を使用
+hashPatternWarning:
+  description: Warning shown in the editor, $1 is the pattern(s).
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: ゴミ箱
@@ -548,7 +554,7 @@ labelSyncUsername:
   message: 'ユーザ名: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: タグ (空白区切り)
 labelTheme:
   description: Label for the visual theme option.
   message: 'テーマ:'
@@ -776,6 +782,9 @@ msgSyncing:
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: 構文エラー？
+msgTardyMatch:
+  description: Shown in popup for scripts that missed their chance to run.
+  message: ''
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: スクリプトが更新されました。

@@ -209,6 +209,9 @@ failureReasonNoninjectable:
   message: |-
     O Violentmonkey não pode executar scripts de utilizador nesta página
     (exemplos comuns: interface do navegador ou uma extensão)
+failureReasonRestarted:
+  description: Shown in the popup.
+  message: ''
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: ''
@@ -248,6 +251,9 @@ genericOn:
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: Usar definições globais
+hashPatternWarning:
+  description: Warning shown in the editor, $1 is the pattern(s).
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Reciclagem
@@ -764,6 +770,9 @@ msgSyncing:
   message: A sincronizar...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
+  message: ''
+msgTardyMatch:
+  description: Shown in popup for scripts that missed their chance to run.
   message: ''
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
