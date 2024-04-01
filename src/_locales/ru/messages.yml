@@ -152,10 +152,19 @@ descEditorOptions:
     rel="noopener noreferrer">полный список</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Булевые параметры можно переключать двойным щелчком на значении:
+    <code>true</code> = включено, <code>false</code> = отключено. Числовые
+    параметры, заканчивающиеся на <code>Delay</code>, <code>Interval</code>,
+    <code>Rate</code>, <code>Time</code>, указываются в миллисекундах.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Нестандартные параметры: <code>autocompleteOnTyping</code> — задержка в
+    миллисекундах для отображения подсказок автозаполнения после ввода текста
+    (<code>0</code> = отключить), <code>killTrailingSpaceOnSave</code>
+    автоматически удаляет пробелы в каждой строке при сохранении,
+    <code>showTrailingSpace</code> показывает пробелы в виде точек.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -227,7 +236,9 @@ failureReasonNoninjectable:
     сайт поисковой системы в Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey был перезапущен. Пожалуйста, перезагрузите вкладку, чтобы
+    запустить пользовательские скрипты.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -276,7 +287,9 @@ genericUseGlobal:
   message: использовать глобальные настройки
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Шаблоны «#» работают только при первоначальном открытии сайта или при
+    перезагрузке вкладки: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Корзина
@@ -285,7 +298,7 @@ helpForLocalFile:
   message: Показать инструкцию по перетаскиванию локальных скриптов
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: для сопоставления скриптов $1
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введите URL-адрес:'
@@ -812,7 +825,13 @@ msgSyntaxError:
   message: Ошибка синтаксиса?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Скрипт не существовал или не соответствовал URL при загрузке страницы, что
+    случается на сайтах с одностраничным приложением, таких как FB или
+    Instagram, которые используют фальшивую навигацию. Вы можете перезагрузить
+    вкладку, чтобы запустить скрипт. Чтобы исправить скрипт, используйте @match
+    для всего сайта, а затем обнаруживайте изменения с помощью MutationObserver
+    или API window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Скрипт обновлён.
@@ -954,7 +973,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * Клавиша <kbd>Enter</kbd> добавляет текст в историю автозаполнения.
+
+    * Все условия не зависят от регистра
+
+    * Условия, разделённые пробелами, можно комбинировать
+
+    * Поиск по метаданным: <code>"Awesome Script" "Description"</code>
+
+    * Поиск по тегам: <code>#tag1 #tag2</code>
+
+    * Поиск по имени скрипта: <code>name: "awesome name"</code>
+
+    * Поиск по коду скрипта: <code>code: "awesome code"</code>
+
+    * Отрицательный поиск: <code>!#tag2 !name: "unwanted"</code>
+
+    * Регулярные выражения: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? с пробелом"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Отслеживать внешние правки
