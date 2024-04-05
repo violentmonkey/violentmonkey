@@ -1,0 +1,5 @@
+# Install dependencies
+$ yarn
+
+# Watch and compile
+$ yarn dev 
