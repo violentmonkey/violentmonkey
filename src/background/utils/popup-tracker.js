@@ -18,8 +18,8 @@ addOwnCommands({
     // FF injects content scripts after update/install/reload
     let reset = !IS_FIREFOX && !failure[0] && badgeData[INJECT] === undefined;
     let cachedSetPopup = cache.pop(getCacheKey(tabId));
-    if (!cachedSetPopup && reset) {
-      cachedSetPopup = await augmentSetPopup(
+    if (reset && (cachedSetPopup ? !cachedSetPopup[0] : cachedSetPopup = {})) {
+      cachedSetPopup[0] = await augmentSetPopup(
         { [IDS]: {}, menus: {} },
         { tab, url, [kFrameId]: 0, [kTop]: 1 },
       );
@@ -64,7 +64,7 @@ async function augmentSetPopup(data, src, key) {
   Object.assign(ids, moreIds);
   Object.assign(data, await getData({ [IDS]: Object.keys(ids) }));
   data = [data, src];
-  if (!key) return { 0: data };
+  if (!key) return data;
   (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = data;
 }
 
