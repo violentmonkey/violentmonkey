@@ -84,7 +84,7 @@ export function createSearchRules(search) {
 }
 
 /**
- * @this {VMScriptItemCache}
+ * @this {Object} $cache, see initScript()
  * @param {VMSearchRule} rule
  * @return {number}
  */
@@ -93,4 +93,12 @@ export function testSearchRule({ re, negative, scope }) {
     re.test(this[scope || 'desc'])
     || !scope && re.test(this.code)
   );
+}
+
+export function performSearch(scripts, rules) {
+  let res = 0;
+  for (const { $cache } of scripts) {
+    res += ($cache.show = rules.every(testSearchRule, $cache));
+  }
+  return res;
 }

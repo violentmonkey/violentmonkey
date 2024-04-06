@@ -8,7 +8,7 @@ import options from '@/common/options';
 import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
-import { store } from './utils';
+import { performSearch, store } from './utils';
 import App from './views/app';
 
 // Same order as getSizes and sizesPrefixRe
@@ -27,8 +27,10 @@ render(App);
 /**
  * @param {VMScript} script
  * @param {number[]} sizes
+ * @param {string} [code]
  */
-function initScript(script, sizes) {
+function initScript(script, sizes, code) {
+  const $cache = script.$cache || (script.$cache = {});
   const meta = script.meta || {};
   const localeName = getLocaleString(meta, 'name');
   const desc = [
@@ -46,16 +48,14 @@ function initScript(script, sizes) {
     total += val;
     if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
   });
-  /** @namespace VMScriptItemCache */
-  script.$cache = {
-    desc,
-    name,
-    lowerName: name.toLocaleLowerCase(),
-    tags: script.custom.tags || '',
-    size: formatByteLength(total, true).replace(' ', ''),
-    sizes: str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B'),
-    sizeNum: total,
-  };
+  $cache.desc = desc;
+  $cache.name = name;
+  $cache.lowerName = name.toLocaleLowerCase();
+  $cache.tags = script.custom.tags || '';
+  $cache.size = formatByteLength(total, true).replace(' ', '');
+  $cache.sizes = str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B');
+  $cache.sizeNum = total;
+  if (code) $cache.code = code;
   script.$canUpdate = getScriptUpdateUrl(script)
     && (script.config.shouldUpdate ? 1 : -1 /* manual */);
   loadScriptIcon(script, store, true);
@@ -99,7 +99,7 @@ function initMain() {
     UpdateSync(data) {
       store.sync = data;
     },
-    async UpdateScript({ update, where } = {}) {
+    async UpdateScript({ update, where, code } = {}) {
       if (!update) return;
       if (updateThrottle
       || (updateThrottle = store.importing)
@@ -115,7 +115,8 @@ function initMain() {
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       Object.assign(script, update);
       if (script.error && !update.error) script.error = null;
-      initScript(script, sizes);
+      initScript(script, sizes, code);
+      performSearch([script], store.search.rules);
       if (update.config?.removed != null) {
         if (update.config.removed) {
           // Note that we don't update store.scripts even if a script is removed,

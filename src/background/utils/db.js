@@ -668,6 +668,7 @@ export async function parseScript(src) {
   });
   Object.assign(update, script, src.update);
   result.where = { id };
+  result[S_CODE] = src[S_CODE];
   sendCmd('UpdateScript', result);
   pluginEvents.emit('scriptChanged', result);
   if (src.reloadTab) reloadTabForScript(script);

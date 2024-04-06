@@ -184,7 +184,7 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { markRemove, store, createSearchRules, testSearchRule, runInBatch } from '../utils';
+import { createSearchRules, markRemove, performSearch, runInBatch, store } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -274,7 +274,7 @@ const state = reactive({
   focusedIndex: -1,
   menuNew: false,
   showHotkeys: false,
-  search: {
+  search: store.search = {
     value: '',
     error: null,
     ...createSearchRules(''),
@@ -374,11 +374,12 @@ async function refreshUI() {
 }
 function onUpdate() {
   const scripts = [...getCurrentList()];
-  const numFound = state.search.rules.length ? performSearch(scripts) : scripts.length;
+  const rules = state.search.rules;
+  const numFound = rules.length ? performSearch(scripts, rules) : scripts.length;
   const cmp = currentSortCompare.value;
   if (cmp) scripts.sort(combinedCompare(cmp));
   state.sortedScripts = scripts;
-  state.filteredScripts = state.search.rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
+  state.filteredScripts = rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
   selectScript(state.focusedIndex);
   if (!step || numFound < step) renderScripts();
   else debouncedRender();
@@ -480,14 +481,9 @@ async function renderScripts() {
     if (step && limit < length) await makePause();
   }
 }
-function performSearch() {
-  return store.scripts.reduce((num, { $cache }) => num + (
-    $cache.show = state.search.rules.every(testSearchRule, $cache)
-  ), 0);
-}
 function scheduleSearch() {
   try {
-    state.search = {
+    state.search = store.search = {
       ...state.search,
       ...createSearchRules(state.search.value),
     };
