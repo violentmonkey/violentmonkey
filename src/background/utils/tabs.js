@@ -43,10 +43,15 @@ export let injectableRe = /^(https?|file|ftps?):/;
 export let fileSchemeRequestable;
 let cookieStorePrefix;
 
-if (!FIREFOX || FIREFOX < 61 || !hasOwnProperty(chrome, 'geckoProfiler')) {
+try {
   // onUpdated is filterable only in desktop FF 61+
-  const { addListener } = tabsOnUpdated;
-  tabsOnUpdated.addListener = fn => tabsOnUpdated::addListener(fn);
+  // but we use a try-catch anyway to detect this feature in nonstandard browsers
+  tabsOnUpdated.addListener(noop, { properties: ['status'] });
+  tabsOnUpdated.removeListener(noop);
+} catch (e) {
+  tabsOnUpdated.addListener = new Proxy(tabsOnUpdated.addListener, {
+    apply: (fn, thisArg, args) => thisArg::fn(args[0]),
+  });
 }
 
 addOwnCommands({
