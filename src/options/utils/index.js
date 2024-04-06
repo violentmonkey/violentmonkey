@@ -6,11 +6,11 @@ export * from './search';
 
 export const store = reactive({
   route,
+  batch: null,
   /** Speedup and deflicker initial page load by not rendering an invisible script list */
   canRenderScripts: [SCRIPTS, TAB_RECYCLE, ''].includes(route.hash),
   scripts: [],
   removedScripts: [],
-  importing: null,
   loading: false,
   /** Whether removed scripts need to be filtered from `store.scripts`. */
   needRefresh: false,
@@ -33,9 +33,8 @@ export function markRemove(script, removed) {
 
 export async function runInBatch(fn, ...args) {
   try {
-    store.importing = true;
-    await fn(...args);
+    await (store.batch = fn(...args) || true);
   } finally {
-    store.importing = false;
+    store.batch = false;
   }
 }

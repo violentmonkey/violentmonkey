@@ -1,7 +1,7 @@
 <template>
   <div>
     <button v-text="i18n('buttonImportData')" @click="pickBackup" ref="buttonImport"
-            :disabled="store.importing"/>
+            :disabled="store.batch"/>
     <button v-text="i18n('buttonUndo') + undoTime" @click="undoImport" class="has-error"
             :title="i18nConfirmUndoImport"
             v-if="undoTime" />
@@ -27,7 +27,7 @@ import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
 import { showConfirmation } from '@/common/ui';
-import { store } from '../../utils';
+import { runInBatch, store } from '../../utils';
 
 const reports = reactive([]);
 const buttonImport = ref();
@@ -53,13 +53,7 @@ function pickBackup() {
 }
 
 async function importBackup(file) {
-  if (!store.importing) {
-    try {
-      await (store.importing = doImportBackup(file));
-    } finally {
-      store.importing = null;
-    }
-  }
+  if (!store.batch) runInBatch(doImportBackup, file);
 }
 
 async function doImportBackup(file) {

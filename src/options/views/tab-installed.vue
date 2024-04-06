@@ -42,7 +42,7 @@
               class="btn-ghost"
               :class="{
                 'has-error': state.batchAction.action === key,
-                 disabled: store.importing,
+                 disabled: store.batch,
               }"
               :data-batch-action="key"
               tabindex="0"
@@ -583,7 +583,7 @@ function handleSmoothScroll(delta) {
   });
 }
 function handleBatchAction(e) {
-  if (store.importing) return;
+  if (store.batch) return;
   const button = getDataBatchAction(e);
   const stateBA = state.batchAction;
   let action = button?.dataset.batchAction;

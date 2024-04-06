@@ -102,7 +102,7 @@ function initMain() {
     async UpdateScript({ update, where, code } = {}) {
       if (!update) return;
       if (updateThrottle
-      || (updateThrottle = store.importing)
+      || (updateThrottle = store.batch)
       && (updateThrottle = Promise.race([updateThrottle, makePause(500)]))) {
         await updateThrottle;
         updateThrottle = null;

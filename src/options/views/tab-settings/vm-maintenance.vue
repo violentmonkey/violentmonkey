@@ -1,10 +1,10 @@
 <template>
   <div class="mr-1c">
     <tooltip :content="i18n('hintVacuum')">
-      <button @click="vacuum" :disabled="store.importing" v-text="labelVacuum" />
+      <button @click="vacuum" :disabled="store.batch" v-text="labelVacuum" />
     </tooltip>
     <button @click="confirmDanger(resetSettings, i18nResetSettings)"
-            :disabled="store.importing"
+            :disabled="store.batch"
             :title="resetHint"
             v-text="resetText" />
   </div>
