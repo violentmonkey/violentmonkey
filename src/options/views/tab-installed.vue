@@ -31,7 +31,7 @@
               </template>
             </Dropdown>
             <Tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
-              <a class="btn-ghost" tabindex="0" @click="handleUpdateAll">
+              <a class="btn-ghost" tabindex="0" @click="handleActionUpdate(null, $event.target)">
                 <Icon name="refresh" />
               </a>
             </Tooltip>
@@ -170,7 +170,7 @@
 
 <script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
-import { i18n, sendCmdDirectly, debounce, makePause, trueJoin } from '@/common';
+import { i18n, sendCmdDirectly, debounce, ensureArray, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
 import { getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
@@ -324,12 +324,12 @@ const ALL_BATCH_ACTIONS = {
   },
   [UPDATE]: {
     icon: 'refresh',
-    fn: scripts => sendCmdDirectly('CheckUpdate', scripts.map(s => s.props.id)),
+    fn: handleActionUpdate,
     [UNDO]: false,
   },
   [REMOVE]: {
     icon: 'trash',
-    async fn(scripts, undo) {
+    async fn(scripts, el, undo) {
       await Promise.all(scripts.map(s => markRemove(s, !undo)));
       // nuking the ghosts because the user's intent was already confirmed
       if (!undo) store.scripts = [];
@@ -383,9 +383,6 @@ function onUpdate() {
   selectScript(state.focusedIndex);
   if (!step || numFound < step) renderScripts();
   else debouncedRender();
-}
-function handleUpdateAll() {
-  sendCmdDirectly('CheckUpdate');
 }
 async function handleInstallFromURL() {
   try {
@@ -561,8 +558,14 @@ function handleActionToggle(script) {
     },
   });
 }
-function handleActionUpdate(script) {
-  return sendCmdDirectly('CheckUpdate', script.props.id);
+/**
+ * @param {VMScript|VMScript[]} [what]
+ * @param {Element} [el]
+ */
+async function handleActionUpdate(what, el) {
+  if (el) (el = (el.querySelector('svg') || el).classList).add('rotate');
+  await sendCmdDirectly('CheckUpdate', what && ensureArray(what).map(s => s.props.id));
+  el?.remove('rotate');
 }
 function handleClickTag(tag) {
   if (activeTags.value.includes(tag)) {
@@ -593,9 +596,10 @@ function handleBatchAction(e) {
     const scripts = state.filteredScripts;
     const arg = baVal.arg?.(scripts) || scripts;
     const fn = baVal.fn;
-    if (fn) runInBatch(fn, arg);
+    const batchArgs = [fn, arg, button];
+    if (fn) runInBatch(...batchArgs);
     stateBA[UNDO] = fn && baVal[UNDO] !== false && (() => {
-      runInBatch(fn, arg, UNDO);
+      runInBatch(...batchArgs, UNDO);
       stateBA[UNDO] = null;
     });
     action = '';
@@ -906,22 +910,6 @@ $iconSize: 2rem; // from .icon in ui/style.css
   cursor: default;
 }
 
-.trash-button {
-  position: relative;
-  b {
-    position: absolute;
-    font-size: 10px;
-    line-height: 1;
-    text-align: center;
-    left: 0;
-    right: 0;
-    bottom: -4px;
-  }
-  &.active b {
-    display: none;
-  }
-}
-
 .hint {
   line-height: 1.5;
   color: var(--fill-6);
@@ -931,16 +919,13 @@ $iconSize: 2rem; // from .icon in ui/style.css
   }
 }
 
-.trash-animate {
-  animation: .5s linear rotate;
+.rotate {
+  animation: 4s linear infinite rotate;
 }
 
 @keyframes rotate {
-  0% {
-    transform: scale(1.2) rotate(0);
-  }
-  100% {
-    transform: scale(1.2) rotate(360deg);
+  to {
+    transform: rotate(1turn);
   }
 }
 </style>
