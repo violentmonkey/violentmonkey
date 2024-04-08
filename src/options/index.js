@@ -113,10 +113,11 @@ function initMain() {
         || update.meta && store.canRenderScripts && {}; // a new script was just saved or installed
       if (!script) return; // We're in editor that doesn't have data for all scripts
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
+      const { search } = store;
       Object.assign(script, update);
       if (script.error && !update.error) script.error = null;
       initScript(script, sizes, code);
-      performSearch([script], store.search.rules);
+      if (search) performSearch([script], search.rules);
       if (update.config?.removed != null) {
         if (update.config.removed) {
           // Note that we don't update store.scripts even if a script is removed,
