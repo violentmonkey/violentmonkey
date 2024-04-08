@@ -176,7 +176,13 @@ editLongLine:
   message: Raden är för lång
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Den här raden är för lång så texten är komprimerad för att undvika
+    fördröjningar vid redigering.
+
+    Du kan justera gränsen i avancerade inställningar, till exempel:
+
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Kod
@@ -213,7 +219,7 @@ failureReasonNoninjectable:
     sökmotorsida i Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: Violentmonkey har startats om. Ladda om fliken för att köra användarskript.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -376,10 +382,10 @@ labelDownloadURL:
   message: 'Nerladdningswebbadress:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Redigera skriptvärde
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Redigera skriptlagring
 labelEditor:
   description: Label for Editor settings
   message: Redigerare
@@ -477,7 +483,7 @@ labelNotifyUpdatesGlobal:
   message: ''
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Sortera skript i popup-fönster efter $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Integritetspolicy
@@ -515,7 +521,7 @@ labelSettings:
   message: Inställningar
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Visa exekveringsorderpositioner
 labelSync:
   description: Label for sync options.
   message: Synka
@@ -584,7 +590,7 @@ labelXhrInjectHint:
   message: ''
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (förutom inkognito och webbplatser med inaktiverade cookies)
 lastSync:
   description: Label for last sync timestamp.
   message: Senaste synkronisering $1
@@ -600,7 +606,7 @@ menuCommands:
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Öppna informationspanel
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
@@ -616,18 +622,18 @@ menuFeedback:
   message: Återkoppling
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: ''
+  message: Hitta skript för den här webbplatsen
 menuInjectionFailed:
   description: Injection error.
   message: ''
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: ''
+  message: Försök igen i "auto-läge"
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Matchade inaktiverade skript
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: ''
@@ -916,10 +922,10 @@ titleSearchHintV2:
   message: ''
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Spåra externa redigeringar
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Håll den här sidan öppen för att spåra dina redigeringar i lokal fil
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

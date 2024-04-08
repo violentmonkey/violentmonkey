@@ -272,19 +272,19 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: размер
+  message: размеру
 genericError:
   description: Label for generic error.
   message: Ошибка
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: отключено
+  message: откл
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: включено
+  message: вкл
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: использовать глобальные настройки
+  message: использовать общую настройку
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
   message: >-
@@ -332,7 +332,7 @@ labelAbout:
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: Дополнительные настройки
+  message: Расширенные
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Разрешить обновление
@@ -350,7 +350,7 @@ labelAutoReloadCurrentTabDisabled:
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Проверять наличие обновлений скриптов каждые $1 дней, 0 для отключения
+  message: Проверять обновления скриптов каждые $1 дн., 0 для отключения
 labelBackup:
   description: Label of the import/export section in settings.
   message: Резервная копия
@@ -498,7 +498,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: '. Уведомления об обновлениях:'
+  message: '. Уведомление:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Уведомлять об обновлениях скриптов
@@ -573,7 +573,7 @@ labelSyncRevoke:
   message: Выйти
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Синхронизировать состояние скриптов.
+  message: Синхронизировать состояние скриптов
 labelSyncServerUrl:
   description: Label for input to hold server URL.
   message: 'URL-адрес сервера:'
@@ -617,8 +617,8 @@ labelXhrInjectHint:
     слишком поздно. Как и режим мгновенного внедрения в Tampermonkey, этот
     вариант использует устаревший синхронный XHR, поэтому в Chrome/Chromium
     будут предупреждения в консоли devtools, но вы можете игнорировать их,
-    поскольку негативные последствия незначительны. Скрыть предупреждения можно,
-    щёлкнув ПКМ на одном из них.
+    поскольку негативные последствия незначительны. Скрыть предупреждения можно
+    щелчком ПКМ на одном из них.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
   message: (кроме инкогнито и сайтов с отключёнными куки)
@@ -664,7 +664,7 @@ menuInjectionFailed:
   message: Не удалось внедрить некоторые скрипты.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: Повторите попытку в "авто" режиме
+  message: Повторить попытку в режиме «auto»
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
@@ -692,7 +692,7 @@ msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
     Щёлкните, чтобы открыть документацию MomentJS. Разрешённые маркеры: $1.
-    Используйте [квадратные скобки] для защиты буквального текста.
+    Используйте [квадратные скобки] для защиты буквенного текста.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -807,7 +807,7 @@ msgSyncError:
   message: Ошибка синхронизации!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: Инициализация...
+  message: Инициализация…
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
   message: Ошибка запуска синхронизации!
@@ -827,11 +827,11 @@ msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
   message: >-
     Скрипт не существовал или не соответствовал URL при загрузке страницы, что
-    случается на сайтах с одностраничным приложением, таких как FB или
+    случается на сайтах с одностраничным приложением, таких как ФБ или
     Instagram, которые используют фальшивую навигацию. Вы можете перезагрузить
     вкладку, чтобы запустить скрипт. Чтобы исправить скрипт, используйте @match
-    для всего сайта, а затем обнаруживайте изменения с помощью MutationObserver
-    или API window.navigation.
+    для всего сайта, а затем находите изменения с помощью MutationObserver или
+    API window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Скрипт обновлён.
@@ -843,7 +843,7 @@ noValues:
   message: Значения не сохраняются
 optionEditorWindow:
   description: Label for the option in settings
-  message: Из всплывающего окна открывать редактор в новом окне
+  message: Открывать редактор из всплывающего меню в новом окне
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
@@ -853,7 +853,7 @@ optionEditorWindowHint:
     сохранении
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: Скрыть омнибокс
+  message: Скрывать адресную строку
 optionPopup:
   description: Label of the popup menu section in settings.
   message: Всплывающее меню и значок
