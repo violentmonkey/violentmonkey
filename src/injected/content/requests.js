@@ -134,14 +134,14 @@ async function requestVirtualUrl(msg, data, url, fileName, eventLoad, realm) {
   };
   msg = {
     id: msg.id,
+    type: eventLoad ? LOAD : LOADEND,
     data,
   };
   if (eventLoad) {
-    msg.type = LOAD;
     sendHttpRequested(msg, realm);
     data[kResponse] = data[kResponseHeaders] = null;
+    msg.type = LOADEND;
   }
-  msg.type = LOADEND;
   sendHttpRequested(msg, realm);
 }
 
