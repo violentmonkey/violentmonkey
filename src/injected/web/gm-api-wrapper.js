@@ -1,17 +1,18 @@
 import bridge from './bridge';
-import { GM_API } from './gm-api';
+import { GM_API, gmGetResourceURL, gmXmlHttpRequest } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils, safeAssign } from './util';
 
-/** Name in Greasemonkey4 -> name in GM */
+/** Name in Greasemonkey4 -> name in GM, all methods are context-bound */
 const GM4_ALIAS = {
   __proto__: null,
-  getResourceUrl: 'getResourceURL',
-  xmlHttpRequest: 'xmlhttpRequest',
+  getResourceUrl: gmGetResourceURL,
+  xmlHttpRequest: gmXmlHttpRequest,
 };
+/** Also includes GM4_ALIAS */
 const GM4_ASYNC = {
   __proto__: null,
-  getResourceUrl: 1,
+  download: 1,
   getValue: 1,
   deleteValue: 1,
   setValue: 1,
@@ -57,27 +58,25 @@ export function makeGmApiWrapper(script) {
     numGrants = 0;
   }
   assign(gm, componentUtils);
-  grant::forEach((name) => {
-    const namePrefix = name::slice(0, 3);
-    const gm4name = namePrefix === 'GM.' && name::slice(3);
-    const gmName = gm4name ? `GM_${GM4_ALIAS[name = gm4name] || gm4name}` : name;
-    const fnBound = GM_API.bound[gmName];
-    let fn = fnBound || GM_API.free[gmName];
-    if (fnBound) {
-      fn = safeBind(fn,
-        GM4_ASYNC[gm4name]
+  for (let name of grant) {
+    let fn, fnGm4, gmName, gm4name;
+    if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
+    || (fn = GM_API.bound[gmName = gm4name ? `GM_${gm4name}` : name])) {
+      fn = safeBind(fnGm4 || fn,
+        fnGm4 || gm4name in GM4_ASYNC
           ? contextAsync || (contextAsync = assign(createNullObj(), { async: true }, context))
           : context);
-    } else if (!fn && (
+    } else if (!(fn = GM_API.free[gmName]) && (
       fn = name === 'window.close' && sendTabClose
         || name === 'window.focus' && sendTabFocus
     )) {
       name = name::slice(7); // 'window.'.length
     }
     if (fn) {
-      (gm4name ? gm4 : gm)[name] = fn;
+      if (gm4name) gm4[gm4name] = fn;
+      else gm[name] = fn;
     }
-  });
+  }
   if (numGrants) {
     wrapper = makeGlobalWrapper(gm);
     /* Exposing the fast cache of resolved properties,

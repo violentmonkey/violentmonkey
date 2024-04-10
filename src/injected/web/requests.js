@@ -7,6 +7,8 @@ const kResponse = 'response';
 const kResponseXML = 'responseXML';
 const kDocument = 'document';
 const kRaw = 'raw';
+const kOnerror = 'onerror';
+export const kOnload = 'onload';
 const EVENTS_TO_NOTIFY = [
   'abort',
   'error',
@@ -159,7 +161,7 @@ function parseRaw(req, msg, propName) {
  * @param {GMReq.UserOpts} opts - must already have a null proto
  * @param {GMContext} context
  * @param {string} fileName
- * @return {VMScriptXHRControl}
+ * @return {VMScriptXHRControl | Promise<VMScriptXHRControl>}
  */
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
@@ -194,6 +196,12 @@ export function onRequestCreate(opts, context, fileName) {
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
   const { withCredentials = true, anonymous = !withCredentials } = opts;
+  // setting opts.onload and onerror before EVENTS_TO_NOTIFY
+  const res = !context.async ? {} : new UnsafePromise((resolve, reject) => {
+    const { [kOnload]: onload, [kOnerror]: onerror } = opts;
+    opts[kOnload] = onload ? v => { resolve(v); onload(v); } : resolve;
+    opts[kOnerror] = onerror ? v => { reject(v); onerror(v); } : reject;
+  });
   idMap[id] = req;
   data = data == null && []
     // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
@@ -215,14 +223,11 @@ export function onRequestCreate(opts, context, fileName) {
     [kXhrType]: req[kXhrType] = XHR_TYPES[type] ? type : '',
     events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
   }, opts, OPTS_TO_PASS));
-  return {
-    abort() {
-      bridge.post('AbortRequest', id);
-    },
-  };
+  setOwnProp(res, 'abort', () => bridge.post('AbortRequest', id));
+  return res;
 }
 
-export function onRequestInitError({ onerror }, err) {
+export function onRequestInitError({ [kOnerror]: onerror }, err) {
   if (isFunction(onerror)) onerror(err);
   else throw err;
 }

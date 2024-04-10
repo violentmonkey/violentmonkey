@@ -2,7 +2,7 @@ import { dumpScriptValue, isEmpty } from '../util';
 import bridge from './bridge';
 import { commands } from './store';
 import { onTabCreate } from './tabs';
-import { onRequestCreate, onRequestInitError } from './requests';
+import { kOnload, onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util';
@@ -88,10 +88,7 @@ export const GM_API = {
     GM_getResourceText(name) {
       return getResource(this, name);
     },
-    /** @this {GMContext} */
-    GM_getResourceURL(name, isBlobUrl) {
-      return getResource(this, name, !!isBlobUrl, isBlobUrl === undefined);
-    },
+    GM_getResourceURL: gmGetResourceURL,
     /** @this {GMContext} */
     GM_registerMenuCommand(text, cb, opts) {
       opts = nullObjFrom(opts);
@@ -126,7 +123,7 @@ export const GM_API = {
       } else if (opts) {
         opts = nullObjFrom(opts);
         name = opts.name;
-        onload = opts.onload;
+        onload = opts[kOnload];
       }
       if (!name ? (name = 'missing') : !isString(name) && (name = 'not a string')) {
         onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
@@ -138,15 +135,12 @@ export const GM_API = {
         method: 'GET',
         overrideMimeType: 'application/octet-stream',
         // Must be present and a function to trigger downloadBlob in content bridge
-        onload: isFunction(onload) ? onload : (() => {}),
+        [kOnload]: isFunction(onload) ? onload : (() => {}),
       });
       return onRequestCreate(opts, this, name);
     },
     GM_notification: createNotification,
-    /** @this {GMContext} */
-    GM_xmlhttpRequest(opts) {
-      return onRequestCreate(nullObjFrom(opts), this);
-    },
+    GM_xmlhttpRequest: gmXmlHttpRequest,
   },
   free: {
     __proto__: null,
@@ -182,6 +176,16 @@ export const GM_API = {
     GM_log: logging.log,
   },
 };
+
+/** @this {GMContext} */
+export function gmGetResourceURL(name, isBlobUrl) {
+  return getResource(this, name, !!isBlobUrl, isBlobUrl === undefined);
+}
+
+/** @this {GMContext} */
+export function gmXmlHttpRequest(opts) {
+  return onRequestCreate(nullObjFrom(opts), this);
+}
 
 function webAddElement(parent, tag, attrs) {
   let el;
