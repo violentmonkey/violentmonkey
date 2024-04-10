@@ -2,7 +2,7 @@ import { dumpScriptValue, isEmpty } from '../util';
 import bridge from './bridge';
 import { commands } from './store';
 import { onTabCreate } from './tabs';
-import { kOnload, onRequestCreate, onRequestInitError } from './requests';
+import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util';
@@ -117,13 +117,11 @@ export const GM_API = {
      * @param {string} [name]
      */
     GM_download(opts, name) {
-      let onload;
       if (isString(opts)) {
         opts = { url: opts, name, __proto__: null };
       } else if (opts) {
         opts = nullObjFrom(opts);
         name = opts.name;
-        onload = opts[kOnload];
       }
       if (!name ? (name = 'missing') : !isString(name) && (name = 'not a string')) {
         onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
@@ -134,8 +132,6 @@ export const GM_API = {
         data: null,
         method: 'GET',
         overrideMimeType: 'application/octet-stream',
-        // Must be present and a function to trigger downloadBlob in content bridge
-        [kOnload]: isFunction(onload) ? onload : (() => {}),
       });
       return onRequestCreate(opts, this, name);
     },

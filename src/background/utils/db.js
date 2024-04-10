@@ -330,7 +330,8 @@ export function getScriptsByURL(url, isTop, errors, prevIds) {
         if (!clipboardChecked && (g === 'GM_setClipboard' || g === 'GM.setClipboard')) {
           clipboardChecked = envStart.clipFF = true;
         }
-        if (!xhrChecked && (g === 'GM_xmlhttpRequest' || g === 'GM.xmlHttpRequest')) {
+        if (!xhrChecked && (g === 'GM_xmlhttpRequest' || g === 'GM.xmlHttpRequest'
+        || g === 'GM_download' || g === 'GM.download')) {
           xhrChecked = envStart.xhr = true;
         }
       }

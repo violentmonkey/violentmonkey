@@ -8,7 +8,7 @@ const kResponseXML = 'responseXML';
 const kDocument = 'document';
 const kRaw = 'raw';
 const kOnerror = 'onerror';
-export const kOnload = 'onload';
+const kOnload = 'onload';
 const EVENTS_TO_NOTIFY = [
   'abort',
   'error',
