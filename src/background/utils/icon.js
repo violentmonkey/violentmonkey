@@ -259,15 +259,12 @@ async function loadIcon(url) {
     img.onload = resolve;
     img.onerror = resolve;
   });
-  const [uri = url, data] = loadIconData(img, !isOwn && (2 * 38)); // dashboard icon size for 2xDPI
-  if (data) iconDataCache[url] = data;
-  return (iconCache[url] = uri);
-}
-
-function loadIconData(img, maxSize) {
+  let res;
+  let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
   let { width, height } = img;
-  if (!width || !height) {
-    return []; // FF reports 0 for SVG
+  if (!width || !height) { // FF reports 0 for SVG
+    iconCache[url] = url;
+    return url;
   }
   if (maxSize && (width > maxSize || height > maxSize)) {
     maxSize /= width > height ? width : height;
@@ -279,8 +276,12 @@ function loadIconData(img, maxSize) {
   canvas.width = width;
   canvas.height = height;
   ctx.drawImage(img, 0, 0, width, height);
-  return [
-    canvas.toDataURL(),
-    !maxSize && ctx.getImageData(0, 0, width, height),
-  ];
+  try {
+    res = canvas.toDataURL();
+    if (isOwn) iconDataCache[url] = ctx.getImageData(0, 0, width, height);
+  } catch (err) {
+    res = url;
+  }
+  iconCache[url] = res;
+  return res;
 }
