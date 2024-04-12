@@ -118,31 +118,28 @@ addBackgroundHandlers({
 });
 
 async function requestVirtualUrl(msg, data, url, fileName, eventLoad, realm) {
-  let len;
   if (fileName) {
     await downloadBlob(url, fileName);
     data = null;
   } else {
-    data = await importBlob(url, len);
+    data = await importBlob(url, isBlobXhr(msg));
   }
-  data = {
-    finalUrl: url,
-    readyState: 4,
-    status: 200,
-    [kResponse]: data,
-    [kResponseHeaders]: '',
-  };
-  msg = {
-    id: msg.id,
-    type: eventLoad ? LOAD : LOADEND,
-    data,
-  };
-  if (eventLoad) {
+  for (;;) {
+    msg = {
+      id: msg.id,
+      type: eventLoad ? LOAD : LOADEND,
+      data: {
+        finalUrl: url,
+        readyState: 4,
+        status: 200,
+        [kResponse]: data,
+        [kResponseHeaders]: '',
+      },
+    };
     sendHttpRequested(msg, realm);
-    data[kResponse] = data[kResponseHeaders] = null;
-    msg.type = LOADEND;
+    if (eventLoad) eventLoad = data = null;
+    else break;
   }
-  sendHttpRequested(msg, realm);
 }
 
 function sendHttpRequested(msg, realm) {
