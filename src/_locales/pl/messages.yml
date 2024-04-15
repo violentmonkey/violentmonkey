@@ -133,7 +133,9 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Cofnij wszystkie zmiany wprowadzone w bazie danych (importowanie,
+    aktualizacja, edycja, dostosowywanie)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: Adresy URL, które są na tej liście, nie zostaną dołączone do skryptów.
@@ -152,10 +154,19 @@ descEditorOptions:
     rel="noopener noreferrer">pełną listę</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Opcje logiczne można przełączać poprzez dwukrotne kliknięcie wartości:
+    <code>true</code> = włączone, <code>false</code> = wyłączone. Opcje
+    numeryczne kończące się na <code>Delay</code>, <code>Interval</code>,
+    <code>Rate</code>, <code>Time</code> podawane są w milisekundach.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Niestandardowe opcje: <code>autocompleteOnTyping</code> to opóźnienie w
+    milisekundach wyświetlania podpowiedzi autouzupełniania po wpisaniu
+    (<code>0</code> = wyłączone), <code>killTrailingSpaceOnSave</code>
+    automatycznie usuwa końcowe spacje w każdym wierszu podczas zapisywania,
+    <code>showTrailingSpace</code> pokazuje końcowe spacje jako kropki.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -228,7 +239,9 @@ failureReasonNoninjectable:
     przez zasady, strona wyszukiwarki w Operze)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey został ponownie uruchomiony. Załaduj ponownie kartę, aby
+    uruchomić skrypty użytkownika.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: ''
@@ -279,7 +292,7 @@ helpForLocalFile:
   message: Pokaż instrukcję dotyczącą przeciągania i upuszczania lokalnych skryptów
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: dla $1 pasujących skryptów
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Wprowadź adres URL:'
@@ -570,7 +583,7 @@ labelSyncUsername:
   message: 'Nazwa użytkownika:'
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Tagi (oddzielone spacją):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Motyw:'
@@ -742,8 +755,8 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: |-
-    Taki skrypt jest już zainstalowany lub wciąż znajduje się w Koszu.
-    Użyj innego @name i @namespace tutaj lub lub zamiast tego edytuj ten skrypt.
+    Taki skrypt jest już zainstalowany.
+    Użyj tutaj a inne @name i @namespace lub zamiast tego edytuj ten skrypt..
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
@@ -949,7 +962,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * Klawisz <kbd>Enter</kbd> dodaje tekst do historii autouzupełniania
+
+    * We wszystkich warunkach wielkość liter nie jest uwzględniana
+
+    * Warunki oddzielone spacjami można łączyć
+
+    * Szukaj według metadanych: <code>"Awesome Script" "Description"</code>
+
+    * Szukaj według tagów: <code>#tag1 #tag2</code>
+
+    * Szukaj według nazwy skryptu: <code>name:"awesome name"</code>
+
+    * Szukaj według kodu skryptu: <code>code:"awesome code"</code>
+
+    * Pomijanie wyszukiwania: <code>!#tag2 !name:"unwanted"</code>
+
+    * Wyrażenia regularne: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: ''
