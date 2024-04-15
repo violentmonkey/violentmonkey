@@ -1,5 +1,5 @@
 import CodeMirror from 'codemirror';
-import defaults, { kAutocompleteOnTyping as ID } from '@/common/options-defaults';
+import { defaultsEditor, kAutocompleteOnTyping as ID } from '@/common/options-defaults';
 
 const OPTIONS = 'options';
 const STATE = 'state';
@@ -53,7 +53,7 @@ const onPicked = cm => {
   getMyState(cm)[PICKED] = true;
 };
 
-CodeMirror.defineOption(ID, defaults.editor[ID], (cm, value) => {
+CodeMirror.defineOption(ID, defaultsEditor[ID], (cm, value) => {
   const myState = getMyState(cm);
   const onOff = value ? 'on' : 'off';
   cm[onOff]('changes', onChanges);

@@ -1,6 +1,19 @@
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
 export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
 export const kShowTrailingSpace = 'showTrailingSpace';
+const defaultsValueEditor = {
+  [kAutocompleteOnTyping]: 100,
+  lineWrapping: false,
+  indentWithTabs: false,
+  indentUnit: 2,
+  tabSize: 2,
+  undoDepth: 500,
+};
+export const defaultsEditor = {
+  [kKillTrailingSpaceOnSave]: true,
+  [kShowTrailingSpace]: true,
+  ...defaultsValueEditor,
+};
 
 export default {
   [IS_APPLIED]: true,
@@ -58,16 +71,7 @@ export default {
     /** @type {'' | 'hide' | 'group'} where '' = show */
     hideDisabled: '',
   },
-  editor: {
-    [kAutocompleteOnTyping]: 100,
-    [kKillTrailingSpaceOnSave]: true,
-    [kShowTrailingSpace]: true,
-    lineWrapping: false,
-    indentWithTabs: false,
-    indentUnit: 2,
-    tabSize: 2,
-    undoDepth: 500,
-  },
+  editor: defaultsEditor,
   editorTheme: '',
   editorThemeName: null,
   editorWindow: false, // whether popup opens editor in a new window
@@ -85,6 +89,7 @@ export default {
 // ==/UserScript==
 `,
   showAdvanced: true,
+  valueEditor: defaultsValueEditor,
   /** @type {'' | 'dark' | 'light'} */
   uiTheme: '',
 };

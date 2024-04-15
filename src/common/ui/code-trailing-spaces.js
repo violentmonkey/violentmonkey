@@ -1,11 +1,11 @@
 import CodeMirror from 'codemirror';
-import defaults, {
+import {
+  defaultsEditor as DEFAULTS,
   kKillTrailingSpaceOnSave as KILL_OPT,
   kShowTrailingSpace as SHOW_OPT,
 } from '@/common/options-defaults';
 
 const OVERLAY = 'trailingspace';
-const DEFAULTS = defaults.editor;
 if (!''.trimEnd) {
   // TODO: remove when min_chrome_version>=66, strict_min_version>=61
   String.prototype.trimEnd = function _() {

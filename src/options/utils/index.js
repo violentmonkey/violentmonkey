@@ -38,3 +38,17 @@ export async function runInBatch(fn, ...args) {
     store.batch = false;
   }
 }
+
+export function toggleBoolean(event) {
+  const el = /** @type {HTMLTextAreaElement} */ event.target;
+  const { selectionStart: start, selectionEnd: end, value } = el;
+  // Ignoring double-clicks outside of <textarea>
+  const toggled = end && { false: 'true', true: 'false' }[value.slice(start, end)];
+  // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24
+  if (toggled && !document.execCommand('insertText', false, toggled)) {
+    el.value = value.slice(0, start) + toggled + value.slice(end);
+    el.setSelectionRange(start + toggled.length, start + toggled.length);
+    el.dispatchEvent(new Event('input'));
+    el.onblur = () => el.dispatchEvent(new Event('change'));
+  }
+}

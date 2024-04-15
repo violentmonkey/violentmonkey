@@ -20,6 +20,7 @@
         </span>
       </div>
       <div class="edit-values-table main"
+         :style="{ '--keyW': pageKeys.width + 'ch' }"
            @keydown.down.exact="onUpDown"
            @keydown.up.exact="onUpDown">
         <a
@@ -61,7 +62,10 @@
     <div class="edit-values-panel flex flex-col flex-1 mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
-        <div>
+        <div class="flex center-items">
+          <a tabindex="0" class="mr-1 flex" @click="editorValueShown = !editorValueShown">
+            <Icon name="cog" :class="{ active: editorValueShown }"/>
+          </a>
           <button v-for="(text, idx) in [i18n('buttonOK'), i18n('buttonApply')]" :key="text"
                   v-text="text" @click="onSave(idx)"
                   :class="{'has-error': current.error, 'save-beacon': !idx}"
@@ -70,6 +74,10 @@
           <button v-text="i18n('buttonCancel')" @click="onCancel" title="Esc"/>
         </div>
       </div>
+      <template v-if="editorValueShown">
+        <p class="my-1" v-html="i18n('descEditorOptions')"/>
+        <setting-text name="valueEditor" json @dblclick="toggleBoolean" :has-save="false"/>
+      </template>
       <label v-show="!current.isAll">
         <span v-text="i18n('valueLabelKey')"/>
         <input type="text" v-model="current.key" :readOnly="!current.isNew || readOnly"
@@ -79,9 +87,9 @@
       </label>
       <label>
         <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
-        <!-- TODO: use CodeMirror in json mode -->
         <vm-code
           :value="current.value"
+          :cm-options="cmOptions"
           ref="$value"
           class="h-100 mt-1"
           mode="application/json"
@@ -102,10 +110,12 @@ import { dumpScriptValue, formatByteLength, getBgPage, isEmpty, sendCmdDirectly 
 import { handleTabNavigation, keyboardService } from '@/common/keyboard';
 import { deepCopy, deepEqual, mapEntry } from '@/common/object';
 import { WATCH_STORAGE } from '@/common/consts';
+import hookSetting from '@/common/hook-setting';
 import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import { getActiveElement, showMessage } from '@/common/ui';
-import { store } from '../../utils';
+import SettingText from '@/common/ui/setting-text';
+import { store, toggleBoolean } from '../../utils';
 
 const props = defineProps({
   /** @type {VMScript} */
@@ -116,6 +126,7 @@ const $el = ref();
 const $editAll = ref();
 const $key = ref();
 const $value = ref();
+const editorValueShown = ref();
 const isActive = ref();
 const current = ref();
 const loading = ref(true);
@@ -130,7 +141,8 @@ const currentObservables = { error: '', dirty: false };
 const cutLength = s => (s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH) : s);
 const reparseJson = (str) => {
   try {
-    return JSON.stringify(JSON.parse(str), null, '  ');
+    // eslint-disable-next-line no-use-before-define
+    return JSON.stringify(JSON.parse(str), null, jsonIndent);
   } catch (e) {
     // This shouldn't happen but the storage may get corrupted or modified directly
     return str;
@@ -145,10 +157,16 @@ const keys = computed(() => Object.keys(values.value || {}).sort());
 const totalPages = computed(() => Math.ceil(keys.value.length / PAGE_SIZE));
 const pageKeys = computed(() => {
   const offset = PAGE_SIZE * (page.value - 1);
-  return keys.value.slice(offset, offset + PAGE_SIZE);
+  const res = keys.value.slice(offset, offset + PAGE_SIZE);
+  for (let i = 0, max = 0; i < res.length; i++ ) {
+    res.width = max = Math.max(max, res[i].length);
+  }
+  return res;
 });
 
 let cm;
+let cmOptions;
+let jsonIndent = '  ';
 let disposeList;
 let focusedElement;
 let sender;
@@ -171,6 +189,15 @@ onActivated(() => {
     () => root::removeEventListener('focusin', onFocus),
     keyboardService.register('pageup', () => flipPage(-1), conditionNotEdit),
     keyboardService.register('pagedown', () => flipPage(1), conditionNotEdit),
+    hookSetting('valueEditor', val => {
+      cmOptions = val;
+      jsonIndent = ' '.repeat(val?.tabSize || 2);
+      if (cm && val) {
+        for (const key in val) {
+          if (key !== 'mode') cm.setOption(key, val[key]);
+        }
+      }
+    }),
   ];
   storageSentry = chrome.runtime.connect({
     name: WATCH_STORAGE + JSON.stringify({
@@ -240,11 +267,11 @@ function getValue(key, sliced, raw) {
   return sliced ? cutLength(value) : value;
 }
 function getValueAll() {
-  return `{\n  ${
+  return `{\n${jsonIndent}${
     keys.value
     .map(key => `${JSON.stringify(key)}: ${getValue(key)}`)
     .join(',\n')
-    .replace(/\n/g, '\n  ') // also handles nested linebreaks inside objects/arrays
+    .replace(/\n/g, '\n' + jsonIndent) // also handles nested linebreaks inside objects/arrays
   }\n}`;
 }
 function setData(data) {
@@ -443,7 +470,8 @@ $lightBorder: 1px solid var(--fill-2);
       padding: 4px 6px;
       &:first-child {
         position: relative;
-        flex: 0 0 30%;
+        flex: 0 0 var(--keyW);
+        box-sizing: content-box;
         max-width: 240px;
       }
       &:not(:first-child) {
@@ -510,6 +538,9 @@ $lightBorder: 1px solid var(--fill-2);
   }
   .CodeMirror {
     border: $lightBorder;
+  }
+  .icon:not(.active) {
+    fill: var(--fg);
   }
 }
 </style>

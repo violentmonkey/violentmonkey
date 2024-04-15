@@ -61,6 +61,7 @@ import { getActiveElement } from '@/common/ui';
 import SettingText from '@/common/ui/setting-text';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import Icon from '@/common/ui/icon';
+import { toggleBoolean } from "@/options/utils";
 
 const $el = ref();
 const hint = ref();
@@ -110,19 +111,6 @@ async function fetchUrl(url, method = 'text') {
     busy.value = false;
     await nextTick();
     el?.focus();
-  }
-}
-function toggleBoolean(event) {
-  const el = /** @type {HTMLTextAreaElement} */ event.target;
-  const { selectionStart: start, selectionEnd: end, value } = el;
-  // Ignoring double-clicks outside of <textarea>
-  const toggled = end && { false: 'true', true: 'false' }[value.slice(start, end)];
-  // FF can't run execCommand on textarea, https://bugzil.la/1220696#c24
-  if (toggled && !document.execCommand('insertText', false, toggled)) {
-    el.value = value.slice(0, start) + toggled + value.slice(end);
-    el.setSelectionRange(start + toggled.length, start + toggled.length);
-    el.dispatchEvent(new Event('input'));
-    el.onblur = () => el.dispatchEvent(new Event('change'));
   }
 }
 async function toggleStateHint(curValue) {
