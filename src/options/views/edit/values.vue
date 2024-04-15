@@ -1,62 +1,64 @@
 <template>
-  <div class="edit-values" ref="$el" :data-editing="current && ''">
-    <div class="mb-1">
-      <button @click="onNew" v-if="!readOnly">+</button>
-      <div class="inline-block ml-2" v-if="totalPages > 1">
-        <button :disabled="page === 1" @click="page -= 1">&larr;</button>
-        <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
-        <button :disabled="page >= totalPages" @click="page += 1">&rarr;</button>
-      </div>
-      <span class="ml-2 mr-2c">
-        <span>
-          <template v-if="totalPages > 1">
-            <kbd>PageUp</kbd>, <kbd>PageDown</kbd>,
-          </template>
-          <kbd>↑</kbd>, <kbd>↓</kbd>, <kbd>Tab</kbd>, <kbd>Shift-Tab</kbd>,
+  <div class="edit-values flex" ref="$el" :data-editing="current && ''">
+    <div class="flex-1 flex flex-col">
+      <div class="mb-1">
+        <button @click="onNew" v-if="!readOnly">+</button>
+        <div class="inline-block ml-2" v-if="totalPages > 1">
+          <button :disabled="page === 1" @click="page -= 1">&larr;</button>
+          <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
+          <button :disabled="page >= totalPages" @click="page += 1">&rarr;</button>
+        </div>
+        <span class="ml-2 mr-2c">
+          <span>
+            <template v-if="totalPages > 1">
+              <kbd>PageUp</kbd>, <kbd>PageDown</kbd>,
+            </template>
+            <kbd>↑</kbd>, <kbd>↓</kbd>, <kbd>Tab</kbd>, <kbd>Shift-Tab</kbd>,
+          </span>
+          <span><kbd>Enter</kbd>: {{i18n('buttonEdit')}},</span>
+          <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
         </span>
-        <span><kbd>Enter</kbd>: {{i18n('buttonEdit')}},</span>
-        <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
-      </span>
-    </div>
-    <div class="edit-values-table main"
-         @keydown.down.exact="onUpDown"
-         @keydown.up.exact="onUpDown">
-      <a
-        ref="$editAll"
-        class="edit-values-row flex"
-        @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')"/>
-      <div
-        v-for="key in pageKeys"
-        :key="key"
-        class="edit-values-row flex monospace-font"
-        @keydown.delete.ctrl.exact="onRemove(key)"
-        @click="onEdit(key)">
-        <div class="ellipsis">
-          <a v-text="key" tabindex="0"/>
-        </div>
-        <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
-        <pre v-text="getLength(key)"/>
-        <div class="del" @click.stop="onRemove(key)">
-          <icon name="trash"/>
+      </div>
+      <div class="edit-values-table main"
+           @keydown.down.exact="onUpDown"
+           @keydown.up.exact="onUpDown">
+        <a
+          ref="$editAll"
+          class="edit-values-row flex"
+          @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')"/>
+        <div
+          v-for="key in pageKeys"
+          :key="key"
+          class="edit-values-row flex monospace-font"
+          @keydown.delete.ctrl.exact="onRemove(key)"
+          @click="onEdit(key)">
+          <div class="ellipsis">
+            <a v-text="key" tabindex="0"/>
+          </div>
+          <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
+          <pre v-text="getLength(key)"/>
+          <div class="del" @click.stop="onRemove(key)">
+            <icon name="trash"/>
+          </div>
         </div>
       </div>
-    </div>
-    <h3 v-text="i18n('headerRecycleBin')" v-if="trash"/>
-    <div class="edit-values-table trash monospace-font"
-         @keydown.down.exact="onUpDown"
-         @keydown.up.exact="onUpDown"
-         v-if="trash">
-      <!-- eslint-disable-next-line vue/no-unused-vars -->
-      <div v-for="({ key, cut, len }, trashKey) in trash" :key="trashKey"
-           class="edit-values-row flex"
-           @click="onRestore(trashKey)">
-        <a class="ellipsis" v-text="key" tabindex="0"/>
-        <s class="ellipsis flex-auto" v-text="cut"/>
-        <pre v-text="len"/>
+      <h3 v-text="i18n('headerRecycleBin')" v-if="trash"/>
+      <div class="edit-values-table trash monospace-font"
+           @keydown.down.exact="onUpDown"
+           @keydown.up.exact="onUpDown"
+           v-if="trash">
+        <!-- eslint-disable-next-line vue/no-unused-vars -->
+        <div v-for="({ key, cut, len }, trashKey) in trash" :key="trashKey"
+             class="edit-values-row flex"
+             @click="onRestore(trashKey)">
+          <a class="ellipsis" v-text="key" tabindex="0"/>
+          <s class="ellipsis flex-auto" v-text="cut"/>
+          <pre v-text="len"/>
+        </div>
       </div>
+      <div class="edit-values-empty mt-1" v-if="!loading && !keys.length" v-text="i18n('noValues')"/>
     </div>
-    <div class="edit-values-empty mt-1" v-if="!loading && !keys.length" v-text="i18n('noValues')"/>
-    <div class="edit-values-panel flex flex-col mb-1c" v-if="current">
+    <div class="edit-values-panel flex flex-col flex-1 mb-1c" v-if="current">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
         <div>
@@ -410,12 +412,22 @@ function onUpDown(evt) {
 
 <style>
 $lightBorder: 1px solid var(--fill-2);
-$editorWidth: 50%;
-$editorGap: calc(100% - $editorWidth);
 
 .edit-values {
-  &[data-editing] {
-    width: $editorGap; /* revealing trashcan icons */
+  gap: 1em;
+  overflow: hidden;
+  @media (max-width: 1200px) {
+    &[data-editing] {
+      flex-direction: column;
+      > :first-child {
+        flex: 0 1 min-content;
+        overflow-y: auto;
+        max-height: 40vh;
+        @media (max-height: 600px) {
+          display: none;
+        }
+      }
+    }
   }
   &-row {
     border: $lightBorder;
@@ -464,19 +476,10 @@ $editorGap: calc(100% - $editorWidth);
   &-empty {
     color: var(--fill-7);
   }
+  &-table {
+    overflow-y: auto;
+  }
   &-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: $editorWidth;
-    height: 100%;
-    padding: 8px;
-    box-shadow: -5px 0 5px var(--fill-2);
-    background: var(--bg);
-    z-index: 10;
-    @media (max-width: 767px) {
-      width: 100%;
-    }
     .control {
       display: flex;
       align-items: center;
