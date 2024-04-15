@@ -9,7 +9,6 @@
       :disabled="disabled"
       :placeholder="placeholder"
       :rows="rows || calcRows(text)"
-      @change="onChange"
       @ctrl-s="onSave"
     />
     <button v-if="hasSave" v-text="saved || i18n('buttonSave')" @click="onSave" :title="ctrlS"
@@ -22,15 +21,26 @@
   </div>
 </template>
 
+<script>
+import { modifiers } from '@violentmonkey/shortcut';
+
+const ctrlS = modifiers.ctrlcmd === 'm' ? '⌘S' : 'Ctrl-S';
+/** XXX compatible with old data format */
+const handleArray = val => (Array.isArray(val) ? val.join('\n') : val || '');
+const handleJSON = val => JSON.stringify(val, null, '  ');
+</script>
+
 <script setup>
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { i18n } from '@/common';
 import { getUnloadSentry } from '@/common/router';
-import { modifiers } from '@violentmonkey/shortcut';
 import { deepEqual, objectGet } from '../object';
 import options from '../options';
 import defaults from '../options-defaults';
 import hookSetting from '../hook-setting';
+
+let savedValue;
+let savedValueText;
 
 const props = defineProps({
   name: String,
@@ -44,18 +54,16 @@ const props = defineProps({
   rows: Number,
 });
 const emit = defineEmits(['bg-error', 'save']);
-const ctrlS = modifiers.ctrlcmd === 'm' ? '⌘S' : 'Ctrl-S';
 const $text = ref();
+const canSave = ref();
+const canReset = ref();
 const error = ref();
-const savedValue = ref();
+const isDirty = ref();
 const saved = ref('');
 const text = ref('');
 const value = ref();
 
-const handle = props.json
-  ? (val => JSON.stringify(val, null, '  '))
-  // XXX compatible with old data format
-  : (val => (Array.isArray(val) ? val.join('\n') : val || ''));
+const handle = props.json ? handleJSON : handleArray;
 const defaultValue = objectGet(defaults, props.name);
 const placeholder = handle(defaultValue);
 const toggleUnloadSentry = getUnloadSentry(() => {
@@ -63,15 +71,12 @@ const toggleUnloadSentry = getUnloadSentry(() => {
      The component won't be destroyed on tab change, so the changes are actually kept.
      Here we reset it to make sure the user loses the changes when leaving the settings tab.
      Otherwise the user may be confused about where the changes are after switching back. */
-  text.value = handle(savedValue.value);
+  text.value = handle(savedValue);
 });
 const revoke = hookSetting(props.name, val => {
-  savedValue.value = val;
-  text.value = handle(val);
+  savedValue = val;
+  text.value = savedValueText = handle(val);
 });
-const isDirty = computed(() => !deepEqual(value.value, savedValue.value || ''));
-const canSave = computed(() => !error.value && isDirty.value);
-const canReset = computed(() => !deepEqual(value.value, defaultValue || ''));
 
 defineExpose({
   defaultValue,
@@ -80,11 +85,13 @@ defineExpose({
 });
 watch(isDirty, toggleUnloadSentry);
 watch(text, str => {
+  let _isDirty, _canSave, isSavedValueText;
   let val;
   let err;
   if (props.json) {
     try {
-      val = JSON.parse(str);
+      isSavedValueText = str === savedValueText;
+      val = isSavedValueText ? savedValue : JSON.parse(str);
     } catch (e) {
       err = e.message;
     }
@@ -94,18 +101,20 @@ watch(text, str => {
   }
   value.value = val;
   saved.value = '';
+  canReset.value = !deepEqual(val, defaultValue || '');
+  isDirty.value = _isDirty = !isSavedValueText && !deepEqual(val, savedValue || '');
+  canSave.value = _canSave = _isDirty && !err;
+  if (_canSave && !props.hasSave) onSave(); // Auto save if there is no `Save` button
 });
 onBeforeUnmount(() => {
   revoke();
   toggleUnloadSentry(false);
 });
 
-function onChange() {
-  // Auto save if there is no `Save` button
-  if (!props.hasSave && canSave.value) onSave();
-}
 function onSave() {
-  options.set(props.name, value.value).catch(bgError);
+  options.set(props.name, savedValue = value.value).catch(bgError);
+  savedValueText = text.value;
+  isDirty.value = canSave.value = false;
   saved.value = i18n('buttonSaved');
   emit('save');
 }
@@ -120,8 +129,8 @@ function onReset() {
   } else {
     // Save button exists = let the user undo the input
     el.select();
-    if (!document.execCommand('insertText', false, placeholder.value)) {
-      value.value = placeholder.value;
+    if (!document.execCommand('insertText', false, placeholder)) {
+      value.value = placeholder;
     }
   }
 }
