@@ -31,16 +31,16 @@ export const bindEvents = (srcId, destId, bridge) => {
     }
     if (!incomingNodeEvent) {
       // CustomEvent is the main message
-      const detail = e::getDetail();
-      const data = cloneInto ? cloneInto(detail, window) : detail;
-      incomingNodeEvent = data.node && data;
-      if (!incomingNodeEvent) bridge.onHandle(data);
+      e = e::getDetail();
+      if (cloneInto) e = cloneInto(e, window);
+      if (e.node && (incomingNodeEvent = e)) return;
     } else {
       // MouseEvent is the second event when the main event has `node: true`
       incomingNodeEvent.node = e::getRelatedTarget();
-      bridge.onHandle(incomingNodeEvent);
-      incomingNodeEvent = null;
+      e = incomingNodeEvent;
+      incomingNodeEvent = null; // must precede onHandle() to handle nested incoming event
     }
+    bridge.onHandle(e);
   }, true);
   /** In Content bridge `pageNode` is `realm` which is wired in setupContentInvoker */
   bridge.post = (cmd, data, pageNode, contNode) => {
