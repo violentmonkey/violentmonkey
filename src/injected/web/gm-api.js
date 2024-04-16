@@ -52,6 +52,9 @@ export const GM_API_CTX_GM4ASYNC = {
   GM_setValues(obj) {
     return dumpValue(this, true, obj);
   },
+  GM_webextSendMessage(id, message) {
+    return bridge.post('WebextSendMessage', {id, message});
+  },
   /**
    * @this {GMContext}
    * @param {VMScriptGMDownloadOptions|string} opts
