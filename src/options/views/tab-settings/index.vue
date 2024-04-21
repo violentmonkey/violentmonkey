@@ -155,6 +155,13 @@
         <p v-html="i18n('descCustomCSS')"/>
         <setting-text name="customCSS"/>
       </section>
+
+      <section class="mb-1c">
+        <h3 v-text="i18n('optionSecurity')"/>
+        <div class="ml-2c flex flex-col">
+          <setting-check name="allowNativeMessaging" :label="i18n('labelNativeMessaging')" />
+        </div>
+      </section>
     </details>
   </div>
 </template>

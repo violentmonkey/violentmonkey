@@ -40,6 +40,8 @@ permissions:
   - clipboardWrite
   - contextMenus
   - cookies
+optional_permissions:
+  - nativeMessaging
 commands:
   _execute_browser_action: {}
   dashboard:
