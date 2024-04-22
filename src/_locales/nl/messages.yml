@@ -110,13 +110,13 @@ buttonUpdateAll:
   message: Alle scripts controleren op updates
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Databank opschonen
+  message: Gegevens opschonen
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: De databank is opgeschoond
+  message: Gegevens zijn opgeschoond
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Bezig met opschonen...
+  message: Gegevens aan het opschonen...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
@@ -152,10 +152,20 @@ descEditorOptions:
     rel="noopener noreferrer">volledige lijst</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Boolean opties kunnen worden omgeschakeld door te dubbelklikken op de
+    waarde: <code>true</code> = ingeschakeld, <code>false</code> =
+    uitgeschakeld. Numerieke opties die eindigen op <code>Delay</code>,
+    <code>Interval</code>, <code>Rate</code>, <code>Time</code> zijn in
+    milliseconden.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Niet-standaard opties: <code>autocompleteOnTyping</code> is een vertraging
+    in milliseconden om autocomplete hints weer te geven na het typen van
+    (<code>0</code> = uitschakelen), <code>killTrailingSpaceOnSave</code>
+    verwijdert automatisch spaties in elke regel bij het opslaan,
+    <code>showTrailingSpace</code> toont de achterliggende spaties als punten.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -164,9 +174,7 @@ descScriptTemplate:
     <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: >-
-    Documentatie over gebruikersscript-metagegevensblokken en <code>GM</code>
-    API:
+  message: 'Documentatie over gebruikersscript metagegevensblok en <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Sneltoetsen:'
@@ -227,7 +235,9 @@ failureReasonNoninjectable:
     bepaalde Opera-zoekmachine)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey is opnieuw opgestart. Laad het tabblad opnieuw om
+    gebruikersscripts uit te voeren.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -276,7 +286,9 @@ genericUseGlobal:
   message: algemene instelling volgen
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    "#"-patronen werken alleen bij het openen van de site of bij het opnieuw
+    laden van het tabblad: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Prullenbak
@@ -703,7 +715,7 @@ msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 item(s) geïmporteerd.
+  message: $1 item(s) zijn geïmporteerd.
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
@@ -711,10 +723,10 @@ msgIncognitoChanges:
   message: Aanpassingen in incognitomodus worden tevens toegepast op het hoofdprofiel.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Het script is geïnstalleerd.
+  message: Script geïnstalleerd.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Het script is ongeldig!
+  message: Ongeldig script!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
@@ -752,10 +764,10 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Er is een nieuwe versie beschikbaar.
+  message: Nieuwe versie gevonden.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Er is geen nieuwe versie beschikbaar.
+  message: Geen update gevonden.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
   message: De scripts kunnen niet worden bijgewerkt. Klik om te openen.
@@ -766,7 +778,7 @@ msgReinstallScripts:
   message: 'Sla de volgende scripts opnieuw op of herinstalleer ze:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: (de code is precies hetzelfde)
+  message: (code is hetzelfde)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: De zwarte lijst is bijgewerkt.
@@ -785,7 +797,7 @@ msgSavedScriptTemplate:
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: '[$1] is bijgewerkt!'
+  message: Script [$1] is bijgewerkt!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Tonen/Verbergen
@@ -812,7 +824,13 @@ msgSyntaxError:
   message: Syntaxisfout?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Het script bestond niet of kwam niet overeen met de URL toen de pagina werd
+    geladen, wat gebeurt bij Single-Page Application-sites zoals FB of Instagram
+    die gebruikmaken van nepnavigatie. Je kan het tabblad opnieuw laden om het
+    script uit te voeren. Gebruik @match voor de hele site om het script te
+    repareren en detecteer vervolgens wijzigingen met MutationObserver of
+    window.navigation API.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Het script is bijgewerkt.
@@ -858,16 +876,16 @@ optionShowEnabledFirst:
   message: Ingeschakelde scripts bovenaan
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: 'Thema:'
+  message: 'UI Thema:'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: Automatisch
+  message: automatisch
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: Donker
+  message: donker
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: Licht
+  message: licht
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
