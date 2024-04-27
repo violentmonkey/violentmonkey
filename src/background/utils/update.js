@@ -69,6 +69,7 @@ async function doCheckUpdate(script, urls, opts) {
       id,
       code: await downloadUpdate(script, urls, opts),
       update: { checking: false },
+      bumpDate: true,
     });
     msgOk = i18n('msgScriptUpdated', [getScriptName(update)]);
     resourceOpts = { ...NO_CACHE };

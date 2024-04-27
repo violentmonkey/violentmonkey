@@ -321,6 +321,7 @@ async function save() {
       isNew: !id,
       message: '',
       reuseDeps: true,
+      bumpDate: true,
     });
     const newId = res?.where?.id;
     CM.markClean();

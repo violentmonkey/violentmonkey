@@ -427,6 +427,7 @@ async function installScript(evt, parsedMeta) {
       cache: resourceCache,
       reloadTab: reloadTab.value,
       reuseDeps: !!confirmedTime,
+      bumpDate: true,
     });
     const time = new Date().toLocaleTimeString(['fr']);
     const time0 = confirmedTime || (confirmedTime = time);
