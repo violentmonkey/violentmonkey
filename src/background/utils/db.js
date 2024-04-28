@@ -659,8 +659,8 @@ export async function parseScript(src) {
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);
   // DANGER! Awaiting here when all props are set to avoid modifications made by a "concurrent" call
-  const codeChanged = src.bumpDate && (!oldScript || code !== await storage[S_CODE].getOne(id));
-  if (codeChanged) props.lastUpdated = now;
+  const codeChanged = !oldScript || code !== await storage[S_CODE].getOne(id);
+  if (codeChanged && src.bumpDate) props.lastUpdated = now;
   // Installer has all the deps, so we'll put them in storage first
   if (src.cache) await depsPromise;
   await storage.base.set({
