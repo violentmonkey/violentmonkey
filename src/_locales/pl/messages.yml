@@ -429,7 +429,11 @@ labelFastFirefoxInject:
   message: Alternatywny tryb $1 w Firefoxie
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Alternatywna metoda wstrzykiwania <document-start> skryptów od Firefoxa
+    wersji 59, szybsza niż tryb domyślny. Podobnie jak „Tryb strony
+    synchronicznej”, zwiększa on również zużycie pamięci, więc możesz go
+    wyłączyć, jeśli Twoje skrypty działają poprawnie bez tej opcji.
 labelFeedback:
   description: Label of link to feedback page.
   message: Informacje zwrotne
@@ -909,7 +913,9 @@ reloadTab:
   message: Odśwież kartę
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Jeśli włączono, aktywna karta zostanie załadowana ponownie po wykryciu zmian
+    i ten skrypt będzie odpowiadał adresowi URL karty.
 removeAllScripts:
   description: Button to remove all scripts
   message: Usuń wszystkie skrypty
@@ -943,7 +949,7 @@ skipScriptsMsg:
     ponownie lub nawiguj w karcie.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Przestań śledzić
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Kolor normalnej odznaki
@@ -983,10 +989,10 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Śledź zmiany zewnętrzne
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Pozostaw tę stronę otwartą, aby śledzić zmiany w pliku lokalnym
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
