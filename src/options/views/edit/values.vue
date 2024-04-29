@@ -294,7 +294,7 @@ async function updateValue({
   rawValue = dumpScriptValue(jsonValue) || '',
 }) {
   const { id } = props.script.props;
-  await sendCmdDirectly('UpdateValue', { id, key, raw: rawValue }, undefined, sender);
+  await sendCmdDirectly('UpdateValue', [id, { [key]: rawValue }], undefined, sender);
   if (rawValue) {
     values.value[key] = rawValue;
   } else {

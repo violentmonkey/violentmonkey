@@ -14,8 +14,11 @@ const GM4_ASYNC = {
   __proto__: null,
   download: 1,
   getValue: 1,
+  getValues: 1,
   deleteValue: 1,
+  deleteValues: 1,
   setValue: 1,
+  setValues: 1,
   listValues: 1,
 };
 /** @type {(keyof VMInjection.Script)[]} */

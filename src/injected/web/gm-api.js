@@ -1,11 +1,10 @@
-import { dumpScriptValue, isEmpty } from '../util';
+import { isEmpty } from '../util';
 import bridge from './bridge';
-import { commands } from './store';
+import { commands, storages } from './store';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
-import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
-import { jsonDump } from './util';
+import { changeHooks, decodeValue, dumpValue } from './gm-values';
 
 const resolveOrReturn = (context, val) => (
   context.async ? promiseResolve(val) : val
@@ -16,30 +15,40 @@ export const GM_API = {
     __proto__: null,
     /** @this {GMContext} */
     GM_deleteValue(key) {
-      const { id } = this;
-      const values = loadValues(id);
-      const oldRaw = values[key];
-      delete values[key];
-      // using `undefined` to match the documentation and TM for GM_addValueChangeListener
-      return dumpValue(id, key, undefined, null, oldRaw, this);
+      return dumpValue(this, false, [key]);
+    },
+    /** @this {GMContext} */
+    GM_deleteValues(keys) {
+      return dumpValue(this, false, keys);
     },
     /** @this {GMContext} */
     GM_getValue(key, def) {
-      const raw = loadValues(this.id)[key];
+      const raw = storages[this.id][key];
       return resolveOrReturn(this, raw ? decodeValue(raw) : def);
     },
     /** @this {GMContext} */
+    GM_getValues(what) {
+      const res = {};
+      const isArr = arrayIsArray(what);
+      const values = storages[this.id];
+      for (const key of isArr ? what : objectKeys(what)) {
+        const raw = values[key];
+        if (raw) setOwnProp(res, key, decodeValue(raw));
+        else if (!isArr) setOwnProp(res, key, what[key]);
+      }
+      return resolveOrReturn(this, res);
+    },
+    /** @this {GMContext} */
     GM_listValues() {
-      return resolveOrReturn(this, objectKeys(loadValues(this.id)));
+      return resolveOrReturn(this, objectKeys(storages[this.id]));
     },
     /** @this {GMContext} */
     GM_setValue(key, val) {
-      const { id } = this;
-      const raw = dumpScriptValue(val, jsonDump) || null;
-      const values = loadValues(id);
-      const oldRaw = values[key];
-      values[key] = raw;
-      return dumpValue(id, key, val, raw, oldRaw, this);
+      return dumpValue(this, true, { [key]: val });
+    },
+    /** @this {GMContext} */
+    GM_setValues(obj) {
+      return dumpValue(this, true, obj);
     },
     /**
      * @callback GMValueChangeListener

@@ -1,5 +1,7 @@
 import bridge, { addHandlers } from './bridge';
 import { storages } from './store';
+import { jsonDump } from './util';
+import { dumpScriptValue } from '../util';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = createNullObj();
@@ -25,29 +27,34 @@ addHandlers({
   },
 });
 
-export function loadValues(id) {
-  return storages[id];
-}
-
 /**
- * @param {number} id
- * @param {string} key
- * @param {?} val
- * @param {?string} raw
- * @param {?string} oldRaw
  * @param {GMContext} context
+ * @param {boolean} add
+ * @param {string[]|Object} what
  * @return {void|Promise<void>}
  */
-export function dumpValue(id, key, val, raw, oldRaw, context) {
+export function dumpValue(context, add, what) {
   let res;
-  if (raw !== oldRaw) {
-    res = bridge[context.async ? 'send' : 'post']('UpdateValue', { id, key, raw });
-    const hooks = changeHooks[id]?.[key];
-    if (hooks) notifyChange(hooks, key, val, raw, oldRaw);
-  } else if (context.async) {
-    res = promiseResolve();
+  const { id, async } = context;
+  const values = storages[id];
+  const keyHooks = changeHooks[id];
+  for (const key of add ? objectKeys(what) : what) {
+    let val, raw, oldRaw, tmp;
+    if (add) {
+      val = what[key];
+      raw = dumpScriptValue(val, jsonDump) || null;
+    } else raw = null; // val is `undefined` to match GM_addValueChangeListener docs
+    oldRaw = values[key];
+    if (add) values[key] = val;
+    else delete values[key];
+    if (raw !== oldRaw) {
+      (res || (res = createNullObj()))[key] = raw;
+      if ((tmp = keyHooks?.[key])) notifyChange(tmp, key, val, raw, oldRaw);
+    }
   }
-  return res;
+  return res ? bridge[async ? 'send' : 'post']('UpdateValue', [id, res])
+    : async ? promiseResolve()
+      : undefined;
 }
 
 export function decodeValue(raw) {
