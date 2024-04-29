@@ -18,6 +18,11 @@ const GM4_ASYNC = {
   setValue: 1,
   listValues: 1,
 };
+/** @type {(keyof VMInjection.Script)[]} */
+const COPY_SCRIPT_PROPS = [
+  'displayName',
+  'id',
+];
 const componentUtils = makeComponentUtils();
 const sendTabClose = () => bridge.post('TabClose');
 const sendTabFocus = () => bridge.post('TabFocus');
@@ -29,17 +34,15 @@ const sendTabFocus = () => bridge.post('TabFocus');
 export function makeGmApiWrapper(script) {
   // Add GM functions
   // Reference: http://wiki.greasespot.net/Greasemonkey_Manual:API
-  const { id, meta } = script;
+  const { meta } = script;
   const { grant } = meta;
   const resources = setPrototypeOf(meta.resources, null);
   /** @type {GMContext} */
-  const context = {
-    __proto__: null, // necessary for optional props like `async`
-    id,
-    script,
+  const context = safePickInto({
     resources,
     resCache: createNullObj(),
-  };
+    async: false,
+  }, script, COPY_SCRIPT_PROPS);
   const gmInfo = makeGmInfo(script.gmi, meta, resources);
   const gm4 = {
     __proto__: null,
@@ -64,7 +67,7 @@ export function makeGmApiWrapper(script) {
     || (fn = GM_API.bound[gmName = gm4name ? `GM_${gm4name}` : name])) {
       fn = safeBind(fnGm4 || fn,
         fnGm4 || gm4name in GM4_ASYNC
-          ? contextAsync || (contextAsync = assign(createNullObj(), { async: true }, context))
+          ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
           : context);
     } else if (!(fn = GM_API.free[gmName]) && (
       fn = name === 'window.close' && sendTabClose

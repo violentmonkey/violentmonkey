@@ -34,7 +34,7 @@ export default function initialize(invokeHost, console) {
       }
       /** @this {GMContext} */
       GM_API.bound.GM_log = function (...args) {
-        bridge.post('Log', ['log', safeConcat([`[${this.script.displayName}]`], args)]);
+        bridge.post('Log', ['log', safeConcat([`[${this.displayName}]`], args)]);
       };
     }
   } else {

@@ -18,7 +18,7 @@ declare interface GMContext {
   id: number;
   resCache: StringMap;
   resources: StringMap;
-  script: VMInjection.Script;
+  displayName: string;
 }
 
 /**
