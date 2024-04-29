@@ -1,11 +1,6 @@
 const handlers = createNullObj();
 export const addHandlers = obj => assign(handlers, obj);
-const callbacks = {
-  __proto__: null,
-  Error(err) {
-    throw err;
-  },
-};
+export const callbacks = createNullObj();
 /**
  * @property {VMScriptGMInfoPlatform} ua
  * @property {VMBridgePostFunc} post
@@ -13,7 +8,6 @@ const callbacks = {
  */
 const bridge = {
   __proto__: null,
-  callbacks,
   onHandle({ cmd, data, node }) {
     const fn = handlers[cmd];
     if (fn) node::fn(data);

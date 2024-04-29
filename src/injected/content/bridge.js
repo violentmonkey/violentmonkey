@@ -45,6 +45,7 @@ const bridge = {
       data = data.data;
     }
     try {
+      if (!handle) throw data;
       if (handle === REIFY) {
         handle = true;
         res = bridge[REIFY];
