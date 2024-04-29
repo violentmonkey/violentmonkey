@@ -30,7 +30,7 @@ buttonEdit:
   message: 편집
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 스크립트 이름을 마우스 오른쪽 버튼으로 클릭하고 [Ctrl] 키를 누르면서 클릭하거나, 휠로 클릭할 수도 있습니다.
+  message: 스크립트 이름을 마우스 오른쪽 버튼 클릭, Ctrl 클릭, 휠 클릭할 수도 있습니다.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: 지금 휴지통 비우기!
@@ -221,7 +221,7 @@ failureReasonNoninjectable:
     (대표적인 원인 예시: 브라우저 UI, 확장 기능, 정책, Opera 내 검색엔진 사이트)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: Violentmonkey가 재시작되었습니다. 유저스크립트를 실행하려면 탭을 새로고침하세요.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -267,7 +267,7 @@ genericUseGlobal:
   message: 전역 설정 사용
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: '"#" 패턴은 사이트를 처음 열거나 탭을 새로 고침할 때만 작동합니다 : $1'
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 휴지통
@@ -619,9 +619,9 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: |-
-    일반 설정에서 이 옵션을 활성화하면 현재 탭이 자동으로 다시 로드됩니다.
+    일반 설정에서 이 옵션을 활성화한 경우 현재 탭이 자동으로 새로고침됩니다.
     다른 모든 탭에 변경 사항을 적용하려면 수동으로 새로고침하세요.
-    Use "Settings"유연성을 높이려면 편집기의 탭을 참조하십시오.
+    더 많은 유연성을 위해 편집기의 '설정' 탭을 사용하세요.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
@@ -629,7 +629,7 @@ menuFeedback:
   message: 피드백
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: 이 사이트를 위한 스크립트 찾기
+  message: 이 사이트의 스크립트 찾기
 menuInjectionFailed:
   description: Injection error.
   message: 일부 스크립트를 삽입할 수 없습니다.
@@ -661,9 +661,7 @@ msgCheckingForUpdate:
   message: 업데이트 확인중...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: >-
-    Click to open MomentJS documentation. Allowed tokens: $1. Use [square
-    brackets] to protect literal text.
+  message: 'MomentJS 문서를 열려면 클릭합니다. 허용된 토큰 : $1. 리터럴 텍스트를 보호하려면 [대괄호]를 사용하세요.'
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -794,7 +792,10 @@ msgSyntaxError:
   message: 구문 오류?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    페이지가 로드될 때 스크립트가 존재하지 않거나 URL과 일치하지 않는데, 이는 페이크 내비게이션을 사용하는 페이스북이나 인스타그램과 같은
+    단일 페이지 애플리케이션 사이트에서 발생합니다. 탭을 새로고침하여 스크립트를 실행할 수 있습니다. 스크립트를 수정하려면 전체 사이트에
+    @match를 사용한 다음 MutationObserver 또는 window.navigation API를 사용하여 변경 사항을 감지합니다.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 스크립트 업데이트됨.

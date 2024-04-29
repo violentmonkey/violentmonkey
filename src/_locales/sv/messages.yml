@@ -158,7 +158,7 @@ descScriptTemplate:
     med MomentJS-kompatibelt format, för exempel <{{date:YYYY-MM-DD}}>.
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: 'Dokumentation om användarskriptmetadatablock och <code>GM</code> API:'
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Tangentbordsgenvägar:'
@@ -198,7 +198,7 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Visa/redigera hela skriptvärdeslagringen
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: En användarskripthanterare med öppen källkod som stöder många webbläsare
@@ -267,13 +267,15 @@ genericUseGlobal:
   message: använd globala inställningar
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    "#"-mönster fungerar endast när du öppnar webbplatsen eller laddar om
+    fliken: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Papperskorg
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Visa instruktionerna för drag och släpp för lokala skript
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: för $1 matchande skript
@@ -285,10 +287,10 @@ hintRecycleBin:
   message: Borttagna skript listas här och kommer att sparas i 7 dagar.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: ''
+  message: Använd @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: ''
+  message: Förkasta redundansen och försök ladda om de saknade resurserna i cachen.
 install:
   description: Label for button to install a script.
   message: Installera
@@ -303,7 +305,7 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: Källfilsfliken bör hållas öppen i Firefox 68 och senare.
 labelAbout:
   description: Label shown on top of the about page.
   message: ''
@@ -397,16 +399,16 @@ labelExclude:
   message: '@uteslutna regler'
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: '@exclude-match regler'
 labelExportScriptData:
   description: Option to export script data along with scripts.
   message: Exportera skriptdata
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'Visa installerad version på användarskriptkatalogsidor: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Alternativt $1-läge i Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: ''
@@ -584,7 +586,7 @@ labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Synkront $1-läge
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: ''
@@ -599,7 +601,7 @@ learnBlacklist:
   message: Läs mer om svartlistade mönster.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Lär dig mer om injektionslägen.
 menuCommands:
   description: Menu item to list script commands.
   message: ''
@@ -625,7 +627,7 @@ menuFindScripts:
   message: Hitta skript för den här webbplatsen
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Det gick inte att injicera vissa skript.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
   message: Försök igen i "auto-läge"
@@ -636,7 +638,7 @@ menuMatchedDisabledScripts:
   message: Matchade inaktiverade skript
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Endast underramsskript
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Matchade skript
@@ -654,12 +656,14 @@ msgCheckingForUpdate:
   message: Sök efter uppdateringar...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Klicka för att öppna MomentJS-dokumentationen. Tillåtna tokens: $1. Använd
+    [hakparenteser] för att skydda det som är text.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: Fel vid hämtning av resurs!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Det gick inte att hämta skriptet!
@@ -810,7 +814,7 @@ optionEditorWindowSimple:
   message: Dölj omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Popup-meny och ikon
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Aktiverade först
@@ -819,7 +823,7 @@ optionPopupGroupDisabled:
   message: Gruppera inaktiverade skript
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Gruppera efter @körskede
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Dölj inaktiverade skript
@@ -936,10 +940,10 @@ valueLabelKey:
   message: Nyckel (sträng)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Värden (serialiserade som JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Alla värden (serialiserade som JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ''
