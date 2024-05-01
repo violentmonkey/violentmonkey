@@ -94,7 +94,7 @@
         </Dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
         <form class="filter-search hidden-xs" @submit.prevent
-              :style="{ 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
+              :style="{ 'min-width': '10em', 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
           <label>
             <input
               type="search"
@@ -804,6 +804,8 @@ $iconSize: 2rem; // from .icon in ui/style.css
     align-items: center;
     line-height: 1;
     border-bottom: 1px solid var(--fill-5);
+    overflow-x: auto;
+    overflow-y: hidden;
     .btn-ghost, select {
       height: $iconSize;
     }
