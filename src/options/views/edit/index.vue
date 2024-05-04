@@ -448,7 +448,6 @@ function setupSavePosition({ id: curWndId, tabs }) {
   }
   &-body {
     padding: .5rem 1rem;
-    // overflow: auto;
     background: var(--bg);
     flex: 1;
   }
@@ -516,10 +515,13 @@ function setupSavePosition({ id: curWndId, tabs }) {
   }
 }
 
-.touch .edit {
-  // fixed/absolute doesn't work well with scroll in Firefox Android
-  position: static;
-  // larger than 100vh to force overflow so that the toolbar can be hidden in Firefox Android
+.touch body {
+  position: relative;
+  /*
+   * Set height to 1px larger than screen height to force overflow so that the toolbar can be hidden in Firefox Android.
+   * Use `100vh` (largest possible viewport) to avoid flashing caused by URL bar resizing.
+   * See https://developer.chrome.com/blog/url-bar-resizing
+   */
   min-height: calc(100vh + 1px);
 }
 

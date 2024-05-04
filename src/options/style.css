@@ -181,12 +181,4 @@ textarea:not([rows="1"]):not(.h100) {
       white-space: normal;
     }
   }
-
-  .edit-open {
-    // hide other components when edit is open to avoid scroll glitches in Firefox Android
-    .page-options {
-      height: 0;
-      overflow: hidden;
-    }
-  }
 }
