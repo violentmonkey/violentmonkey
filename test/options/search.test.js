@@ -2,7 +2,7 @@ import { createSearchRules } from '@/options/utils/search';
 
 test('createSearchRules', () => {
   expect(createSearchRules('')).toMatchSnapshot();
-  expect(createSearchRules('#a #b !#c hello CaseSensitive')).toMatchSnapshot();
+  expect(createSearchRules('#a #b !#c hello "CaseSensitive" CaseInsensitive')).toMatchSnapshot();
   expect(createSearchRules('#a-b #b name:hello world')).toMatchSnapshot();
   expect(createSearchRules('#a.b #b name:"hello world"')).toMatchSnapshot();
   expect(createSearchRules('#a.b #b name+re:"hello world"')).toMatchSnapshot();

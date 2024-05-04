@@ -57,7 +57,7 @@ export function createSearchRules(search) {
       } else if (reStr) {
         str = reStr;
       } else {
-        if (str === str.toLocaleLowerCase()) flags = 'i';
+        if (!quoted) flags = 'i';
         str = escapeStringForRegExp(str);
       }
       /** @namespace VMSearchRule */

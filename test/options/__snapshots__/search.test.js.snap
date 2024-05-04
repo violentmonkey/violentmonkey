@@ -30,6 +30,11 @@ exports[`createSearchRules 2`] = `
       "re": /CaseSensitive/u,
       "scope": "",
     },
+    {
+      "negative": false,
+      "re": /CaseInsensitive/iu,
+      "scope": "",
+    },
   ],
   "tokens": [
     {
@@ -60,7 +65,13 @@ exports[`createSearchRules 2`] = `
       "negative": false,
       "parsed": "CaseSensitive",
       "prefix": "",
-      "raw": "CaseSensitive",
+      "raw": ""CaseSensitive"",
+    },
+    {
+      "negative": false,
+      "parsed": "CaseInsensitive",
+      "prefix": "",
+      "raw": "CaseInsensitive",
     },
   ],
 }
@@ -124,7 +135,7 @@ exports[`createSearchRules 4`] = `
     },
     {
       "negative": false,
-      "re": /hello world/iu,
+      "re": /hello world/u,
       "scope": "name",
     },
   ],
@@ -230,12 +241,12 @@ exports[`createSearchRules 7`] = `
   "rules": [
     {
       "negative": false,
-      "re": /#a\\\\\\.b/iu,
+      "re": /#a\\\\\\.b/u,
       "scope": "",
     },
     {
       "negative": true,
-      "re": /#b/iu,
+      "re": /#b/u,
       "scope": "",
     },
   ],
