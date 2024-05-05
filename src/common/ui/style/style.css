@@ -512,7 +512,7 @@ input[type].has-error {
   }
 }
 
-@media (max-width: 500px) { /* This value is also used in other files */
+@media (max-width: 550px) { /* This value is also used in other files */
   .hidden-sm {
     display: none !important;
   }

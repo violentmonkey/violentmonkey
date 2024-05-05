@@ -804,8 +804,6 @@ $iconSize: 2rem; // from .icon in ui/style.css
     align-items: center;
     line-height: 1;
     border-bottom: 1px solid var(--fill-5);
-    overflow-x: auto;
-    overflow-y: hidden;
     .btn-ghost, select {
       height: $iconSize;
     }
@@ -813,8 +811,13 @@ $iconSize: 2rem; // from .icon in ui/style.css
   .vl-dropdown-menu {
     white-space: nowrap;
   }
-  @media (max-width: 500px) { // same size as `hidden-sm` in @/common/ui/style/style.css
-    .vl-dropdown-right .vl-dropdown-menu {
+  @media (max-width: 550px) { // same size as `hidden-sm` in @/common/ui/style/style.css
+    /* The header bar must be set to scrollable and the dropdown fixed simultaneously. */
+    header {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .vl-dropdown-menu {
       position: fixed;
       top: auto;
       left: 0;
