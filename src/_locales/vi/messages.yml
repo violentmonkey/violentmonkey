@@ -80,7 +80,7 @@ buttonReset:
   message: Thiết lập lại
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Đặt lại cài đặt
 buttonRestore:
   description: Button to restore a removed script.
   message: Khôi phục
@@ -131,7 +131,9 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Hoàn nguyên tất cả các thay đổi được thực hiện cho cơ sở dữ liệu (nhập, cập
+    nhật, chỉnh sửa, tùy chỉnh)
 descBlacklist:
   description: HTML Description for the global blacklist.
   message: URL trong danh sách này sẽ không bị bỏ qua.
@@ -150,7 +152,11 @@ descEditorOptions:
     rel="noopener noreferrer">Xem chi tiết.</a>
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Các tùy chọn Boolean có thể được bật bằng cách nhấp đúp vào giá trị
+    <code>true</code> = enabled, <code>false</code> = disabled. Tùy chọn số kết
+    thúc bằng <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
+    <code>Time</code> tính bằng mili giây.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
   message: ''
@@ -218,7 +224,9 @@ failureReasonNoninjectable:
   message: Violentmonkey không hoạt động ở đây.
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey đã được khởi động lại. Vui lòng tải lại tab để chạy
+    userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -334,7 +342,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Sao lưu và bảo trì
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Hiển thị ở huy hiệu: '
