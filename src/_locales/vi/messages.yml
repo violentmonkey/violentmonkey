@@ -758,12 +758,12 @@ msgNoUpdate:
   message: Không có cập nhật mới.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Lỗi cập nhật tập lệnh. Nhấn vào đây để mở chúng.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Vui lòng lưu lại hoặc cài đặt lại (các) tập lệnh này:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (mã nguồn không đổi)'
@@ -809,10 +809,15 @@ msgSyncing:
   message: Đang đồng bộ...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Lỗi cú pháp?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Tập lệnh không tồn tại hoặc không khớp với URL khi trang được tải, điều này
+    xảy ra trong các trang Ứng dụng một trang như fb hoặc instagram đang sử dụng
+    điều hướng giả mạo. Bạn có thể tải lại tab để chạy tập lệnh. Để sửa tập
+    lệnh, hãy sử dụng @match cho toàn bộ trang web, sau đó phát hiện các thay
+    đổi bằng MutationObserver hoặc API window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Đã cập nhật script.
@@ -887,7 +892,7 @@ readonlyOptWarn:
   message: ''
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Cài đặt lại
 reloadTab:
   description: Label of action to reload the tab
   message: ''

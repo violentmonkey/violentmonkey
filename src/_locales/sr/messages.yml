@@ -1,12 +1,12 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Примени
 buttonCancel:
   description: Cancel button on dialog.
   message: Откажи
 buttonCheckForUpdates:
   description: Button to check a script for updates.
-  message: Провери ажурирања
+  message: Потражи ажурирања
 buttonClose:
   description: Button to close window.
   message: Затвори
@@ -30,16 +30,18 @@ buttonEdit:
   message: Уреди
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    Можете и да притиснете десним тастером миша, точкићем или у комбинацији са
+    Ctrl-ом на назив скрипте.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Испразни отпад
 buttonEnable:
   description: Button to enable a script.
   message: Омогући
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Извези као zip
+  message: Извези као ZIP
 buttonFilter:
   description: Button to show filters menu.
   message: Филтери
@@ -49,7 +51,7 @@ buttonHome:
   message: Почетна страница
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Увези из zip датотеке
+  message: Увези из ZIP-а…
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: Инсталирај са адресе
@@ -65,7 +67,7 @@ buttonOK:
   message: У реду
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Отпад
 buttonRemove:
   description: Button to remove a script.
   message: Уклони
@@ -77,13 +79,13 @@ buttonReplaceAll:
   message: Све
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Ресетуј
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Ресетуј подешавања
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Врати
 buttonSave:
   description: Button to save modifications of a script.
   message: Сачувај
@@ -92,10 +94,10 @@ buttonSaveClose:
   message: Сачувај и затвори
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Сачувано
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Прикажи подешавања уређивача
 buttonSupport:
   description: Button to open support page.
   message: Страница подршке
@@ -110,16 +112,18 @@ buttonUpdateAll:
   message: Провери ажурирања за све
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Избриши базу података
+  message: Обриши кеш
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Подаци су избрисани
+  message: Кеш је обрисан
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Брисање података...
+  message: Брисање кеша…
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Аутоматско ажурирање је онемогућено за ову скрипту.
+    Кликните на „У реду” да бисте је ипак ажурирали.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -248,7 +252,7 @@ hashPatternWarning:
   message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Отпад
 helpForLocalFile:
   description: Label of the checkbox.
   message: ''
@@ -620,7 +624,7 @@ menuMatchedScripts:
   message: Скрипте које се подударају
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Направи нову скрипту
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
   message: Скрипта је онемогућена
@@ -703,7 +707,7 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Нова верзија је пронађена.
+  message: Доступна је нова верзија.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: Нема пронађених ажурирања.
