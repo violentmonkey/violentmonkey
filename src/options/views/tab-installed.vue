@@ -398,7 +398,7 @@ async function handleInstallFromURL() {
       await sendCmdDirectly('ConfirmInstall', { url });
     }
   } catch (err) {
-    if (err) showMessage({ text: err });
+    showMessage({ text: err.message || err });
   }
 }
 async function moveScript(from, to) {

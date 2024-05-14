@@ -18,7 +18,12 @@ addPublicCommands({
     if (!fs) {
       if (!code) code = (await request(url)).data;
       // TODO: display the error in UI
-      if (!isUserScript(code)) throw i18n('msgInvalidScript');
+      if (!isUserScript(code)) {
+        throw `${i18n('msgInvalidScript')}\n\n${
+          code.trim().split(/[\r\n]+\s*/, 9/*max lines*/).join('\n')
+            .slice(0, 500/*max overall length*/)
+        }...`;
+      }
       cache.put(url, code, 3000);
     }
     const confirmKey = getUniqId();
