@@ -221,7 +221,7 @@ const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const kFiltersPopup = 'filtersPopup';
 const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
-const needsReload = {};
+const needsReload = reactive({});
 
 const $root = ref();
 const $extras = ref();
