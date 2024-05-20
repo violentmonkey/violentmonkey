@@ -6,6 +6,7 @@ import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
 import { decodeValue, dumpValue, loadValues, changeHooks } from './gm-values';
 import { jsonDump } from './util';
+import {nativeConnect} from "./native";
 
 const resolveOrReturn = (context, val) => (
   context.async ? promiseResolve(val) : val
@@ -137,6 +138,16 @@ export const GM_API = {
     },
     GM_notification: createNotification,
     GM_xmlhttpRequest: gmXmlHttpRequest,
+    /**
+     * @this {GMContext}
+     * @param {String} app
+     */
+    GM_nativeConnect(apps) {
+      return function(app) {
+        if (app in apps)
+          return nativeConnect(this.id, app);
+      }
+    },
   },
   free: {
     __proto__: null,
