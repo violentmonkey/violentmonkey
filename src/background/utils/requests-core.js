@@ -46,13 +46,12 @@ const EXTRA_HEADERS = [
 const headersToInject = {};
 /** @param {chrome.webRequest.HttpHeader} header */
 const isVmVerify = header => header.name === VM_VERIFY;
-const isCookie = header => /^cookie2?$/i.test(header.name);
 const isntSetCookie = header => !/^set-cookie2?$/i.test(header.name);
-const isSendable = header => !isVmVerify(header)
-  && !(/^origin$/i.test(header.name) && header.value === extensionOrigin);
+export const kCookie = 'cookie';
+const kRequestHeaders = 'requestHeaders';
 const API_EVENTS = {
   onBeforeSendHeaders: [
-    onBeforeSendHeaders, 'requestHeaders', 'blocking', ...EXTRA_HEADERS,
+    onBeforeSendHeaders, kRequestHeaders, 'blocking', ...EXTRA_HEADERS,
   ],
   onHeadersReceived: [
     onHeadersReceived, kResponseHeaders, 'blocking', ...EXTRA_HEADERS,
@@ -70,7 +69,7 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId }) {
 }
 
 /** @param {chrome.webRequest.WebRequestHeadersDetails} details */
-function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
+function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
   // only the first call during a redirect/auth chain will have VM-Verify header
   const reqId = verify[requestId] || headers.find(isVmVerify)?.value;
   const req = requests[reqId];
@@ -78,19 +77,27 @@ function onBeforeSendHeaders({ requestHeaders: headers, requestId, url }) {
     verify[requestId] = reqId;
     req.coreId = requestId;
     req.url = url; // remember redirected URL with #hash as it's stripped in XHR.responseURL
-    const headers2 = headersToInject[reqId] || [];
-    const i = headers.findIndex(isCookie);
-    const j = headers2.findIndex(isCookie);
-    if (i >= 0) {
-      if (req.noNativeCookie) {
-        headers.splice(i, 1);
-      } else if (j >= 0) {
-        headers[i].value += '; ' + headers2.splice(j, 1)[0].value;
+    const headersMap = {};
+    const headers2 = headersToInject[reqId];
+    let name;
+    let h2 = !headers2;
+    for (const h of headers) {
+      if ((name = h.name) === VM_VERIFY
+      || (name = name.toLowerCase()) === 'origin' && h.value === extensionOrigin
+      || name === kCookie && req.noNativeCookie) {
+        continue;
+      }
+      if (!h2 && name === kCookie && (h2 = headers2[name])) {
+        // combining with the original value of the custom header
+        h2.value = h.value + '; ' + (req[name] || (req[name] = h2.value));
+      } else {
+        headersMap[name] = h;
       }
     }
-    headers = headers.filter(isSendable).concat(headers2);
+    return {
+      [kRequestHeaders]: Object.values(Object.assign(headersMap, headers2))
+    };
   }
-  return { requestHeaders: headers };
 }
 
 export function toggleHeaderInjector(reqId, headers) {

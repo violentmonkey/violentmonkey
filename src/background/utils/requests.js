@@ -1,13 +1,13 @@
 import { blob2base64, getFullUrl, sendTabCmd, string2uint8array } from '@/common';
-import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
-import { forEachEntry, forEachValue, objectPick } from '@/common/object';
+import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS } from '@/common/consts';
+import { deepEqual, forEachEntry, forEachValue, objectPick } from '@/common/object';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import {
-  FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify,
+  FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify, kCookie,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
-import { FIREFOX } from './ua';
+import { FIREFOX, navUA, navUAD } from './ua';
 
 addPublicCommands({
   /**
@@ -64,6 +64,17 @@ const TEXT_CHUNK_SIZE = IS_FIREFOX
 const BLOB_LIFE = 60e3;
 const SEND_XHR_PROPS = ['readyState', 'status', 'statusText'];
 const SEND_PROGRESS_PROPS = ['lengthComputable', 'loaded', 'total'];
+const quoteHeaderValue = str => `"${str.replace(/[\\"]/g, '\\$&')}"`;
+const SEC_CH_UA = 'sec-ch-ua';
+const UA_GETTERS = {
+  __proto__: null,
+  'user-agent': val => val,
+  /** @param {NavigatorUABrandVersion[]} brands */
+  [SEC_CH_UA]: brands => brands.map(b => `${quoteHeaderValue(b.brand)};v="${b.version}"`).join(', '),
+  [SEC_CH_UA + '-mobile']: val => `?${val ? 1 : 0}`,
+  [SEC_CH_UA + '-platform']: quoteHeaderValue,
+};
+const UA_HEADERS = Object.keys(UA_GETTERS);
 
 function blob2chunk(response, index, size) {
   return blob2base64(response, index * size, size);
@@ -202,7 +213,7 @@ async function httpRequest(opts, events, src, cb) {
   if (!req || req.cb) return;
   req.cb = cb;
   const { xhr } = req;
-  const vmHeaders = [];
+  const vmHeaders = {};
   // Firefox can send Blob/ArrayBuffer directly
   const willStringifyBinaries = xhrType && !IS_FIREFOX;
   // Chrome can't fetch Blob URL in incognito so we use chunks
@@ -212,25 +223,26 @@ async function httpRequest(opts, events, src, cb) {
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   const shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
-  let uaHeader;
+  const uaHeaders = [];
   req.noNativeCookie = shouldSendCookies || anonymous;
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);
   if (contentType) xhr.setRequestHeader('Content-Type', contentType);
   opts.headers::forEachEntry(([name, value]) => {
-    if (FORBIDDEN_HEADER_RE.test(name)
-    || !uaHeader && (uaHeader = name.toLowerCase() === 'user-agent')) {
-      pushWebRequestHeader(vmHeaders, name, value);
+    const nameLow = name.toLowerCase();
+    const i = UA_HEADERS.indexOf(nameLow);
+    if (i >= 0 && (uaHeaders[i] = true) || FORBIDDEN_HEADER_RE.test(name)) {
+      pushWebRequestHeader(vmHeaders, name, value, nameLow);
     } else {
       xhr.setRequestHeader(name, value);
     }
   });
-  if (!uaHeader) {
-    uaHeader = navigator.userAgent;
-    if (uaHeader !== opts.ua) {
-      pushWebRequestHeader(vmHeaders, 'User-Agent', opts.ua);
+  opts.ua.forEach((val, i) => {
+    if (!uaHeaders[i] && !deepEqual(val, !i ? navUA : navUAD[UA_PROPS[i]])) {
+      const name = UA_HEADERS[i];
+      pushWebRequestHeader(vmHeaders, name, UA_GETTERS[name](val), name);
     }
-  }
+  });
   xhr[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
   xhr.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (overrideMimeType) xhr.overrideMimeType(overrideMimeType);
@@ -252,7 +264,7 @@ async function httpRequest(opts, events, src, cb) {
       ...FIREFOX >= 59 && { firstPartyDomain: null },
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
-      pushWebRequestHeader(vmHeaders, 'cookie',
+      pushWebRequestHeader(vmHeaders, kCookie,
         cookies.map(c => `${c.name}=${c.value};`).join(' '));
     }
   }
@@ -315,10 +327,11 @@ function decodeBody([body, type, wasBlob]) {
 }
 
 /**
- * @param {chrome.webRequest.HttpHeader[]} arr
+ * @param {Object} res
  * @param {string} name
  * @param {string} value
+ * @param {string} [nameLow]
  */
-function pushWebRequestHeader(arr, name, value) {
-  arr.push({ name, value });
+function pushWebRequestHeader(res, name, value, nameLow = name) {
+  res[nameLow] = { name, value };
 }

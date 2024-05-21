@@ -97,7 +97,7 @@ declare namespace GMReq {
       password?: string;
       responseType: XMLHttpRequestResponseType;
       timeout?: number;
-      ua: string;
+      ua?: string[];
       url: string;
       user?: string;
       /** responseType to use in the actual XHR */

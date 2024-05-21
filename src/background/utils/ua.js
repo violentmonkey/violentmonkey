@@ -1,18 +1,19 @@
 import { addOwnCommands, init } from './init';
 
+export const navUA = navigator.userAgent;
+export const navUAD = navigator.userAgentData;
 const info = (() => {
-  const uad = navigator.userAgentData;
   let brand, ver, full;
-  if (uad) {
-    full = uad.getHighEntropyValues(['uaFullVersion']);
-    [brand, ver] = uad.brands.map(({ brand: b, version }) => `${
+  if (navUAD) {
+    full = navUAD.getHighEntropyValues(['uaFullVersion']);
+    [brand, ver] = navUAD.brands.map(({ brand: b, version }) => `${
       /Not[^a-z]*A[^a-z]*Brand/i.test(b) ? '4' :
         b === 'Chromium' ? '3' + b :
           b === 'Google Chrome' ? '2' + b :
             '1' + b
     }\n${version}`).sort()[0]?.slice(1).split('\n') || [];
   } else {
-    ver = navigator.userAgent.match(/\s(?:Chrom(?:e|ium)|Firefox)\/(\d+[.0-9]*)|$/i)[1];
+    ver = navUA.match(/\s(?:Chrom(?:e|ium)|Firefox)\/(\d+[.0-9]*)|$/i)[1];
   }
   return {
     [IS_FIREFOX ? 'FF' : 'CH']: parseFloat(ver) || 1,

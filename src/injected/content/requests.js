@@ -1,5 +1,6 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import { makeElem, sendCmd } from './util';
+import { UA_PROPS } from '../util';
 
 const {
   fetch: safeFetch,
@@ -21,13 +22,24 @@ const isBlobXhr = req => req[kXhrType] === 'blob';
 /** @type {GMReq.Content} */
 const requests = createNullObj();
 let downloadChain = promiseResolve();
-/** @type {()=>string} */
-let getTabUserAgent;
+let navigator, getUAData, getUAProps;
 
 onScripts.push(data => {
   if (data.xhr) {
     // The tab may have a different UA due to a devtools override or about:config
-    getTabUserAgent = describeProperty(Navigator[PROTO], 'userAgent').get.bind(navigator);
+    navigator = global.navigator;
+    getUAProps = UA_PROPS;
+    for (let p = getPrototypeOf(navigator), i = 0; i < getUAProps.length; i++) {
+      getUAProps[i] = p && describeProperty(p, getUAProps[i]).get;
+      if (!i) {
+        if ((p = describeProperty(p, 'userAgentData'))) {
+          getUAData = p.get;
+          p = global.NavigatorUAData[PROTO];
+        } else {
+          getUAProps.length = 1;
+        }
+      }
+    }
   }
 });
 
@@ -63,7 +75,8 @@ addHandlers({
       data = await encodeBody(data[0], data[1]);
       msg.data = cloneInto ? cloneInto(data, msg) : data;
     }
-    msg.ua = getTabUserAgent();
+    data = getUAData && navigator::getUAData();
+    msg.ua = getUAProps::map((fn, i) => (!i ? navigator : data)::fn());
     return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
