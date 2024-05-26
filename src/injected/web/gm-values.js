@@ -1,15 +1,19 @@
 import bridge, { addHandlers } from './bridge';
 import { storages } from './store';
+import { jsonDump } from './util';
+import { dumpScriptValue } from '../util';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = createNullObj();
-
 const dataDecoders = {
   __proto__: null,
   o: jsonParse,
   n: val => +val,
   b: val => val === 'true',
 };
+let uploadAsync;
+let uploadBuf = createNullObj();
+let uploadThrottle;
 
 addHandlers({
   UpdatedValues(updates) {
@@ -25,29 +29,38 @@ addHandlers({
   },
 });
 
-export function loadValues(id) {
-  return storages[id];
-}
-
 /**
- * @param {number} id
- * @param {string} key
- * @param {?} val
- * @param {?string} raw
- * @param {?string} oldRaw
  * @param {GMContext} context
+ * @param {boolean} add
+ * @param {string[]|Object} what
  * @return {void|Promise<void>}
  */
-export function dumpValue(id, key, val, raw, oldRaw, context) {
+export function dumpValue(context, add, what) {
   let res;
-  if (raw !== oldRaw) {
-    res = bridge[context.async ? 'send' : 'post']('UpdateValue', { id, key, raw });
-    const hooks = changeHooks[id]?.[key];
-    if (hooks) notifyChange(hooks, key, val, raw, oldRaw);
-  } else if (context.async) {
-    res = promiseResolve();
+  const { id, async } = context;
+  const values = storages[id];
+  const keyHooks = changeHooks[id];
+  for (const key of add ? objectKeys(what) : what) {
+    let val, raw, oldRaw, tmp;
+    if (add) {
+      val = what[key];
+      raw = dumpScriptValue(val, jsonDump) || null;
+    } else raw = null; // val is `undefined` to match GM_addValueChangeListener docs
+    oldRaw = values[key];
+    if (add) values[key] = val;
+    else delete values[key];
+    if (raw !== oldRaw) {
+      (res || (res = uploadBuf[id] || (uploadBuf[id] = createNullObj())))[key] = raw;
+      if ((tmp = keyHooks?.[key])) notifyChange(tmp, key, val, raw, oldRaw);
+    }
   }
-  return res;
+  if (res) {
+    res = uploadThrottle || (uploadThrottle = promiseResolve()::then(upload));
+    if (async) uploadAsync = true;
+  }
+  if (async) {
+    return res || promiseResolve();
+  }
 }
 
 export function decodeValue(raw) {
@@ -93,4 +106,11 @@ function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
       log('error', ['GM_addValueChangeListener', 'callback'], e);
     }
   });
+}
+
+function upload() {
+  const res = bridge[uploadAsync ? 'send' : 'post']('UpdateValue', uploadBuf);
+  uploadBuf = createNullObj();
+  uploadThrottle = uploadAsync = false;
+  return res;
 }

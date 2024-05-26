@@ -1,23 +1,8 @@
 import bridge from './bridge';
-import { GM_API, gmGetResourceURL, gmXmlHttpRequest } from './gm-api';
+import { GM4_ALIAS, GM_API, GM_API_CTX, GM_API_CTX_GM4ASYNC } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils, safeAssign } from './util';
 
-/** Name in Greasemonkey4 -> name in GM, all methods are context-bound */
-const GM4_ALIAS = {
-  __proto__: null,
-  getResourceUrl: gmGetResourceURL,
-  xmlHttpRequest: gmXmlHttpRequest,
-};
-/** Also includes GM4_ALIAS */
-const GM4_ASYNC = {
-  __proto__: null,
-  download: 1,
-  getValue: 1,
-  deleteValue: 1,
-  setValue: 1,
-  listValues: 1,
-};
 /** @type {(keyof VMInjection.Script)[]} */
 const COPY_SCRIPT_PROPS = [
   'displayName',
@@ -64,12 +49,13 @@ export function makeGmApiWrapper(script) {
   for (let name of grant) {
     let fn, fnGm4, gmName, gm4name;
     if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
-    || (fn = GM_API.bound[gmName = gm4name ? `GM_${gm4name}` : name])) {
+    || (fn = GM_API_CTX[gmName = gm4name ? `GM_${gm4name}` : name])
+    || (fn = GM_API_CTX_GM4ASYNC[gmName]) && (!gm4name || (fnGm4 = fn))) {
       fn = safeBind(fnGm4 || fn,
-        fnGm4 || gm4name in GM4_ASYNC
+        fnGm4
           ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
           : context);
-    } else if (!(fn = GM_API.free[gmName]) && (
+    } else if (!(fn = GM_API[gmName]) && (
       fn = name === 'window.close' && sendTabClose
         || name === 'window.focus' && sendTabFocus
     )) {

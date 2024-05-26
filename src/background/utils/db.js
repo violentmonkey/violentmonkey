@@ -262,7 +262,7 @@ const makeEnv = () => ({
   [RUN_AT]: {},
   [SCRIPTS]: [],
 });
-const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Value)$/;
+const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Values?)$/;
 const STORAGE_ROUTES = {
   [S_CACHE]: CACHE_KEYS,
   [S_CODE]: IDS,
