@@ -541,20 +541,16 @@ function showButtons(item) {
 
 onMounted(async () => {
   const $el = $root.value;
-  const $elStyle = $el.style;
-  const oldDocH = IS_FIREFOX && document.documentElement.clientHeight;
-  const oldH = innerHeight;
-  // Can't rely on devicePixelRatio because Chrome's page zoom doesn't change popup's real height
-  const newH = (
-    $elStyle.height = screen.availHeight - screenY - 8 + 'px',
-    $el.clientHeight /* forcing layout re-calc */,
-    IS_FIREFOX && await new Promise(requestAnimationFrame),
-    innerHeight
-  );
-  // Firefox may take more than one RAF to change the size of the popup,
-  // so we'll use a hardcoded height, which can be bigger than 600px in Android
-  $elStyle.maxHeight = (newH !== oldH && newH !== oldDocH ? newH : Math.max(600, newH)) + 'px';
-  $elStyle.height = '';
+  const $max = document.createElement('div');
+  $max.style.height = '1px';
+  document.body.after($max);
+  new IntersectionObserver(([e], obs) => {
+    if (!e.isIntersecting) {
+      obs.disconnect();
+      $el.style.maxHeight = (e.rootBounds.height | 0) + 'px';
+      $max.remove();
+    }
+  }).observe($max);
   focusMe($el);
   keyboardService.enable();
   keyboardService.register('escape', () => {
