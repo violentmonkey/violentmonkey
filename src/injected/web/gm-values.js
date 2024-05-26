@@ -5,13 +5,15 @@ import { dumpScriptValue } from '../util';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = createNullObj();
-
 const dataDecoders = {
   __proto__: null,
   o: jsonParse,
   n: val => +val,
   b: val => val === 'true',
 };
+let uploadAsync;
+let uploadBuf = createNullObj();
+let uploadThrottle;
 
 addHandlers({
   UpdatedValues(updates) {
@@ -48,13 +50,17 @@ export function dumpValue(context, add, what) {
     if (add) values[key] = val;
     else delete values[key];
     if (raw !== oldRaw) {
-      (res || (res = createNullObj()))[key] = raw;
+      (res || (res = uploadBuf[id] || (uploadBuf[id] = createNullObj())))[key] = raw;
       if ((tmp = keyHooks?.[key])) notifyChange(tmp, key, val, raw, oldRaw);
     }
   }
-  return res ? bridge[async ? 'send' : 'post']('UpdateValue', [id, res])
-    : async ? promiseResolve()
-      : undefined;
+  if (res) {
+    res = uploadThrottle || (uploadThrottle = promiseResolve()::then(upload));
+    if (async) uploadAsync = true;
+  }
+  if (async) {
+    return res || promiseResolve();
+  }
 }
 
 export function decodeValue(raw) {
@@ -100,4 +106,11 @@ function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
       log('error', ['GM_addValueChangeListener', 'callback'], e);
     }
   });
+}
+
+function upload() {
+  const res = bridge[uploadAsync ? 'send' : 'post']('UpdateValue', uploadBuf);
+  uploadBuf = createNullObj();
+  uploadThrottle = uploadAsync = false;
+  return res;
 }

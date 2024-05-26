@@ -34,17 +34,22 @@ addOwnCommands({
 });
 
 addPublicCommands({
-  UpdateValue([id, data], src) {
-    const values = objectGet(openers, [id, src.tab.id, getFrameDocIdFromSrc(src)]);
+  UpdateValue(what, src) {
+    const res = {};
+    for (const id in what) {
+      const values = objectGet(openers, [id, src.tab.id, getFrameDocIdFromSrc(src)]);
       // preventing the weird case of message arriving after the page navigated
-    if (!values) return;
-    const hub = nest(toSend, id);
-    for (const key in data) {
-      const raw = data[key];
-      if (raw) values[key] = raw; else delete values[key];
-      hub[key] = raw || null;
+      if (!values) return;
+      const hub = nest(toSend, id);
+      const data = what[id];
+      for (const key in data) {
+        const raw = data[key];
+        if (raw) values[key] = raw; else delete values[key];
+        hub[key] = raw || null;
+      }
+      res[id] = values;
     }
-    commit({ [id]: values });
+    commit(res);
   },
 });
 
