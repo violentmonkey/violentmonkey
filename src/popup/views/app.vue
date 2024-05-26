@@ -539,7 +539,7 @@ function showButtons(item) {
   return extras.value?.id === item.id || focusedItem.value?.id === item.id || focusBug;
 }
 
-onMounted(async () => {
+onMounted(() => {
   const $el = $root.value;
   const $max = document.createElement('div');
   $max.style.height = '1px';
