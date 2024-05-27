@@ -449,17 +449,17 @@ export function notifyToOpenScripts(title, text, ids) {
  */
 export async function getData({ id, ids, sizes }) {
   if (id) ids = [id];
+  const res = {};
   const scripts = ids
     // Some ids shown in popup/editor may have been hard-deleted
     ? getScriptsByIdsOrAll(ids).filter(Boolean)
     : getScriptsByIdsOrAll();
   scripts.forEach(inferScriptProps);
-  return {
-    [SCRIPTS]: scripts,
-    cache: !id && await getIconCache(scripts),
-    sizes: sizes && getSizes(ids),
-    sync: !id && sizes && commands.SyncGetStates(),
-  };
+  res[SCRIPTS] = scripts;
+  if (sizes) res.sizes = getSizes(ids);
+  if (!id) res.cache = await getIconCache(scripts);
+  if (!id && sizes) res.sync = commands.SyncGetStates();
+  return res;
 }
 
 /**
