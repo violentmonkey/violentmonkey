@@ -30,7 +30,7 @@
         readOnly
         :cm-options="cmOptions"
         :mode="data.mode"
-        :commands="{...commands, close: () => $list.focus() }"
+        :commands="{...commands, close: () => $list?.focus() }"
         :active="isActive && !data.img"
       />
       </KeepAlive>
