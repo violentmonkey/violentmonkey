@@ -447,7 +447,8 @@ export function notifyToOpenScripts(title, text, ids) {
  * @desc Get data for dashboard.
  * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
-export async function getData({ ids, sizes }) {
+export async function getData({ id, ids, sizes }) {
+  if (id) ids = [id];
   const scripts = ids
     // Some ids shown in popup/editor may have been hard-deleted
     ? getScriptsByIdsOrAll(ids).filter(Boolean)
@@ -455,9 +456,9 @@ export async function getData({ ids, sizes }) {
   scripts.forEach(inferScriptProps);
   return {
     [SCRIPTS]: scripts,
-    cache: await getIconCache(scripts),
+    cache: !id && await getIconCache(scripts),
     sizes: sizes && getSizes(ids),
-    sync: sizes && commands.SyncGetStates(),
+    sync: !id && sizes && commands.SyncGetStates(),
   };
 }
 

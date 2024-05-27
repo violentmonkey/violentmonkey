@@ -153,7 +153,7 @@ import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch }
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
 import LocaleGroup from '@/common/ui/locale-group';
-import { store } from '../../utils';
+import { kStorageSize, store } from '../../utils';
 import VmSettings from './settings';
 import VMSettingsUpdate from './settings-update';
 import VmValues from './values';
@@ -207,10 +207,10 @@ const frozen = ref(false);
 const frozenNote = ref(false);
 
 const navItems = computed(() => {
-  const { meta, props: { id } } = script.value;
+  const { meta, props: { id }, $cache = {} } = script.value;
   const req = meta.require.length && '@require';
   const res = !isEmpty(meta.resources) && '@resource';
-  const size = store.storageSize;
+  const size = $cache[kStorageSize];
   return {
     code: i18n('editNavCode'),
     settings: i18n('editNavSettings'),
@@ -257,7 +257,6 @@ onMounted(() => {
   if (options.get('editorWindow') && global.history.length === 1) {
     browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
   }
-  store.storageSize = 0;
   // hotkeys
   const navLabels = Object.values(navItems.value);
   const hk = hotkeys.value = [

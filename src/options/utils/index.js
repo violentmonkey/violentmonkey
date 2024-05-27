@@ -4,6 +4,7 @@ import { route } from '@/common/router';
 
 export * from './search';
 
+export const kStorageSize = 'storageSize';
 export const store = reactive({
   route,
   batch: null,
@@ -14,7 +15,6 @@ export const store = reactive({
   loading: false,
   /** Whether removed scripts need to be filtered from `store.scripts`. */
   needRefresh: false,
-  storageSize: 0,
   sync: [],
   title: null,
 });

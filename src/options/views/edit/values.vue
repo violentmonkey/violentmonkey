@@ -115,7 +115,7 @@ import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import { getActiveElement, showMessage } from '@/common/ui';
 import SettingText from '@/common/ui/setting-text';
-import { store, toggleBoolean } from '../../utils';
+import { kStorageSize, toggleBoolean } from '../../utils';
 
 const props = defineProps({
   /** @type {VMScript} */
@@ -297,7 +297,9 @@ function setData(data, isSave) {
   }
 }
 function calcSize() {
-  store.storageSize = keys.value.reduce((sum, key) => sum
+  const { script } = props;
+  const { $cache = script.$cache = {} } = script;
+  $cache[kStorageSize] = keys.value.reduce((sum, key) => sum
     + key.length + 4 + values.value[key].length + 2, 0);
 }
 async function updateValue({
