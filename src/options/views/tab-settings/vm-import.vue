@@ -27,7 +27,10 @@ import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
 import { showConfirmation } from '@/common/ui';
-import { runInBatch, store } from '../../utils';
+import {
+  kDownloadURL, kExclude, kInclude, kMatch, kOrigExclude, kOrigInclude, kOrigMatch,
+  runInBatch, store,
+} from '../../utils';
 
 const reports = reactive([]);
 const buttonImport = ref();
@@ -155,15 +158,15 @@ async function doImportBackup(file) {
         shouldUpdate: opts.check_for_updates ? 1 : 0,
       },
       custom: {
-        downloadURL: typeof meta.file_url === 'string' ? meta.file_url : undefined,
+        [kDownloadURL]: typeof meta.file_url === 'string' ? meta.file_url : undefined,
         noframes: ovr.noframes == null ? undefined : +!!ovr.noframes,
         runAt: RUN_AT_RE.test(opts.run_at) ? opts.run_at : undefined,
-        exclude: toStringArray(ovr.use_excludes),
-        include: toStringArray(ovr.use_includes),
-        match: toStringArray(ovr.use_matches),
-        origExclude: ovr.merge_excludes !== false, // will also set to true if absent
-        origInclude: ovr.merge_includes !== false,
-        origMatch: ovr.merge_matches !== false,
+        [kExclude]: toStringArray(ovr.use_excludes),
+        [kInclude]: toStringArray(ovr.use_includes),
+        [kMatch]: toStringArray(ovr.use_matches),
+        [kOrigExclude]: ovr.merge_excludes !== false, // will also set to true if absent
+        [kOrigInclude]: ovr.merge_includes !== false,
+        [kOrigMatch]: ovr.merge_matches !== false,
       },
       position: +settings.position || undefined,
       props: {

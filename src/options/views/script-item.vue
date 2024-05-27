@@ -154,7 +154,7 @@ import {
 import { getActiveElement, showConfirmation } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, toggleTip } from '@/common/keyboard';
-import { store } from '../utils';
+import { kDescription, store } from '../utils';
 
 const itemMargin = 8;
 
@@ -198,7 +198,7 @@ export default {
       return this.script.config.enabled ? this.i18n('buttonDisable') : this.i18n('buttonEnable');
     },
     description() {
-      return this.script.custom.description || getLocaleString(this.script.meta, 'description');
+      return this.script.custom[kDescription] || getLocaleString(this.script.meta, kDescription);
     },
     updatedAt() {
       const { props, config } = this.script;

@@ -183,6 +183,18 @@ export function getScriptSupportUrl(script) {
   return script.meta[SUPPORT_URL] || script[INFERRED]?.[SUPPORT_URL];
 }
 
+/**
+ * @param {VMScript} script
+ * @returns {string}
+ */
+export function getScriptIcon(script) {
+  return script.custom.icon || script.meta.icon;
+}
+
+/**
+ * @param {VMScript} script
+ * @returns {string}
+ */
 export function getScriptName(script) {
   return script.custom.name || getLocaleString(script.meta, 'name')
     || `#${script.props.id ?? i18n('labelNoName')}`;

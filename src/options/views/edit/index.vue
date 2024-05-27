@@ -100,19 +100,23 @@ import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@
 import { keyboardService } from '@/common/keyboard';
 import options from '@/common/options';
 import { getUnloadSentry } from '@/common/router';
-import { kExclude, kExcludeMatch, kInclude, kMatch } from '../../utils';
+import {
+  kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
+  kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL,
+} from '../../utils';
 
 const urlMatching = 'https://violentmonkey.github.io/api/matching/';
 const CUSTOM_PROPS = {
-  name: '',
-  homepageURL: '',
-  updateURL: '',
-  downloadURL: '',
+  [kName]: '',
+  [kHomepageURL]: '',
+  [kUpdateURL]: '',
+  [kDownloadURL]: '',
+  [kIcon]: '',
+  [kOrigInclude]: true,
+  [kOrigExclude]: true,
+  [kOrigMatch]: true,
+  [kOrigExcludeMatch]: true,
   tags: '',
-  origInclude: true,
-  origExclude: true,
-  origMatch: true,
-  origExcludeMatch: true,
 };
 const toProp = val => val !== '' ? val : null; // `null` removes the prop from script object
 const CUSTOM_LISTS = [

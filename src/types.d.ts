@@ -154,6 +154,7 @@ declare namespace VMScript {
     homepageURL?: string;
     lastInstallURL?: string;
     updateURL?: string;
+    icon?: string;
     injectInto?: VMScriptInjectInto;
     noframes?: NumBoolNull;
     exclude?: string[];
@@ -166,6 +167,7 @@ declare namespace VMScript {
     origMatch: boolean;
     pathMap?: StringMap;
     runAt?: VMScriptRunAt;
+    tags?: string;
   }
   type Meta = {
     description?: string;

@@ -473,7 +473,8 @@ async function getIconCache(scripts) {
   const toGet = [`${ICON_PREFIX}38.png`];
   const toPrime = [];
   const res = {};
-  for (let { custom, meta: { icon } } of scripts) {
+  for (let { custom, meta } of scripts) {
+    let icon = custom.icon || meta.icon;
     if (isValidHttpUrl(icon)) {
       icon = custom.pathMap[icon] || icon;
       toGet.push(icon);
@@ -698,7 +699,8 @@ function buildPathMap(script, base) {
 
 /** @return {Promise<?string>} resolves to error text if `resourceCache` is absent */
 export async function fetchResources(script, resourceCache, reqOptions) {
-  const { custom: { pathMap }, meta } = script;
+  const { custom, meta } = script;
+  const { pathMap } = custom;
   const snatch = async (url, type, validator) => {
     if (!url || isDataUri(url)) return;
     url = pathMap[url] || url;
@@ -711,12 +713,13 @@ export async function fetchResources(script, resourceCache, reqOptions) {
       return storage[type].fetch(url, reqOptions, validator).catch(err => err);
     }
   };
+  const icon = custom.icon || meta.icon;
   const errors = await Promise.all([
     ...meta.require.map(url => snatch(url, S_REQUIRE)),
     ...Object.values(meta.resources).map(url => snatch(url, S_CACHE)),
-    isRemote(meta.icon) && Promise.race([
+    isRemote(icon) && Promise.race([
       makePause(1000), // ensures slow icons don't prevent installation/update
-      snatch(meta.icon, S_CACHE, validateImage),
+      snatch(icon, S_CACHE, validateImage),
     ]),
   ]);
   if (!resourceCache?.ignoreDepsErrors) {
@@ -807,7 +810,7 @@ export async function vacuum(data) {
   scriptSizes = sizes;
   getScriptsByIdsOrAll().forEach((script) => {
     const { meta, props } = script;
-    const { icon } = meta;
+    const icon = script.custom.icon || meta.icon;
     const { id } = props;
     const pathMap = script.custom.pathMap || buildPathMap(script);
     const updUrls = getScriptUpdateUrl(script, { all: true });

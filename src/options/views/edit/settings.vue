@@ -102,12 +102,12 @@
 import { computed, shallowRef } from 'vue';
 import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
+import { objectPick } from '@/common/object';
 import VMSettingsUpdate from './settings-update';
-import { kExclude, kExcludeMatch, kInclude, kMatch } from '../../utils';
-
-const kDownloadURL = 'downloadURL';
-const kHomepageURL = 'homepageURL';
-const kUpdateURL = 'updateURL';
+import {
+  kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
+  kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL,
+} from '../../utils';
 
 const props = defineProps({
   script: Object,
@@ -122,23 +122,24 @@ const placeholders = computed(() => {
   const { script } = props;
   const { meta } = script;
   return {
-    name: meta.name,
+    ...objectPick(meta, [kIcon, kName]),
     [kHomepageURL]: getScriptHome(script),
     [kUpdateURL]: meta[kUpdateURL] || i18n('hintUseDownloadURL'),
     [kDownloadURL]: meta[kDownloadURL] || script.custom.lastInstallURL,
   };
 });
 const textInputs = [
-  ['name', i18n('labelName')],
+  [kName, i18n('labelName')],
   [kHomepageURL, i18n('labelHomepageURL')],
   [kUpdateURL, i18n('labelUpdateURL')],
   [kDownloadURL, i18n('labelDownloadURL')],
+  [kIcon, i18n('labelIconURL')],
 ];
 const textAreas = [
-  [kInclude, 'origInclude', ...highlightMetaKeys(i18n('labelInclude'))],
-  [kMatch, 'origMatch', ...highlightMetaKeys(i18n('labelMatch'))],
-  [kExclude, 'origExclude', ...highlightMetaKeys(i18n('labelExclude'))],
-  [kExcludeMatch, 'origExcludeMatch', ...highlightMetaKeys(i18n('labelExcludeMatch'))],
+  [kInclude, kOrigInclude, ...highlightMetaKeys(i18n('labelInclude'))],
+  [kMatch, kOrigMatch, ...highlightMetaKeys(i18n('labelMatch'))],
+  [kExclude, kOrigExclude, ...highlightMetaKeys(i18n('labelExclude'))],
+  [kExcludeMatch, kOrigExcludeMatch, ...highlightMetaKeys(i18n('labelExcludeMatch'))],
 ];
 </script>
 

@@ -4,7 +4,6 @@ import { route } from '@/common/router';
 
 export * from './search';
 
-export const kStorageSize = 'storageSize';
 export const store = reactive({
   route,
   batch: null,
@@ -23,6 +22,17 @@ export const kInclude = 'include';
 export const kMatch = 'match';
 export const kExclude = 'exclude';
 export const kExcludeMatch = 'excludeMatch';
+export const kDescription = 'description';
+export const kDownloadURL = 'downloadURL';
+export const kHomepageURL = 'homepageURL';
+export const kIcon = 'icon';
+export const kName = 'name';
+export const kOrigExclude = 'origExclude';
+export const kOrigExcludeMatch = 'origExcludeMatch';
+export const kOrigInclude = 'origInclude';
+export const kOrigMatch = 'origMatch';
+export const kStorageSize = 'storageSize';
+export const kUpdateURL = 'updateURL';
 
 export function markRemove(script, removed) {
   return sendCmdDirectly('MarkRemoved', {
