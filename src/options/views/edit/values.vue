@@ -108,7 +108,7 @@
 import { computed, nextTick, onActivated, onDeactivated, ref, watch } from 'vue';
 import { dumpScriptValue, formatByteLength, getBgPage, isEmpty, sendCmdDirectly } from '@/common';
 import { handleTabNavigation, keyboardService } from '@/common/keyboard';
-import { deepCopy, deepEqual, mapEntry } from '@/common/object';
+import { deepCopy, deepEqual, forEachEntry, mapEntry } from '@/common/object';
 import { WATCH_STORAGE } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
 import VmCode from '@/common/ui/code';
@@ -274,10 +274,22 @@ function getValueAll() {
     .replace(/\n/g, '\n' + jsonIndent) // also handles nested linebreaks inside objects/arrays
   }\n}`;
 }
-function setData(data) {
+function setData(data, isSave) {
   // Note: default parameter doesn't work when data=null
   data ??= {};
-  if (!deepEqual(values.value, data)) {
+  const oldData = values.value;
+  let changed;
+  if (isSave) {
+    oldData::forEachEntry(([key, val]) => {
+      if (val !== data[key]) {
+        addToTrash(key);
+        changed = true;
+      }
+    });
+  } else {
+    changed = !deepEqual(oldData, data);
+  }
+  if (changed) {
     values.value = data;
     page.value = Math.min(page.value, totalPages.value) || 1;
     calcSize();
@@ -292,7 +304,8 @@ async function updateValue({
   key,
   jsonValue,
   rawValue = dumpScriptValue(jsonValue) || '',
-}) {
+}, isSave) {
+  if (isSave) addToTrash(key);
   const { id } = props.script.props;
   await sendCmdDirectly('UpdateValue', { [id]: { [key]: rawValue } }, undefined, sender);
   if (rawValue) {
@@ -311,14 +324,17 @@ function onNew() {
     ...currentObservables,
   };
 }
-async function onRemove(key) {
-  updateValue({ key });
+function addToTrash(key) {
   (trash.value || (trash.value = {}))[key + Math.random()] = {
     key,
     rawValue: values.value[key],
     cut: getValue(key, true),
     len: getLength(key),
   };
+}
+function onRemove(key) {
+  updateValue({ key });
+  addToTrash(key);
   if (current.value?.key === key) {
     current.value = null;
   }
@@ -368,9 +384,9 @@ async function onSave(buttonIndex) {
     await sendCmdDirectly('SetValueStores', {
       [props.script.props.id]: newValues,
     });
-    setData(newValues);
+    setData(newValues, true);
   } else {
-    await updateValue(cur);
+    await updateValue(cur, true);
   }
 }
 function onCancel() {
@@ -392,11 +408,12 @@ function onChange(isChanged) {
   const cur = current.value;
   cur.dirty = isChanged;
   cur.error = null;
-  if (cur.jsonPaused) return;
   const t0 = performance.now();
+  const str = cm.getValue().trim();
   try {
-    const str = cm.getValue();
-    cur.jsonValue = str.trim() ? JSON.parse(str) : undefined;
+    if (cur.isAll && str[0] !== '{') throw 'Expected { at position 0';
+    if (cur.jsonPaused) return;
+    cur.jsonValue = JSON.parse(str);
   } catch (e) {
     const re = /(position\s+)(\d+)|$/;
     const pos = cm.posFromIndex(+`${e}`.match(re)[2] || 0);
