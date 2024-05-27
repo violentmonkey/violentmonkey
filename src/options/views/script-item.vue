@@ -481,7 +481,7 @@ $removedItemHeight: calc(
     min-width: 4em;
     > .ellipsis {
       display: inline-block;
-      max-width: 100px;
+      max-width: 15ch;
     }
   }
   &-message {
@@ -558,7 +558,7 @@ $removedItemHeight: calc(
         auto /* main icons */
         auto /* trash icon */
         $iconSize /* script icon */
-        1fr /* name */
+        minmax(15ch, 1fr) /* name */
         auto /* info */;
       align-items: center;
       height: 2.5rem;
@@ -623,9 +623,6 @@ $removedItemHeight: calc(
       }
       &.removed .script-buttons .sep {
         display: none;
-      }
-      &-author > .ellipsis {
-        max-width: 15vw;
       }
       &-message {
         position: absolute;
