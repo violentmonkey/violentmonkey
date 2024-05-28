@@ -47,7 +47,7 @@ export function dumpValue(context, add, what) {
       raw = dumpScriptValue(val, jsonDump) || null;
     } else raw = null; // val is `undefined` to match GM_addValueChangeListener docs
     oldRaw = values[key];
-    if (add) values[key] = val;
+    if (add) values[key] = raw;
     else delete values[key];
     if (raw !== oldRaw) {
       (res || (res = uploadBuf[id] || (uploadBuf[id] = createNullObj())))[key] = raw;
