@@ -541,16 +541,15 @@ function showButtons(item) {
 
 onMounted(() => {
   const $el = $root.value;
-  const $max = document.createElement('div');
-  $max.style.height = '1px';
-  document.body.after($max);
+  /* Popup is auto-sized by the browser, so we force it to expand to extract the maximum height.
+   * Doing it at startup helps avoid glitchy re-adjustments later. */
+  $el.style.height = screen.height + 'px';
   new IntersectionObserver(([e], obs) => {
-    if (!e.isIntersecting) {
-      obs.disconnect();
-      $el.style.maxHeight = (e.rootBounds.height | 0) + 'px';
-      $max.remove();
-    }
-  }).observe($max);
+    obs.disconnect();
+    // rootBounds may be 0 in old Firefox, so we'll use clientHeight as fallback
+    $el.style.maxHeight = ((e.rootBounds.height | 0) || document.documentElement.clientHeight) + 'px';
+    $el.style.height = '';
+  }).observe($el);
   focusMe($el);
   keyboardService.enable();
   keyboardService.register('escape', () => {
