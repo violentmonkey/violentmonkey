@@ -31,6 +31,8 @@ declare namespace GMReq {
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     coreId: number;
+    /** Firefox-only workaround for CSP blocking a blob: URL */
+    fileName: string;
     frame: VMMessageTargetFrame;
     frameId: number;
     id: string;

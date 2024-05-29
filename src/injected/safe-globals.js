@@ -8,7 +8,6 @@
 
 export const PROTO = 'prototype';
 export const CALLBACK_ID = '__CBID';
-export const kFileName = 'fileName';
 
 export const throwIfProtoPresent = process.env.DEBUG && (obj => {
   if (!obj || obj.__proto__) { // eslint-disable-line no-proto

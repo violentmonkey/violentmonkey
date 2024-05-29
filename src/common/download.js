@@ -1,10 +1,29 @@
 import { makePause } from '@/common';
+import { addPublicCommands } from '@/background/utils';
 
-export function downloadBlob(blob, name) {
-  const url = URL.createObjectURL(blob);
+let chain = Promise.resolve();
+
+addPublicCommands({
+  DownloadBlob(args) {
+    downloadBlob(...args);
+  },
+});
+
+/**
+ * @param {Blob|string} what
+ * @param {string} name
+ * @param {boolean} force
+ */
+export function downloadBlob(what, name, force) {
+  // Frequent downloads are ignored in Chrome and possibly other browsers
+  if (!force) {
+    chain = chain.then(() => (downloadBlob(what, name, true), makePause(150)));
+    return;
+  }
+  const url = isObject(what) ? URL.createObjectURL(what) : what;
   const a = document.createElement('a');
   a.href = url;
   a.download = name || '';
-  a.dispatchEvent(new MouseEvent('click'));
-  makePause(3000).then(() => URL.revokeObjectURL(url));
+  a.click();
+  if (isObject(what)) makePause(3000).then(() => URL.revokeObjectURL(url));
 }

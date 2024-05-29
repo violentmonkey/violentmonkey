@@ -1,5 +1,6 @@
 import { blob2base64, getFullUrl, sendTabCmd, string2uint8array } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS } from '@/common/consts';
+import { downloadBlob } from '@/common/download';
 import { deepEqual, forEachEntry, forEachValue, objectPick } from '@/common/object';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
@@ -151,6 +152,9 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           : blobbed ? 1 : 0;
       }
     }
+    if (response && isEnd && req[kFileName]) {
+      downloadBlob(response, req[kFileName]);
+    }
     const shouldSendResponse = shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
@@ -205,13 +209,12 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 async function httpRequest(opts, events, src, cb) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, id, overrideMimeType, [kXhrType]: xhrType, url: unsafeUrl } = opts;
-  const url = unsafeUrl.startsWith('blob:')
-    ? unsafeUrl // TODO: process blob and data URLs in `injected` without sending anything to bg
-    : getFullUrl(unsafeUrl, src.url);
+  const { anonymous, id, overrideMimeType, [kXhrType]: xhrType } = opts;
+  const url = getFullUrl(opts.url, src.url);
   const req = requests[id];
   if (!req || req.cb) return;
   req.cb = cb;
+  req[kFileName] = opts[kFileName];
   const { xhr } = req;
   const vmHeaders = {};
   // Firefox can send Blob/ArrayBuffer directly

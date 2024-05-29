@@ -32,7 +32,6 @@ export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
  */
 const bridge = {
   __proto__: null,
-  /** @type {VMBridgeContentIds} */
   [IDS]: createNullObj(),
   cache: createNullObj(),
   pathMaps: createNullObj(),

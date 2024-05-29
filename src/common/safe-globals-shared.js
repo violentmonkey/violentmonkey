@@ -32,3 +32,4 @@ export const kXhrType = 'xhrType';
 export const SKIP_SCRIPTS = 'SkipScripts';
 export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';
+export const kFileName = 'fileName';
