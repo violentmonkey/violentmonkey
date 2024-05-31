@@ -269,6 +269,7 @@ let narrowMediaRules;
 const refSearch = ref();
 const refList = ref();
 const scroller = ref();
+const kScrollTop = 'scrollTop';
 
 const state = reactive({
   focusedIndex: -1,
@@ -449,8 +450,13 @@ async function onHashChange() {
   // Workaround for bug in Chrome, not suppressible via overflow-anchor:none
   if (!IS_FIREFOX) {
     const el = scroller.value;
-    const pos = el.scrollTop;
-    nextTick(() => { el.scrollTop = pos; });
+    const el2 = document.scrollingElement; // for compact layout
+    const pos = el[kScrollTop];
+    const pos2 = el2[kScrollTop];
+    nextTick(() => {
+      el[kScrollTop] = pos;
+      el2[kScrollTop] = pos2;
+    });
   }
 }
 async function renderScripts() {
