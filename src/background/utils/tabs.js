@@ -151,7 +151,7 @@ addPublicCommands({
         ...storeId,
         ...canOpenIncognito && {
           [kWindowId]: windowId,
-          ...insert && { index: srcTab.index + 1 },
+          ...insert && srcTab.index != null && { index: srcTab.index + 1 },
           ...openerTabIdSupported && { openerTabId: srcTab.id },
         },
       });
