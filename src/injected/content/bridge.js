@@ -68,12 +68,11 @@ const bridge = {
 
 export default bridge;
 
-browser.runtime.onMessage.addListener(async ({ cmd, data }, src) => {
-  try {
-    const fn = bgHandlers[cmd];
-    if (fn) await fn(data, src); // awaiting to let the sender know when we're done
-  } catch (err) {
-    logging.error(err); // printing here in the tab
+browser.runtime.onMessage.addListener(({ cmd, data }, src) => {
+  if ((cmd = bgHandlers[cmd])) {
+    data = cmd(data, src);
+    if (data && isPromise(data)) data::then(null, logging.error);
+    return data;
   }
 });
 
