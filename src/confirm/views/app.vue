@@ -647,7 +647,7 @@ $vertLayoutThresholdMinus1: 1800px;
       content: attr(data-verb) " + ";
     }
     &::after {
-      content: " (" attr(data-hotkey) ")";
+      content: "\a0(" attr(data-hotkey) ")";
       opacity: .75;
       font-weight: normal;
     }
