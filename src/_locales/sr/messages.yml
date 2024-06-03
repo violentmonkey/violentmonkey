@@ -410,6 +410,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Адреса почетне странице:'
+labelIconURL:
+  description: Label for the input.
+  message: ''
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: ''
