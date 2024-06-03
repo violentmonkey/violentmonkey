@@ -452,6 +452,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL-адрес домашней страницы:'
+labelIconURL:
+  description: Label for the input.
+  message: Адрес значка
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Импорт данных скрипта

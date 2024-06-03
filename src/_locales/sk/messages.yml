@@ -455,6 +455,9 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Adresa domovskej stránky:'
+labelIconURL:
+  description: Label for the input.
+  message: Adresa URL ikony
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importovať dáta skriptu
