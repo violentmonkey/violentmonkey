@@ -299,8 +299,9 @@ function setData(data, isSave) {
 function calcSize() {
   const { script } = props;
   const { $cache = script.$cache = {} } = script;
-  $cache[kStorageSize] = keys.value.reduce((sum, key) => sum
+  const res = keys.value.reduce((sum, key) => sum
     + key.length + 4 + values.value[key].length + 2, 0);
+  $cache[kStorageSize] = res ? res + 2 : res; // {}
 }
 async function updateValue({
   key,

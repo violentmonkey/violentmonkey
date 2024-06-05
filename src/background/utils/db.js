@@ -794,8 +794,14 @@ export async function vacuum(data) {
       if (id !== scriptId) {
         status[S_MOD_PRE + id] = 1;
       }
-      if (prefix !== S_MOD_PRE) {
-        sizes[key] = deepSize(data[key]) + (prefix === S_VALUE_PRE ? 0 : key.length);
+      if (prefix === S_VALUE_PRE) {
+        if ((sizes[key] = deepSize(data[key])) === 2) {
+          // remove empty {}
+          sizes[key] = 0;
+          status[key] = -1;
+        }
+      } else if (prefix !== S_MOD_PRE) {
+        sizes[key] = deepSize(data[key]) + key.length;
       }
     } else if (!val && !prefixIgnoreMissing.includes(prefix)) {
       status[key] = 2 + scriptId;
