@@ -74,7 +74,7 @@ aside {
 }
 section {
   padding: 0 0 $tabPadY;
-  > h3 {
+  .tab-settings & > h3 {
     background: linear-gradient(to right, var(--fill-1), transparent);
     border-top: $sectionBorder;
     line-height: 2;
@@ -109,6 +109,13 @@ textarea:not([rows="1"]):not(.h100) {
   padding: $tabPadTopY $tabPadX 0;
   // overflow-y: auto;
   background: var(--bg);
+}
+.tab-settings, .edit-settings {
+  .icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--fg);
+  }
 }
 
 .vl-modal {
