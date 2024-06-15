@@ -92,4 +92,5 @@ export default {
   valueEditor: defaultsValueEditor,
   /** @type {'' | 'dark' | 'light'} */
   uiTheme: '',
+  allowGmXhrResponseCookies: false,
 };

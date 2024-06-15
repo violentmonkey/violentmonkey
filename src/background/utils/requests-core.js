@@ -1,5 +1,6 @@
 import { buffer2string, getUniqId, isEmpty, noop } from '@/common';
 import { forEachEntry } from '@/common/object';
+import { getOption } from './options';
 import { CHROME } from './ua';
 
 let encoder;
@@ -64,7 +65,14 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId }) {
   if (req) {
     // Populate responseHeaders for GM_xhr's `response`
     req[kResponseHeaders] = headers.map(encodeWebRequestHeader).join('');
-    return { [kResponseHeaders]: headers.filter(isntSetCookie) };
+
+    // Filter out response cookies unless the user has explicitly allowed them
+    let filteredHeaders = headers;
+    if (!getOption('allowGmXhrResponseCookies')) {
+      filteredHeaders = headers.filter(isntSetCookie);
+    }
+
+    return { [kResponseHeaders]: filteredHeaders };
   }
 }
 

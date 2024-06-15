@@ -133,6 +133,7 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
+        <setting-check name="allowGmXhrResponseCookies" :label="i18n('labelAllowGmXhrResponseCookies')"/>
       </section>
 
       <vm-editor />

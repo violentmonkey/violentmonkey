@@ -324,6 +324,9 @@ labelAbout:
 labelAdvanced:
   description: Label for button to show advanced settings.
   message: Advanced
+labelAllowGmXhrResponseCookies:
+  description: Option to allow GM.xhr responses to set browser cookies
+  message: 'Allow GM.xhr responses to set browser cookies'
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Allow update
