@@ -5,7 +5,7 @@ import { deepEqual, forEachEntry, forEachValue, objectPick } from '@/common/obje
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import {
-    FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify, kCookie, kSetCookie,
+  FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify, kCookie, kSetCookie,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 import { FIREFOX, navUA, navUAD } from './ua';
@@ -227,7 +227,7 @@ async function httpRequest(opts, events, src, cb) {
   // Both Chrome & FF need explicit routing of cookies in containers or incognito
   const shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
   const uaHeaders = [];
-  if (shouldSendCookies || anonymous) req[kCookie] = '';
+  req[kCookie] = !anonymous && !shouldSendCookies;
   req[kSetCookie] = !anonymous;
   xhr.open(opts.method || 'GET', url, true, opts.user || '', opts.password || '');
   xhr.setRequestHeader(VM_VERIFY, id);

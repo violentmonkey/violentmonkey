@@ -96,23 +96,23 @@ function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
     req.url = url; // remember redirected URL with #hash as it's stripped in XHR.responseURL
     const headersMap = {};
     const headers2 = headersToInject[reqId];
+    const combinedHeaders = headers2 && {};
     let name;
     let h2 = !headers2;
     for (const h of headers) {
       if ((name = h.name) === VM_VERIFY
       || (name = name.toLowerCase()) === 'origin' && h.value === extensionOrigin
-      || name === kCookie && kCookie in req) {
+      || name === kCookie && !req[kCookie]) {
         continue;
       }
       if (!h2 && name === kCookie && (h2 = headers2[name])) {
-        // combining with the original value of the custom header
-        h2.value = h.value + '; ' + (req[name] || (req[name] = h2.value));
+        combinedHeaders[name] = { name, value: h.value + '; ' + h2.value };
       } else {
         headersMap[name] = h;
       }
     }
     return {
-      [kRequestHeaders]: Object.values(Object.assign(headersMap, headers2))
+      [kRequestHeaders]: Object.values(Object.assign(headersMap, headers2, combinedHeaders))
     };
   }
 }
