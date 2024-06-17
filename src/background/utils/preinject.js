@@ -14,6 +14,7 @@ import { clearNotifications } from './notifications';
 import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
+import { kSetCookie } from './requests-core';
 import {
   S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE,
   S_VALUE_PRE,
@@ -361,7 +362,7 @@ function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, [kFrameId]: frame
     JSON.stringify(bag[INJECT]),
   ]));
   responseHeaders.push({
-    name: 'Set-Cookie',
+    name: kSetCookie,
     value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, 60e3, blobUrl);

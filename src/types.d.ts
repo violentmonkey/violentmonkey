@@ -30,13 +30,16 @@ declare namespace GMReq {
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
+    /** if present, overwrites browser's `cookie` header */
+    cookie?: string;
+    /** allow Set-Cookie header to affect browser */
+    'set-cookie'?: boolean;
     coreId: number;
     /** Firefox-only workaround for CSP blocking a blob: URL */
     fileName: string;
     frame: VMMessageTargetFrame;
     frameId: number;
     id: string;
-    noNativeCookie: boolean;
     responseHeaders: string;
     storeId: string;
     tabId: number;
