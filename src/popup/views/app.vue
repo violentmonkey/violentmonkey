@@ -544,7 +544,7 @@ onMounted(() => {
   const style = $el.style;
   // Chrome bug: the popup's initial devicePixelRatio equals zoom level of a normal extension page
   const ratio = !IS_FIREFOX && devicePixelRatio;
-  if (ratio !== 1) {
+  if (ratio && ratio !== 1) {
     self.onresize = () => {
       if (ratio !== devicePixelRatio) {
         style.maxHeight = parseInt(style.maxHeight) * ratio + 'px';
