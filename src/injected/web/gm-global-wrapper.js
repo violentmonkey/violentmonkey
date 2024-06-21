@@ -61,7 +61,8 @@ const globalKeys = (function makeGlobalKeys() {
 }());
 const inheritedDesc = createNullObj();
 
-const isChildWindowKey = key => (key = +key) >= 0 /* is number */
+const isChildWindowKey = key => isString(key) /* skipping Symbol as it throws on conversion */
+  && (key = +key) >= 0 /* is number */
   && (key === (key | 0)) /* is 32-bit integer, no fraction */
   && key < window::getWindowLength();
 
@@ -183,7 +184,7 @@ function proxyDescribe(local, name, wrapper, events, returnAsValue) {
     get = false;
     delete desc.get;
     delete desc.set;
-  } else if (get && set && typeof name === 'string'
+  } else if (get && set && isString(name)
     // Spoofed String index getters won't be called within length, length itself is unforgeable
     && name.length >= 3 && name[0] === 'o' && name[1] === 'n'
   ) {
