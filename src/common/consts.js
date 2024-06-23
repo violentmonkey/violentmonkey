@@ -37,3 +37,5 @@ export const KNOWN_INJECT_INTO = {
 export const NO_CACHE = { cache: 'no-cache' };
 export const __CODE = /*@__PURE__*/Symbol('code'); // not enumerable and stripped when serializing
 export const UA_PROPS = ['userAgent', 'brands', 'mobile', 'platform'];
+export const TL_AWAIT = 'topLevelAwait';
+export const UNWRAP = 'unwrap';

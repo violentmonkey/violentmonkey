@@ -211,6 +211,7 @@ declare namespace VMScript {
     resources: StringMap;
     runAt?: VMScriptRunAt;
     supportURL?: string;
+    topLevelAwait?: boolean;
     unwrap?: boolean;
     version?: string;
   }

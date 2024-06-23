@@ -1,6 +1,6 @@
 import { getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
 import {
-  __CODE,
+  __CODE, TL_AWAIT, UNWRAP,
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
@@ -73,7 +73,6 @@ const META_KEYS_TO_ENSURE_FROM = [
 const META_KEYS_TO_PLURALIZE_RE = /^(?:(m|excludeM)atch|(ex|in)clude)$/;
 const pluralizeMetaKey = (s, consonant) => s + (consonant ? 'es' : 's');
 const pluralizeMeta = key => key.replace(META_KEYS_TO_PLURALIZE_RE, pluralizeMetaKey);
-const UNWRAP = 'unwrap';
 const propsToClear = {
   [S_CACHE_PRE]: CACHE_KEYS,
   [S_CODE_PRE]: true,
@@ -457,7 +456,9 @@ function prepareScript(script, env) {
   const displayName = getScriptName(script);
   const pathMap = custom.pathMap || {};
   const wrap = !meta[UNWRAP];
-  const { grant } = meta;
+  const wrapTryCatch = wrap && IS_FIREFOX; // FF doesn't show errors in content script's console
+  const { grant, [TL_AWAIT]: topLevelAwait } = meta;
+  const startIIFE = topLevelAwait ? 'await(async' : '(';
   const numGrants = grant.length;
   const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
   // Storing slices separately to reuse JS-internalized strings for code in our storage cache
@@ -477,13 +478,16 @@ function prepareScript(script, env) {
   }
   if (wrap) {
     // TODO: push winKey/dataKey as separate chunks so we can change them for each injection?
-    injectedCode.push(`window.${winKey}=function ${dataKey}(`
+    injectedCode.push('window.', winKey, '=',
+      wrapTryCatch && topLevelAwait ? 'async ' : '',
+      'function ', dataKey, '(',
       // using a shadowed name to avoid scope pollution
-      + (grantNone ? GRANT_NONE_VARS : 'GM')
-      + (IS_FIREFOX ? `,${dataKey}){try{` : '){')
-      + (grantNone ? '' : 'with(this)with(c)delete c,')
+      grantNone ? GRANT_NONE_VARS : 'GM',
+      wrapTryCatch ? `,${dataKey}){try{` : '){',
+      grantNone ? '' : 'with(this)with(c)delete c,',
+      !topLevelAwait ? '(' : wrapTryCatch ? startIIFE : '(async',
       // hiding module interface from @require'd scripts so they don't mistakenly use it
-      + '((define,module,exports)=>{');
+      '(define,module,exports)=>{');
   }
   for (const url of meta[S_REQUIRE]) {
     const req = require[pathMap[url] || url];
@@ -494,17 +498,19 @@ function prepareScript(script, env) {
   }
   // adding a nested IIFE to support 'use strict' in the code when there are @requires
   if (hasReqs && wrap) {
-    injectedCode.push('(()=>{');
+    injectedCode.push(startIIFE, '()=>{');
   }
   codeIndex = injectedCode.length;
   injectedCode.push(code);
   // adding a new line in case the code ends with a line comment
-  injectedCode.push((!NEWLINE_END_RE.test(code) ? '\n' : '')
-    + (hasReqs && wrap ? '})()' : '')
-    + (wrap ? `})()${IS_FIREFOX ? `}catch(e){${dataKey}(e)}` : ''}}` : '')
+  injectedCode.push(...[
+    !NEWLINE_END_RE.test(code) ? '\n' : '',
+    hasReqs && wrap ? '})()' : '',
+    wrapTryCatch ? `})()}catch(e){${dataKey}(e)}}` : wrap ? `})()}` : '',
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
-    + (IS_FIREFOX ? ';0' : '')
-    + `\n//# sourceURL=${getScriptPrettyUrl(script, displayName)}`);
+    IS_FIREFOX ? ';0' : '',
+    '\n//# sourceURL=', getScriptPrettyUrl(script, displayName),
+  ].filter(Boolean));
   return {
     code: '',
     displayName,

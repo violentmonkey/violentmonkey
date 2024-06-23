@@ -2,7 +2,7 @@ import {
   encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, noop,
 } from '@/common';
 import {
-  __CODE,
+  __CODE, TL_AWAIT, UNWRAP,
   HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
 } from '@/common/consts';
 import { formatDate } from '@/common/date';
@@ -65,7 +65,8 @@ const metaOptionalTypes = {
   compatible: arrayType,
   connect: arrayType,
   noframes: booleanType,
-  unwrap: booleanType,
+  [TL_AWAIT]: booleanType,
+  [UNWRAP]: booleanType,
 };
 export function parseMeta(code, includeMatchedString) {
   // initialize meta
