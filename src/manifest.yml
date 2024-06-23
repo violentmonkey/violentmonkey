@@ -50,6 +50,10 @@ commands:
     description: __MSG_menuNewScript__
   SkipScripts:
     description: __MSG_skipScripts__
+  updateScripts:
+    description: __MSG_updateScriptsAll__
+  updateScriptsInTab:
+    description: __MSG_updateScriptsInTab__
 
 minimum_chrome_version: '61.0'
 # 61: URLSearchParams(obj)

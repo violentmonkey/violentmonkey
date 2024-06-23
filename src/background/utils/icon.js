@@ -40,6 +40,7 @@ const browserAction = (() => {
 // Promisifying explicitly because this API returns an id in Firefox and not a Promise
 const contextMenus = chrome.contextMenus;
 
+/** @type {{ [tabId: string]: VMBadgeData }}*/
 export const badges = {};
 const KEY_SHOW_BADGE = 'showBadge';
 const KEY_BADGE_COLOR = 'badgeColor';
@@ -120,13 +121,7 @@ init.then(async () => {
 });
 
 contextMenus?.onClicked.addListener(({ menuItemId: id }, tab) => {
-  if (id === SKIP_SCRIPTS) {
-    commands[SKIP_SCRIPTS](tab);
-  } else if (id === TAB_SETTINGS) {
-    openDashboard(id);
-  } else if (id.startsWith(KEY_SHOW_BADGE)) {
-    setOption(KEY_SHOW_BADGE, id.slice(KEY_SHOW_BADGE.length + 1));
-  }
+  handleHotkeyOrMenu(id, tab);
 });
 tabsOnRemoved.addListener(id => delete badges[id]);
 tabsOnUpdated.addListener((tabId, { url }, tab) => {
@@ -138,22 +133,13 @@ tabsOnUpdated.addListener((tabId, { url }, tab) => {
 
 function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js
+  /** @type {VMBadgeData} */
   const data = nest(badges, tabId);
   data.icon = iconDefault;
   data.total = 0;
   data.unique = 0;
-  /** all ids */
   data[IDS] = new Set();
-  /** [frame id] = number of scripts */
   data[kFrameId] = undefined;
-  /**
-   * undefined = after VM started (unknown injectability),
-   * null = after tab navigated (unknown injectability),
-   * false = without scripts,
-   * true = with some scripts,
-   * 'SkipScripts' = skip scripts mode,
-   * 'off' = loaded when isApplied was off
-   */
   data[INJECT] = isInjected;
   // Notify popup about non-injectable tab
   if (!isInjected) popupTabs[tabId]?.postMessage(null);
@@ -168,6 +154,7 @@ function resetBadgeData(tabId, isInjected) {
 export function setBadge(ids, reset, { tab, [kFrameId]: frameId, [kTop]: isTop }) {
   const tabId = tab.id;
   const injectable = ids === SKIP_SCRIPTS || ids === 'off' ? ids : !!ids;
+  /** @type {VMBadgeData} */
   const data = !(reset && isTop) && badges[tabId] || resetBadgeData(tabId, injectable);
   if (Array.isArray(ids)) {
     const {
@@ -247,6 +234,25 @@ export function getFailureReason(url, data, def = titleDefault) {
           : data[INJECT] === SKIP_SCRIPTS
             ? [titleSkipped, SKIP_SCRIPTS]
             : [def];
+}
+
+export function handleHotkeyOrMenu(id, tab) {
+  if (id === SKIP_SCRIPTS) {
+    commands[SKIP_SCRIPTS](tab);
+  } else if (id === TAB_SETTINGS) {
+    openDashboard(id);
+  } else if (id === 'dashboard') {
+    openDashboard('');
+  } else if (id === 'newScript') {
+    commands.OpenEditor();
+  } else if (id === 'updateScripts') {
+    commands.CheckUpdate();
+  } else if (id === 'updateScriptsInTab') {
+    id = badges[tab.id]?.[IDS];
+    if (id) commands.CheckUpdate([...id]);
+  } else if (id.startsWith(KEY_SHOW_BADGE)) {
+    setOption(KEY_SHOW_BADGE, id.slice(KEY_SHOW_BADGE.length + 1));
+  }
 }
 
 async function loadIcon(url) {

@@ -1000,6 +1000,9 @@ updateScript:
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Update all scripts
+updateScriptsInTab:
+  description: Command/button to update scripts that run in current tab.
+  message: Update current tab's scripts
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)

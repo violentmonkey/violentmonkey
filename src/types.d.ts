@@ -130,6 +130,25 @@ declare type VMBridgePostFunc = (
 
 declare type VMBadgeMode = 'unique' | 'total' | ''
 
+declare type VMBadgeData = {
+  /** Map: frameId -> number of scripts in this frame */
+  frameIds: { [frameId: string]: number };
+  icon: string;
+  /** all ids */
+  ids: Set<number>;
+  /**
+   * undefined = after VM started (unknown injectability),
+   * null = after tab navigated (unknown injectability),
+   * false = without scripts,
+   * true = with some scripts,
+   * 'SkipScripts' = skip scripts mode,
+   * 'off' = loaded when isApplied was off
+   */
+  inject: boolean | string;
+  total: number;
+  unique: number;
+}
+
 /**
  * Internal script representation
  */

@@ -1,11 +1,10 @@
 import '@/common/browser';
-import { makePause } from '@/common';
+import { getActiveTab, makePause } from '@/common';
 import { deepCopy } from '@/common/object';
+import { handleHotkeyOrMenu } from './utils/icon';
 import { addPublicCommands, commands, init } from './utils';
 import './sync';
 import './utils/clipboard';
-import './utils/hotkeys';
-import './utils/icon';
 import './utils/notifications';
 import './utils/preinject';
 import './utils/script';
@@ -68,3 +67,6 @@ async function handleCommandMessageAsync(func, data, src) {
 global.handleCommandMessage = handleCommandMessage;
 global.deepCopy = deepCopy;
 browser.runtime.onMessage.addListener(handleCommandMessage);
+browser.commands?.onCommand.addListener(async cmd => {
+  handleHotkeyOrMenu(cmd, await getActiveTab());
+});
