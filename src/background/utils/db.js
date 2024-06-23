@@ -3,7 +3,7 @@ import {
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
 } from '@/common';
-import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK } from '@/common/consts';
+import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
@@ -146,6 +146,7 @@ addOwnCommands({
       } = script;
       if (!meta.require) meta.require = [];
       if (!meta.resources) meta.resources = {};
+      if (TL_AWAIT in meta) meta[TL_AWAIT] = true; // a string if the script was saved in old VM
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
     }
   });
