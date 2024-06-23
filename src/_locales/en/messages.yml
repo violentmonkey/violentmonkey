@@ -994,6 +994,12 @@ updateListedCmd:
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
   message: Update scripts ($1)
+updateScript:
+  description: Button to update one script.
+  message: Update
+updateScriptsAll:
+  description: Command/button to update all scripts.
+  message: Update all scripts
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)

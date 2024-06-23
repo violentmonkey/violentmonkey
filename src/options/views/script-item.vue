@@ -90,7 +90,7 @@
           </tooltip>
           <tooltip
             :disabled="!script.$canUpdate || script.checking"
-            :content="i18n('buttonCheckForUpdates')"
+            :content="i18n('updateScript')"
             align="start">
             <a
               class="btn-ghost"

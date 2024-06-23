@@ -30,7 +30,7 @@
                 />
               </template>
             </Dropdown>
-            <Tooltip :content="i18n('buttonUpdateAll')" placement="bottom" align="start">
+            <Tooltip :content="i18n('updateScriptsAll')" placement="bottom" align="start">
               <a class="btn-ghost" tabindex="0" @click="handleActionUpdate(null, $event.target)">
                 <Icon name="refresh" />
               </a>
