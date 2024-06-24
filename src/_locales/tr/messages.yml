@@ -7,6 +7,7 @@ buttonCancel:
 buttonCheckForUpdates:
   description: Button to check a script for updates.
   message: Güncellemeleri denetle
+  touched: false
 buttonClose:
   description: Button to close window.
   message: Kapat
@@ -110,6 +111,7 @@ buttonUpdate:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Güncellemeleri denetle
+  touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Verileri al
@@ -971,6 +973,16 @@ updateListedCmd:
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
   message: Betikleri güncelle ($1)
+updateScript:
+  description: Button to update one script.
+  message: Güncelle
+updateScriptsAll:
+  description: Command/button to update all scripts.
+  message: ''
+updateScriptsInTab:
+  description: Command/button to update scripts that run in current tab.
+  message: ''
+  touched: false
 valueLabelKey:
   description: Label for key of a script value.
   message: Anahtar (metin)

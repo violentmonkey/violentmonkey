@@ -7,6 +7,7 @@ buttonCancel:
 buttonCheckForUpdates:
   description: Button to check a script for updates.
   message: Auf Aktualisierungen prüfen
+  touched: false
 buttonClose:
   description: Button to close window.
   message: Schließen
@@ -108,6 +109,7 @@ buttonUpdate:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Alle auf Aktualisierungen prüfen
+  touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Datenbank säubern
@@ -1024,6 +1026,16 @@ updateListedCmd:
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
   message: Skript(e) aktualisieren ($1)
+updateScript:
+  description: Button to update one script.
+  message: Aktualisierung
+updateScriptsAll:
+  description: Command/button to update all scripts.
+  message: Alle Skripte aktualisieren
+updateScriptsInTab:
+  description: Command/button to update scripts that run in current tab.
+  message: Skripte des aktuellen Tabs aktualisieren
+  touched: false
 valueLabelKey:
   description: Label for key of a script value.
   message: Schlüssel (String)

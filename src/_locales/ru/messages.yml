@@ -7,6 +7,7 @@ buttonCancel:
 buttonCheckForUpdates:
   description: Button to check a script for updates.
   message: Проверить обновления
+  touched: false
 buttonClose:
   description: Button to close window.
   message: Закрыть
@@ -108,6 +109,7 @@ buttonUpdate:
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: Проверить обновления скриптов
+  touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Сбросить кэш
@@ -1008,6 +1010,16 @@ updateListedCmd:
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
   message: Обновить скрипты ($1)
+updateScript:
+  description: Button to update one script.
+  message: Обновить
+updateScriptsAll:
+  description: Command/button to update all scripts.
+  message: Обновить все скрипты
+updateScriptsInTab:
+  description: Command/button to update scripts that run in current tab.
+  message: Обновить скрипты текущей вкладки
+  touched: false
 valueLabelKey:
   description: Label for key of a script value.
   message: Ключ (строка)
