@@ -195,6 +195,10 @@ function extract(options) {
     .catch(cb);
   }
 
+  if (options.manifest) {
+    const mf = require('fs').readFileSync(options.manifest, 'utf8');
+    extractFile(mf, 'json');
+  }
   return through.obj(bufferContents, endStream);
 }
 

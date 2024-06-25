@@ -1035,7 +1035,6 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Skripte des aktuellen Tabs aktualisieren
-  touched: false
 valueLabelKey:
   description: Label for key of a script value.
   message: Schlüssel (String)

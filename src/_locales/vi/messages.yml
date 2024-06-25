@@ -973,7 +973,6 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: ''
-  touched: false
 valueLabelKey:
   description: Label for key of a script value.
   message: Khóa (chuỗi)

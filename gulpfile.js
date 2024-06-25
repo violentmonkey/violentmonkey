@@ -148,6 +148,7 @@ function updateI18n() {
   .pipe(plumber(logError))
   .pipe(i18n.extract({
     base: 'src/_locales',
+    manifest: 'src/manifest.yml',
     touchedOnly: false,
     useDefaultLang: false,
     markUntouched: true,

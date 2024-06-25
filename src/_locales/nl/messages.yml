@@ -1016,7 +1016,6 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Scripts van huidig tabblad bijwerken
-  touched: false
 valueLabelKey:
   description: Label for key of a script value.
   message: Sleutel (tekenreeks)
