@@ -173,7 +173,10 @@ function batch(state) {
 async function updateScriptSizeContributor(key, val) {
   const area = sizesPrefixRe.exec(key);
   if (area && area[0] !== S_SCRIPT_PRE) {
-    scriptSizes[key] = deepSize(val);
+    const size = scriptSizes[key] = deepSize(val);
+    if (size === 2 && area[0] === S_VALUE_PRE) {
+      scriptSizes[key] = 0; // don't count an empty {}
+    }
   }
 }
 

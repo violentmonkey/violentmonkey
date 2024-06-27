@@ -20,7 +20,7 @@
         </span>
       </div>
       <div class="edit-values-table main"
-         :style="{ '--keyW': pageKeys.width + 'ch' }"
+         :style="pageKeys.style"
            @keydown.down.exact="onUpDown"
            @keydown.up.exact="onUpDown">
         <a
@@ -43,10 +43,12 @@
           </div>
         </div>
       </div>
+      <div class="edit-values-empty mt-1" v-if="!loading && !keys.length" v-text="i18n('noValues')"/>
       <h3 v-text="i18n('headerRecycleBin')" v-if="trash"/>
       <div class="edit-values-table trash monospace-font"
            @keydown.down.exact="onUpDown"
            @keydown.up.exact="onUpDown"
+           :style="trashKeyWidthStyle"
            v-if="trash">
         <!-- eslint-disable-next-line vue/no-unused-vars -->
         <div v-for="({ key, cut, len }, trashKey) in trash" :key="trashKey"
@@ -57,7 +59,6 @@
           <pre v-text="len"/>
         </div>
       </div>
-      <div class="edit-values-empty mt-1" v-if="!loading && !keys.length" v-text="i18n('noValues')"/>
     </div>
     <div class="edit-values-panel flex flex-col flex-1 mb-1c" v-if="current">
       <div class="control">
@@ -133,6 +134,9 @@ const loading = ref(true);
 const page = ref();
 const values = ref();
 const trash = ref();
+const trashKeyWidthStyle = computed(() => (
+  updateKeyWidthStyle(Object.values(trash.value), 'key')
+));
 
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
@@ -158,9 +162,7 @@ const totalPages = computed(() => Math.ceil(keys.value.length / PAGE_SIZE));
 const pageKeys = computed(() => {
   const offset = PAGE_SIZE * (page.value - 1);
   const res = keys.value.slice(offset, offset + PAGE_SIZE);
-  for (let i = 0, max = 0; i < res.length; i++ ) {
-    res.width = max = Math.max(max, res[i].length);
-  }
+  res.style = updateKeyWidthStyle(res);
   return res;
 });
 
@@ -286,6 +288,7 @@ function setData(data, isSave) {
         changed = true;
       }
     });
+    changed ??= true; // empty oldData
   } else {
     changed = !deepEqual(oldData, data);
   }
@@ -302,6 +305,12 @@ function calcSize() {
   const res = keys.value.reduce((sum, key) => sum
     + key.length + 4 + values.value[key].length + 2, 0);
   $cache[kStorageSize] = res ? res + 2 : res; // {}
+}
+
+function updateKeyWidthStyle(items, propName) {
+  let max = 0;
+  for (const item of items) max = Math.max(max, (propName ? item[propName] : item).length);
+  return { '--keyW': `${max}ch` };
 }
 async function updateValue({
   key,
@@ -526,6 +535,7 @@ $lightBorder: 1px solid var(--fill-2);
   }
   &-table {
     overflow-y: auto;
+    min-height: 2.5em;
   }
   &-panel {
     .control {
