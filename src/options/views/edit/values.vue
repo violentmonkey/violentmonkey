@@ -317,7 +317,9 @@ async function updateValue({
   jsonValue,
   rawValue = dumpScriptValue(jsonValue) || '',
 }, isSave) {
-  if (isSave) addToTrash(key);
+  if (isSave && keys.value.includes(key)) {
+    addToTrash(key);
+  }
   const { id } = props.script.props;
   await sendCmdDirectly('UpdateValue', { [id]: { [key]: rawValue } }, undefined, sender);
   if (rawValue) {
@@ -336,12 +338,17 @@ function onNew() {
     ...currentObservables,
   };
 }
-function addToTrash(key) {
+function addToTrash(
+  key,
+  rawValue = values.value[key],
+  cut = getValue(key, true),
+  len = getLength(key, rawValue),
+) {
   (trash.value || (trash.value = {}))[key + Math.random()] = {
     key,
-    rawValue: values.value[key],
-    cut: getValue(key, true),
-    len: getLength(key),
+    rawValue,
+    cut,
+    len,
   };
 }
 function onRemove(key) {
@@ -404,15 +411,9 @@ async function onSave(buttonIndex) {
 function onCancel() {
   const cur = current.value;
   if (cur.dirty) {
-    const key = `${cur.key} ${Math.random() * 1e9 | 0}`;
-    const val = cm.getValue();
-    const rawValue = dumpScriptValue(val);
-    (trash.value || (trash.value = {}))[key] = {
-      key,
-      rawValue,
-      cut: cutLength(val),
-      len: getLength(key, rawValue),
-    };
+    const str = cm.getValue().trim();
+    const {jsonValue = str} = cur;
+    addToTrash(cur.key, dumpScriptValue(jsonValue), cutLength(str));
   }
   current.value = null;
 }
