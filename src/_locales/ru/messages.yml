@@ -453,7 +453,7 @@ labelHomepage:
   message: Домашняя страница
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'URL-адрес домашней страницы:'
+  message: 'Адрес домашней страницы:'
 labelIconURL:
   description: Label for the input.
   message: Адрес значка

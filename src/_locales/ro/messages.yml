@@ -240,7 +240,9 @@ failureReasonNoninjectable:
     via politici, un site al unui motor de căutare în Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey a fost repornit. Te rugăm să reîncarci fila pentru a rula
+    userscripturi.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -289,7 +291,9 @@ genericUseGlobal:
   message: folosește setarea globală
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Tiparele „#” funcționează numai atunci când deschizi inițial site-ul sau
+    reîncarci fila: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Coș de reciclare
@@ -461,7 +465,7 @@ labelHomepageURL:
   message: 'URL pentru pagina de start:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: URL-ul pictogramei
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importă datele scripturilor
@@ -841,7 +845,13 @@ msgSyntaxError:
   message: Eroare de sintaxă?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Scriptul nu a existat sau nu a coincis cu URL-ul la încărcarea paginii, ceea
+    ce se întâmplă în cazul site-urilor cu aplicație într-o singură pagină, cum
+    ar fi fb sau instagram, care folosesc navigarea falsă. Poți reîncărca fila
+    pentru a rula scriptul. Pentru a repara scriptul, folosește @match pentru
+    întregul site și apoi detectează modificările folosind MutationObserver sau
+    API-ul window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script actualizat.
@@ -1011,10 +1021,10 @@ updateListedCmd:
   message: Actualizează scripturile ($1)
 updateScript:
   description: Button to update one script.
-  message: Actualizare
+  message: Actualizează
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Actualizează toate scripturile
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: ''
