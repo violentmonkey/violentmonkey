@@ -1,24 +1,32 @@
 <template>
   <div class="edit-values flex" ref="$el" :data-editing="current && ''">
     <div class="flex-1 flex flex-col">
-      <div class="mb-1">
-        <button @click="onNew" v-if="!readOnly">+</button>
-        <div class="inline-block ml-2" v-if="totalPages > 1">
-          <button :disabled="page === 1" @click="page -= 1">&larr;</button>
-          <span class="ml-1" v-text="page"/> / <span class="mr-1" v-text="totalPages"/>
-          <button :disabled="page >= totalPages" @click="page += 1">&rarr;</button>
-        </div>
-        <span class="ml-2 mr-2c">
-          <span>
-            <template v-if="totalPages > 1">
-              <kbd>PageUp</kbd>, <kbd>PageDown</kbd>,
-            </template>
-            <kbd>↑</kbd>, <kbd>↓</kbd>, <kbd>Tab</kbd>, <kbd>Shift-Tab</kbd>,
-          </span>
-          <span><kbd>Enter</kbd>: {{i18n('buttonEdit')}},</span>
-          <span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span>
-        </span>
-      </div>
+      <nav class="mb-1 flex center-items">
+        <a @click="onNew" v-if="!readOnly" class="btn-ghost" tabindex="0">
+          <Icon name="plus"/>
+        </a>
+        <template v-if="totalPages > 1">
+          <a @click="flipPage(-1)" class="btn-ghost" tabindex="0"
+             :class="{ subtle: page === 1 }">⏴</a>
+          <input v-model="page" type="number" @wheel="flipPage($event.deltaY > 0 ? 1 : -1)">
+          <span v-text="`\xA0/\xA0${totalPages}`"/>
+          <a @click="flipPage(1)" class="btn-ghost" tabindex="0"
+             :class="{ subtle: page >= totalPages }">⏵</a>
+        </template>
+        <Dropdown>
+          <a class="btn-ghost" tabindex="0">
+            <Icon name="info"/>
+          </a>
+          <template #content>
+            <ul>
+              <li><kbd>PageUp</kbd>, <kbd>PageDown</kbd></li>
+              <li><kbd>↑</kbd>, <kbd>↓</kbd>, <kbd>Tab</kbd>, <kbd>Shift-Tab</kbd></li>
+              <li><span><kbd>Enter</kbd>: {{i18n('buttonEdit')}},</span></li>
+              <li v-if="!readOnly"><span><kbd>Ctrl-Del</kbd>: {{i18n('buttonRemove')}}</span></li>
+            </ul>
+          </template>
+        </Dropdown>
+      </nav>
       <div class="edit-values-table main"
          :style="pageKeys.style"
            @keydown.down.exact="onUpDown"
@@ -38,7 +46,7 @@
           </div>
           <div class="ellipsis flex-auto" v-text="getValue(key, true)"></div>
           <pre v-text="getLength(key)"/>
-          <div class="del" @click.stop="onRemove(key)">
+          <div class="del" @click.stop="onRemove(key)" v-if="!readOnly">
             <icon name="trash"/>
           </div>
         </div>
@@ -112,6 +120,7 @@ import { handleTabNavigation, keyboardService } from '@/common/keyboard';
 import { deepCopy, deepEqual, forEachEntry, mapEntry } from '@/common/object';
 import { WATCH_STORAGE } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
+import Dropdown from 'vueleton/lib/dropdown';
 import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import { getActiveElement, showMessage } from '@/common/ui';
@@ -352,6 +361,7 @@ function addToTrash(
   };
 }
 function onRemove(key) {
+  if (props.readOnly) return;
   updateValue({ key });
   addToTrash(key);
   if (current.value?.key === key) {
@@ -484,6 +494,24 @@ $lightBorder: 1px solid var(--fill-2);
           display: none;
         }
       }
+    }
+  }
+  nav {
+    a.btn-ghost {
+      font-size: 1.3rem;
+    }
+    input {
+      padding: 0 1ex;
+      max-width: 5ch;
+      field-sizing: content;
+      -moz-appearance: textfield;
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+      }
+    }
+    ul {
+      width: max-content;
     }
   }
   &-row {
