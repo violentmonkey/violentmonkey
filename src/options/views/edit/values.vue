@@ -92,6 +92,7 @@
         <input type="text" v-model="current.key" :readOnly="!current.isNew || readOnly"
                ref="$key"
                spellcheck="false"
+               @keydown="onKeyDownInKeyInput"
                @keydown.esc.exact.stop="onCancel">
       </label>
       <label>
@@ -120,12 +121,13 @@ import { handleTabNavigation, keyboardService } from '@/common/keyboard';
 import { deepCopy, deepEqual, forEachEntry, mapEntry } from '@/common/object';
 import { WATCH_STORAGE } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
+import CodeMirror from 'codemirror';
 import Dropdown from 'vueleton/lib/dropdown';
 import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import { getActiveElement, showMessage } from '@/common/ui';
 import SettingText from '@/common/ui/setting-text';
-import { kStorageSize, toggleBoolean } from '../../utils';
+import { K_SAVE, kStorageSize, toggleBoolean } from '../../utils';
 
 const props = defineProps({
   /** @type {VMScript} */
@@ -445,6 +447,11 @@ function onChange(isChanged) {
     cur.jsonValue = undefined;
   }
   cur.jsonPaused = performance.now() - t0 > MAX_JSON_DURATION;
+}
+function onKeyDownInKeyInput(evt) {
+  if (CodeMirror.keyName(evt) === K_SAVE) {
+    onSave();
+  }
 }
 function onStorageChanged(changes) {
   const data = Object.values(changes)[0].newValue;

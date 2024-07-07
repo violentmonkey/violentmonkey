@@ -101,8 +101,8 @@ import { keyboardService } from '@/common/keyboard';
 import options from '@/common/options';
 import { getUnloadSentry } from '@/common/router';
 import {
-  kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
-  kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL,
+  kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude, kOrigExcludeMatch,
+  kOrigInclude, kOrigMatch, kUpdateURL,
 } from '../../utils';
 
 const urlMatching = 'https://violentmonkey.github.io/api/matching/';
@@ -157,7 +157,7 @@ import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch }
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
 import LocaleGroup from '@/common/ui/locale-group';
-import { kStorageSize, store } from '../../utils';
+import { inferSaveHotKey, K_SAVE, kStorageSize, store } from '../../utils';
 import VmSettings from './settings';
 import VMSettingsUpdate from './settings-update';
 import VmValues from './values';
@@ -166,7 +166,6 @@ import VmHelp from './help';
 let CM;
 let $codeComp;
 let disposeList;
-let K_SAVE; // deduced from the current CodeMirror keymap
 let savedCopy;
 let shouldSavePositionOnSave;
 let toggleUnloadSentry;
@@ -269,11 +268,7 @@ onMounted(() => {
     ...Object.entries($codeComp.expandKeyMap())
     .sort((a, b) => compareString(a[1], b[1]) || compareString(a[0], b[0])),
   ];
-  K_SAVE = hk.find(([, cmd]) => cmd === 'save')?.[0];
-  if (!K_SAVE) {
-    K_SAVE = 'Ctrl-S';
-    hk.unshift([K_SAVE, 'save']);
-  }
+  if (!K_SAVE) inferSaveHotKey(hk);
 });
 
 onActivated(() => {

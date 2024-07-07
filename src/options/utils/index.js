@@ -34,6 +34,16 @@ export const kOrigMatch = 'origMatch';
 export const kStorageSize = 'storageSize';
 export const kUpdateURL = 'updateURL';
 
+export let K_SAVE; // deduced from the current CodeMirror keymap
+
+export function inferSaveHotKey(hotkeys) {
+  K_SAVE = hotkeys.find(([, cmd]) => cmd === 'save')?.[0];
+  if (!K_SAVE) {
+    K_SAVE = 'Ctrl-S';
+    hotkeys.unshift([K_SAVE, 'save']);
+  }
+}
+
 export function markRemove(script, removed) {
   return sendCmdDirectly('MarkRemoved', {
     id: script.props.id,
