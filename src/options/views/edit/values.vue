@@ -105,6 +105,7 @@
           mode="application/json"
           :readOnly="readOnly"
           @code-dirty="onChange"
+          @keydown.tab.shift.exact.capture.stop
           :commands="{ close: onCancel, save: onSave }"
           :active="isActive"
           focusme
