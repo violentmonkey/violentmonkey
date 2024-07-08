@@ -1008,10 +1008,10 @@ updateScript:
   message: Aktualizuj
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Zaktualizuj wszystkie skrypty
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Zaktualizuj skrypty bieżącej karty
 valueLabelKey:
   description: Label for key of a script value.
   message: Klucz (string)
