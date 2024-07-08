@@ -277,7 +277,7 @@ helpForLocalFile:
   message: パソコン内のスクリプトをドラッグ＆ドロップするための説明を表示
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: $1 個の一致したスクリプトに対して
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URLを入力:'
@@ -431,7 +431,7 @@ labelHomepageURL:
   message: 'ホームページのURL:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: アイコンのURL
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: スクリプトデータのインポート
@@ -962,10 +962,10 @@ updateScript:
   message: 更新
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: すべてのスクリプトを更新
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: 現在のタブのスクリプトを更新
 valueLabelKey:
   description: Label for key of a script value.
   message: キー (文字列)
