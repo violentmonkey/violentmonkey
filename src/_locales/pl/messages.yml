@@ -285,7 +285,9 @@ genericUseGlobal:
   message: użyj globalnych ustawień
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    "#" wzorce działają tylko przy pierwszym otwarciu witryny lub ponownym
+    załadowaniu karty: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Kosz
