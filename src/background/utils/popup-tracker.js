@@ -82,12 +82,10 @@ function onPopupOpened(port) {
   if (cmd !== 'Popup') return;
   if (!cached) notifyTab(+tabId, true);
   popupTabs[tabId] = port;
-  port.onDisconnect.addListener(onPopupClosed);
-}
-
-function onPopupClosed({ name }) {
-  delete popupTabs[name];
-  notifyTab(+name, false);
+  port.onDisconnect.addListener(() => {
+    delete popupTabs[tabId];
+    notifyTab(+tabId, false);
+  });
 }
 
 async function prefetchSetPopup() {
