@@ -28,6 +28,7 @@ export function makeGmApiWrapper(script) {
     resCache: createNullObj(),
     async: false,
   }, script, COPY_SCRIPT_PROPS);
+  context.connect = (meta.connect || []).slice();
   const gmInfo = makeGmInfo(script.gmi, meta, resources);
   const gm4 = {
     __proto__: null,
