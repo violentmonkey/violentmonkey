@@ -318,7 +318,6 @@ async function save() {
       // otherwise the script with same namespace will be overridden
       isNew: !id,
       message: '',
-      reuseDeps: true,
       bumpDate: true,
     });
     const newId = res?.where?.id;

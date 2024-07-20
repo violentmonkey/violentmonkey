@@ -702,15 +702,17 @@ function buildPathMap(script, base) {
 export async function fetchResources(script, resourceCache, reqOptions) {
   const { custom, meta } = script;
   const { pathMap } = custom;
+  const reuseDeps = resourceCache?.reuseDeps;
   const snatch = async (url, type, validator) => {
     if (!url || isDataUri(url)) return;
     url = pathMap[url] || url;
     const contents = resourceCache?.[type]?.[url];
-    if (contents != null && (!validator || resourceCache?.reuseDeps)) {
+    if (contents != null && (!validator || reuseDeps)) {
       storage[type].setOne(url, contents);
       return;
     }
-    if (!resourceCache || validator || await storage[type].getOne(url) == null) {
+    if (!resourceCache || validator || !reuseDeps && !isRemote(url)
+    || await storage[type].getOne(url) == null) {
       return storage[type].fetch(url, reqOptions, validator).catch(err => err);
     }
   };
