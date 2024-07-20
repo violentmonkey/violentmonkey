@@ -4,7 +4,7 @@ import { nest, objectPick } from '@/common/object';
 import { addOwnCommands, commands, init } from './init';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
-import storage from './storage';
+import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
 import { FIREFOX } from './ua';
@@ -260,7 +260,7 @@ async function loadIcon(url) {
   const isOwn = url.startsWith(ICON_PREFIX);
   img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
     : url.startsWith('data:') ? url
-      : makeDataUri(url[0] === 'i' ? url : await storage.cache.getOne(url, true));
+      : makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url));
   await new Promise((resolve) => {
     img.onload = resolve;
     img.onerror = resolve;
@@ -290,4 +290,9 @@ async function loadIcon(url) {
   }
   iconCache[url] = res;
   return res;
+}
+
+async function loadStorageCache(url) {
+  return await storage[S_CACHE].getOne(url)
+    ?? await storage[S_CACHE].fetch(url, 'res').catch(console.warn);
 }

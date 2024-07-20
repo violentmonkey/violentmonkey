@@ -26,17 +26,11 @@ class StorageArea {
 
   /**
    * @param {string|number} id
-   * @param {boolean} [fetchMissing]
    * @return {Promise<?>}
    */
-  async getOne(id, fetchMissing) {
+  async getOne(id) {
     const key = this.toKey(id);
-    const {
-      [key]: val = fetchMissing
-        ? await this.fetch(id, 'res').catch(console.warn)
-        : undefined,
-    } = await api.get([key]);
-    return val;
+    return (await api.get([key]))[key];
   }
 
   /**

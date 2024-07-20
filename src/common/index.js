@@ -314,13 +314,12 @@ export function makeDataUri(raw, url) {
 
 /**
  * @param {VMReq.Response} response
- * @param {boolean} [noJoin]
- * @returns {string|string[]}
+ * @returns {string}
  */
-export async function makeRaw(response, noJoin) {
+export async function makeRaw(response) {
   const type = (response.headers.get('content-type') || '').split(';')[0] || '';
   const body = await blob2base64(response.data);
-  return noJoin ? [type, body] : `${type},${body}`;
+  return `${type},${body}`;
 }
 
 export function loadQuery(string) {

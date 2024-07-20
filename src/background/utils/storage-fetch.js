@@ -9,14 +9,8 @@ const requestLimited = limitConcurrency(request, 4, 100, 1000,
 );
 
 storage.cache.fetch = cacheOrFetch({
-  init(options) {
-    return { ...options, [kResponseType]: 'blob' };
-  },
-  async transform(response, url, options, check) {
-    const [type, body] = await makeRaw(response, true);
-    await check?.(url, response.data, type);
-    return `${type},${body}`;
-  },
+  init: options => ({ ...options, [kResponseType]: 'blob' }),
+  transform: response => makeRaw(response),
 });
 
 storage.require.fetch = cacheOrFetch({

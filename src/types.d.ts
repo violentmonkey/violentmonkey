@@ -364,7 +364,6 @@ declare type VMStorageFetch = (
   url: string,
   /** 'res' makes the function resolve with the result */
   options?: VMReq.Options | 'res',
-  check?: (...args) => void // throws on error
 ) => Promise<void>
 
 /** Augmented by handleCommandMessage in messages from the content script */

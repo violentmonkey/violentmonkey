@@ -702,18 +702,18 @@ function buildPathMap(script, base) {
 export async function fetchResources(script, resourceCache, reqOptions) {
   const { custom, meta } = script;
   const { pathMap } = custom;
-  const reuseDeps = resourceCache?.reuseDeps;
-  const snatch = async (url, type, validator) => {
+  const snatch = async (url, type) => {
     if (!url || isDataUri(url)) return;
     url = pathMap[url] || url;
     const contents = resourceCache?.[type]?.[url];
-    if (contents != null && (!validator || reuseDeps)) {
+    if (contents != null) {
       storage[type].setOne(url, contents);
       return;
     }
-    if (!resourceCache || validator || !reuseDeps && !isRemote(url)
+    if (!resourceCache
+    || !resourceCache.reuseDeps && !isRemote(url)
     || await storage[type].getOne(url) == null) {
-      return storage[type].fetch(url, reqOptions, validator).catch(err => err);
+      return storage[type].fetch(url, reqOptions).catch(err => err);
     }
   };
   const icon = custom.icon || meta.icon;
@@ -722,7 +722,7 @@ export async function fetchResources(script, resourceCache, reqOptions) {
     ...Object.values(meta.resources).map(url => snatch(url, S_CACHE)),
     isRemote(icon) && Promise.race([
       makePause(1000), // ensures slow icons don't prevent installation/update
-      snatch(icon, S_CACHE, validateImage),
+      snatch(icon, S_CACHE),
     ]),
   ]);
   if (!resourceCache?.ignoreDepsErrors) {
@@ -736,22 +736,6 @@ export async function fetchResources(script, resourceCache, reqOptions) {
       return `${message}\n${error}`;
     }
   }
-}
-
-/** @return {Promise<void>} resolves on success, rejects on error */
-function validateImage(url, buf, type) {
-  return new Promise((resolve, reject) => {
-    const blobUrl = URL.createObjectURL(new Blob([buf], { type }));
-    const onDone = (e) => {
-      URL.revokeObjectURL(blobUrl);
-      if (e.type === 'load') resolve();
-      else reject(`IMAGE_ERROR: ${url}`);
-    };
-    const image = new Image();
-    image.onload = onDone;
-    image.onerror = onDone;
-    image.src = blobUrl;
-  });
 }
 
 function formatHttpError(e) {
