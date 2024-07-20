@@ -58,9 +58,17 @@ export const GM_API_CTX_GM4ASYNC = {
       if (u.slice(0, p.length) != p) continue;
       const name = u.slice(p.length);
       if (name != id && name != '*') continue;
-      return bridge.post('WebextSendMessage', {id, message});
+      return new Promise((resolve, reject) => {
+        bridge.call(
+          'WebextSendMessage', { extId: id, message }, null,
+          ({ ok, response }) => (ok ? resolve : reject)(response),
+          'cbId'
+        );
+      });
     }
-    throw new Error(`this userscript is not allowed to connect to ${id}`);
+    return Promise.reject(
+      new Error(`this userscript is not allowed to connect to ${id}`)
+    );
   },
   /**
    * @this {GMContext}
