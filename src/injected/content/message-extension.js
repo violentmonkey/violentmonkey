@@ -2,7 +2,7 @@ import bridge, { addHandlers } from './bridge';
 import { browser } from '../util';
 
 addHandlers({
-  async WebextSendMessage(options, realm) {
+  async MessageExtension(options, realm) {
     let response;
     let ok = true;
     try {

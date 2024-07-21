@@ -52,15 +52,16 @@ export const GM_API_CTX_GM4ASYNC = {
   GM_setValues(obj) {
     return dumpValue(this, true, obj);
   },
-  GM_webextSendMessage(id, message) {
+  /** @this {GMContext} */
+  GM_messageExtension(id, message) {
+    const p = 'web-extension://';
     for (const u of this.connect) {
-      const p = 'web-extension://';
       if (u.slice(0, p.length) != p) continue;
       const name = u.slice(p.length);
       if (name != id && name != '*') continue;
       return new Promise((resolve, reject) => {
         bridge.call(
-          'WebextSendMessage', { extId: id, message }, null,
+          'MessageExtension', { extId: id, message }, null,
           ({ ok, response }) => (ok ? resolve : reject)(response),
           'cbId'
         );
