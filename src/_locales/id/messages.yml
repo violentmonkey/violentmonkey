@@ -226,7 +226,9 @@ failureReasonNoninjectable:
     (contoh: UI peramban atau ekstensi)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey telah dimulai ulang. Silakan muat ulang tab untuk menjalankan
+    skrip.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: ''
@@ -437,7 +439,7 @@ labelHomepageURL:
   message: 'URL Situs Web:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: URL Ikon
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Impor data skrip
@@ -899,7 +901,9 @@ reloadTab:
   message: Muat ulang tab
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Jika diaktifkan, tab yang aktif akan dimuat ulang saat mendeteksi adanya
+    perubahan dan dengan URL yang sama.
 removeAllScripts:
   description: Button to remove all scripts
   message: Hapus semua skrip
@@ -975,10 +979,10 @@ updateScript:
   message: Perbarui
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Perbarui semua skrip
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Perbarui skrip tab aktif saat ini
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)
