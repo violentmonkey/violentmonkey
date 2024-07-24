@@ -1,9 +1,9 @@
 /* eslint-disable max-classes-per-file */
 import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
-import { BLACKLIST, BLACKLIST_ERRORS } from '@/common/consts';
+import { BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from '@/common/tld';
-import { getOption, hookOptionsInit } from './options';
+import { hookOptionsInit } from './options';
 import storage from './storage';
 
 const matchAlways = { test: () => 1 };
@@ -44,9 +44,15 @@ const RE_URL_PARTS = /^([^:]*):\/\/([^/]*)\/(.*)/;
 const RE_STR_ANY = '(?:|[^:/]*?\\.)';
 const RE_STR_TLD = '(|(?:\\.[-\\w]+)+)';
 const MAX_BL_CACHE_LENGTH = 100e3;
-let blCache = {};
-let blCacheSize = 0;
-let blacklistRules = [];
+const blacklist = {
+  [BLACKLIST]: CreateBlacklist(),
+  [BLACKLIST_NET]: CreateBlacklist(),
+};
+export const {
+  reset: resetBlacklist,
+  test: testBlacklist,
+} = blacklist[BLACKLIST];
+export const testBlacklistNet = blacklist[BLACKLIST_NET].test;
 // Context start
 let batchErrors;
 let curUrl;
@@ -58,11 +64,13 @@ let urlResultsInc;
 // Context end
 
 hookOptionsInit((changes) => {
-  if (BLACKLIST in changes) {
-    const errors = resetBlacklist(changes[BLACKLIST] || []);
-    const res = errors.length ? errors : null;
-    storage.base.setOne(BLACKLIST_ERRORS, res);
-    if (res) throw res; // will be passed to the UI
+  for (const key in blacklist) {
+    if (key in changes) {
+      const errors = blacklist[key].reset(changes[key] || []);
+      const res = errors.length ? errors : null;
+      storage.base.setOne(key + ERRORS, res);
+      if (res) throw res; // will be passed to the UI
+    }
   }
 });
 
@@ -292,68 +300,73 @@ function pathMatcher(tail) {
     || RegExp(`^${str2RE(tail)}${hasHash ? '$' : `($|${iQuery >= 0 ? '#' : '[?#]'})`}`);
 }
 
-export function testBlacklist(url) {
-  let res = blCache[url];
-  if (res === undefined) {
-    if (curUrl !== url) setContext(url);
-    const rule = blacklistRules.find(m => m.test(url));
-    res = rule?.reject && rule.text;
-    updateBlacklistCache(url, res || false);
+function CreateBlacklist() {
+  let cache = {};
+  let cacheSize = 0;
+  let rules = [];
+  return { reset, test };
+  function emplace(accum, rule, builder) {
+    return accum.get(rule) || accum.put(rule, builder(rule));
   }
-  return res;
-}
-
-export function resetBlacklist(rules = getOption(BLACKLIST)) {
-  const emplace = (cache, rule, builder) => cache.get(rule) || cache.put(rule, builder(rule));
-  const errors = [];
-  testerBatch(true);
-  if (process.env.DEBUG) {
-    console.info('Reset blacklist:', rules);
+  function reset(value) {
+    const errors = [];
+    testerBatch(true);
+    if (process.env.DEBUG) {
+      console.info('Reset blacklist:', value);
+    }
+    // XXX compatible with {Array} list in v2.6.1-
+    rules = [];
+    for (let text of Array.isArray(value) ? value : (value || '').split('\n')) {
+      try {
+        text = text.trim();
+        if (!text || text.startsWith('#')) continue;
+        const mode = text.startsWith('@') && text.split(/\s/, 1)[0];
+        const rule = mode ? text.slice(mode.length + 1).trim() : text;
+        const isInc = mode === '@include';
+        const m = (isInc || mode === '@exclude') && emplace(cacheInc, rule, autoReg)
+          || !mode && !rule.includes('/') && emplace(cacheMat, `*://${rule}/*`, MatchTest.try) // domain
+          || emplace(cacheMat, rule, MatchTest.try); // @match and @exclude-match
+        m.reject = !(mode === '@match' || isInc); // @include and @match = whitelist
+        m.text = text;
+        rules.push(m);
+      } catch (err) {
+        errors.push(err);
+      }
+    }
+    cache = {};
+    cacheSize = 0;
+    testerBatch();
+    return errors;
   }
-  // XXX compatible with {Array} list in v2.6.1-
-  blacklistRules = (Array.isArray(rules) ? rules : (rules || '').split('\n'))
-  .reduce((res, text) => {
-    try {
-      text = text.trim();
-      if (!text || text.startsWith('#')) return res;
-      const mode = text.startsWith('@') && text.split(/\s/, 1)[0];
-      const rule = mode ? text.slice(mode.length + 1).trim() : text;
-      const isInc = mode === '@include';
-      const m = (isInc || mode === '@exclude') && emplace(cacheInc, rule, autoReg)
-      || !mode && !rule.includes('/') && emplace(cacheMat, `*://${rule}/*`, MatchTest.try) // domain
-      || emplace(cacheMat, rule, MatchTest.try); // @match and @exclude-match
-      m.reject = !(mode === '@match' || isInc); // @include and @match = whitelist
-      m.text = text;
-      res.push(m);
-    } catch (err) {
-      errors.push(err);
+  function test(url) {
+    let res = cache[url];
+    if (res === undefined) {
+      if (curUrl !== url) setContext(url);
+      res = rules.find(m => m.test(url));
+      res = res?.reject && res.text;
+      updateCache(url, res || false);
     }
     return res;
-  }, []);
-  blCache = {};
-  blCacheSize = 0;
-  testerBatch();
-  return errors;
-}
-
-/**
- Simple FIFO queue for the results of testBlacklist, cached separately from the main |cache|
- because the blacklist is updated only once in a while so its entries would be crowding
- the main cache and reducing its performance (objects with lots of keys are slow to access).
- We also don't need to auto-expire the entries after a timeout.
- The only limit we're concerned with is the overall memory used.
- The limit is specified in the amount of unicode characters (string length) for simplicity.
- Disregarding deduplication due to interning, the actual memory used is approximately twice as big:
- 2 * keyLength + objectStructureOverhead * objectCount
-*/
-function updateBlacklistCache(key, value) {
-  blCache[key] = value;
-  blCacheSize += key.length;
-  if (blCacheSize > MAX_BL_CACHE_LENGTH) {
-    for (const k in blCache) {
-      if (delete blCache[k] && (blCacheSize -= k.length) < MAX_BL_CACHE_LENGTH * 0.75) {
-        // Reduced the cache to 75% so that this function doesn't run too often
-        return;
+  }
+  /**
+   Simple FIFO queue for the results of testBlacklist, cached separately from the main |cache|
+   because the blacklist is updated only once in a while so its entries would be crowding
+   the main cache and reducing its performance (objects with lots of keys are slow to access).
+   We also don't need to auto-expire the entries after a timeout.
+   The only limit we're concerned with is the overall memory used.
+   The limit is specified in the amount of unicode characters (string length) for simplicity.
+   Disregarding deduplication due to interning, the actual memory used is approximately twice as big:
+   2 * keyLength + objectStructureOverhead * objectCount
+  */
+  function updateCache(key, value) {
+    cache[key] = value;
+    cacheSize += key.length;
+    if (cacheSize > MAX_BL_CACHE_LENGTH) {
+      for (const k in cache) {
+        if (delete cache[k] && (cacheSize -= k.length) < MAX_BL_CACHE_LENGTH * 0.75) {
+          // Reduced the cache to 75% so that this function doesn't run too often
+          return;
+        }
       }
     }
   }

@@ -137,8 +137,13 @@ confirmUndoImport:
     Revert all changes made to the database (importing, updating, editing,
     customizing)
 descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: URL matched in this list will not be injected by scripts.
+  description: Description for the global injection blacklist.
+  message: Injection blacklist (scripts won't run in the matching sites)
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: >-
+    Network blacklist (scripts won't connect to the matching sites and their
+    cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

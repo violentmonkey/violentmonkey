@@ -1,3 +1,5 @@
+import { BLACKLIST, BLACKLIST_NET } from '@/common/consts';
+
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
 export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
 export const kShowTrailingSpace = 'showTrailingSpace';
@@ -17,6 +19,8 @@ export const defaultsEditor = {
 
 export default {
   [IS_APPLIED]: true,
+  [BLACKLIST]: null,
+  [BLACKLIST_NET]: null,
   autoUpdate: 1, // days, 0 = disable
   updateEnabledScriptsOnly: true,
   // ignoreGrant: false,
@@ -38,7 +42,6 @@ export default {
   trackLocalFile: false,
   autoReload: false,
   features: null,
-  blacklist: null,
   syncScriptStatus: true,
   sync: null,
   customCSS: '',

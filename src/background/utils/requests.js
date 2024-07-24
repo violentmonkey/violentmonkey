@@ -8,6 +8,7 @@ import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify, kCookie, kSetCookie,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
+import { testBlacklistNet } from './tester';
 import { FIREFOX, navUA, navUAD } from './ua';
 
 addPublicCommands({
@@ -34,7 +35,7 @@ addPublicCommands({
     return httpRequest(opts, events, src, cb)
     .catch(events.includes('error') && (err => cb({
       id,
-      error: err.message,
+      error: err.message || err,
       data: null,
       type: 'error',
     })));
@@ -213,6 +214,7 @@ async function httpRequest(opts, events, src, cb) {
   const url = getFullUrl(opts.url, src.url);
   const req = requests[id];
   if (!req || req.cb) return;
+  if (testBlacklistNet(url)) throw 'Not allowed to access a blacklisted URL ' + url;
   req.cb = cb;
   req[kFileName] = opts[kFileName];
   const { xhr } = req;

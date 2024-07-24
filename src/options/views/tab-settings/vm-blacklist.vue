@@ -1,35 +1,19 @@
 <template>
   <section>
-    <h3 v-text="i18n('labelBlacklist')"></h3>
+    <h3 v-text="i18n('labelBlacklist')"/>
     <p>
-      {{i18n('descBlacklist')}}
-      <a href="https://violentmonkey.github.io/posts/smart-rules-for-blacklist/#blacklist-patterns" target="_blank" rel="noopener noreferrer" v-text="i18n('learnBlacklist')"></a>
+      <a href="https://violentmonkey.github.io/posts/smart-rules-for-blacklist/#blacklist-patterns"
+         v-text="i18n('learnBlacklist')" target="_blank" rel="noopener noreferrer"/>
     </p>
-    <div class="flex flex-wrap">
-      <setting-text name="blacklist" class="flex-1" @bgError="errors = $event"/>
-      <ol v-if="errors" class="text-red">
-        <li v-for="e in errors" :key="e" v-text="e"/>
-      </ol>
-    </div>
+    <VmBlacklistBody :name="BLACKLIST" :desc="i18n('descBlacklist')"/>
+    <VmBlacklistBody :name="BLACKLIST_NET" :desc="i18n('descBlacklistNet')"/>
   </section>
 </template>
 
 <script>
-import { sendCmdDirectly } from '@/common';
-import { BLACKLIST_ERRORS } from '@/common/consts';
-import SettingText from '@/common/ui/setting-text';
+import { BLACKLIST, BLACKLIST_NET } from '@/common/consts';
+</script>
 
-export default {
-  components: {
-    SettingText,
-  },
-  data() {
-    return {
-      errors: null,
-    };
-  },
-  async mounted() {
-    this.errors = await sendCmdDirectly('Storage', ['base', 'getOne', BLACKLIST_ERRORS]);
-  },
-};
+<script setup>
+import VmBlacklistBody from './vm-blacklist-body';
 </script>
