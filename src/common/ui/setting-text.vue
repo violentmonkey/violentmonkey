@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
 });
 
 function onSave() {
-  options.set(props.name, savedValue = value.value).catch(bgError);
+  options.set(props.name, savedValue = value.value).then(bgError, bgError);
   savedValueText = text.value;
   isDirty.value = canSave.value = false;
   saved.value = i18n('buttonSaved');
@@ -125,7 +125,7 @@ function onReset() {
   el.focus();
   if (!props.hasSave) {
     // No save button = something rather trivial e.g. the export file name
-    options.set(props.name, defaultValue).catch(bgError);
+    options.set(props.name, defaultValue).then(bgError, bgError);
   } else {
     // Save button exists = let the user undo the input
     el.select();
@@ -135,7 +135,7 @@ function onReset() {
   }
 }
 function bgError(err) {
-  emit('bg-error', err);
+  emit('bg-error', err && JSON.parse(err.message));
 }
 </script>
 
