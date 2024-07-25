@@ -109,6 +109,13 @@ footer {
   }
 }
 
+.script-name {
+  /* expand right-click-to-edit area */
+  flex: 1;
+  align-self: stretch;
+  align-content: center;
+}
+
 .menu-buttons {
   align-items: center;
   padding: $padding $padding $padding 0;
@@ -134,6 +141,7 @@ footer {
   &-item {
     position: relative;
     display: flex;
+    flex-wrap: wrap; /* the update notice must go to the next row */
     align-items: center;
     min-height: 2rem;
     padding-left: $itemPaddingX;
