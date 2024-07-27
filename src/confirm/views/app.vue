@@ -186,7 +186,7 @@ const icons = computed(() => {
 
 /** @type {FileSystemFileHandle} */
 let fileHandle;
-/** @type {FileSystemObserver} */
+/** @type {FileSystemObserver | false} */
 let fso;
 /** @type {chrome.runtime.Port} */
 let filePort;
@@ -474,7 +474,7 @@ async function trackLocalFile() {
     await onFileChanged();
     stopResolve();
   }
-  fso?.unobserve(fileHandle);
+  if (fso) fso.unobserve(fileHandle);
   trackingPromise = tracking.value = false;
 }
 async function onFileChanged() {
