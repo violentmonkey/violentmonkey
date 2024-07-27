@@ -9,6 +9,8 @@ const COPY_SCRIPT_PROPS = [
   'id',
 ];
 const componentUtils = makeComponentUtils();
+const getUAHints = hints => bridge.send('UAH', hints);
+const getUAData = () => setOwnProp(bridge.call('UA'), 'getHighEntropyValues', getUAHints);
 const sendTabClose = () => bridge.post('TabClose');
 const sendTabFocus = () => bridge.post('TabFocus');
 
@@ -83,6 +85,7 @@ function makeGmInfo(gmInfo, meta, resources) {
   // No __proto__:null because these are standard objects for userscripts
   meta.resources = resourcesArr;
   safeAssign(gmInfo, bridge.gmi);
+  setOwnProp(gmInfo, 'userAgentData', getUAData, true, 'get');
   return safeAssign(gmInfo, {
     [INJECT_INTO]: bridge.mode,
     platform: safeAssign({}, bridge.ua),
@@ -91,4 +94,3 @@ function makeGmInfo(gmInfo, meta, resources) {
     version: process.env.VM_VER,
   });
 }
-

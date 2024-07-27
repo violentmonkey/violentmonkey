@@ -38,6 +38,7 @@ import { downloadBlob } from '@/common/download';
 import loadZip from '@/common/zip';
 import VmDateInfo from './vm-date-info';
 
+/** @type {VMScriptGMInfoPlatform} */
 let ua;
 
 const tpl = ref();
@@ -64,7 +65,7 @@ function download(blob) {
    * v61 in MacOS https://bugzil.la/1385403
    * v63 in Linux https://bugzil.la/1357487 */
   // TODO: remove when strict_min_version >= 63
-  const FF = IS_FIREFOX && parseFloat(ua.version);
+  const FF = IS_FIREFOX && parseFloat(ua.browserVersion);
   const name = fileName.value;
   if (FF && (ua.os === 'win' ? FF < 56 : ua.os === 'mac' ? FF < 61 : FF < 63)) {
     const reader = new FileReader();

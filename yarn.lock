@@ -2220,10 +2220,10 @@
   dependencies:
     "@babel/runtime" "^7.16.7"
 
-"@violentmonkey/types@0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.1.5.tgz#264f062082cb4543da54abe3adcf4973d1fd0461"
-  integrity sha512-pDj3TndOfXRWuyRLVlGCZbXDqh7L/Ca3qO8TDUWTtSuUPF+PkNKbMwuxPGrqmRFXn3V0hXp4wjCwzrDWyJCYiw==
+"@violentmonkey/types@0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.1.9.tgz#dd77c8d8c031716175229b418c88e3dff20d89ef"
+  integrity sha512-mBEHd8IOIrJW9NTSFf9474et5eduoq16Pmddg5O3MC/RElCxXay//Go0jpSz20LEpA9t0H44EHDRcXJYMBBtNg==
 
 "@volar/language-core@1.10.1", "@volar/language-core@~1.10.0":
   version "1.10.1"

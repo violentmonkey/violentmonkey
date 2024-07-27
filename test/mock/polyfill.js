@@ -26,6 +26,9 @@ global.browser = {
     onReplaced: { addListener: () => {} },
     onUpdated: { addListener: () => {} },
   },
+  windows: {
+    getCurrent: () => ({}),
+  },
 };
 if (!window.Response) window.Response = { prototype: {} };
 const domProps = Object.getOwnPropertyDescriptors(window);

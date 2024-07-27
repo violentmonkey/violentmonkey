@@ -291,7 +291,6 @@ export function getScriptsByURL(url, isTop, errors, prevIds) {
   /** @type {VMInjection.EnvDelayed} */
   let envDelayed;
   let clipboardChecked = isDelayed || !IS_FIREFOX;
-  let xhrChecked = isDelayed;
   testerBatch(errors || true);
   for (const script of aliveScripts) {
     const {
@@ -326,14 +325,10 @@ export function getScriptsByURL(url, isTop, errors, prevIds) {
     if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
       env[VALUE_IDS].push(id);
     }
-    if (!clipboardChecked || !xhrChecked) {
+    if (!clipboardChecked) {
       for (const g of meta.grant) {
         if (!clipboardChecked && (g === 'GM_setClipboard' || g === 'GM.setClipboard')) {
           clipboardChecked = envStart.clipFF = true;
-        }
-        if (!xhrChecked && (g === 'GM_xmlhttpRequest' || g === 'GM.xmlHttpRequest'
-        || g === 'GM_download' || g === 'GM.download')) {
-          xhrChecked = envStart.xhr = true;
         }
       }
     }

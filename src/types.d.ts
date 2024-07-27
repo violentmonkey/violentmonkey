@@ -235,7 +235,6 @@ declare interface VMInjectionDisabled {
 declare interface VMInjectionFlags {
   clipFF?: boolean;
   forceContent?: boolean;
-  xhr?: boolean;
 }
 
 /**
