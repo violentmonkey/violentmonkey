@@ -117,6 +117,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import {
+  debounce,
   getFullUrl, getLocaleString, getScriptHome, i18n, isRemote,
   makePause, makeRaw, request, sendCmdDirectly, trueJoin,
 } from '@/common';
@@ -185,6 +186,8 @@ const icons = computed(() => {
 
 /** @type {FileSystemFileHandle} */
 let fileHandle;
+/** @type {FileSystemObserver} */
+let fso;
 /** @type {chrome.runtime.Port} */
 let filePort;
 let filePortResolve;
@@ -453,20 +456,35 @@ async function trackLocalFile() {
   }
   cachedCodePromise = null; // always re-read because the file may have changed since then
   tracking.value = true;
-  while (tracking.value && !await Promise.race([
-    makePause(500),
-    trackingPromise = new Promise(cb => { stopResolve = cb; }),
-  ])) {
+  if (fileHandle && fso == null && (fso = global.FileSystemObserver || false)) {
+    fso = new fso(debounce(onFileChanged, 20)); // one write to a file produces several calls
+  }
+  if (fso) {
     try {
-      await loadData(true);
-      const parsedMeta = await parseMeta();
-      await loadDeps();
-      await installScript(null, parsedMeta);
-      sameCode.value = false;
-    } catch (e) { /* NOP */ }
+      await fso.observe(fileHandle);
+    } catch (err) {
+      fso = null;
+    }
+  }
+  while (tracking.value) {
+    trackingPromise = new Promise(cb => { stopResolve = cb; });
+    if (await (fso ? trackingPromise : Promise.race([makePause(500), trackingPromise]))) {
+      break;
+    }
+    await onFileChanged();
     stopResolve();
   }
+  fso?.unobserve(fileHandle);
   trackingPromise = tracking.value = false;
+}
+async function onFileChanged() {
+  try {
+    await loadData(true);
+    const parsedMeta = await parseMeta();
+    await loadDeps();
+    await installScript(null, parsedMeta);
+    sameCode.value = false;
+  } catch (e) { /* NOP */ }
 }
 async function checkSameCode() {
   const { name, namespace } = script.value.meta || {};
