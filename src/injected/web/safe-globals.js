@@ -23,7 +23,8 @@ export let
   Object,
   SafeProxy,
   SafeSymbol,
-  UnsafePromise,
+  SafePromiseConstructor,
+  SafePromise,
   fire,
   getWindowLength,
   getWindowParent,
@@ -113,6 +114,7 @@ export const VAULT = (() => {
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
+    SafePromiseConstructor = res[i += 1] || src.Promise[PROTO].constructor,
     SafeSymbol = res[i += 1] || src.Symbol,
     // In FF content mode global.Proxy !== window.Proxy
     SafeProxy = res[i += 1] || src.Proxy,
@@ -175,13 +177,7 @@ export const VAULT = (() => {
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
+  // Binding Promise to this realm
+  SafePromise = safeBind(SafePromiseConstructor, getPrototypeOf(promiseResolve()));
   return res;
 })();
-
-try {
-  /* We can't use safe Promise from vault because it stops working when iframe is removed,
-   * so we use the unsafe current global - only for userscript API stuff, not internally.
-   * Using `try` because the `Promise` global may be an already spoofed getter.
-   * TODO: try reimplementing Promise in our sandbox wrapper if it can work with user code */
-  UnsafePromise = Promise;
-} catch (e) { /**/ }

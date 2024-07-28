@@ -197,7 +197,7 @@ export function onRequestCreate(opts, context, fileName) {
   // it's true by default per the standard/historical behavior of gmxhr
   const { withCredentials = true, anonymous = !withCredentials } = opts;
   // setting opts.onload and onerror before EVENTS_TO_NOTIFY
-  const res = !context.async ? {} : new UnsafePromise((resolve, reject) => {
+  const res = !context.async ? {} : new SafePromise((resolve, reject) => {
     const { [kOnload]: onload, [kOnerror]: onerror } = opts;
     opts[kOnload] = onload ? v => { resolve(v); onload(v); } : resolve;
     opts[kOnerror] = onerror ? v => { reject(v); onerror(v); } : reject;

@@ -16,13 +16,9 @@ const bridge = {
   send(cmd, data, node) {
     let cb;
     let res;
-    try {
-      res = new UnsafePromise(resolve => {
-        cb = resolve;
-      });
-    } catch (e) {
-      // Unavoidable since vault's Promise can't be used after the iframe is removed
-    }
+    res = new SafePromise(resolve => {
+      cb = resolve;
+    });
     postWithCallback(cmd, data, node, cb);
     return res;
   },
