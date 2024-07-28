@@ -67,7 +67,8 @@ addHandlers({
     return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
-  UA() {
+  UA: () => navigator::getUAProps[0](),
+  UAD() {
     if (getUAData) {
       const res = createNullObj();
       const uaData = navigator::getUAData();

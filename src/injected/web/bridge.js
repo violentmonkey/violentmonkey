@@ -2,6 +2,7 @@ const handlers = createNullObj();
 export const addHandlers = obj => assign(handlers, obj);
 export const callbacks = createNullObj();
 /**
+ * @property {BridgeGMInfo} gmi
  * @property {VMScriptGMInfoPlatform} ua
  * @property {VMBridgePostFunc} post
  * @property {VMBridgeMode} mode

@@ -1,4 +1,4 @@
-import { FastLookup, safeAssign, safeConcat } from './util';
+import { FastLookup, safeConcat, safeCopy } from './util';
 
 const kConsole = 'console';
 const scopeSym = SafeSymbol.unscopables;
@@ -192,7 +192,7 @@ function proxyDescribe(local, name, wrapper, events, returnAsValue) {
   } else {
     if (get) desc.get = safeBind(get, window);
     if (set) desc.set = safeBind(set, window);
-    if (value && name === kConsole) desc.value = value = safeAssign({}, value);
+    if (value && name === kConsole) desc.value = value = safeCopy(value);
   }
   if (!isChild) {
     defineProperty(local, name, desc); /* proto is null */// eslint-disable-line no-restricted-syntax
