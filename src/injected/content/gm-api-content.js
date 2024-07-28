@@ -32,7 +32,7 @@ addHandlers({
       parent::appendChild(el);
     } catch (e) {
       // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
-      // TODO: maybe move try/catch to bridge.onHandle and use bridge.sendSync in all web commands
+      // TODO: maybe move try/catch to bridge.onHandle and use bridge.call in all web commands
       res = [`${e}`, e.stack];
     }
     bridge.post('Callback', { id: cbId, data: res }, realm, el);

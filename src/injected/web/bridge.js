@@ -4,7 +4,7 @@ export const callbacks = createNullObj();
 /**
  * @property {BridgeGMInfo} gmi
  * @property {VMScriptGMInfoPlatform} ua
- * @property {VMBridgePostFunc} post
+ * @property {VMBridgePostFunc} post - synchronous
  * @property {VMBridgeMode} mode
  */
 const bridge = {
@@ -13,7 +13,8 @@ const bridge = {
     const fn = handlers[cmd];
     if (fn) node::fn(data);
   },
-  send(cmd, data, node) {
+  /** @return {Promise} asynchronous */
+  promise(cmd, data, node) {
     let cb;
     let res;
     res = new SafePromise(resolve => {
@@ -22,6 +23,7 @@ const bridge = {
     postWithCallback(cmd, data, node, cb);
     return res;
   },
+  /** @return {?} synchronous */
   call: postWithCallback,
 };
 

@@ -39,6 +39,6 @@ export function createNotification(text, title, image, onclick) {
   notifications[id] = options;
   bridge.post('Notification', msg);
   return {
-    remove: () => bridge.send('RemoveNotification', id),
+    remove: () => bridge.promise('RemoveNotification', id),
   };
 }

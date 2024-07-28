@@ -113,7 +113,7 @@ addHandlers({
       version: process.env.VM_VER,
       isInstalled: (name, namespace) => (
         allowGetScriptVer
-          ? bridge.send('GetScriptVer', { meta: { name, namespace } })
+          ? bridge.promise('GetScriptVer', { meta: { name, namespace } })
           : promiseResolve()
       ),
     };

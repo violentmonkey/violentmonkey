@@ -11,7 +11,7 @@ const COPY_SCRIPT_PROPS = [
 const componentUtils = makeComponentUtils();
 const kResources = 'resources';
 const getUA = () => bridge.call('UA');
-const getUAHints = hints => bridge.send('UAH', hints);
+const getUAHints = hints => bridge.promise('UAH', hints);
 const getUAData = _ => (_ = bridge.call('UAD'))
   && setOwnProp(_, 'getHighEntropyValues', getUAHints);
 const sendTabClose = () => bridge.post('TabClose');
