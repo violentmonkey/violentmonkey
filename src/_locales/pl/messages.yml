@@ -139,8 +139,11 @@ confirmUndoImport:
     Cofnij wszystkie zmiany wprowadzone w bazie danych (importowanie,
     aktualizacja, edycja, dostosowywanie)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: Adresy URL, które są na tej liście, nie zostaną dołączone do skryptów.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

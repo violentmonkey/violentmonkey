@@ -137,8 +137,11 @@ confirmUndoImport:
     Hoàn nguyên tất cả các thay đổi được thực hiện cho cơ sở dữ liệu (nhập, cập
     nhật, chỉnh sửa, tùy chỉnh)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: URL trong danh sách này sẽ không bị bỏ qua.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

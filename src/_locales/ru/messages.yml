@@ -137,8 +137,13 @@ confirmUndoImport:
     Отменить все изменения, внесённые в базу данных (импорт, обновление,
     редактирование, настройка)
 descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: URL-адреса из этого списка не будут обрабатываться скриптами.
+  description: Description for the global injection blacklist.
+  message: Чёрный список инъекций (скрипты не будут запускаться на указанных сайтах)
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: >-
+    Чёрный список сети (скрипты не будут подключаться к указанным сайтам и их
+    куки)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

@@ -140,8 +140,11 @@ confirmUndoImport:
     Veritabanında yapılan tüm değişiklikleri geri alma (içe aktarma, güncelleme,
     düzenleme, özelleştirme)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: Listede eşleşen URL girişleri betik tarafından eklenmeyecek.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

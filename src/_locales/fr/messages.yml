@@ -135,8 +135,11 @@ confirmUndoImport:
     is also shown as a confirmation dialog after clicking this button.
   message: ''
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: Les scripts se seront pas injectés dans les URL filtrées par cette liste.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

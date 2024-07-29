@@ -139,8 +139,13 @@ confirmUndoImport:
     Vrátiť všetky zmeny vykonané v databáze (import, aktualizácia, úprava,
     prispôsobenie)
 descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: Webové adresy v tomto zozname nebudú injektované skriptami.
+  description: Description for the global injection blacklist.
+  message: Čierna listina spúšťania (skripty sa nespustia na zodpovedajúcich stránkach)
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: >-
+    Sieťová čierna listina (skripty sa nepripoja na zodpovedajúce stránky ani
+    cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

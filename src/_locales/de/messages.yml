@@ -137,8 +137,13 @@ confirmUndoImport:
     Alle an der Datenbank gemachten Änderungen zurücksetzen (importieren,
     aktualisieren, editieren, anpassen)
 descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: URLs in dieser Liste bleiben von Skripten unberührt.
+  description: Description for the global injection blacklist.
+  message: Injektions-Blacklist (Skripte werden bei gematchten Seiten nicht ausgeführt)
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: >-
+    Netzwerk-Blacklist (Skripte verbinden sich nicht mit gematchten Seiten und
+    ihren Cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

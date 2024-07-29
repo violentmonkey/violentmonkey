@@ -137,8 +137,13 @@ confirmUndoImport:
     Herstel alle wijzigingen aan de databank (importeren, bijwerken, bewerken en
     aanpassen)
 descBlacklist:
-  description: HTML Description for the global blacklist.
-  message: Scripts worden niet uitgevoerd op url's die op deze lijst staan.
+  description: Description for the global injection blacklist.
+  message: Zwarte injectielijst (scripts worden niet op deze sites uitgevoerd)
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: >-
+    Zwarte netwerklijst (scripts maken geen verbinding met deze sites en hun
+    cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

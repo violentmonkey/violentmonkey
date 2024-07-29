@@ -133,10 +133,13 @@ confirmUndoImport:
     is also shown as a confirmation dialog after clicking this button.
   message: ''
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: >-
     Στα URL που ταιριάζουν σε αυτήν την λίστα δεν θα εκτελούνται σενάρια
     εντολών.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
