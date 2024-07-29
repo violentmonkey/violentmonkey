@@ -141,10 +141,13 @@ confirmUndoImport:
     Ripristina tutte le modifiche eseguite al database (importazioni,
     aggiornamenti, modifiche e personalizzazioni)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: >-
     Negli URL che non corrispondono a questa lista non verranno iniettati
     script.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

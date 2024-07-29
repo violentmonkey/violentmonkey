@@ -137,8 +137,11 @@ confirmUndoImport:
     Revocă toate modificările efectuate în baza de date (importare, actualizare,
     editare, personalizare)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: Scripturile nu vor fi injectate în URL-urile corespondente acestei liste.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

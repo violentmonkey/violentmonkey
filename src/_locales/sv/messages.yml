@@ -137,8 +137,11 @@ confirmUndoImport:
     Återställ alla ändringar som gjorts i databasen (importering, uppdatering,
     redigering, anpassning)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: Webbadress som matchas i den här listan kommer inte att injiceras av skript.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

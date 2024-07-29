@@ -141,10 +141,13 @@ confirmUndoImport:
     Az adatbázisban végzett összes módosítás visszaállítása (importálás,
     frissítés, szerkesztés, testreszabás)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: >-
     Az URL-ek, amik egyeznek ebben a listában, nem lesznek injektálva
     szkriptekkel.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-

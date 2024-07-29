@@ -135,8 +135,11 @@ confirmUndoImport:
     is also shown as a confirmation dialog after clicking this button.
   message: 데이터베이스의 모든 변경 사항 되돌리기 (가져오기, 업데이트, 수정, 사용자 지정)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: 이 목록과 일치하는 URL에는 스크립트가 삽입되지 않습니다.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: 옵션 페이지와 스크립트 설치 페이지를 위한 커스텀 CSS입니다. 만약 이게 뭔지 모르신다면 수정하지 마세요.

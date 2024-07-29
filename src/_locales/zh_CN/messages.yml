@@ -135,8 +135,11 @@ confirmUndoImport:
     is also shown as a confirmation dialog after clicking this button.
   message: 撤销所有数据变更（导入、更新、编辑、自定义）
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: 此列表匹配的URL将不会被注入脚本。
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。

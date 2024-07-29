@@ -139,8 +139,11 @@ confirmUndoImport:
     Reverter todas as alterações feitas no banco de dados (importação,
     atualização, edição, personalização)
 descBlacklist:
-  description: HTML Description for the global blacklist.
+  description: Description for the global injection blacklist.
   message: URL nesta lista não será injetado por scripts.
+descBlacklistNet:
+  description: Description for the global network blacklist.
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
