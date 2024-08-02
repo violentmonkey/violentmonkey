@@ -109,7 +109,7 @@ function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
 }
 
 function upload() {
-  const res = bridge[uploadAsync ? 'send' : 'post']('UpdateValue', uploadBuf);
+  const res = (uploadAsync ? bridge.promise : bridge.post)('UpdateValue', uploadBuf);
   uploadBuf = createNullObj();
   uploadThrottle = uploadAsync = false;
   return res;
