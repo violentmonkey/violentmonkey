@@ -484,7 +484,7 @@ labelKeepOriginal:
   message: Сохранить исходное соответствие
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Дата последнего обновления $1
+  message: Последний раз обновлялось в$1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'N строки:'
@@ -786,7 +786,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: 'Пожалуйста, пересохраните или переустановите эти скрипты:'
+  message: 'Пожалуйста, пере-сохраните или переустановите эти скрипты:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (код такой же)'

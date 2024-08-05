@@ -967,7 +967,7 @@ updateScript:
   message: 更新
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: 更新所有脚本
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: ''
