@@ -26,20 +26,27 @@ init.deps.push(
   Promise.all([
     browser.runtime.getPlatformInfo(),
     browser.runtime.getBrowserInfo?.(),
-    navUAD?.getHighEntropyValues(['uaFullVersion']),
+    navUAD?.getHighEntropyValues(['fullVersionList']),
     !IS_FIREFOX && browserWindows.getCurrent(),
   ]).then(([
     { os, arch },
     { name, version } = {},
-    { uaFullVersion } = {},
+    uadValues,
     wnd,
   ]) => {
+    if (!version && (uadValues = uadValues?.fullVersionList) && uadValues[0]) {
+      [name, version] = uadValues.map(({ brand, version: v }) => (
+        /[^\sa-z]/i.test(brand) ? '3' : // downgrading GREASE value
+          brand === 'Chromium' ? '2' + brand : // known generic value
+            '1' + brand // preferring non-generic value
+      ) + '\n' + v).sort()[0].slice(1).split('\n');
+    }
     ua.arch = arch;
     ua.os = os;
     ua.browserName = wnd && (wnd.vivExtData/*new*/ || wnd.extData/*old*/)
-      ? 'vivaldi'
-      : name?.toLowerCase() || 'chrome';
-    ua.browserVersion = uaFullVersion || version || uaVer;
+      ? 'Vivaldi'
+      : name || 'chrome';
+    ua.browserVersion = version || uaVer;
     if (FIREFOX) FIREFOX = parseFloat(version);
   })
 );
