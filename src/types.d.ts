@@ -297,7 +297,11 @@ declare namespace VMInjection {
     more: EnvDelayed;
   }
   interface Info {
+    gmi: {
+      isIncognito: boolean;
+    };
     ua: VMScriptGMInfoPlatform;
+    uad?: true;
   }
   /**
    * Script prepared for injection

@@ -22,7 +22,7 @@ const isBlobXhr = req => req[kXhrType] === 'blob';
 const requests = createNullObj();
 let navigator, getUAData, getUAProps, getHighEntropyValues;
 
-onScripts.push(() => {
+onScripts.push(data => {
   // The tab may have a different UA due to a devtools override or about:config
   navigator = global.navigator;
   getUAProps = [];
@@ -32,6 +32,7 @@ onScripts.push(() => {
       getUAData = p.get;
       p = getPrototypeOf(navigator::getUAData());
       getHighEntropyValues = p.getHighEntropyValues;
+      data.info.uad = true;
     }
   }
 });

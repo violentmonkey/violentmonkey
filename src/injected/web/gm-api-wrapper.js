@@ -12,8 +12,8 @@ const componentUtils = makeComponentUtils();
 const kResources = 'resources';
 const getUA = () => bridge.call('UA');
 const getUAHints = hints => bridge.promise('UAH', hints);
-const getUAData = _ => (_ = bridge.call('UAD'))
-  && setOwnProp(_, 'getHighEntropyValues', getUAHints);
+const getUAData = () => bridge.uad
+  && setOwnProp(bridge.call('UAD'), 'getHighEntropyValues', getUAHints);
 const sendTabClose = () => bridge.post('TabClose');
 const sendTabFocus = () => bridge.post('TabFocus');
 
