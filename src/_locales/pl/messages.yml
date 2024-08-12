@@ -140,10 +140,12 @@ confirmUndoImport:
     aktualizacja, edycja, dostosowywanie)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Adresy URL, które są na tej liście, nie zostaną dołączone do skryptów.
+  message: Czarna lista wstrzykiwań (skrypty nie będą działać w pasujących witrynach)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Czarna lista sieci (skrypty nie będą łączyć się z pasującymi witrynami i ich
+    plikami cookie)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
