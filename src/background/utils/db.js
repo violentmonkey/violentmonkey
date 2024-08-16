@@ -2,6 +2,7 @@ import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
   getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
+  ignoreChromeErrors,
 } from '@/common';
 import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
@@ -32,6 +33,8 @@ const removedScripts = [];
 /** Same order as in SIZE_TITLES and getSizes */
 export const sizesPrefixRe = RegExp(
   `^(${S_CODE_PRE}|${S_SCRIPT_PRE}|${S_VALUE_PRE}|${S_REQUIRE_PRE}|${S_CACHE_PRE}${S_MOD_PRE})`);
+const pendingDeps = new Map();
+const depsPorts = {};
 
 addPublicCommands({
   GetScriptVer(opts) {
@@ -697,18 +700,30 @@ function buildPathMap(script, base) {
 export async function fetchResources(script, resourceCache, reqOptions) {
   const { custom, meta } = script;
   const { pathMap } = custom;
+  const { portId } = resourceCache || {};
+  const onError = err => err;
   const snatch = async (url, type) => {
     if (!url || isDataUri(url)) return;
     url = pathMap[url] || url;
-    const contents = resourceCache?.[type]?.[url];
-    if (contents != null) {
-      storage[type].setOne(url, contents);
+    let res = pendingDeps.get(url);
+    if (res) return res;
+    res = resourceCache?.[type]?.[url];
+    if (res != null) {
+      storage[type].setOne(url, res);
       return;
     }
     if (!resourceCache
     || !resourceCache.reuseDeps && !isRemote(url)
     || await storage[type].getOne(url) == null) {
-      return storage[type].fetch(url, reqOptions).catch(err => err);
+      res = storage[type].fetch(url, reqOptions).then(portId && (() => {
+        pendingDeps.delete(url);
+        postToPort(depsPorts, portId, [url, true]);
+      }), onError);
+      if (portId) {
+        pendingDeps.set(url, res);
+        postToPort(depsPorts, portId, [url]);
+      }
+      return res;
     }
   };
   const icon = custom.icon || meta.icon;
@@ -731,6 +746,18 @@ export async function fetchResources(script, resourceCache, reqOptions) {
       return `${message}\n${error}`;
     }
   }
+}
+
+function postToPort(ports, id, msg) {
+  let p = ports[id];
+  if (!p) {
+    p = ports[id] = chrome.runtime.connect({ name: id });
+    p.onDisconnect.addListener(() => {
+      ignoreChromeErrors();
+      delete ports[id];
+    });
+  }
+  p.postMessage(msg);
 }
 
 function formatHttpError(e) {
