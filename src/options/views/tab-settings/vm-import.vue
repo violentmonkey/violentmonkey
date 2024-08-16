@@ -21,7 +21,7 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
-import { ensureArray, i18n, sendCmdDirectly } from '@/common';
+import { ensureArray, getUniqId, i18n, sendCmdDirectly } from '@/common';
 import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
@@ -39,6 +39,7 @@ const i18nConfirmUndoImport = i18n('confirmUndoImport');
 const labelImportScriptData = i18n('labelImportScriptData');
 const labelImportSettings = i18n('labelImportSettings');
 
+let depsPortId;
 let undoPort;
 
 onMounted(() => {
@@ -68,6 +69,7 @@ async function doImportBackup(file) {
   const entries = await reader.getEntries().catch(report) || [];
   if (reports.length) return;
   report('', file.name, 'info');
+  report('', '', 'info'); // deps
   const uriMap = {};
   const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
   const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
@@ -76,6 +78,23 @@ async function doImportBackup(file) {
   const scripts = vm.scripts || {};
   const values = vm.values || {};
   let now;
+  let depsDone = 0;
+  let depsTotal = 0;
+  depsPortId = getUniqId();
+  chrome.runtime.onConnect.addListener(port => {
+    if (port.name !== depsPortId) return;
+    port.onMessage.addListener(([url, done]) => {
+      if (done) ++depsDone; else ++depsTotal;
+      reports[1].name = i18n('msgLoadingDependency', [depsDone, depsTotal]);
+      if (depsDone === depsTotal) {
+        url = i18n('buttonOK');
+        port.disconnect();
+      } else if (!done) {
+        url += '...';
+      }
+      reports[1].text = url;
+    });
+  });
   if (!undoPort) {
     now = ' ⯈ ' + new Date().toLocaleTimeString();
     undoPort = chrome.runtime.connect({ name: 'undoImport' });
@@ -121,6 +140,7 @@ async function doImportBackup(file) {
     const more = scripts[name];
     const data = {
       code,
+      portId: depsPortId,
       ...more && {
         custom: more.custom,
         config: {
