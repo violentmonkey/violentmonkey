@@ -1,4 +1,4 @@
-import { isDataUri, isRemote, makeRaw, request } from '@/common';
+import { isCdnUrlRe, isDataUri, isRemote, makeRaw, request } from '@/common';
 import { NO_CACHE } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import storage from './storage';
@@ -70,7 +70,7 @@ export async function requestNewer(url, opts) {
   }
   for (const get of multi ? [0, 1] : [1]) {
     if (modOld || get) {
-      const req = await (isLocal ? request : requestLimited)(url,
+      const req = await (isLocal || isCdnUrlRe.test(url) ? request : requestLimited)(url,
         get ? opts
           : { ...opts, ...NO_CACHE, method: 'HEAD' });
       const { headers } = req;

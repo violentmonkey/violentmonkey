@@ -269,6 +269,38 @@ const isLocalUrlRe = re`/^(
     )
     (:\d+|\/|$)
 )/ix`;
+/** Cherry-picked from https://greasyfork.org/en/help/cdns */
+export const isCdnUrlRe = re`/^https:\/\/(
+  cdn(js)?\.[^/]+ |
+  bundle\.run |
+  (update\.)?(greas|sleaz)yfork\.org |
+  (www\.)?gitcdn\.\w+ |
+  (
+    ajax\.aspnetcdn |
+    apis\.google |
+    apps\.bdimg |
+    caiyunapp |
+    code\.(bdstatic | jquery) |
+    kit\.fontawesome |
+    lib\.baomitu |
+    libs\.baidu |
+    npm\.elemecdn |
+    registry\.npmmirror |
+    static\.(hdslb | yximgs) |
+    uicdn\.toast |
+    unpkg |
+    www\.(gstatic | layuicdn) |
+    \w+\.googleapis
+  )\.com |
+  (
+    bowercdn |
+    craig\.global\.ssl\.fastly
+  )\.net |
+  [^/.]+\.(
+    github\.(io | com) |
+    zstatic\.net
+  )
+)\//ix`;
 export const isDataUri = url => /^data:/i.test(url);
 export const isValidHttpUrl = url => /^https?:\/\//i.test(url) && tryUrl(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
