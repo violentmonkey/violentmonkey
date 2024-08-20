@@ -43,6 +43,7 @@ const API_EXTRA = [
 const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
+const SAFE_IIFE_RE = /^\s*(?:\/\*[\s\S]*?\*\/\s*)*[!;]/u;
 const UNSAFE_INLINE = "'unsafe-inline'";
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
@@ -486,10 +487,16 @@ function prepareScript(script, env) {
       // hiding module interface from @require'd scripts so they don't mistakenly use it
       '(define,module,exports)=>{');
   }
+  tmp = false;
   for (const url of meta[S_REQUIRE]) {
     const req = require[pathMap[url] || url];
     if (/\S/.test(req)) {
-      injectedCode.push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
+      injectedCode.push(...[
+        tmp && !SAFE_IIFE_RE.test(req) && ';',
+        req,
+        !NEWLINE_END_RE.test(req) && '\n',
+      ].filter(Boolean));
+      tmp = true;
     }
   }
   codeIndex = injectedCode.length;
