@@ -463,7 +463,6 @@ function prepareScript(script, env) {
   const injectedCode = [];
   const metaCopy = meta::mapEntry(null, pluralizeMeta);
   const metaStrMatch = METABLOCK_RE.exec(code);
-  let hasReqs;
   let codeIndex;
   let tmp;
   for (const key of META_KEYS_TO_ENSURE) {
@@ -491,22 +490,16 @@ function prepareScript(script, env) {
     const req = require[pathMap[url] || url];
     if (/\S/.test(req)) {
       injectedCode.push(req, NEWLINE_END_RE.test(req) ? ';' : '\n;');
-      hasReqs = true;
     }
-  }
-  // adding a nested IIFE to support 'use strict' in the code when there are @requires
-  if (hasReqs && wrap) {
-    injectedCode.push(startIIFE, '()=>{');
   }
   codeIndex = injectedCode.length;
   injectedCode.push(code);
   // adding a new line in case the code ends with a line comment
   injectedCode.push(...[
-    !NEWLINE_END_RE.test(code) ? '\n' : '',
-    hasReqs && wrap ? '})()' : '',
-    wrapTryCatch ? `})()}catch(e){${dataKey}(e)}}` : wrap ? `})()}` : '',
+    !NEWLINE_END_RE.test(code) && '\n',
+    wrapTryCatch ? `})()}catch(e){${dataKey}(e)}}` : wrap && `})()}`,
     // 0 at the end to suppress errors about non-cloneable result of executeScript in FF
-    IS_FIREFOX ? ';0' : '',
+    IS_FIREFOX && ';0',
     '\n//# sourceURL=', getScriptPrettyUrl(script, displayName),
   ].filter(Boolean));
   return {
