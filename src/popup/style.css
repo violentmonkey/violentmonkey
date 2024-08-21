@@ -113,7 +113,17 @@ footer {
   /* expand right-click-to-edit area */
   flex: 1;
   align-self: stretch;
-  align-content: center;
+  align-items: center;
+  display: flex;
+  .tardy {
+    margin-left: .5rem;
+    color: red;
+    .icon {
+      width: 16px;
+      height: 16px;
+      vertical-align: text-bottom;
+    }
+  }
 }
 
 .menu-buttons {
@@ -283,10 +293,6 @@ footer {
   border: 1px solid var(--fill-2);
   max-height: $footerHeight;
   overflow: hidden;
-  &[data-tall] {
-    overflow-y: auto;
-    max-height: 50vh;
-  }
 }
 
 .failure-reason {
@@ -297,6 +303,11 @@ footer {
   }
   code {
     max-width: 100%;
+  }
+  &.note {
+    font-size: smaller;
+    padding-left: $iconML;
+    hyphens: auto;
   }
 }
 

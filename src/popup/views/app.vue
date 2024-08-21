@@ -90,7 +90,7 @@
           <div
             class="menu-item menu-area"
             :tabIndex="tabIndex"
-            :data-message="!store.failure && item.data.more ? TARDY_MATCH : item.name"
+            :data-message="item.name"
             @focus="focusedItem = item"
             @keydown.enter.exact.stop="onEditScript(item)"
             @keydown.space.exact.stop="onToggleScript(item)"
@@ -103,6 +103,11 @@
                  @mousedown.middle.exact.stop="onEditScript(item)">
               <sup class="syntax" v-if="item.data.syntax" v-text="i18n('msgSyntaxError')"/>
               {{item.name}}
+              <a v-if="!store.failure && item.data.more"
+                 class="tardy" tabindex="0" :title="TARDY_MATCH"
+                 @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
+                <Icon name="info"/>
+              </a>
             </div>
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>
@@ -159,10 +164,10 @@
         </div>
       </div>
     </div>
-    <div class="failure-reason" v-if="store.injectionFailure">
-      <div v-text="i18n('menuInjectionFailed')"/>
+    <div class="failure-reason" v-if="note || store.injectionFailure" :class="{note}">
+      <div v-text="note || i18n('menuInjectionFailed')"/>
       <a v-text="i18n('menuInjectionFailedFix')" href="#"
-         v-if="store.injectionFailure.fixable"
+         v-if="!note && store.injectionFailure.fixable"
          @click.prevent="onInjectionFailureFix"/>
     </div>
     <div class="incognito"
@@ -172,7 +177,7 @@
       <a v-if="reloadHint" v-text="reloadHint" :tabIndex="tabIndex" @click="reloadTab" />
       <a v-else target="_blank" :href="'https://' + HOME" :tabIndex="tabIndex" v-text="HOME" />
     </footer>
-    <div class="message" v-if="message" v-text="message" :data-tall="message === TARDY_MATCH"/>
+    <div class="message" v-if="message" v-text="message"/>
     <div v-show="topExtras" ref="$topExtras" class="extras-menu">
       <div v-text="i18n('labelSettings')" @click="onManage(1)" tabindex="0"/>
       <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
@@ -235,6 +240,7 @@ const activeMenu = ref('scripts');
 const extras = ref();
 const focusedItem = ref();
 const message = ref();
+const note = ref();
 const topExtras = ref();
 
 const activeLinks = computed(makeActiveLinks);
