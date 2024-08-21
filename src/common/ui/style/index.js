@@ -75,3 +75,4 @@ options.hook((changes) => {
 if (isTouch) {
   document.documentElement.classList.add('touch');
 }
+document.documentElement.lang = chrome.i18n.getUILanguage(); // enable CSS hyphenation
