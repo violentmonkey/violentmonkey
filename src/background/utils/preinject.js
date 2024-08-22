@@ -43,7 +43,12 @@ const API_EXTRA = [
 const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
-const UNSAFE_CONCAT_RE = /^\s*(?:\/\*[\s\S]*?\*\/|\/\/.*[\r\n]+|\s+)*[-+[(]/u;
+const SKIP_COMMENTS_RE = /^\s*(?:\/\*[\s\S]*?\*\/|\/\/.*[\r\n]+|\s+)*/u;
+/** Not using a combined regex to check for the chars to avoid catastrophic backtracking */
+const isUnsafeConcat = s => (s = s.charCodeAt(s.match(SKIP_COMMENTS_RE)[0].length)) === 45/*"-"*/
+  || s === 43/*"+"*/
+  || s === 91/*"["*/
+  || s === 40/*"("*/;
 const UNSAFE_INLINE = "'unsafe-inline'";
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
@@ -492,14 +497,14 @@ function prepareScript(script, env) {
     const req = require[pathMap[url] || url];
     if (/\S/.test(req)) {
       injectedCode.push(...[
-        tmp && UNSAFE_CONCAT_RE.test(req) && ';',
+        tmp && isUnsafeConcat(req) && ';',
         req,
         !NEWLINE_END_RE.test(req) && '\n',
       ].filter(Boolean));
       tmp = true;
     }
   }
-  if (tmp && UNSAFE_CONCAT_RE.test(code)) {
+  if (tmp && isUnsafeConcat(code)) {
     injectedCode.push(';');
   }
   codeIndex = injectedCode.length;
