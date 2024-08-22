@@ -184,7 +184,9 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
-import { createSearchRules, markRemove, performSearch, runInBatch, store } from '../utils';
+import {
+  createSearchRules, markRemove, performSearch, runInBatch, store, TOGGLE_OFF, TOGGLE_ON,
+} from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
@@ -313,7 +315,6 @@ const searchNeedsCodeIds = computed(() => state.search.rules.some(rule => !rule.
 const activeTags = computed(() => state.search.tokens.filter(token => token.prefix === '#' && !token.negative).map(token => token.parsed));
 const getCurrentList = () => showRecycle.value ? store.removedScripts : store.scripts;
 const getDataBatchAction = evt => evt.target.closest('[data-batch-action]');
-const TOGGLE_ON = 'toggle-on';
 const ALL_BATCH_ACTIONS = {
   [TOGGLE]: {
     icon: TOGGLE_ON,
@@ -348,7 +349,7 @@ const batchActions = computed(() => {
     toEnable += !s.config.enabled;
     if (!allShown) toUpdate += s.$canUpdate > 0;
   }
-  res[TOGGLE].icon = toEnable ? TOGGLE_ON : 'toggle-off';
+  res[TOGGLE].icon = toEnable ? TOGGLE_ON : TOGGLE_OFF;
   res[TOGGLE].num = toEnable < num ? toEnable : '';
   if (!toUpdate) ({ [UPDATE]: toUpdate, ...res } = res);
   else res[UPDATE].num = toUpdate < num ? toUpdate : '';

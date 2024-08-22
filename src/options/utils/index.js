@@ -33,6 +33,8 @@ export const kOrigInclude = 'origInclude';
 export const kOrigMatch = 'origMatch';
 export const kStorageSize = 'storageSize';
 export const kUpdateURL = 'updateURL';
+export const TOGGLE_ON = 'toggle-on';
+export const TOGGLE_OFF = 'toggle-off';
 
 export let K_SAVE; // deduced from the current CodeMirror keymap
 
