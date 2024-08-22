@@ -43,7 +43,7 @@ const API_EXTRA = [
 const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
-const SAFE_IIFE_RE = /^\s*(?:\/\*[\s\S]*?\*\/\s*)*[!;]/u;
+const UNSAFE_CONCAT_RE = /^\s*(?:\/\*[\s\S]*?\*\/|\/\/.*[\r\n]+|\s+)*[-+[(]/u;
 const UNSAFE_INLINE = "'unsafe-inline'";
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
@@ -492,12 +492,15 @@ function prepareScript(script, env) {
     const req = require[pathMap[url] || url];
     if (/\S/.test(req)) {
       injectedCode.push(...[
-        tmp && !SAFE_IIFE_RE.test(req) && ';',
+        tmp && UNSAFE_CONCAT_RE.test(req) && ';',
         req,
         !NEWLINE_END_RE.test(req) && '\n',
       ].filter(Boolean));
       tmp = true;
     }
+  }
+  if (tmp && UNSAFE_CONCAT_RE.test(code)) {
+    injectedCode.push(';');
   }
   codeIndex = injectedCode.length;
   injectedCode.push(code);
