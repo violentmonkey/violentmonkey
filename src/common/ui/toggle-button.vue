@@ -1,38 +1,22 @@
 <template>
-  <div class="toggle-button" :class="{active: modelValue}"
-       tabindex="0"
-       @keypress.enter.exact="onToggle"
-       @keypress.space.exact="onToggle"
-       @click="onToggle">
-    <slot></slot>
-  </div>
+  <!-- Using an unstyled button for proper native accessibility and Space/Enter keys -->
+  <button class="toggle-button" :class="{active: model}" @click="model = !model">
+    <slot/>
+  </button>
 </template>
 
 <script setup>
-const props = defineProps(['modelValue']);
-const emits = defineEmits(['update:modelValue']);
-// TODO: switch to defineModel() when it's not experimental
-function onToggle() {
-  emits('update:modelValue', !props.modelValue);
-}
+const model = defineModel({ type: Boolean });
 </script>
 
 <style>
 .toggle-button {
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
-  line-height: 24px;
-  text-align: center;
   color: var(--fill-12);
   background: var(--fill-2);
-  cursor: pointer;
+  border-color: var(--fill-3);
   &.active {
     color: var(--bg);
     background: var(--fill-9);
-  }
-  &:focus, &:hover {
-    filter: brightness(.8);
   }
 }
 </style>
