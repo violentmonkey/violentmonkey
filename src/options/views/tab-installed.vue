@@ -38,7 +38,7 @@
           </div>
           <div v-if="state.filteredScripts.length" class="btn-group">
             <a
-              v-for="({ icon, num }, key) in batchActions" :key="key"
+              v-for="({ icon, num }, key) in batchActions" :key
               class="btn-ghost"
               :class="{
                 'has-error': state.batchAction.action === key,
@@ -138,12 +138,12 @@
           :key="script.props.id"
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
-          :script="script"
-          :draggable="draggable"
+          :script
+          :draggable
           :visible="index < state.batchRender.limit"
           :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
-          :activeTags="activeTags"
+          :activeTags
           @remove="handleActionRemove"
           @restore="handleActionRestore"
           @toggle="handleActionToggle"

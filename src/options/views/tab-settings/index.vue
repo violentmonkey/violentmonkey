@@ -21,7 +21,7 @@
           <locale-group i18n-key="labelPopupSort">
             <select v-for="opt in ['filtersPopup.sort']" v-model="settings[opt]" :key="opt">
               <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
-                      :value="value" v-text="title" />
+                      :value v-text="title" />
             </select>
           </locale-group>
         </label>
@@ -30,7 +30,7 @@
         <label>
           <select v-for="opt in ['filtersPopup.hideDisabled']" v-model="settings[opt]" :key="opt">
             <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
-                    :value="value" v-text="title" />
+                    :value v-text="title" />
           </select>
         </label>
         <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
@@ -41,7 +41,7 @@
           <span v-text="i18n('labelBadge')"></span>
           <select v-for="opt in ['showBadge']" v-model="settings[opt]" :key="opt">
             <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
-                    :value="value" v-text="title" />
+                    :value v-text="title" />
           </select>
         </label>
       </div>
@@ -81,7 +81,7 @@
       <vm-maintenance/>
     </section>
     <vm-sync></vm-sync>
-    <details v-for="(obj, key) in {showAdvanced: settings}" :key="key" :open="obj[key]">
+    <details v-for="(obj, key) in {showAdvanced: settings}" :key :open="obj[key]">
       <summary @click.prevent="obj[key] = !obj[key]">
         <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
         <component v-text="i18n('labelAdvanced')" class="inline-block"
@@ -94,7 +94,7 @@
             <locale-group i18n-key="optionUiTheme">
               <select v-for="opt in ['uiTheme']" v-model="settings[opt]" :key="opt">
                 <option v-for="(title, value) in items[opt].enum" :key="value"
-                        :value="value" v-text="title" />
+                        :value v-text="title" />
               </select>
             </locale-group>
           </label>

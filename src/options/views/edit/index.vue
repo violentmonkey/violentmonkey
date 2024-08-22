@@ -34,7 +34,7 @@
     <div class="frozen-note shelf mr-2c flex flex-wrap" v-if="frozenNote && nav === 'code'">
       <p v-text="i18n('readonlyNote')"/>
       <keep-alive>
-        <VMSettingsUpdate class="flex ml-2c" :script="script"/>
+        <VMSettingsUpdate class="flex ml-2c" :script/>
       </keep-alive>
     </div>
 
@@ -51,7 +51,7 @@
       ref="$code"
       v-show="nav === 'code'"
       :active="nav === 'code'"
-      :commands="commands"
+      :commands
       @code-dirty="codeDirty = $event"
     />
     <keep-alive ref="$tabBody">
@@ -73,7 +73,7 @@
     <vm-help
       class="edit-body"
       v-else-if="nav === 'help'"
-      :hotkeys="hotkeys"
+      :hotkeys
     />
     </keep-alive>
 

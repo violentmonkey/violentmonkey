@@ -17,27 +17,27 @@
       <span
         class="menu-area"
         :data-message="optionsData.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
-        :tabIndex="tabIndex"
+        :tabIndex
         @click="onToggle">
         <icon :name="getSymbolCheck(optionsData.isApplied)"></icon>
       </span>
       <span
         class="menu-area"
         :data-message="i18n('menuDashboard')"
-        :tabIndex="tabIndex"
+        :tabIndex
         @click="onManage">
         <icon name="cog"></icon>
       </span>
       <span
         class="menu-area"
         :data-message="i18n('menuNewScript')"
-        :tabIndex="tabIndex"
+        :tabIndex
         @click="onCreateScript">
         <icon name="plus"></icon>
       </span>
       <span
         class="menu-area"
-        :tabIndex="tabIndex"
+        :tabIndex
         :_item.prop="{}"
         @click="showExtras">
         <icon name="more" />
@@ -47,7 +47,7 @@
       <div class="menu-item menu-area menu-find">
         <template v-for="(url, text, i) in findUrls" :key="url">
           <a target="_blank" :class="{ ellipsis: !i, 'mr-1': !i, 'ml-1': i }"
-             :href="url" :data-message="url.split('://')[1]" :tabIndex="tabIndex">
+             :href="url" :data-message="url.split('://')[1]" :tabIndex>
             <icon name="search" v-if="!i"/>{{text}}
           </a>
           <template v-if="!i">/</template>
@@ -69,7 +69,7 @@
       :key="scope.name">
       <div
         class="menu-item menu-area menu-group"
-        :tabIndex="tabIndex"
+        :tabIndex
         @click="toggleMenu(scope.name)">
         <icon name="arrow" class="icon-collapse"></icon>
         <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
@@ -89,7 +89,7 @@
           class="script">
           <div
             class="menu-item menu-area"
-            :tabIndex="tabIndex"
+            :tabIndex
             :data-message="item.name"
             @focus="focusedItem = item"
             @keydown.enter.exact.stop="onEditScript(item)"
@@ -114,20 +114,20 @@
           <div class="submenu-buttons"
                v-show="showButtons(item)">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
-            <div class="submenu-button" :tabIndex="tabIndex" @click="onEditScript(item)"
+            <div class="submenu-button" :tabIndex @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
             <div
               class="submenu-button"
-              :tabIndex="tabIndex"
+              :tabIndex
               :_item.prop="item"
               @click="showExtras">
               <icon name="more"/>
             </div>
           </div>
           <div v-if="item.excludes" class="excludes-menu mb-1c mr-1c">
-            <button v-for="(val, key) in item.excludes[1]" :key="key"
+            <button v-for="(val, key) in item.excludes[1]" :key
                     v-text="val" class="ellipsis" :title="`*://${val}/*`"
                     @click="onExcludeSave(item, `*://${val}/*`)"/>
             <input v-model="item.excludes[0]" spellcheck="false"
@@ -149,8 +149,8 @@
             <div
               class="menu-item menu-area"
               v-for="({ autoClose = true, text, title }, key) in store.commands[item.id]"
-              :key="key"
-              :tabIndex="tabIndex"
+              :key
+              :tabIndex
               :cmd.prop="[item.id, key, autoClose]"
               :data-message="title || text"
               @mousedown="onCommand"
@@ -174,8 +174,8 @@
        v-if="store.tab?.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
     <footer>
-      <a v-if="reloadHint" v-text="reloadHint" :tabIndex="tabIndex" @click="reloadTab" />
-      <a v-else target="_blank" :href="'https://' + HOME" :tabIndex="tabIndex" v-text="HOME" />
+      <a v-if="reloadHint" v-text="reloadHint" :tabIndex @click="reloadTab" />
+      <a v-else target="_blank" :href="'https://' + HOME" :tabIndex v-text="HOME" />
     </footer>
     <div class="message" v-if="message" v-text="message"/>
     <div v-show="topExtras" ref="$topExtras" class="extras-menu">

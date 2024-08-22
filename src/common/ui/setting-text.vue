@@ -6,8 +6,8 @@
       :class="{'has-error': error}"
       spellcheck="false"
       v-model="text"
-      :disabled="disabled"
-      :placeholder="placeholder"
+      :disabled
+      :placeholder
       :rows="rows || calcRows(text)"
       @ctrl-s="onSave"
     />

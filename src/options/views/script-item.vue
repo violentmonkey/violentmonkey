@@ -9,7 +9,7 @@
       focused: focused,
       hotkeys: focused && showHotkeys,
     }"
-    :tabIndex="tabIndex"
+    :tabIndex
     @focus="setScriptFocus(true)"
     @blur="setScriptFocus(false)">
     <div class="script-icon hidden-xs">
@@ -59,7 +59,7 @@
             class="ellipsis"
             :href="`mailto:${author.email}`"
             v-text="author.name"
-            :tabIndex="tabIndex"
+            :tabIndex
           />
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
@@ -75,7 +75,7 @@
     <div class="script-buttons script-buttons-left">
       <template v-if="canRender">
         <tooltip :content="i18n('buttonEdit')" align="start">
-          <a class="btn-ghost" :href="url" :data-hotkey="hotkeys.edit" :tabIndex="tabIndex">
+          <a class="btn-ghost" :href="url" :data-hotkey="hotkeys.edit" :tabIndex>
             <icon name="code"></icon>
           </a>
         </tooltip>
@@ -85,7 +85,7 @@
               class="btn-ghost"
               @click="onToggle"
               :data-hotkey="hotkeys.toggle"
-              :tabIndex="tabIndex">
+              :tabIndex>
               <icon :name="isEnabled ? TOGGLE_ON : TOGGLE_OFF"/>
             </a>
           </tooltip>
@@ -127,7 +127,7 @@
     <div class="script-buttons script-buttons-right">
       <template v-if="canRender">
         <tooltip :content="i18n('buttonRemove')" align="end" v-if="showRecycle || !isRemoved">
-          <a class="btn-ghost" :class="{ 'btn-danger': isRemoved }" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex="tabIndex">
+          <a class="btn-ghost" :class="{ 'btn-danger': isRemoved }" @click="onRemove" :data-hotkey="hotkeys.remove" :tabIndex>
             <icon name="trash"></icon>
           </a>
         </tooltip>
@@ -136,7 +136,7 @@
             class="btn-ghost"
             @click="onRestore"
             :data-hotkey="hotkeys.restore"
-            :tabIndex="tabIndex">
+            :tabIndex>
             <icon name="undo"></icon>
           </a>
         </tooltip>

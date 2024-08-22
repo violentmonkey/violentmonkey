@@ -104,7 +104,7 @@
         :value="script"
         class="abs-full"
         :cm-options="cmOptions"
-        :commands="commands"
+        :commands
         :install="{ code, deps, url: info.url }"
       />
     </div>

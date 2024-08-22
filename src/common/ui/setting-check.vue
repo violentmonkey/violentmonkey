@@ -1,6 +1,6 @@
 <template>
   <label class="setting-check">
-    <input type="checkbox" v-model="value" :disabled="disabled">
+    <input type="checkbox" v-model="value" :disabled>
     <slot>
       <span v-text="label" />
     </slot>

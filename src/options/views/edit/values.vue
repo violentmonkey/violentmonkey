@@ -37,7 +37,7 @@
           @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')"/>
         <div
           v-for="key in pageKeys"
-          :key="key"
+          :key
           class="edit-values-row flex monospace-font"
           @keydown.delete.ctrl.exact="onRemove(key)"
           @click="onEdit(key)">
@@ -103,7 +103,7 @@
           ref="$value"
           class="h-100 mt-1"
           mode="application/json"
-          :readOnly="readOnly"
+          :readOnly
           @code-dirty="onChange"
           @keydown.tab.shift.exact.capture.stop
           :commands="{ close: onCancel, save: onSave }"

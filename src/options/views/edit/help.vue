@@ -7,7 +7,7 @@
     </div>
     <div class="keyboard">
       <h3 v-text="i18n('editHelpKeyboard')"/>
-      <dl v-for="([key, cmd]) of hotkeys" :key="key">
+      <dl v-for="([key, cmd]) of hotkeys" :key>
         <dt class="monospace-font" v-text="key"></dt>
         <dd v-text="cmd"></dd>
       </dl>
