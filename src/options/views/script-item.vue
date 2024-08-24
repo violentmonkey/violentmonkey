@@ -180,7 +180,6 @@ const emit = defineEmits([
 ]);
 const $root = ref();
 const canRender = ref(props.visible);
-const script = computed(() => props.script); // to simplify the template
 const isEnabled = computed(() => props.script.config.enabled);
 const isRemoved = computed(() => props.script.config.removed);
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
