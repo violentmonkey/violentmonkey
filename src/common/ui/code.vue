@@ -595,8 +595,12 @@ $selectionDarkBg: rgba(80, 75, 65, .99);
     align-items: center;
     margin-right: .5rem;
   }
-  input[type=search] {
-    min-width: 8em;
+  @supports (field-sizing: content) {
+    input {
+      field-sizing: content;
+      min-width: 3ch;
+      width: auto;
+    }
   }
   span > input { // a tooltip'ed input
     width: 100%;
