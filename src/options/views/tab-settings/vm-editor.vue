@@ -62,6 +62,7 @@ import SettingText from '@/common/ui/setting-text';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import Icon from '@/common/ui/icon';
 import { toggleBoolean } from "@/options/utils";
+import cmDefaults from '@/common/ui/code-defaults';
 
 const $el = ref();
 const hint = ref();
@@ -129,7 +130,7 @@ async function toggleStateHint(curValue) {
     const opts = {};
     Object.entries({
       ...(await import('codemirror')).default.defaults,
-      ...(await import('@/common/ui/code')).default.data().cmDefaults,
+      ...cmDefaults,
       ...options.get('editor'),
     })
     // sort by keys alphabetically to make it more readable
