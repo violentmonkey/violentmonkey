@@ -9,7 +9,7 @@
               :class="{active: state.menuNew}"
               :closeAfterClick="true">
               <Tooltip :content="i18n('buttonNew')" placement="bottom" align="start" :disabled="state.menuNew">
-                <a class="btn-ghost" tabindex="0">
+                <a class="btn-ghost" tabindex="0" ref="$menuNew">
                   <Icon name="plus" />
                 </a>
               </Tooltip>
@@ -268,6 +268,7 @@ let columnsForCardsMode = [];
 /** @type {CSSMediaRule} */
 let narrowMediaRules;
 
+const $menuNew = ref();
 const refSearch = ref();
 const refList = ref();
 const scroller = ref();
@@ -752,6 +753,13 @@ if (screen.availWidth > 767) {
 }
 watch(getCurrentList, refreshUI);
 watch(() => store.route.paths[1], onHashChange);
+watch(() => store.scripts, val => {
+  if (!val.length) {
+    val = $menuNew.value;
+    val.focus(); // for Tab navigation and focus highlight
+    val.click();
+  }
+});
 watch(selectedScript, script => {
   keyboardService.setContext('selectedScript', script);
 });
