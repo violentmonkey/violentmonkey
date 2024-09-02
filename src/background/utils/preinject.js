@@ -1,4 +1,6 @@
-import { getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd } from '@/common';
+import {
+  browserWindows, getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd
+} from '@/common';
 import {
   __CODE, TL_AWAIT, UNWRAP,
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
@@ -22,12 +24,13 @@ import {
 import { clearStorageCache, onStorageChanged } from './storage-cache';
 import { getFrameDocId, getFrameDocIdAsObj, tabsOnRemoved } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
-import { ua } from './ua';
+import { setBrowserName, ua } from './ua';
 
 let isApplied;
 let injectInto;
 let ffInject;
 let xhrInject = false; // must be initialized for proper comparison when toggling
+let checkedVivaldi = IS_FIREFOX;
 
 const sessionId = getUniqId();
 const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
@@ -153,6 +156,7 @@ addPublicCommands({
     const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
+    if (!checkedVivaldi) checkVivaldi(tab);
     clearFrameData(tabId, frameDoc);
     let skip = skippedTabs[tabId];
     if (skip > 0) { // first time loading the tab after skipScripts was invoked
@@ -395,6 +399,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   const bag = { [INJECT]: inject };
   const { allIds, [MORE]: envDelayed } = env;
   const moreKey = envDelayed[IDS].length && getUniqId('more');
+  if (isObject(checkedVivaldi)) await checkedVivaldi;
   Object.assign(inject, {
     [SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
@@ -662,6 +667,17 @@ function clearFrameData(tabId, frameId, tabRemoved) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
   clearNotifications(tabId, frameId, tabRemoved);
+}
+
+/** Checking on demand because a tab/window definitely exists now,
+ * which is not guaranteed at browser start */
+function checkVivaldi(obj) {
+  checkedVivaldi = true;
+  if (obj.vivExtData/*new*/ || obj.extData/*old*/) {
+    setBrowserName('Vivaldi');
+  } else if ((obj = obj.windowId) != null) {
+    checkedVivaldi = browserWindows.get(obj).then(checkVivaldi);
+  }
 }
 
 function sendPopupShown(tabId, frameDoc) {
