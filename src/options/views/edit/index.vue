@@ -235,12 +235,6 @@ watch(canSave, val => {
   toggleUnloadSentry(val);
   keyboardService.setContext('canSave', val);
 });
-// usually errors for resources
-watch(() => props.initial.error, error => {
-  if (error) {
-    showMessage({ text: `${props.initial.message}\n\n${error}` });
-  }
-});
 watch(codeDirty, onDirty);
 watch(script, onScript);
 
@@ -251,6 +245,15 @@ watch(script, onScript);
   script.value = deepCopy(src);
   watch(() => script.value.config, onChange, { deep: true });
   watch(() => script.value.custom, onChange, { deep: true });
+  watch(() => src.error, error => {
+    // usually errors for resources
+    if (error) showMessage({ text: `${src.message}\n\n${error}` });
+  });
+  watch(() => src.config.enabled, val => {
+    // script was toggled externally in the popup/dashboard/sync
+    script.value.config.enabled = val;
+    if (savedCopy) savedCopy.config.enabled = val;
+  });
 }
 
 onMounted(() => {
