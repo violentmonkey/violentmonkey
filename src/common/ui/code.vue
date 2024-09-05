@@ -244,7 +244,7 @@ function createPlaceholders(change) {
   return res;
 }
 function renderPlaceholders() {
-  for (const p of placeholders) {
+  placeholders.forEach(p => {
     if (!p.el) {
       const { line, ch, body, length } = p;
       const el = document.createElement('span');
@@ -261,7 +261,7 @@ function renderPlaceholders() {
       };
       p.el = el;
     }
-  }
+  });
 }
 function initialize() {
   maxDisplayLength = cm.options.maxDisplayLength;
