@@ -21,6 +21,9 @@ $DARKhoverColor: var(--fill-15);
 $DARKhoverBack: #404c5c;
 $DARKhoverButtonInactiveBack: #5b6979;
 
+html {
+  scrollbar-width: none; /* Vivaldi: preventing the full-body scrollbar before size-adjustment kicks in */
+}
 body {
   width: 320px;
   max-width: 100%;

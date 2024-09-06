@@ -548,25 +548,15 @@ function showButtons(item) {
 onMounted(() => {
   const $el = $root.value;
   const style = $el.style;
-  // Chrome bug: the popup's initial devicePixelRatio equals zoom level of a normal extension page
-  const ratio = !IS_FIREFOX && devicePixelRatio;
-  if (ratio && ratio !== 1) {
-    self.onresize = () => {
-      if (ratio !== devicePixelRatio) {
-        style.maxHeight = parseInt(style.maxHeight) * ratio + 'px';
-        self.onresize = null;
-      }
-    };
-  }
-  /* Popup is auto-sized by the browser, so we force it to expand to extract the maximum height.
-   * Doing it at startup helps avoid glitchy re-adjustments later. */
-  style.height = screen.height + 'px';
-  new IntersectionObserver(([e], obs) => {
-    obs.disconnect();
-    // rootBounds may be 0 in old Firefox, so we'll use clientHeight as fallback
-    style.maxHeight = ((e.rootBounds.height | 0) || document.documentElement.clientHeight) + 'px';
-    style.height = '';
-  }).observe($el);
+  const setMaxHeightOnResize = () => {
+    // 1. Ignoring initial empty popup
+    // 2. Ignoring initial devicePixelRatio which is based on page zoom in this extension's tabs
+    if (document.readyState !== 'loading' && $el.clientHeight > innerHeight) {
+      removeEventListener('resize', setMaxHeightOnResize);
+      style.maxHeight = innerHeight + 'px';
+    }
+  };
+  addEventListener('resize', setMaxHeightOnResize);
   focusMe($el);
   keyboardService.enable();
   keyboardService.register('escape', () => {
