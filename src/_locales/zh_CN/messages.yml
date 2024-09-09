@@ -136,10 +136,10 @@ confirmUndoImport:
   message: 撤销所有数据变更（导入、更新、编辑、自定义）
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: 此列表匹配的URL将不会被注入脚本。
+  message: 注入黑名单（脚本不会在匹配的网站上运行）
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: 网络黑名单（脚本不会连接到匹配的网站及其 cookie）
 descCustomCSS:
   description: Description of custom CSS section.
   message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。
@@ -152,10 +152,17 @@ descEditorOptions:
     rel="noopener noreferrer">完整列表</a>。
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    布尔选项可以通过双击值来切换：<code>true</code> 表示启用，<code>false</code> 表示停用。以
+    <code>Delay</code>、<code>Interval</code>、<code>Rate</code>、<code>Time</code>
+    结尾的数值选项单位为毫秒。
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    非标准选项：<code>autocompleteOnTyping</code>
+    是在打字后显示自动完成提示的延迟时间（以毫秒计，<code>0</code>
+    表示停用），<code>killTrailingSpaceOnSave</code>在保存时自动移除每一行的尾随空格
+    ，<code>showTrailingSpace</code>将尾随空格显示为点 。
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -219,7 +226,7 @@ failureReasonNoninjectable:
     （常见原因：浏览器/扩展内置页面、被策略屏蔽、Opera 下的搜索页面需要特殊设置）
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: 暴力猴已重新启动。请重新载入标签页以执行用户脚本。
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -264,7 +271,7 @@ genericUseGlobal:
   message: 使用全局设置
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: '"#" 模式仅在首次打开网站或重新加载标签页时有效： $1'
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: 回收站
@@ -273,7 +280,7 @@ helpForLocalFile:
   message: 显示拖放本地脚本的详细说明
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: '针对 $1匹配的脚本 '
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：
@@ -427,7 +434,7 @@ labelHomepageURL:
   message: 主页地址：
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 图标地址
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: 导入脚本数据
@@ -791,7 +798,10 @@ msgSyntaxError:
   message: 语法错误？
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    当页面载入时，如果脚本不存在或与网址不匹配，这种情况通常发生在像是 fb 或 instagram
+    这类使用假导航的单页应用网站中。您可以重新载入分页以执行脚本。要修正脚本，请对整个网站使用 @match，然后利用 MutationObserver 或
+    window.navigation API 来侦测变化。
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 脚本已更新。
@@ -956,10 +966,10 @@ updateScript:
   message: 更新
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: 更新所有脚本
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: 更新当前选项卡的脚本
 valueLabelKey:
   description: Label for key of a script value.
   message: 键名（字符串）
