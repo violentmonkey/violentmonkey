@@ -394,7 +394,7 @@ function prepare(cacheKey, url, isTop) {
 }
 
 async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
-  await env[PROMISE];
+  if (env[PROMISE]) await env[PROMISE];
   cache.batch(true);
   const bag = { [INJECT]: inject };
   const { allIds, [MORE]: envDelayed } = env;
@@ -431,6 +431,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
 }
 
 function prepareScripts(env) {
+  env[PROMISE] = null; // let GC have it
   const scripts = env[SCRIPTS];
   for (let i = 0, script, key, id; i < scripts.length; i++) {
     script = scripts[i];
@@ -672,12 +673,13 @@ function clearFrameData(tabId, frameId, tabRemoved) {
 /** Checking on demand because a tab/window definitely exists now,
  * which is not guaranteed at browser start */
 function checkVivaldi(obj) {
-  checkedVivaldi = true;
   if (obj.vivExtData/*new*/ || obj.extData/*old*/) {
     setBrowserName('Vivaldi');
-  } else if ((obj = obj.windowId) != null) {
-    checkedVivaldi = browserWindows.get(obj).then(checkVivaldi);
+  } else if (!checkedVivaldi) { // skipping when we're in the nested self-call
+    checkedVivaldi = browserWindows.getCurrent().then(checkVivaldi);
+    return;
   }
+  checkedVivaldi = true;
 }
 
 function sendPopupShown(tabId, frameDoc) {
