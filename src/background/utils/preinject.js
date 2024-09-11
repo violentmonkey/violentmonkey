@@ -676,7 +676,7 @@ function checkVivaldi(obj) {
   if (obj.vivExtData/*new*/ || obj.extData/*old*/) {
     setBrowserName('Vivaldi');
   } else if ((obj = obj.windowId) != null) {
-    checkedVivaldi = browserWindows.get(obj).then(checkVivaldi);
+    checkedVivaldi = browserWindows.getCurrent().then(checkVivaldi);
   }
 }
 

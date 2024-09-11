@@ -405,7 +405,7 @@ async function readEnvironmentData(env) {
   if (badScripts.size) {
     reportBadScripts(badScripts);
   }
-  env[PROMISE] = null; // indicating it's been processed
+  // env[PROMISE] = null; // indicating it's been processed
   return env;
 }
 
