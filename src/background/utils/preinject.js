@@ -394,7 +394,7 @@ function prepare(cacheKey, url, isTop) {
 }
 
 async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
-  await env[PROMISE];
+  if (!env.db) await env[PROMISE];
   cache.batch(true);
   const bag = { [INJECT]: inject };
   const { allIds, [MORE]: envDelayed } = env;
@@ -427,6 +427,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   }
   cache.put(cacheKey, bag);
   cache.batch(false);
+  env[PROMISE] = null; // let GC have it
   return bag;
 }
 
@@ -672,12 +673,13 @@ function clearFrameData(tabId, frameId, tabRemoved) {
 /** Checking on demand because a tab/window definitely exists now,
  * which is not guaranteed at browser start */
 function checkVivaldi(obj) {
-  checkedVivaldi = true;
   if (obj.vivExtData/*new*/ || obj.extData/*old*/) {
     setBrowserName('Vivaldi');
-  } else if ((obj = obj.windowId) != null) {
+  } else if (!checkedVivaldi) { // skipping when we're in the nested self-call
     checkedVivaldi = browserWindows.getCurrent().then(checkVivaldi);
+    return;
   }
+  checkedVivaldi = true;
 }
 
 function sendPopupShown(tabId, frameDoc) {
