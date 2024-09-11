@@ -265,8 +265,6 @@ declare namespace VMInjection {
     cache: StringMap;
     cacheKeys: string[];
     code: StringMap;
-    /** DB data was added */
-    db: boolean;
     /** Dependencies by key to script ids */
     depsMap: { [url: string]: number[] };
     ids: number[];

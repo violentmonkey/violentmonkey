@@ -405,7 +405,6 @@ async function readEnvironmentData(env) {
   if (badScripts.size) {
     reportBadScripts(badScripts);
   }
-  env.db = true;
   return env;
 }
 

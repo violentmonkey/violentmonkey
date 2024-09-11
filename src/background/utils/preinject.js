@@ -394,7 +394,7 @@ function prepare(cacheKey, url, isTop) {
 }
 
 async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
-  if (!env.db) await env[PROMISE];
+  if (env[PROMISE]) await env[PROMISE];
   cache.batch(true);
   const bag = { [INJECT]: inject };
   const { allIds, [MORE]: envDelayed } = env;
@@ -427,11 +427,11 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   }
   cache.put(cacheKey, bag);
   cache.batch(false);
-  env[PROMISE] = null; // let GC have it
   return bag;
 }
 
 function prepareScripts(env) {
+  env[PROMISE] = null; // let GC have it
   const scripts = env[SCRIPTS];
   for (let i = 0, script, key, id; i < scripts.length; i++) {
     script = scripts[i];
