@@ -273,7 +273,6 @@ const isLocalUrlRe = re`/^(
 export const isCdnUrlRe = re`/^https:\/\/(
   cdn(js)?\.[^/]+ |
   bundle\.run |
-  (update\.)?(greas|sleaz)yfork\.org |
   (www\.)?gitcdn\.\w+ |
   (
     ajax\.aspnetcdn |
