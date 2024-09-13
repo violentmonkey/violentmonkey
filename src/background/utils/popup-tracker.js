@@ -88,8 +88,8 @@ function onPopupOpened(port) {
   });
 }
 
-async function prefetchSetPopup() {
-  notifyTab((await getActiveTab()).id, true);
+function prefetchSetPopup() {
+  getActiveTab().then(t => t && notifyTab(t.id, true));
 }
 
 function notifyTab(tabId, data) {
