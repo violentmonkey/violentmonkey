@@ -1,3 +1,5 @@
+import { browserWindows } from '@/common';
+import { listenOnce } from '@/common/browser';
 import { addOwnCommands, init } from './init';
 
 export const {
@@ -8,7 +10,6 @@ const uaVer = navUA.match(/\s(?:Chrom(?:e|ium)|Firefox)\/(\d+[.0-9]*)|$/i)[1];
 
 /** @type {VMScriptGMInfoPlatform} */
 export const ua = {};
-export const setBrowserName = name => { ua.browserName = name; };
 /** @type {number|void} This value can be trusted because the only way to spoof it in Chrome/ium
  * is to manually open devtools for the background page in device emulation mode.
  * Using `void` for numeric comparisons like CHROME < 100 to be false in Firefox */
@@ -27,10 +28,12 @@ init.deps.push(
     browser.runtime.getPlatformInfo(),
     browser.runtime.getBrowserInfo?.(),
     navUAD?.getHighEntropyValues(['fullVersionList']),
+    IS_FIREFOX ? [] : browserWindows.getAll(),
   ]).then(([
     { os, arch },
     { name, version } = {},
     uadValues,
+    [wnd],
   ]) => {
     if (!version && (uadValues = uadValues?.fullVersionList) && uadValues[0]) {
       [name, version] = uadValues.map(({ brand, version: v }) => (
@@ -44,5 +47,17 @@ init.deps.push(
     setBrowserName(name || 'chrome');
     ua.browserVersion = version || uaVer;
     if (FIREFOX) FIREFOX = parseFloat(version);
+    else if (wnd) checkVivaldi(wnd);
+    else browserWindows.onCreated::listenOnce(checkVivaldi);
   })
 );
+
+function checkVivaldi(wnd) {
+  if (wnd.vivExtData/*new*/ || wnd.extData/*old*/) {
+    setBrowserName('Vivaldi');
+  }
+}
+
+function setBrowserName(name) {
+  ua.browserName = name;
+}

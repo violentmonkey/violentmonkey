@@ -27,6 +27,7 @@ global.browser = {
     onUpdated: { addListener: () => {} },
   },
   windows: {
+    getAll: () => [{}],
     getCurrent: () => ({}),
   },
 };

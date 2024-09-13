@@ -19,18 +19,22 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted, reactive, ref } from 'vue';
+<script>
 import { ensureArray, getUniqId, i18n, sendCmdDirectly } from '@/common';
+import { listenOnce } from '@/common/browser';
 import { RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
-import SettingCheck from '@/common/ui/setting-check';
 import loadZipLibrary from '@/common/zip';
 import { showConfirmation } from '@/common/ui';
 import {
   kDownloadURL, kExclude, kInclude, kMatch, kOrigExclude, kOrigInclude, kOrigMatch,
   runInBatch, store,
 } from '../../utils';
+</script>
+
+<script setup>
+import { onMounted, reactive, ref } from 'vue';
+import SettingCheck from '@/common/ui/setting-check';
 
 const reports = reactive([]);
 const buttonImport = ref();
@@ -222,10 +226,7 @@ async function undoImport() {
 }
 
 function resolveOnUndoMessage(resolve) {
-  undoPort.onMessage.addListener(function fn() {
-    undoPort.onMessage.removeListener(fn);
-    resolve();
-  });
+  undoPort.onMessage::listenOnce(resolve);
 }
 
 function initDragDrop(targetElement) {

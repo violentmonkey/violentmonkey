@@ -1,4 +1,6 @@
 let { browser } = global;
+const kAddListener = 'addListener';
+const kRemoveListener = 'removeListener';
 
 // Since this also runs in a content script we'll guard against implicit global variables
 // for DOM elements with 'id' attribute which is a standard feature, more info:
@@ -9,8 +11,8 @@ if (!IS_FIREFOX && !browser?.runtime) {
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
-  const isSyncMethodName = key => key === 'addListener'
-    || key === 'removeListener'
+  const isSyncMethodName = key => key === kAddListener
+    || key === kRemoveListener
     || key === 'hasListener'
     || key === 'hasListeners';
   /** API types or enums or literal constants */
@@ -149,7 +151,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
       getManifest: 0,
       getURL: 0,
       onMessage: {
-        addListener: (onMessage, addListener) => (
+        [kAddListener]: (onMessage, addListener) => (
           listener => {
             if (process.env.DEV
             && !process.env.IS_INJECTED
@@ -210,3 +212,14 @@ if (!IS_FIREFOX && !browser?.runtime) {
  */
 
 export default browser;
+
+/** @this {object} browser api event
+ * @return {Promise<?>} listener's first parameter */
+export function listenOnce(cb) {
+  const event = this;
+  const onceFn = data => {
+    event[kRemoveListener](onceFn);
+    cb(data);
+  };
+  event[kAddListener](onceFn);
+}
