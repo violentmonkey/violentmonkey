@@ -4,7 +4,7 @@ import {
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
   ignoreChromeErrors,
 } from '@/common';
-import { INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
+import { FETCH_OPTS, INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
@@ -30,10 +30,13 @@ const scriptMap = {};
 const aliveScripts = [];
 /** @type {VMScript[]} */
 const removedScripts = [];
+/** Ensuring slow icons don't prevent installation/update */
+const ICON_TIMEOUT = 1000;
 /** Same order as in SIZE_TITLES and getSizes */
 export const sizesPrefixRe = RegExp(
   `^(${S_CODE_PRE}|${S_SCRIPT_PRE}|${S_VALUE_PRE}|${S_REQUIRE_PRE}|${S_CACHE_PRE}${S_MOD_PRE})`);
-const pendingDeps = new Map();
+/** @type {{ [type: 'cache' | 'require']: { [url: string]: Promise<?> } }} */
+const pendingDeps = { [S_CACHE]: {}, [S_REQUIRE]: {} };
 const depsPorts = {};
 
 addPublicCommands({
@@ -594,7 +597,15 @@ function parseMetaWithErrors(src) {
   };
 }
 
-/** @return {Promise<{ isNew?, update, where }>} */
+/**
+ * @param {VMScriptSourceOptions} src
+ * @return {Promise<{
+ *   errors: string[],
+ *   isNew: boolean,
+ *   update: VMScript & { message: string },
+ *   where: { id: number },
+ * }>}
+ */
 export async function parseScript(src) {
   const { meta, errors } = src.meta ? src : parseMetaWithErrors(src);
   if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
@@ -602,7 +613,7 @@ export async function parseScript(src) {
     message: src.message == null ? i18n('msgUpdated') : src.message || '',
   };
   const result = { errors, update };
-  const { code } = src;
+  const { [S_CODE]: code, update: srcUpdate } = src;
   const now = Date.now();
   let { id } = src;
   let script;
@@ -655,7 +666,7 @@ export async function parseScript(src) {
   }
   if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
   script.custom.tags = script.custom.tags?.split(/\s+/).map(normalizeTag).filter(Boolean).join(' ').toLowerCase();
-  if (!src.update) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
+  if (!srcUpdate) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);
   // DANGER! Awaiting here when all props are set to avoid modifications made by a "concurrent" call
@@ -667,7 +678,7 @@ export async function parseScript(src) {
     [S_SCRIPT_PRE + id]: script,
     ...codeChanged && { [S_CODE_PRE + id]: code },
   });
-  Object.assign(update, script, src.update);
+  Object.assign(update, script, srcUpdate);
   result.where = { id };
   result[S_CODE] = src[S_CODE];
   sendCmd('UpdateScript', result);
@@ -695,54 +706,73 @@ function buildPathMap(script, base) {
   return pathMap;
 }
 
-/** @return {Promise<?string>} resolves to error text if `resourceCache` is absent */
-export async function fetchResources(script, resourceCache, reqOptions) {
+/**
+ * @param {VMScript} script
+ * @param {VMScriptSourceOptions} src
+ * @return {Promise<?string>} error text
+ */
+export async function fetchResources(script, src) {
   const { custom, meta } = script;
   const { pathMap } = custom;
-  const { portId } = resourceCache || {};
-  const onError = err => err;
-  const snatch = async (url, type) => {
-    if (!url || isDataUri(url)) return;
-    url = pathMap[url] || url;
-    let res = pendingDeps.get(url);
-    if (res) return res;
-    res = resourceCache?.[type]?.[url];
-    if (res != null) {
-      storage[type].setOne(url, res);
-      return;
-    }
-    if (!resourceCache
-    || !resourceCache.reuseDeps && !isRemote(url)
-    || await storage[type].getOne(url) == null) {
-      res = storage[type].fetch(url, reqOptions).then(portId && (() => {
-        pendingDeps.delete(url);
-        postToPort(depsPorts, portId, [url, true]);
-      }), onError);
-      if (portId) {
-        pendingDeps.set(url, res);
-        postToPort(depsPorts, portId, [url]);
-      }
-      return res;
-    }
-  };
+  const { resources } = meta;
   const icon = custom.icon || meta.icon;
-  const errors = await Promise.all([
-    ...meta.require.map(url => snatch(url, S_REQUIRE)),
-    ...Object.values(meta.resources).map(url => snatch(url, S_CACHE)),
-    isRemote(icon) && Promise.race([
-      makePause(1000), // ensures slow icons don't prevent installation/update
-      snatch(icon, S_CACHE),
-    ]),
-  ]);
-  if (!resourceCache?.ignoreDepsErrors) {
-    const error = errors.map(formatHttpError)::trueJoin('\n');
-    if (error) {
-      const message = i18n('msgErrorFetchingResource');
-      sendCmd('UpdateScript', {
-        update: { error, message },
-        where: { id: script.props.id },
-      });
-      return `${message}\n${error}`;
+  const jobs = [];
+  for (const url of meta.require) {
+    jobs.push([S_REQUIRE, url]);
+  }
+  for (const key in resources) {
+    jobs.push([S_CACHE, resources[key]]);
+  }
+  if (isRemote(icon)) {
+    jobs.push([S_CACHE, icon, ICON_TIMEOUT]);
+  }
+  for (let i = 0, type, url, timeout, res; i < jobs.length; i++) {
+    [type, url, timeout] = jobs[i];
+    if (!(res = pendingDeps[type][url])) {
+      if (url && !isDataUri(url)) {
+        url = pathMap[url] || url;
+        if ((res = src[type]) && (res = res[url]) != null) {
+          storage[type].setOne(url, res);
+          res = '';
+        } else {
+          res = fetchResource(src, type, url);
+          if (timeout) res = Promise.race([res, makePause(timeout)]);
+          pendingDeps[type][url] = res;
+        }
+      }
+    }
+    jobs[i] = res;
+  }
+  const errors = await Promise.all(jobs);
+  const error = errors.map(formatHttpError)::trueJoin('\n');
+  if (error) {
+    const message = i18n('msgErrorFetchingResource');
+    sendCmd('UpdateScript', {
+      update: { error, message },
+      where: { id: getPropsId(script) },
+    });
+    return `${message}\n${error}`;
+  }
+}
+
+/**
+ * @param {VMScriptSourceOptions} src
+ * @param {string} type
+ * @param {string} url
+ * @return {Promise<?>}
+ */
+async function fetchResource(src, type, url) {
+  if (!src.reuseDeps && !isRemote(url)
+  || await storage[type].getOne(url) == null) {
+    const { portId } = src;
+    if (portId) postToPort(depsPorts, portId, [url]);
+    try {
+      await storage[type].fetch(url, src[FETCH_OPTS]);
+    } catch (err) {
+      return err;
+    } finally {
+      if (portId) postToPort(depsPorts, portId, [url, true]);
+      delete pendingDeps[type][url];
     }
   }
 }

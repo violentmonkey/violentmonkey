@@ -40,3 +40,4 @@ export const __CODE = /*@__PURE__*/Symbol('code'); // not enumerable and strippe
 export const UA_PROPS = ['userAgent', 'brands', 'mobile', 'platform'];
 export const TL_AWAIT = 'topLevelAwait';
 export const UNWRAP = 'unwrap';
+export const FETCH_OPTS = 'fetchOpts';

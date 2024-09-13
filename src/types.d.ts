@@ -225,6 +225,32 @@ declare namespace VMScript {
   }
 }
 
+declare interface VMScriptSourceOptions {
+  code?: string;
+  config?: VMScript.Config;
+  custom?: VMScript.Custom;
+  meta?: VMScript.Meta;
+  props?: VMScript.Props;
+
+  id?: number;
+  isNew?: boolean;
+  position?: number;
+
+  cache?: StringMap;
+  require?: StringMap;
+
+  from?: string;
+  url?: string;
+
+  bumpDate?: boolean;
+  fetchOpts?: object;
+  message?: string;
+  portId?: string;
+  reloadTab?: boolean;
+  reuseDeps?: boolean;
+  update?: object;
+}
+
 /**
  * Injection data sent to the content bridge when injection is disabled
  */
