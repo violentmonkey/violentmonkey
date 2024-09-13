@@ -754,8 +754,7 @@ if (screen.availWidth > 767) {
 watch(getCurrentList, refreshUI);
 watch(() => store.route.paths[1], onHashChange);
 watch(() => store.scripts, val => {
-  if (!val.length) {
-    val = $menuNew.value;
+  if (!val.length && (val = $menuNew.value)) {
     val.focus(); // for Tab navigation and focus highlight
     val.click();
   }
