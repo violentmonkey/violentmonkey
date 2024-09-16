@@ -135,13 +135,19 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Вратите све промене направљене у бази података (увоз, ажурирање, уређивање,
+    прилагођавање)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Адресе које се подударају у овом списку неће убацити скрипта
+  message: >-
+    Црна листа за убризгавање (скрипте се неће покретати на одговарајућим
+    сајтовима)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Мрежна црна листа (скрипте се неће повезати са одговарајућим сајтовима и
+    њиховим колачићима)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -149,10 +155,19 @@ descCustomCSS:
     Ако нисте сигурни чему служи, молимо не уређујте.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Прилагођене опције за CodeMirror и додатке у JSON објекту као што је
+    <code>{"indentUnit":2, "smartIndent":true}</code>, међутим, имајте на уму да
+    неке од њих можда неће радити у Violentmonkey. Погледајте <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">целу листу</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Булеан опције могу се пребацивати двоструким кликом на вредност:<code> true
+    = омогућено, false<code> = онемогућено. Нумеричке опције које се завршавају
+    на <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
+    <code>Time</code> су у милисекундама.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
   message: ''
@@ -164,10 +179,10 @@ editHelpDocumention:
   message: ''
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Пречице на тастатури:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Користите други уређивач?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Прилагођени метаподаци
@@ -176,10 +191,16 @@ editLabelSettings:
   message: Подешавања скрипти
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Ред је предугачак
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: >-
+    Овај ред је предугачак па је његов текст скупљен да би се избегла кашњења
+    приликом уређивања.
+
+    Можете подесити ограничење у напредним подешавањима, на пример: 
+
+    „maxDisplayLength“: 20000
 editNavCode:
   description: Label of code tab in script editor.
   message: Код
@@ -188,43 +209,48 @@ editNavSettings:
   message: Подешавања
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Вредности
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Прикажи/измени целокупно складиште вредности скрипте
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: ''
+  message: Менаџер корисничких скрипти отвореног кода који подржава много претраживача
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: ''
+  message: Стављено на црну листу у подешавањима Violentmonkey-а.
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: >-
+    Violentmonkey не може да покрене корисничке скрипте на овој страници (чести
+    примери: кориснички интерфејс претраживача, додатак, блокирано политиком,
+    сајт за претрагу у Opera-у).
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey је поново покренут. Поново учитајте картицу да бисте покренули
+    корисничке скрипте.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: алфабету
+  message: абецедним редом
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: реду извршења
+  message: ред извршења
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: време последњег ажурирања
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: ''
@@ -239,37 +265,39 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: величина
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Грешка
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: ''
+  message: искључено
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: ''
+  message: на
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: користите глобално подешавање
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    „#“ обрасци раде само када се на почетку отвори сајт или поново учита
+    картица:$1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Отпад
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Прикажи упутство за повучене и испуштене локалне скрипте.
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: за $1 одговарајуће скрипте
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Унесите адресу:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: Уклоњене скрипте су наведене овде и чуваће се 7 дана.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Користи @downloadURL
@@ -278,7 +306,7 @@ hintVacuum:
   message: Одбаци вишак и поново учитај недостајуће податке у кеш.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Инсталирај
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Инсталирај са $1
@@ -290,14 +318,16 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: >-
+    Картица изворне датотеке треба да буде отворена у Firefox-у 68 и новијим
+    верзијама.
 labelAbout:
   description: Label shown on top of the about page.
   message: Информације о Violentmonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: Напредни
+  message: Напредно
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Дозволи ажурирања
@@ -324,28 +354,28 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Прављење резервних копија и одржавање
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'Приказ на значки:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Боје значке:'
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: ниједан
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: број покренутих скрипти
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: број јединствених покренутих скрипти
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Црна листа
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Сарадници
 labelCurrentLang:
   description: Label of current language.
   message: 'Тренутни језик:'
@@ -369,16 +399,16 @@ labelDownloadURL:
   message: 'Адреса преузимања:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Уређивање вредности скрипте
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Уређивање складишта скрипте
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Уређивач
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: само омогућене скрипте
 labelExclude:
   description: Label of @exclude rules.
   message: Правила изузимања
@@ -390,10 +420,10 @@ labelExportScriptData:
   message: Извези податке скрипти
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: Изложите инсталирану верзију на сајтовима каталога корисничких скрипта:$1
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Алтернативни режим $1 у Firefox-у
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: ''
@@ -408,7 +438,7 @@ labelGeneral:
   message: Опште
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Помоћ у преводу
 labelHomepage:
   description: Label for home page in about tab.
   message: Почетна страница
@@ -417,10 +447,10 @@ labelHomepageURL:
   message: 'Адреса почетне странице:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: URL иконе
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: увоз података скрипте
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Увези подешавања
@@ -431,7 +461,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: ''
+  message: 'Режим убризгавања:'
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Инсталирање скрипте
@@ -440,7 +470,7 @@ labelKeepOriginal:
   message: Задржи оригинал
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: Последњи пут ажурирано у $1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Број линије:'
@@ -464,24 +494,24 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', онда обавести:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Обавести о ажурирањима скрипти
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: игнорисати обавештење по скрипти (картица „подешавања“ у уређивачу)
 labelPopupSort:
   description: Label in the VM settings tab for script list sort order in popup
-  message: ''
+  message: Сортирај скрипте у искачућем прозору по $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Политика приватности
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Поновно инсталирање скрипте
 labelRelated:
   description: Label of related links.
   message: Сродне везе
@@ -499,7 +529,7 @@ labelRunAtDefault:
   message: (Подразумевано)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Прилагођени Шаблон Скрипте
 labelSearch:
   description: Label for search input in search box.
   message: 'Тражи:'
@@ -511,13 +541,13 @@ labelSettings:
   message: Подешавања
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Прикажи позиције редоследа извршавања
 labelSync:
   description: Label for sync options.
   message: Синхронизација
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Користите анонимни налог
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: Одобри
@@ -529,7 +559,7 @@ labelSyncDisabled:
   message: Ниједна
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Лозинка:'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
@@ -542,19 +572,19 @@ labelSyncScriptStatus:
   message: Статус синхронизовања скрипти
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'URL сервера:'
 labelSyncService:
   description: Label for sync service select.
   message: Синхронизуј са
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'Корисничко име:'
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Ознаке (раздвојене размаком):'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Тема:'
 labelTranslator:
   description: Label of translator.
   message: 'Преводилац:'
@@ -566,21 +596,21 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Једна колона
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Табеларно
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Синхрони $1 режим
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: ''
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (осим без архивирања и сајтова са онемогућеним колачићима)
 lastSync:
   description: Label for last sync timestamp.
   message: 'Последња синхронизација: $1'
@@ -589,7 +619,7 @@ learnBlacklist:
   message: Сазнајте више о обрасцима за црну листу
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: Сазнајте више о режимима убризгавања.
 menuCommands:
   description: Menu item to list script commands.
   message: Команде скрипте
@@ -601,7 +631,7 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Искључи...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: ''
@@ -615,15 +645,15 @@ menuFindScripts:
   message: Пронађи скрипте за овај сајт
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Није могуће убацити неке скрипте.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: ''
+  message: Покушајте поново у „аутоматском“ режиму
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Подударање онемогућених скрипти
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
   message: ''
@@ -649,7 +679,7 @@ msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: Грешка при преузимању ресурса!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
   message: Грешка при преузимању скрипте!
@@ -673,7 +703,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    Промене које унесете у режиму без архивирања примењују се и на ваш главни
+    профил.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипта је инсталирана.
@@ -700,7 +732,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Недостају потребни ресурси.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -710,7 +742,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Скрипта са истим @name и @namespace је већ инсталирана.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -721,15 +753,15 @@ msgNoUpdate:
   message: Нема пронађених ажурирања.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Грешка при ажурирању скрипти. Кликните да их отворите.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Поново сачувајте или поново инсталирајте ове скрипту/e:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (код је иста)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Црна листа је ажурирана
@@ -751,7 +783,7 @@ msgScriptUpdated:
   message: Скрипта [$1] је ажурирана.
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: Прикажи/сакриј
 msgSyncError:
   description: Message shown when sync failed.
   message: Грешка при синхронизацији
@@ -763,7 +795,7 @@ msgSyncInitError:
   message: Грешка при покретању!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Још није овлашћено.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Синхронизација ће ускоро почети...
@@ -772,10 +804,16 @@ msgSyncing:
   message: Синхронизовање...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Синтаксичка грешка?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Скрипта није постојала или се није подударала са УРЛ-ом када се страница
+    учитала, што се дешава на сајтовима са једном страницом као што су fb или
+    instagram који користе лажну навигацију. Можете освежити таб да бисте
+    покренули скрипту. Да бисте исправили скрипту, користите @match за читав
+    сајт и затим откријте промене користећи MutationObserver или
+    window.navigation API.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Скрипта је ажурирана.
@@ -784,51 +822,51 @@ msgUpdating:
   message: Ажурирање...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Не чува се никаква вредност
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: Отворите уређивач из искачућег прозора у новом прозору
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: Положај прозора уређивача ће се памтити само при промени величине или чувању
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Сакриј омнибокс
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Искачући мени и икона
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Прво омогућено
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: ''
+  message: Групно онемогућене скрипте
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Групиши по @run-at фази
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: ''
+  message: Сакриј онемогућене скрипте
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: ''
+  message: Прикажи онемогућене скрипте
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Прикажи прво омогућене скрипте
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'Тема корисничког интерфејса:'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: аутоматски
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: мрачна
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: светла
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
@@ -836,25 +874,29 @@ optionUpdate:
   message: Ажурирај
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Само за читање
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Аутоматски ажурирана скрипта је само за читање осим ако не онемогућите
+    ажурирања или дозволите уређивање.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Дозволи измене
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (следеће ажурирање ће их заменити)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Поново инсталирај
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Поново учитај картицу
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Ако је омогућено, активна табла ће се освежити када се открију промене и ако
+    се скрипта поклапа са URL-ом табле.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -865,10 +907,10 @@ removeAllScriptsConfirm:
   touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Осетљиво на велика и мала слова
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Користи Regex
 sideMenuAbout:
   description: 'Side menu: About'
   message: Информације
@@ -880,19 +922,21 @@ sideMenuSettings:
   message: Подешавања
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Поново учитај страницу без корисничких скрипти
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Онемогућили сте корисничке скрипте за ову страницу. Да бисте их покренули,
+    поново учитајте картицу или се крећете по њој.
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Зауставите праћење
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Нормална боја значке
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: Badge color when the site is non-injectable (blacklisted or unsupported)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''
@@ -904,33 +948,35 @@ titleSearchHintV2:
   message: ''
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Пратите спољне измене
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Оставите ову страницу отвореном да бисте пратили своје измене у локалној
+    датотеци
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Ажурирајте скрипте ($1)
 updateScript:
   description: Button to update one script.
   message: Ажурирај
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Ажурирајте све скрипте
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Ажурирајте скрипте тренутне картице
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Кључ (жица/стринг)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: Вредност (сериализовано као JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: Све вредности (сериализовано као JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ''
