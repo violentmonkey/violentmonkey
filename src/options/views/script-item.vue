@@ -90,15 +90,15 @@
             </a>
           </tooltip>
           <tooltip
-            :disabled="!($ = script.$canUpdate) || script.checking"
+            :disabled="!canUpdate || script.checking"
             :content="i18n('updateScript')"
             align="start">
             <a
               class="btn-ghost"
               @click="onUpdate"
               :data-hotkey="hotkeys.update"
-              :tabIndex="$ ? tabIndex : -1">
-              <icon name="refresh" :invert.attr="$ === -1 ? '' : null" />
+              :tabIndex="canUpdate ? tabIndex : -1">
+              <icon name="refresh" :invert.attr="canUpdate === -1 ? '' : null" />
             </a>
           </tooltip>
         </template>
@@ -192,6 +192,7 @@ const author = computed(() => {
     name: matches ? matches[1] : text,
   };
 });
+const canUpdate = computed(() => props.script.$canUpdate);
 const description = computed(() => {
   return props.script.custom[kDescription] || getLocaleString(props.script.meta, kDescription);
 });
