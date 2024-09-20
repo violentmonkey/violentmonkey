@@ -9,6 +9,7 @@ import App from './views/app';
 import { emptyStore, store } from './utils';
 
 let mutex, mutexResolve, port;
+let hPrev;
 
 initialize();
 render(App);
@@ -84,6 +85,10 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     });
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
+  if (!hPrev) {
+    hPrev = innerHeight;
+    window.onresize = onResize;
+  }
 }
 
 function initMutex(delay = 100) {
@@ -127,4 +132,15 @@ async function initialize() {
 function isMyTab(tab) {
   // No `tab` is a FF bug when it sends messages from removed iframes
   return tab && (!store.tab || store.tab.id === tab.id);
+}
+
+function onResize() {
+  // 1. Ignoring initial empty popup
+  // 2. Ignoring initial devicePixelRatio which is based on page zoom in this extension's tabs
+  const h = innerHeight;
+  if (h > hPrev && document.readyState !== 'loading' && document.body.clientHeight > h) {
+    window.onresize = null;
+    store.maxHeight = h + 'px';
+  }
+  hPrev = h;
 }

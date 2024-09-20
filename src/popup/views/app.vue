@@ -1,6 +1,5 @@
 <template>
   <div
-    ref="$root"
     class="page-popup flex flex-col"
     @click="extras = topExtras = null"
     @click.capture="onOpenUrl"
@@ -8,6 +7,7 @@
     @mouseleave.capture="delegateMouseLeave"
     @focus.capture="updateMessage"
     :data-is-applied="optionsData.isApplied"
+    :style="{'max-height': store.maxHeight}"
     :class="store.failure">
     <div class="flex menu-buttons">
       <div class="logo">
@@ -74,7 +74,7 @@
         <icon name="arrow" class="icon-collapse"></icon>
         <div class="flex-auto" v-text="scope.title" :data-totals="scope.totals" />
       </div>
-      <div class="submenu" focusme>
+      <div class="submenu">
         <div
           v-for="item in scope.list"
           :key="item.id"
@@ -212,7 +212,7 @@ import {
 } from '@/common';
 import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
-import { focusMe, getActiveElement } from '@/common/ui';
+import { getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { store } from '../utils';
@@ -228,7 +228,6 @@ const kFiltersPopup = 'filtersPopup';
 const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
 const needsReload = reactive({});
 
-const $root = ref();
 const $extras = ref();
 const $topExtras = ref();
 const optionsData = reactive({
@@ -495,7 +494,7 @@ async function onExcludeSave(item, btn) {
 }
 function navigate(dir) {
   const elems = [];
-  for (const el of $root.value.querySelectorAll('[tabindex="0"]')) {
+  for (const el of document.querySelectorAll('[tabindex="0"]')) {
     const rect = el.getBoundingClientRect();
     if (rect.width && rect.height) {
       el.rect = rect;
@@ -546,18 +545,6 @@ function showButtons(item) {
 }
 
 onMounted(() => {
-  const $el = $root.value;
-  const style = $el.style;
-  const setMaxHeightOnResize = () => {
-    // 1. Ignoring initial empty popup
-    // 2. Ignoring initial devicePixelRatio which is based on page zoom in this extension's tabs
-    if (document.readyState !== 'loading' && $el.clientHeight > innerHeight) {
-      removeEventListener('resize', setMaxHeightOnResize);
-      style.maxHeight = innerHeight + 'px';
-    }
-  };
-  addEventListener('resize', setMaxHeightOnResize);
-  focusMe($el);
   keyboardService.enable();
   keyboardService.register('escape', () => {
     const item = extras.value || topExtras.value;
