@@ -356,6 +356,8 @@ function addVaultExports(vaultSrc) {
     /* global exportFunction */
   });
   exports.console = exportedConsole;
+  // In FF 130 a detached Promise's `then` doesn't work with `await`
+  exports.then = exportFunction(then, document);
   // vaultSrc[0] is the iframe's `this`
   // DANGER! vaultSrc[1] must be initialized in injectPageSandbox to prevent prototype hooking
   vaultSrc[1] = exports;

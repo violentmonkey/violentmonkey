@@ -78,7 +78,7 @@ export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
  * immediately after adding it to DOM via direct manipulation in frame.contentWindow
  * or window[0] before our content script runs at document_start, https://crbug.com/1261964 */
 export const VAULT = (() => {
-  let ArrayP;
+  let tmp;
   let Reflect;
   let SafeObject;
   let i = -1;
@@ -114,7 +114,6 @@ export const VAULT = (() => {
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
-    SafePromiseConstructor = res[i += 1] || src.Promise[PROTO].constructor,
     SafeSymbol = res[i += 1] || src.Symbol,
     // In FF content mode global.Proxy !== window.Proxy
     SafeProxy = res[i += 1] || src.Proxy,
@@ -131,10 +130,10 @@ export const VAULT = (() => {
     objectKeys = res[i += 1] || SafeObject.keys,
     objectValues = res[i += 1] || SafeObject.values,
     // Array.prototype
-    concat = res[i += 1] || (ArrayP = src.Array[PROTO]).concat,
-    filter = res[i += 1] || ArrayP.filter,
-    forEach = res[i += 1] || ArrayP.forEach,
-    indexOf = res[i += 1] || ArrayP.indexOf,
+    concat = res[i += 1] || (tmp = src.Array[PROTO]).concat,
+    filter = res[i += 1] || tmp.filter,
+    forEach = res[i += 1] || tmp.forEach,
+    indexOf = res[i += 1] || tmp.indexOf,
     // Element.prototype
     remove = res[i += 1] || src.Element[PROTO].remove,
     // String.prototype
@@ -159,7 +158,8 @@ export const VAULT = (() => {
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    then = res[i += 1] || src.Promise[PROTO].then,
+    SafePromiseConstructor = res[i += 1] || (tmp = src.Promise[PROTO]).constructor,
+    then = res[i += 1] || (srcFF || tmp).then,
     urlSearchParamsToString = res[i += 1] || src.URLSearchParams[PROTO].toString,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
