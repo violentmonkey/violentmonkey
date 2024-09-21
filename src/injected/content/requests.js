@@ -28,11 +28,15 @@ onScripts.push(data => {
   getUAProps = [];
   for (let p = getPrototypeOf(navigator), i = 0; p && i < UA_PROPS.length; i++) {
     getUAProps[i] = describeProperty(p, UA_PROPS[i]).get;
-    if (!i && (p = describeProperty(p, 'userAgentData'))) {
-      getUAData = p.get;
-      p = getPrototypeOf(navigator::getUAData());
-      getHighEntropyValues = p.getHighEntropyValues;
-      data.info.uad = true;
+    if (!i && (p = describeProperty(p, 'userAgentData')) && (getUAData = p.get)) {
+      // Guarding against broken implementations in linux chromium forks
+      if ((p = navigator::getUAData())
+      && (p = getPrototypeOf(p))
+      && (getHighEntropyValues = p.getHighEntropyValues)) {
+        data.info.uad = true;
+      } else {
+        p = getUAData = null;
+      }
     }
   }
 });
