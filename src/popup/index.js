@@ -3,7 +3,7 @@ import { sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { mapEntry } from '@/common/object';
-import { render } from '@/common/ui';
+import { isTouch, render } from '@/common/ui';
 import '@/common/ui/style';
 import App from './views/app';
 import { emptyStore, store } from './utils';
@@ -88,6 +88,8 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
   if (!hPrev) {
     hPrev = innerHeight;
     window.onresize = onResize;
+    // Mobile browsers show the popup maximized to the entire screen, no resizing
+    if (isTouch && hPrev > document.body.clientHeight) onResize();
   }
 }
 
@@ -134,11 +136,12 @@ function isMyTab(tab) {
   return tab && (!store.tab || store.tab.id === tab.id);
 }
 
-function onResize() {
+function onResize(evt) {
   // 1. Ignoring initial empty popup
   // 2. Ignoring initial devicePixelRatio which is based on page zoom in this extension's tabs
   const h = innerHeight;
-  if (h > hPrev && document.readyState !== 'loading' && document.body.clientHeight > h) {
+  if (!evt
+  || h > hPrev && document.readyState !== 'loading' && document.body.clientHeight > h) {
     window.onresize = null;
     store.maxHeight = h + 'px';
   }
