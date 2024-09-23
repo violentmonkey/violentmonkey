@@ -478,7 +478,7 @@ labelInjectionMode:
   message: 'Режим внедрения: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Установка скрипта...
+  message: Установка скрипта
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
   message: Сохранить исходное соответствие
@@ -750,7 +750,7 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Загрузка кода скрипта...
+  message: Загружаются данные скрипта…
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Загрузка зависимостей... ($1/$2)
