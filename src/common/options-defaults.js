@@ -1,8 +1,11 @@
 import { BLACKLIST, BLACKLIST_NET } from '@/common/consts';
 
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
+export const kFiltersPopup = 'filtersPopup';
 export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
+export const kPopupWidth = 'popupWidth';
 export const kShowTrailingSpace = 'showTrailingSpace';
+export const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
 const defaultsValueEditor = {
   [kAutocompleteOnTyping]: 100,
   lineWrapping: false,
@@ -21,8 +24,9 @@ export default {
   [IS_APPLIED]: true,
   [BLACKLIST]: null,
   [BLACKLIST_NET]: null,
+  [kPopupWidth]: 320,
+  [kUpdateEnabledScriptsOnly]: true,
   autoUpdate: 1, // days, 0 = disable
-  updateEnabledScriptsOnly: true,
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,
@@ -66,7 +70,7 @@ export default {
     /** @type {boolean} */
     viewTable: false,
   },
-  filtersPopup: {
+  [kFiltersPopup]: {
     /** @type {'exec' | 'alpha'} */
     sort: 'exec',
     enabledFirst: false,

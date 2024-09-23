@@ -1,61 +1,9 @@
 <template>
-  <div class="tab-settings" :data-show-advanced="settings.showAdvanced">
+  <div ref="$el" class="tab-settings" :data-show-advanced="settings.showAdvanced">
     <h1 v-text="i18n('labelSettings')"></h1>
     <section class="mb-1c">
       <h3 v-text="i18n('optionPopup')"/>
-      <div>
-        <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')" />
-      </div>
-      <div class="ml-2c flex flex-col">
-        <!-- ml-2c indents children after the first one for visual grouping -->
-        <setting-check name="editorWindow" class="mr-2" ref="EW">
-          <tooltip :content="editorWindowHint" :disabled="!editorWindowHint">
-            <span v-text="i18n('optionEditorWindow')"></span>
-          </tooltip>
-        </setting-check>
-        <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
-                       v-show="$refs.EW?.value"/>
-      </div>
-      <div class="ml-2c">
-        <label>
-          <locale-group i18n-key="labelPopupSort">
-            <select v-for="opt in ['filtersPopup.sort']" v-model="settings[opt]" :key="opt">
-              <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
-                      :value v-text="title" />
-            </select>
-          </locale-group>
-        </label>
-        <setting-check name="filtersPopup.groupRunAt" :label="i18n('optionPopupGroupRunAt')"
-                       v-show="settings['filtersPopup.sort'] === 'exec'" />
-        <label>
-          <select v-for="opt in ['filtersPopup.hideDisabled']" v-model="settings[opt]" :key="opt">
-            <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
-                    :value v-text="title" />
-          </select>
-        </label>
-        <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
-                       v-show="!settings['filtersPopup.hideDisabled']" />
-      </div>
-      <div>
-        <label>
-          <span v-text="i18n('labelBadge')"></span>
-          <select v-for="opt in ['showBadge']" v-model="settings[opt]" :key="opt">
-            <option v-for="(title, value) in items[opt].enum" :key="`${opt}:${value}`"
-                    :value v-text="title" />
-          </select>
-        </label>
-      </div>
-      <div>
-        <label>
-          <span v-text="i18n('labelBadgeColors')"/>
-          <tooltip v-for="(title, name) in items.badgeColor.enum" :key="`bc:${name}`"
-                   :content="title">
-            <input type="color" v-model="settings[name]">
-          </tooltip>
-          <button v-text="i18n('buttonReset')" v-show="isCustomBadgeColor" class="ml-1"
-                  @click="onResetBadgeColors"/>
-        </label>
-      </div>
+      <settings-popup/>
     </section>
     <section class="mb-1c">
       <h3 v-text="i18n('optionUpdate')"/>
@@ -65,7 +13,8 @@
             <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1/>
           </locale-group>
         </label>
-        <setting-check name="updateEnabledScriptsOnly" :label="i18n('labelEnabledScriptsOnly')" />
+        <setting-check :name="kUpdateEnabledScriptsOnly"
+                       :label="i18n('labelEnabledScriptsOnly')" />
       </div>
       <div class="ml-2c flex flex-col">
         <setting-check name="notifyUpdates" :label="i18n('labelNotifyUpdates')" />
@@ -93,7 +42,7 @@
           <label>
             <locale-group i18n-key="optionUiTheme">
               <select v-for="opt in ['uiTheme']" v-model="settings[opt]" :key="opt">
-                <option v-for="(title, value) in items[opt].enum" :key="value"
+                <option v-for="(title, value) in items[opt]" :key="value"
                         :value v-text="title" />
               </select>
             </locale-group>
@@ -103,7 +52,7 @@
           <label>
             <span v-text="i18n('labelInjectionMode')"></span>
             <select v-for="opt in ['defaultInjectInto']" v-model="settings[opt]" :key="opt">
-              <option v-for="(_, mode) in items[opt].enum" :key="mode" v-text="mode" />
+              <option v-for="(_, mode) in items[opt]" :key="mode" v-text="mode" />
             </select>
             <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
           </label>
@@ -160,19 +109,34 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
-import { debounce, i18n } from '@/common';
+import { i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
-import SettingCheck from '@/common/ui/setting-check';
-import { forEachEntry, mapEntry } from '@/common/object';
 import options from '@/common/options';
-import optionsDefaults from '@/common/options-defaults';
-import hookSetting from '@/common/hook-setting';
+import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
 import { focusMe, getActiveElement } from '@/common/ui';
+import { hookSettingsForUI } from '@/common/ui/util';
+
+const items = {
+  autoUpdate: value => Math.max(0, Math.min(365, +value || 0)),
+  defaultInjectInto: { ...KNOWN_INJECT_INTO },
+  showAdvanced: value => value,
+  uiTheme: {
+    '': i18n('optionUiThemeAuto'),
+    dark: i18n('optionUiThemeDark'),
+    light: i18n('optionUiThemeLight'),
+  },
+  xhrInject: value => value,
+};
+</script>
+
+<script setup>
+import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
+import Tooltip from 'vueleton/lib/tooltip';
+import SettingCheck from '@/common/ui/setting-check';
 import LocaleGroup from '@/common/ui/locale-group';
 import SettingText from '@/common/ui/setting-text';
+import SettingsPopup from '@/common/ui/settings-popup.vue';
 import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmMaintenance from './vm-maintenance';
@@ -181,127 +145,25 @@ import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
 import VmDateInfo from './vm-date-info';
 
-const badgeColorEnum = {
-  badgeColor: i18n('titleBadgeColor'),
-  badgeColorBlocked: i18n('titleBadgeColorBlocked'),
-};
-const badgeColorNames = Object.keys(badgeColorEnum);
-const badgeColorItem = {
-  enum: badgeColorEnum, // exposing to the template
-  normalize: (value, name) => (
-    /^#[0-9a-f]{6}$/i.test(value) ? value : optionsDefaults[name]
-  ),
-};
-const items = {
-  autoUpdate: {
-    normalize: value => Math.max(0, Math.min(365, +value || 0)),
-  },
-  defaultInjectInto: {
-    enum: KNOWN_INJECT_INTO,
-  },
-  showAdvanced: {
-    normalize: value => value,
-  },
-  showBadge: {
-    enum: {
-      '': i18n('labelBadgeNone'),
-      unique: i18n('labelBadgeUnique'),
-      total: i18n('labelBadgeTotal'),
-    },
-  },
-  'filtersPopup.hideDisabled': {
-    enum: {
-      '': i18n('optionPopupShowDisabled'),
-      group: i18n('optionPopupGroupDisabled'),
-      hide: i18n('optionPopupHideDisabled'),
-    },
-  },
-  'filtersPopup.sort': {
-    enum: {
-      exec: i18n('filterExecutionOrder'),
-      alpha: i18n('filterAlphabeticalOrder'),
-    },
-  },
-  uiTheme: {
-    enum: {
-      '': i18n('optionUiThemeAuto'),
-      dark: i18n('optionUiThemeDark'),
-      light: i18n('optionUiThemeLight'),
-    },
-  },
-  xhrInject: {
-    normalize: value => value,
-  },
-  ...badgeColorEnum::mapEntry(() => badgeColorItem),
-};
-const normalizeEnum = (value, name) => (
-  hasOwnProperty(items[name].enum, value)
-    ? value
-    : Object.keys(items[name].enum)[0]
-);
-const getItemUpdater = (name, normalize) => (
-  debounce((value, oldValue) => {
-    value = normalize(value, name);
-    oldValue = normalize(oldValue, name);
-    if (value !== oldValue) options.set(name, value);
-  }, 50)
-);
+const $el = ref();
 const settings = reactive({});
+const expose = ref();
+const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
+let revokers;
 
-export default {
-  components: {
-    VmImport,
-    VmExport,
-    VmMaintenance,
-    VmSync,
-    VmEditor,
-    VmBlacklist,
-    VmDateInfo,
-    SettingCheck,
-    SettingText,
-    LocaleGroup,
-    Tooltip,
-  },
-  data() {
-    return {
-      expose: null,
-      items,
-      settings,
-    };
-  },
-  computed: {
-    editorWindowHint() {
-      return chrome.windows?.onBoundsChanged ? null : this.i18n('optionEditorWindowHint');
-    },
-    isCustomBadgeColor() {
-      return badgeColorNames.some(name => settings[name] !== optionsDefaults[name]);
-    },
-  },
-  methods: {
-    ctrlS() {
-      getActiveElement().dispatchEvent(new Event('ctrl-s'));
-    },
-    onResetBadgeColors() {
-      badgeColorNames.forEach(name => {
-        settings[name] = optionsDefaults[name];
-      });
-    },
-  },
-  activated() {
-    focusMe(this.$el);
-    this.revokers = [
-      keyboardService.register('ctrlcmd-s', this.ctrlS, { condition: 'inputFocus' }),
-    ];
-    items::forEachEntry(([name, { normalize = normalizeEnum }]) => {
-      this.revokers.push(hookSetting(name, val => { settings[name] = normalize(val, name); }));
-      this.$watch(() => settings[name], getItemUpdater(name, normalize));
-    });
-    this.expose = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
-  },
-  deactivated() {
-    this.revokers.forEach((revoke) => { revoke(); });
-  },
-};
+onActivated(() => {
+  focusMe($el.value);
+  revokers = [
+    keyboardService.register('ctrlcmd-s', ctrlS, { condition: 'inputFocus' }),
+    ...hookSettingsForUI(items, settings, watch),
+  ];
+  expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
+});
+
+onDeactivated(() => {
+  revokers.forEach(r => r());
+  revokers = null;
+});
 </script>
 
 <style>

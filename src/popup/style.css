@@ -296,6 +296,7 @@ footer {
   border: 1px solid var(--fill-2);
   max-height: $footerHeight;
   overflow: hidden;
+  white-space: pre-wrap;
 }
 
 .failure-reason {
@@ -394,6 +395,12 @@ footer {
   &::after {
     content: attr(title);
   }
+}
+
+.settings {
+  padding: 1em;
+  background: none;
+  overflow-y: auto;
 }
 
 .syntax {

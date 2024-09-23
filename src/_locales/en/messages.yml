@@ -605,6 +605,8 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Table view
+labelWidth:
+  message: 'Width: '
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -892,6 +894,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Update
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: Popup settings
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: 'Right-click: popup settings'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Read-only

@@ -8,6 +8,7 @@ import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseSc
 import { addOwnCommands, commands, init } from './init';
 import { parseMeta } from './script';
 import { getOption, hookOptions, setOption } from './options';
+import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { requestNewer } from './storage-fetch';
 
 const processes = {};
@@ -33,7 +34,7 @@ addOwnCommands({
     const urlOpts = {
       all: true,
       allowedOnly: isAll,
-      enabledOnly: isAll && getOption('updateEnabledScriptsOnly'),
+      enabledOnly: isAll && getOption(kUpdateEnabledScriptsOnly),
     };
     const opts = {
       [FETCH_OPTS]: {

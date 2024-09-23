@@ -23,8 +23,10 @@
       </span>
       <span
         class="menu-area"
-        :data-message="i18n('menuDashboard')"
+        :data-message="i18n('menuDashboard') + '\n' + i18n('popupSettingsHint')"
         :tabIndex
+        @contextmenu.prevent="showSettings = !showSettings"
+        @auxclick="$event.button !== 2 && onManage($event)"
         @click="onManage">
         <icon name="cog"></icon>
       </span>
@@ -57,6 +59,10 @@
     <div class="failure-reason" v-if="store.failureText">
       <span v-text="store.failureText"/>
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
+    </div>
+    <div v-if="showSettings" class="mb-1c menu settings">
+      <settings-popup/>
+      <button v-text="i18n('buttonClose')" @click="showSettings = false"/>
     </div>
     <div
       v-for="scope in injectionScopes"
@@ -180,6 +186,7 @@
     <div class="message" v-if="message" v-text="message"/>
     <div v-show="topExtras" ref="$topExtras" class="extras-menu">
       <div v-text="i18n('labelSettings')" @click="onManage(1)" tabindex="0"/>
+      <div v-text="i18n('popupSettings')" @click="showSettings = true" tabindex="0"/>
       <div v-text="i18n('updateListedCmd', `${Object.keys(store.updatableScripts).length}`)"
            @click="onUpdateListed" tabindex="0"
            v-if="store.updatableScripts"/>
@@ -206,6 +213,9 @@
 <script setup>
 import { computed, nextTick, onActivated, onMounted, reactive, ref } from 'vue';
 import options from '@/common/options';
+import optionsDefaults, {
+  kFiltersPopup, kPopupWidth, kUpdateEnabledScriptsOnly,
+} from '@/common/options-defaults';
 import {
   getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
   i18n, makePause, sendCmdDirectly, sendTabCmd,
@@ -214,6 +224,7 @@ import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
 import { getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
+import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { store } from '../utils';
 
@@ -224,18 +235,18 @@ const NAME = `${extensionManifest.name} ${process.env.VM_VER}`;
 const TARDY_MATCH = i18n('msgTardyMatch');
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
-const kFiltersPopup = 'filtersPopup';
-const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
 const needsReload = reactive({});
 
 const $extras = ref();
 const $topExtras = ref();
-const optionsData = reactive({
-  [IS_APPLIED]: true,
-  [kFiltersPopup]: {},
-  [kUpdateEnabledScriptsOnly]: true,
-});
+const optionsData = reactive(objectPick(optionsDefaults, [
+  IS_APPLIED,
+  kFiltersPopup,
+  kPopupWidth,
+  kUpdateEnabledScriptsOnly,
+]));
 const activeMenu = ref('scripts');
+const showSettings = ref();
 const extras = ref();
 const focusedItem = ref();
 const message = ref();
@@ -253,8 +264,9 @@ options.hook((changes) => {
     const v = changes[key];
     if (v != null) {
       optionsData[key] = v && isObject(v)
-          ? { ...optionsData[key], ...v }
-          : v;
+        ? { ...optionsData[key], ...v }
+        : v;
+      if (key === kPopupWidth) document.body.style.width = v + 'px';
     }
   }
 });
@@ -393,9 +405,11 @@ function onToggle() {
   checkReload();
   updateMessage();
 }
-/** @param {number | Event} evt - index of tab to open in src/options/views/app.vue */
+/** @param {number | MouseEvent} evt - index of tab to open in src/options/views/app.vue */
 function onManage(evt) {
-  sendCmdDirectly('OpenDashboard', evt === 1 ? TAB_SETTINGS : '').then(close);
+  sendCmdDirectly('OpenDashboard',
+    evt === 1 || evt.button === 1 || evt.ctrlKey ? TAB_SETTINGS : '')
+  .then(close);
 }
 function onOpenUrl(e) {
   const el = e.target.closest('a[href][target=_blank]');
