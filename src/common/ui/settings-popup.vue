@@ -171,8 +171,6 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  > span:first-child {
-    white-space: pre-wrap;
-  }
+  white-space: pre-wrap;
 }
 </style>

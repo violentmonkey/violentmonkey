@@ -72,8 +72,8 @@
             </tooltip>
           </label>
         </div>
-        <div>
-          <locale-group i18n-key="labelExposeStatus" class="flex flex-col">
+        <div class="flex flex-col">
+          <locale-group i18n-key="labelExposeStatus">
             <setting-check v-for="([key, host]) in expose" :key="host"
                            :name="`expose.${key}`" class="ml-2 mr-1c valign-tb">
               <span v-text="host" />
