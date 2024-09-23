@@ -161,10 +161,21 @@ descEditorOptions:
     rel="noopener noreferrer">tıklayın</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Boolean operatörlerini değelerine çift tıklayarak değiştirebilirsiniz:
+    <code>true</code> = etkin, <code>false</code> = devre dışı.
+    <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
+    <code>Time</code> ile biten sayısal seçeneklerin değerleri milisaniye
+    cinsindendir.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Standart dışı seçenekler: <code>autocompleteOnTyping</code>, yazmaya
+    başladığınızda otomatik tamamlama ipuçlarının gösterileceği milisaniye
+    cinsinden gecikme süresidir (<code>0</code> = devre dışı).
+    <code>killTrailingSpaceOnSave</code> kayıt sırasında satır sonlarındaki
+    boşlukları otomatik olarak kaldırır. <code>showTrailingSpace</code> satır
+    sonlarındaki boşlukları nokta şeklinde gösterir.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -241,15 +252,15 @@ failureReasonRestarted:
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
-    Yerel bir dosyadaki düzenlemeleri yüklemek veya izlemek için birkaç yöntem
+    Yerel bir dosyayı yüklemenin ve düzenlemeleri izlemenin birkaç yöntem
     vardır: 
 
-    <1>Dosyayı, bu da dahil olmak üzere açık bir Violentmonkey sayfasına veya
-    açılır penceresine sürükleyip bırakın. <2>Bu dosya için yerel bir HTTP
-    sunucusu kurun ve http://localhost üzerinden açın. <3>chrome://extensions
-    sayfasındaki Violentmonkey ayrıntılarında "Dosya URL'lerine erişime izin
-    ver" seçeneğini etkinleştirin. Bu tehlikelidir çünkü herhangi bir kullanıcı
-    betiği herhangi bir yerel dosyayı okuyabilir.
+    <1>Dosyayı sürükleyip açık bir Violentmonkey sayfasına veya açılır
+    penceresine bırakabilirsiniz (bu sayfa dahil). <2>Dosya için yerel bir HTTP
+    sunucusu kurup http://localhost üzerinden açabilirsiniz.
+    <3>chrome://extensions sayfasındaki Violentmonkey ayrıntılarında "Dosya
+    URL'lerine erişime izin ver" seçeneğini etkinleştirebilirsiniz. Ancak bu
+    tehlikelidir çünkü tüm kullanıcı betikleri tüm yerel dosyaları okuyabilir.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetik olarak
@@ -288,7 +299,9 @@ genericUseGlobal:
   message: global ayarı kullan
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    "#" şablonları yalnızca siteyi ilk açtığınızda veya sekmeyi yenilediğinizde
+    çalışır: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Geri Dönüşüm Kutusu
@@ -300,7 +313,7 @@ hintForBatchAction:
   message: eşleşen $1 betik
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL Girdisi:'
+  message: 'URL''yi girin:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Kaldırılan betikler 7 gün boyunca burada listelenecek ve tutulacaktır.
@@ -309,7 +322,7 @@ hintUseDownloadURL:
   message: '@downloadURL kullan'
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Fazlalığı atın ve eksik kaynakları önbellekte yeniden yüklemeyi deneyin.
+  message: Fazlalıkları at ve eksik kaynakları önbelleğe geri yüklemeyi dene.
 install:
   description: Label for button to install a script.
   message: Yükle
@@ -429,10 +442,11 @@ labelFastFirefoxInject:
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Firefox 59'dan beri <document-start> komut dosyası için alternatif bir
-    enjeksiyon yöntemi, varsayılan moddan daha hızlı. "Eşzamanlı sayfa modu" ile
-    benzer şekilde bellek tüketimini de artırır, bu nedenle komut dosyalarınız
-    bu seçenek olmadan düzgün çalışıyorsa devre dışı bırakmak isteyebilirsiniz.
+    <document-start> betikleri için Firefox 59'dan beri kullanılabilen
+    alternatif bir enjeksiyon yöntemi. Varsayılan moddan daha hızlıdır. "Eş
+    zamanlı sayfa modu" ile benzer şekilde bellek tüketimini artırır. Bu
+    nedenle, betikleriniz bu seçenek olmadan düzgün çalışıyorsa devre dışı
+    bırakmayı düşünebilirsiniz.
 labelFeedback:
   description: Label of link to feedback page.
   message: Geri bildirim
@@ -616,13 +630,13 @@ labelXhrInject:
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
-    Sadece sayfa yüklenmeden önce çalışması gereken bir betiğiniz varsa ve an
-    itibarı ile geç çalışıyorsa açın. Tampermonkey'deki anında enjekte etme
-    modunda olduğu gibi bu seçenek de artık kullanılmayan bir teknoloji olan eş
-    zamanlı XHR kullanmaktadır, bu sebeple Chrome/Chromium tarayıcılarında
-    devtools konsolunda uyarılar görebilirsiniz, yine de olumsuz etkiler bu
-    durumda önemsiz olduğu için bu hataları güvenli bir şekilde görmezden
-    gelebilirsiniz. Uyarıları, birine sağ tıklayarak tamamen gizleyebilirsiniz.
+    Sayfa yüklenmeden önce çalışması gereken bir betiğiniz varsa ve şu anda bu
+    betik çok geç çalışıyorsa bu seçeneği etkinleştirin. Tampermonkey'deki
+    "anında enjeksiyon" moduna benzer şekilde, bu seçenek de artık kullanılmayan
+    eş zamanlı XHR teknolojisini kullanmaktadır. Bu sebeple Chrome/Chromium
+    geliştirici araçları konsolunda uyarılar görebilirsiniz. Ancak yan etkiler
+    bu durumda önemsiz olduğu için bu hataları görmezden gelebilirsiniz.
+    Uyarılarıdan birine sağ tıklayarak bu uyarıları tamamen gizleyebilirsiniz.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
   message: (gizli pencereler ve çerezleri devre dışı bırakılmış siteler hariç)
@@ -650,12 +664,14 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    Bu seçeneği genel ayarlardan açarsanız geçerli sekme otomatik olarak
+    Genel ayarlardan bu seçeneği açarsanız geçerli sekme otomatik olarak
     yenilenecektir.
 
-    Değişiklikleri diğer tüm sekmelere de uygulamak için elle yenileyiniz.
+    Değişiklikleri diğer sekmelere de uygulamak için onları manuel olarak
+    yenilemelisiniz.
 
-    Daha esnek ayarlar için düzenleyicinin "Ayarlar" sekmesini kullanın.
+    Daha esnek ayarlar için düzenleyicinin "Ayarlar" sekmesini
+    kullanabilirsiniz.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
@@ -696,8 +712,8 @@ msgCheckingForUpdate:
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
-    MomentJS dokümantasyonunu açmak için tıklayın. Kabul edilen tokenler: $1.
-    Metinleri korumak için [köşeli parantez] kullanın.
+    MomentJS dokümantasyonunu açmak için tıklayın. Kabul edilen token'lar: $1.
+    Metinleri korumak için [köşeli parantez] kullanabilirsiniz.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -726,7 +742,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: Gizli mod'da yaptığınız değişiklikler de ana profilinize etki eder.
+  message: Gizli modda yaptığınız değişiklikler de ana profilinize etki eder.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Betik yüklendi.
@@ -758,10 +774,9 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: >-
-    Böyle bir betik ya hâlihazırda yüklü ya da geri dönüşüm kutusunda bulunuyor.
-    Lütfen farklı bir @name ve @namespace kullanın veya çakışmayı oluşturan
-    betiği düzenleyin.
+  message: |-
+    Böyle bir betik zaten yüklenmiş.
+    Lütfen farklı bir @name ve @namespace kullanın veya diğer betiği düzenleyin.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
@@ -831,7 +846,13 @@ msgSyntaxError:
   message: Söz dizimi hatası?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Sayfa yüklendiğinde bu betik mevcut değildi veya URL ile eşleşmedi. Sahte
+    navigasyon kullanan Facebook ve Instagram gibi tek sayfa uygulamasında bu
+    sorun yaşanabilir. Betiği çalıştırmak içn sekmeyi yenileyebilirsiniz. Betiği
+    düzeltmek isterseniz sitenin tamamı için @match kullanabilir, ardından
+    değişiklikleri MutationObserver veya window.navigation API ile tespit
+    edebilirsiniz.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Betik güncellendi.
@@ -843,7 +864,7 @@ noValues:
   message: Kayıtlı değer yok
 optionEditorWindow:
   description: Label for the option in settings
-  message: Düzenleyiciyi yeni bir pencerede aç
+  message: Düzenleyiciyi yeni pencerede aç
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
@@ -969,7 +990,25 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * <kbd>Enter</kbd> tuşu metni otomatik tamamlama geçmişine ekler
+
+    * Tüm koşullar büyük-küçük harfe duyarlıdır
+
+    * Koşullar boşlukla ayrılarak birlikte kullanılabilir
+
+    * Meta verisi arama: <code>"Şahane Betik" "Açıklama"</code>
+
+    * Etiket arama: <code>#etiket1 #etiket2</code>
+
+    * Betik ismi arama: <code>name:"şahane isim"</code>
+
+    * Betik kodunda arama: <code>code:"şahane kod"</code>
+
+    * Negatif arama: <code>!#etiket2 !name:"istenmeyen"</code>
+
+    * Düzenli ifadeler: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 trackEdits:
   description: Button in a script installation dialog.
   message: Harici düzenlemeleri izle

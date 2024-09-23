@@ -136,10 +136,10 @@ confirmUndoImport:
   message: 還原對資料庫所做的所有變更（導入、更新、編輯、自訂）
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: 出現在此清單裡的網址將不會受到暴力猴用戶腳本的影響。這意味著，這些網址不會運行任何暴力猴腳本。
+  message: 注入黑名單（腳本將不會在匹配的網站上執行）
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: 網路黑名單（腳本將無法連接到匹配的網站及其 Cookie）
 descCustomCSS:
   description: Description of custom CSS section.
   message: 設定選項介面和腳本安裝頁的自訂 CSS 格式。如果您不清楚這部分的用途，建議您不要更改此設定。
@@ -434,7 +434,7 @@ labelHomepageURL:
   message: 首頁網址：
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 圖示 URL
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: 匯入腳本資料
@@ -970,7 +970,7 @@ updateScriptsAll:
   message: 更新所有脚本
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: 更新當前分頁的腳本
 valueLabelKey:
   description: Label for key of a script value.
   message: 鍵（字串）
