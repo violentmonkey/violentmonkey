@@ -107,12 +107,18 @@ class Locales {
     options = options || {};
     const data = {};
     const langData = this.locales[lang];
-    const defaultData = options.useDefaultLang && lang != this.defaultLang && this.locales[this.defaultLang];
+    const defaultData = options.useDefaultLang && lang !== this.defaultLang
+      ? this.locales[this.defaultLang]
+      : null;
+    const colons = defaultData && !/^(ja|ko|zh)/.test(lang);
     Object.keys(this.data).forEach(key => {
       if (options.touchedOnly && !this.data[key].touched) return;
+      const msg = langData.getMessage(key) || defaultData?.getMessage(key) || '';
       data[key] = {
         description: this.data[key].description || this.newLocaleItem,
-        message: langData.getMessage(key) || defaultData && defaultData.getMessage(key) || '',
+        message: colons
+          ? normalizeTrailingColon(msg, defaultData.getMessage(key))
+          : msg,
       };
       if (options.markUntouched && !this.data[key].touched) data[key].touched = false;
     });
@@ -206,6 +212,16 @@ function read(options) {
   const stream = extract(options);
   process.nextTick(() => stream.end());
   return stream;
+}
+
+function normalizeTrailingColon(str, sourceStr = '') {
+  if (sourceStr.endsWith(': ') && str.endsWith(':')) {
+    return str + ' ';
+  }
+  if (sourceStr.endsWith(':') && str.endsWith(': ')) {
+    return str.slice(0, -1);
+  }
+  return str;
 }
 
 module.exports = {
