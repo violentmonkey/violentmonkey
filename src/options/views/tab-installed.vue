@@ -62,7 +62,7 @@
         </template>
         <div v-else class="ml-2" v-text="i18n('headerRecycleBin')" />
         <div class="flex-auto"></div>
-        <locale-group i18n-key="sortOrder" class="ml-1" span>
+        <span class="ml-1">{{ i18n('sortOrder') }}
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
               v-for="(option, name) in filterOptions.sort"
@@ -71,7 +71,7 @@
               :value="name">
             </option>
           </select>
-        </locale-group>
+        </span>
         <Dropdown align="right" class="filter-sort">
           <Tooltip :content="i18n('labelSettings')" placement="bottom">
             <a class="btn-ghost" tabindex="0">
@@ -182,7 +182,6 @@ import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
-import LocaleGroup from '@/common/ui/locale-group';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import {
   createSearchRules, markRemove, performSearch, runInBatch, store, TOGGLE_OFF, TOGGLE_ON,

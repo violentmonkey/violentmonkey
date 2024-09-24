@@ -301,10 +301,6 @@ footer {
 
 .failure-reason {
   padding: .5rem $itemPaddingX .5rem $leftPaneWidth;
-  .page-popup:not(.noninjectable):not(.blacklisted) & {
-    // Making the warning noticeable at the bottom of the script list
-    background: hsla(30, 100%, 50%, .2);
-  }
   code {
     max-width: 100%;
   }
@@ -312,6 +308,16 @@ footer {
     font-size: smaller;
     padding-left: $iconML;
     hyphens: auto;
+  }
+}
+
+.page-popup:not(.noninjectable):not(.blacklisted) {
+  .failure-reason {
+    // Making the warning noticeable
+    background: hsla(30, 100%, 50%, .2);
+  }
+  .settings {
+    background: none;
   }
 }
 
@@ -399,7 +405,6 @@ footer {
 
 .settings {
   padding: 1em;
-  background: none;
   overflow-y: auto;
 }
 

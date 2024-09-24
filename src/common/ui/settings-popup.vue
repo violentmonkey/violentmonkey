@@ -12,54 +12,50 @@
     <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
                    v-show="$EW?.value"/>
   </div>
-  <div class="single">
-    <label>
-      <span v-text="i18n('labelWidth')"/>
+  <div class="mid">
+    <label>{{ i18n('labelWidth') }}
       <input v-model="popupWidth" type="range"
              @mousedown="onMouseDownInRangeInput"
              :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" />
-      <input v-model="popupWidth" type="number" style="field-sizing:content" class="ml-1"
-             ref="$popupWidthNumber"
-             :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" />
-      px
-      <button v-text="i18n('buttonReset')" class="ml-1"
-              v-if="popupWidth !== optionsDefaults[kPopupWidth]"
-              @click="popupWidth = optionsDefaults[kPopupWidth]"/>
     </label>
+    <input v-model="popupWidth" type="number" style="field-sizing:content" class="ml-1"
+           ref="$popupWidthNumber"
+           :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" /> px
+    <button v-text="i18n('buttonReset')" class="ml-1"
+            v-if="popupWidth !== optionsDefaults[kPopupWidth]"
+            @click="popupWidth = optionsDefaults[kPopupWidth]"/>
   </div>
-  <div class="ml-2c">
-    <label>
-      <locale-group i18n-key="labelPopupSort">
-        <select v-for="opt in [kFPSort]" v-model="settings[opt]" :key="opt">
-          <option v-for="(title, value) in items[opt]" :key="`${opt}:${value}`"
-                  :value v-text="title"/>
-        </select>
-      </locale-group>
+  <div class="mid ml-2c">
+    <label>{{ i18n('sortOrder') }}
+      <select v-model="settings[kFPSort]">
+        <option v-for="(title, value) in items[kFPSort]" :key="value"
+                :value v-text="title"/>
+      </select>
     </label>
     <setting-check name="filtersPopup.groupRunAt" :label="i18n('optionPopupGroupRunAt')"
                    v-show="settings[kFPSort] === 'exec'"/>
-    <label>
-      <select v-for="opt in [kFPHideDisabled]" v-model="settings[opt]" :key="opt">
-        <option v-for="(title, value) in items[opt]" :key="`${opt}:${value}`"
+  </div>
+  <div class="mid ml-2c">
+    <label>{{ i18n('disabledScriptsSelector') }}
+      <select v-model="settings[kFPHideDisabled]">
+        <option v-for="(title, value) in items[kFPHideDisabled]" :key="value"
                 :value v-text="title"/>
       </select>
     </label>
     <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
                    v-show="!settings[kFPHideDisabled]"/>
   </div>
-  <div class="single">
-    <label>
-      <span v-text="i18n('labelBadge')"/>
-      <select v-for="opt in [kShowBadge]" v-model="settings[opt]" :key="opt">
-        <option v-for="(title, value) in items[opt]" :key="`${opt}:${value}`"
+  <div class="mid">
+    <label>{{ i18n('labelBadge') }}
+      <select v-model="settings[kShowBadge]">
+        <option v-for="(title, value) in items[kShowBadge]" :key="value"
                 :value v-text="title"/>
       </select>
     </label>
   </div>
-  <div class="single">
-    <label>
-      <span v-text="i18n('labelBadgeColors')"/>
-      <tooltip v-for="(title, name) in badgeColorEnum" :key="`bc:${name}`"
+  <div class="mid">
+    <label>{{ i18n('labelBadgeColors') }}
+      <tooltip v-for="(title, name) in badgeColorEnum" :key="name"
                :content="title">
         <input type="color" v-model="settings[name]" v-if="settings[name]">
       </tooltip>
@@ -100,9 +96,9 @@ const items = {
     total: i18n('labelBadgeTotal'),
   },
   [kFPHideDisabled]: {
-    '': i18n('optionPopupShowDisabled'),
-    group: i18n('optionPopupGroupDisabled'),
-    hide: i18n('optionPopupHideDisabled'),
+    '': i18n('disabledScriptsShow'),
+    group: i18n('disabledScriptsGroup'),
+    hide: i18n('disabledScriptsHide'),
   },
   [kFPSort]: {
     exec: i18n('filterExecutionOrder'),
@@ -115,7 +111,6 @@ const items = {
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import LocaleGroup from './locale-group.vue';
 import SettingCheck from './setting-check.vue';
 
 let popupWidthDragging;
@@ -167,10 +162,14 @@ onMounted(() => {
 </script>
 
 <style>
-.single > label {
+.mid,
+.mid > label {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   white-space: pre-wrap;
+}
+.mid.mid > label { /* duplicating to override `.tab-settings label` */
+  display: inline-flex;
 }
 </style>

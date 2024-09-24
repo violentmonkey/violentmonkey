@@ -177,6 +177,18 @@ descScriptTemplate:
   message: >-
     Supported variables: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
     with MomentJS-compatible format, for example <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: group
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: hide
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 'Disabled scripts:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: show
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
@@ -249,10 +261,10 @@ fileInstallBlocked:
     userscript may read any local file.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: alphabetical order
+  message: alphabetical
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: execution order
+  message: execution
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: last update time
@@ -358,7 +370,7 @@ labelBackupMaintenance:
   message: Backup and maintenance
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Display on badge: '
+  message: 'Badge:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Badge colors: '
@@ -435,9 +447,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
-labelFilterSort:
-  description: Label for sort filter.
-  message: Sort by $1
 labelGeneral:
   description: Label for general settings.
   message: General
@@ -506,9 +515,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignore per-script notification ("settings" tab in editor)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Sort scripts in popup by $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Privacy Policy
@@ -606,7 +612,8 @@ labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Table view
 labelWidth:
-  message: 'Width: '
+  description: Width.
+  message: 'Width:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -865,15 +872,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Group disabled scripts
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Group by @run-at stage
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Hide disabled scripts
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Show disabled scripts
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Show enabled scripts first
@@ -960,6 +970,9 @@ skipScriptsMsg:
   message: >-
     You disabled userscripts for this page. To run them, reload or navigate the
     tab.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: 'Sort order:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Stop tracking
