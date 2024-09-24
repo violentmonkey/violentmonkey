@@ -15,14 +15,16 @@
   <div class="single">
     <label>
       <span v-text="i18n('labelWidth')"/>
-      <input v-model="settings[kPopupWidth]" type="range" style="flex:1"
+      <input v-model="popupWidth" type="range"
+             @mousedown="onMouseDownInRangeInput"
              :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" />
-      <input v-model="settings[kPopupWidth]" type="number" style="field-sizing:content" class="ml-1"
+      <input v-model="popupWidth" type="number" style="field-sizing:content" class="ml-1"
+             ref="$popupWidthNumber"
              :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" />
       px
       <button v-text="i18n('buttonReset')" class="ml-1"
-              v-if="settings[kPopupWidth] !== optionsDefaults[kPopupWidth]"
-              @click="settings[kPopupWidth] = optionsDefaults[kPopupWidth]"/>
+              v-if="popupWidth !== optionsDefaults[kPopupWidth]"
+              @click="popupWidth = optionsDefaults[kPopupWidth]"/>
     </label>
   </div>
   <div class="ml-2c">
@@ -68,9 +70,10 @@
 </template>
 
 <script>
-import { browserWindows, i18n } from '@/common';
+import { browserWindows, debounce, i18n } from '@/common';
 import { mapEntry } from '@/common/object';
 import optionsDefaults, { kPopupWidth } from '@/common/options-defaults';
+import { getActiveElement } from '@/common/ui';
 import { hookSettingsForUI, NORMALIZE } from '@/common/ui/util';
 
 const EDITOR_WINDOW_HINT = browserWindows?.onBoundsChanged ? '' : i18n('optionEditorWindowHint');
@@ -115,7 +118,11 @@ import Tooltip from 'vueleton/lib/tooltip';
 import LocaleGroup from './locale-group.vue';
 import SettingCheck from './setting-check.vue';
 
+let popupWidthDragging;
+
 const settings = reactive({});
+const popupWidth = ref();
+const $popupWidthNumber = ref();
 const $EW = ref();
 const isCustomBadgeColor = computed(() => { // eslint-disable-line vue/return-in-computed-property
   for (const name in badgeColorEnum) {
@@ -129,9 +136,33 @@ const onResetBadgeColors = () => {
     settings[name] = optionsDefaults[name]; // eslint-disable-line vue/no-mutating-props
   }
 };
+const onMouseUp = () => {
+  popupWidthDragging = false;
+  settings[kPopupWidth] = popupWidth.value;
+};
+const onMouseDownInRangeInput = () => {
+  popupWidthDragging = true;
+  addEventListener('mouseup', onMouseUp, { once: true });
+};
+const flushPopupWidth = val => {
+  settings[kPopupWidth] = val;
+};
+const flushPopupWidthLater = debounce(flushPopupWidth, 250);
 
 onMounted(() => {
-  hookSettingsForUI(items, settings, watch, { kPopupWidth: 200 });
+  hookSettingsForUI(items, settings, watch, 0);
+  watch(() => settings[kPopupWidth], val => {
+    if (!popupWidthDragging) popupWidth.value = val;
+  });
+  watch(popupWidth, val => {
+    if (!popupWidthDragging) {
+      (getActiveElement() === $popupWidthNumber.value
+        ? flushPopupWidthLater
+        : flushPopupWidth
+      )(val);
+    }
+  });
+  popupWidth.value = settings[kPopupWidth];
 });
 </script>
 

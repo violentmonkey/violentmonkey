@@ -155,7 +155,7 @@ onActivated(() => {
   focusMe($el.value);
   revokers = [
     keyboardService.register('ctrlcmd-s', ctrlS, { condition: 'inputFocus' }),
-    ...hookSettingsForUI(items, settings, watch),
+    ...hookSettingsForUI(items, settings, watch, 50),
   ];
   expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
 });

@@ -13,10 +13,10 @@ export function normalizeEnum(val) {
  * @param {object} items - source definitions
  * @param {object} settings - target
  * @param {function} watch - Vue's watch()
- * @param {number | { [key]: number }} toDebounce
- * @return {*[]}
+ * @param {number} [delay] - debounce
+ * @return {any[]}
  */
-export function hookSettingsForUI(items, settings, watch, toDebounce = 50) {
+export function hookSettingsForUI(items, settings, watch, delay) {
   const revokers = [];
   for (const key in items) {
     const obj = items[key];
@@ -27,7 +27,6 @@ export function hookSettingsForUI(items, settings, watch, toDebounce = 50) {
       old = normalize(old, key);
       if (val !== old) options.set(key, val);
     };
-    const delay = +toDebounce || toDebounce[key];
     revokers.push(
       hookSetting(key, val => {
         settings[key] = normalize(val, key);
