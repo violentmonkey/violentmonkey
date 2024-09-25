@@ -86,7 +86,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
   if (!hPrev) {
-    hPrev = innerHeight;
+    hPrev = Math.max(innerHeight, 100); // ignore the not-yet-resized popup e.g. in Firefox
     window.onresize = onResize;
     // Mobile browsers show the popup maximized to the entire screen, no resizing
     if (isTouch && hPrev > document.body.clientHeight) onResize();
