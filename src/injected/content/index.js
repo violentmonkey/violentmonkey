@@ -31,10 +31,14 @@ async function init() {
       ? await getDataFF(dataPromise)
       : await dataPromise
   );
+  const info = data.info;
   const injectInto = bridge[INJECT_INTO] = data[INJECT_INTO];
   assign(ids, data[IDS]);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
+  }
+  if (IS_FIREFOX && info) { // must redefine now as it's used by injectPageSandbox
+    IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
   if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
@@ -42,7 +46,7 @@ async function init() {
   }
   if (objectKeys(ids).length) {
     onScripts.forEach(fn => fn(data));
-    await injectScripts(data, isXml);
+    await injectScripts(data, info, isXml);
   }
   onScripts.length = 0;
   finish(injectInto);

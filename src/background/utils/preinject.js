@@ -375,7 +375,9 @@ function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, [kFrameId]: frame
 }
 
 function prepare(cacheKey, url, isTop) {
-  const shouldExpose = isTop && url.startsWith('https://') && expose[url.split('/', 3)[2]];
+  const shouldExpose = isTop && url.startsWith('https://')
+    ? expose[url.split('/', 3)[2]]
+    : null;
   const bagNoOp = shouldExpose != null ? BAG_NOOP_EXPOSE : BAG_NOOP;
   BAG_NOOP_EXPOSE[INJECT][EXPOSE] = shouldExpose;
   if (!isApplied) {

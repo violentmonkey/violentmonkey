@@ -123,16 +123,14 @@ export function injectPageSandbox(data) {
 
 /**
  * @param {VMInjection} data
+ * @param {VMInjection.Info} info
  * @param {boolean} isXml
  */
-export async function injectScripts(data, isXml) {
-  const { errors, info, [MORE]: more } = data;
+export async function injectScripts(data, info, isXml) {
+  const { errors, [MORE]: more } = data;
   const CACHE = 'cache';
   if (errors) {
     logging.warn(errors);
-  }
-  if (IS_FIREFOX) {
-    IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
   info.gmi = {
     isIncognito: chrome.extension.inIncognitoContext,
