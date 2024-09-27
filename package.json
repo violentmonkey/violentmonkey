@@ -114,5 +114,6 @@
       "./test/mock/index.js"
     ],
     "testEnvironment": "./test/mock/env.js"
-  }
+  },
+  "beta": 1
 }
