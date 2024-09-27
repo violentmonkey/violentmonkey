@@ -182,7 +182,7 @@ editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
     Documentație cu privire la blockurile metadatelor usescripturilor și
-    API-urile <code>GM</code>: 
+    API-urile <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: Comenzi rapide de la tastatură
@@ -468,7 +468,7 @@ labelHomepageURL:
   message: 'URL pentru pagina de start:'
 labelIconURL:
   description: Label for the input.
-  message: URL-ul pictogramei
+  message: 'URL-ul pictogramei:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importă datele scripturilor

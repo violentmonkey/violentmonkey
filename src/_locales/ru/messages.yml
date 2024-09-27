@@ -461,7 +461,7 @@ labelHomepageURL:
   message: 'Адрес домашней страницы:'
 labelIconURL:
   description: Label for the input.
-  message: Адрес значка
+  message: 'Адрес значка:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Импорт данных скрипта
@@ -764,7 +764,7 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: |-
-    Конфликт пространства имён скрипта. 
+    Конфликт пространства имён скрипта.
     Пожалуйста, смените @name и @namespace здесь или исправьте этот скрипт.
 msgNamespaceConflictRestore:
   description: >-

@@ -198,7 +198,7 @@ editLongLineTooltip:
     Овај ред је предугачак па је његов текст скупљен да би се избегла кашњења
     приликом уређивања.
 
-    Можете подесити ограничење у напредним подешавањима, на пример: 
+    Можете подесити ограничење у напредним подешавањима, на пример:
 
     „maxDisplayLength“: 20000
 editNavCode:
@@ -447,7 +447,7 @@ labelHomepageURL:
   message: 'Адреса почетне странице:'
 labelIconURL:
   description: Label for the input.
-  message: URL иконе
+  message: 'URL иконе:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: увоз података скрипте

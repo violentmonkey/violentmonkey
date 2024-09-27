@@ -434,7 +434,7 @@ labelHomepageURL:
   message: 首頁網址：
 labelIconURL:
   description: Label for the input.
-  message: 圖示 URL
+  message: 圖示 URL：
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: 匯入腳本資料
@@ -625,7 +625,7 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: |-
-    若您在「一般設定」裡啟用了自動重新載入，目前開啟的標籤頁將會自動更新。 
+    若您在「一般設定」裡啟用了自動重新載入，目前開啟的標籤頁將會自動更新。
     如需將變更應用到其他標籤頁，您需要手動進行重新載入。
     更多客製化選項，請至編輯器的「設定」標籤頁進行調整。
 menuFeedback:

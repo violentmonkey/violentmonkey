@@ -468,7 +468,7 @@ labelHomepageURL:
   message: 'Homepage-URL:'
 labelIconURL:
   description: Label for the input.
-  message: Icon-URL
+  message: 'Icon-URL:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Skriptdaten importieren

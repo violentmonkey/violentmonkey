@@ -460,7 +460,7 @@ labelHomepageURL:
   message: 'Website-url:'
 labelIconURL:
   description: Label for the input.
-  message: Pictogram-url
+  message: 'Pictogram-url:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Scriptgegevens importeren
@@ -983,7 +983,7 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * <kbd>Enter</kbd>toets om tekst toe te voegen aan automatisch aanvullen 
+    * <kbd>Enter</kbd>toets om tekst toe te voegen aan automatisch aanvullen
 
     * Alle omstandigheden zijn hoofdletterongevoelig
 

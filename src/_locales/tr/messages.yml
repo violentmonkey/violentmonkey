@@ -253,7 +253,7 @@ fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Yerel bir dosyayı yüklemenin ve düzenlemeleri izlemenin birkaç yöntem
-    vardır: 
+    vardır:
 
     <1>Dosyayı sürükleyip açık bir Violentmonkey sayfasına veya açılır
     penceresine bırakabilirsiniz (bu sayfa dahil). <2>Dosya için yerel bir HTTP
@@ -467,7 +467,7 @@ labelHomepageURL:
   message: 'Ana sayfa URL''si:'
 labelIconURL:
   description: Label for the input.
-  message: Simge URL'si
+  message: 'Simge URL''si:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Betik verilerini içeri aktar
