@@ -169,6 +169,18 @@ descScriptTemplate:
   message: >-
     Variabel yang didukung: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
     dengan format yang kompatibel dengan MomentJS, contoh <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ''
+disabledScriptsSelector:
+  description: Label of the option.
+  message: ''
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentasi tentang blok data meta skrip dan API <code>GM</code>:'
@@ -425,9 +437,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Umpanbalik
-labelFilterSort:
-  description: Label for sort filter.
-  message: Urutkan menurut $1
 labelGeneral:
   description: Label for general settings.
   message: Umum
@@ -496,9 +505,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: abaikan notifikasi per skrip (tab "pengaturan" di dalam penyunting)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Urutkan skrip di popup menurut $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Kebijakan Privasi
@@ -595,6 +601,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tampilan tabel
+labelWidth:
+  description: Width.
+  message: ''
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -853,15 +862,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Grup skrip nonaktif
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Kelompokkan menurut tahap @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Sembunyikan nonaktif
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Tampilkan skrip nonaktif
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Tampilkan skrip aktif di atas
@@ -882,6 +894,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Perbarui
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: ''
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Hanya-baca
@@ -942,6 +960,9 @@ skipScriptsMsg:
   message: >-
     Anda menonaktifkan userscript untuk halaman ini. Untuk menjalankannya, muat
     ulang atau kunjungi tab tersebut.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Setop pelacakan

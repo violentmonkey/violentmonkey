@@ -167,6 +167,18 @@ descScriptTemplate:
   message: >-
     使用可能な変数: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}> はMomentJS互換、例
     <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: グループ
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: 非表示
+disabledScriptsSelector:
+  description: Label of the option.
+  message: '無効化中のスクリプト:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: 表示
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'ユーザースクリプトのメタデータ部分と <code>GM</code> API の説明文書:'
@@ -342,7 +354,7 @@ labelBackupMaintenance:
   message: バックアップと管理
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'バッジの表示: '
+  message: 'バッジ:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'バッジの色:'
@@ -417,9 +429,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: 意見や報告
-labelFilterSort:
-  description: Label for sort filter.
-  message: $1 に並べ替え
 labelGeneral:
   description: Label for general settings.
   message: 基本設定
@@ -488,9 +497,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: スクリプトごとの通知を無視 (エディタの「設定」タブ内)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: ポップアップ内のスクリプトを $1 に並べ替え
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: 個人情報保護方針
@@ -587,6 +593,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: 表形式
+labelWidth:
+  description: Width.
+  message: '幅:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -830,15 +839,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: 無効中のものをグループ化
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: '@run-at の指定値ごとにグループ化'
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: 無効中のものを非表示
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: 無効中のものも表示
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 有効なスクリプトを先に表示
@@ -859,6 +871,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: 更新
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: 設定をポップアップ
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: '右クリック: 設定をポップアップ'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: 読取専用
@@ -911,6 +929,9 @@ skipScripts:
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: ユーザースクリプトを無効化中。再び実行するには再読込または移動します。
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: '並び替え:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: 追跡を中止

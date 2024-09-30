@@ -168,6 +168,18 @@ descScriptTemplate:
   message: >-
     지원하는 변수: MomentJS와 호환되는 <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
     형식. 예: <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ''
+disabledScriptsSelector:
+  description: Label of the option.
+  message: ''
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: '유저스크립트의 메타데이터와 <code>GM</code> API 문서:'
@@ -418,9 +430,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: 피드백
-labelFilterSort:
-  description: Label for sort filter.
-  message: '정렬: $1'
 labelGeneral:
   description: Label for general settings.
   message: 일반
@@ -489,9 +498,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: 각 스크립트의 알림 설정을 무시하고 전역 설정 사용
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: 팝업에서 $1 순서로 스크립트 나열하기
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: 개인정보 보호정책
@@ -588,6 +594,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: 표 형식
+labelWidth:
+  description: Width.
+  message: ''
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -833,15 +842,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: 비활성화된 스크립트 묶기
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: '@run-at stage로 묶기'
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: 비활성화된 스크립트 숨김
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: 비활성화된 스크립트 표시
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 활성화된 스크립트 먼저 보여주기
@@ -862,6 +874,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: 업데이트
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: ''
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: 읽기 전용
@@ -912,6 +930,9 @@ skipScripts:
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: 이 페이지에서 유저스크립트를 비활성화했습니다. 스크립트를 실행하려면 탭을 새로고침하거나 탐색하세요.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: 추적 중단

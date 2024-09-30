@@ -168,6 +168,18 @@ descScriptTemplate:
   message: >-
     支持的变量：<{{name}}>、<{{url}}>、<{{date}}>、<{{date:format}}> 使用 MomentJS 支持的格式，如
     <{{date:YYYY-MM-DD}}>。
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: 隐藏
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 禁用脚本：
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: 显示
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
@@ -342,7 +354,7 @@ labelBackupMaintenance:
   message: 备份和维护
 labelBadge:
   description: Label for option to show number on badge.
-  message: 在扩展图标上显示：
+  message: 徽标：
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 徽标颜色：
@@ -417,9 +429,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: 反馈
-labelFilterSort:
-  description: Label for sort filter.
-  message: 按 $1 排序
 labelGeneral:
   description: Label for general settings.
   message: 通用
@@ -488,9 +497,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: 忽略每个脚本的提示（编辑器中的“设置”页）
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: 弹出菜单中的脚本按$1排序
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: 隐私策略
@@ -587,6 +593,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: 表格视图
+labelWidth:
+  description: Width.
+  message: 宽度：
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -831,15 +840,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: 分组禁用的脚本
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: 按照 @run-at 阶段分组
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: 隐藏禁用的脚本
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: 显示禁用的脚本
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: 先显示被启用的脚本
@@ -860,6 +872,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: 更新
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: 弹窗设置
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: 只读
@@ -912,6 +930,9 @@ skipScripts:
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: 你已在当前页面禁用用户脚本，刷新或跳转页面后将会重新启用。
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: 排序方式：
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: 停止跟踪

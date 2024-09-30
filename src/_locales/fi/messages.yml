@@ -155,6 +155,18 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: ''
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ''
+disabledScriptsSelector:
+  description: Label of the option.
+  message: ''
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: ''
@@ -394,9 +406,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Palaute
-labelFilterSort:
-  description: Label for sort filter.
-  message: Järjestä $1:n mukaan
 labelGeneral:
   description: Label for general settings.
   message: Yleiset
@@ -464,9 +473,6 @@ labelNotifyUpdates:
   message: Näytä ilmoitus päivityksistä
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
   message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
@@ -563,6 +569,9 @@ labelViewSingleColumn:
   message: ''
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
+  message: ''
+labelWidth:
+  description: Width.
   message: ''
 labelXhrInject:
   description: >-
@@ -801,15 +810,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: ''
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: ''
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: ''
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Näytä käytössä olevat skriptit ensin
@@ -830,6 +842,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Päivitys
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: ''
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: ''
@@ -879,6 +897,9 @@ skipScripts:
   message: ''
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
   message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.

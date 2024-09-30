@@ -179,6 +179,18 @@ descScriptTemplate:
     Ondersteunde variabelen: <{{name}}>, <{{url}}>, <{{date}}>,
     <{{date:format}}> met een met MomentJS compatibel formaat, bijvoorbeeld
     <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: groep
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: verbergen
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 'Uitgeschakelde scripts:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: tonen
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentatie over gebruikersscript metagegevensblok en <code>GM</code> API:'
@@ -257,7 +269,7 @@ fileInstallBlocked:
     uitlezen.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: alfabetische volgorde
+  message: alfabetisch
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: uitvoervolgorde
@@ -366,7 +378,7 @@ labelBackupMaintenance:
   message: Reservekopie en onderhoud
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Tonen op embleem: '
+  message: 'Embleem:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Embleemkleuren:'
@@ -443,9 +455,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
-labelFilterSort:
-  description: Label for sort filter.
-  message: Sorteren op $1
 labelGeneral:
   description: Label for general settings.
   message: Algemeen
@@ -514,9 +523,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: per-scriptmeldingen negeren (tabblad 'instellingen' in de bewerker)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Scripts in pop-up sorteren op $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Privacybeleid
@@ -613,6 +619,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tabelweergave
+labelWidth:
+  description: Width.
+  message: 'Breedte:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -872,15 +881,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Uitgeschakelde scripts groeperen
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Groeperen op @run-at-niveau
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Uitgeschakelde scripts verbergen
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Uitgeschakelde scripts tonen
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Ingeschakelde scripts bovenaan
@@ -901,6 +913,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Bijwerken
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: Pop-upinstellingen
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: 'Rechtsklikken: pop-upinstellingen'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Alleen-lezen
@@ -961,6 +979,9 @@ skipScriptsMsg:
   message: >-
     Je hebt gebruikersscripts uitgeschakeld op deze pagina. Schakel ze in door
     te herladen of een link aan te klikken.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: Sorteervolgorde
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Bijhouden stoppen
@@ -983,7 +1004,7 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * <kbd>Enter</kbd>toets om tekst toe te voegen aan automatisch aanvullen
+    * <kbd>Enter</kbd>toets om tekst toe te voegen aan automatisch aanvullen 
 
     * Alle omstandigheden zijn hoofdletterongevoelig
 
