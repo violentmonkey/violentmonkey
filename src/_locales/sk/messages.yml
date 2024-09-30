@@ -179,6 +179,18 @@ descScriptTemplate:
   message: >-
     Podporované premenné: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
     formát kompatibilný s MomentJS, napríklad <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: skupina
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: skryť
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 'Vypnuté skripty:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: zobraziť
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentácia k bloku metadát požívateľského skriptu a <code>GM</code> API:'
@@ -259,10 +271,10 @@ fileInstallBlocked:
     používateľský skript môže čítať akýkoľvek lokálny súbor.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: abecedy
+  message: abecedne
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: spustenia
+  message: vykonanie
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: poslednej aktualizácie
@@ -370,7 +382,7 @@ labelBackupMaintenance:
   message: Zálohovanie a údržba
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Zobraziť počítadlo: '
+  message: 'Odznak:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Farby odznaku:'
@@ -447,9 +459,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba
-labelFilterSort:
-  description: Label for sort filter.
-  message: Zoradiť podľa $1
 labelGeneral:
   description: Label for general settings.
   message: Všeobecné
@@ -518,9 +527,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignorovať nastavenie upozornenia (záložka "Nastavenia" v editore)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Zoradiť skripty vo vyskakovacom okne podľa $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Zásady ochrany osobných údajov
@@ -617,6 +623,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tabuľkové zobrazenie
+labelWidth:
+  description: Width.
+  message: 'Šírka:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -875,15 +884,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Zoskupiť zakázané skripty
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Zoskupiť podľa @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Skryť zakázané skripty
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Zobraziť zakázané skripty
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Zobraziť najskôr povolené skripty
@@ -904,6 +916,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualizácia
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: Nastavenia vyskakovacieho okna
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: 'Kliknutie pravým tlačidlom myši: vyskakovacie okno s nastaveniami'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Iba na čítanie
@@ -964,6 +982,9 @@ skipScriptsMsg:
   message: >-
     Zakázali ste používateľské skripty pre túto stránku. Ak ich chcete znovu
     spustiť, znovu načítajte alebo prejdite na kartu.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: 'Zoradenie:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Zastaviť sledovanie

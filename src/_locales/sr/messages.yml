@@ -174,6 +174,18 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: ''
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ''
+disabledScriptsSelector:
+  description: Label of the option.
+  message: ''
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: ''
@@ -198,7 +210,7 @@ editLongLineTooltip:
     Овај ред је предугачак па је његов текст скупљен да би се избегла кашњења
     приликом уређивања.
 
-    Можете подесити ограничење у напредним подешавањима, на пример:
+    Можете подесити ограничење у напредним подешавањима, на пример: 
 
     „maxDisplayLength“: 20000
 editNavCode:
@@ -430,9 +442,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Повратне информације
-labelFilterSort:
-  description: Label for sort filter.
-  message: Сортирај по $1
 labelGeneral:
   description: Label for general settings.
   message: Опште
@@ -501,9 +510,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: игнорисати обавештење по скрипти (картица „подешавања“ у уређивачу)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Сортирај скрипте у искачућем прозору по $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Политика приватности
@@ -600,6 +606,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Табеларно
+labelWidth:
+  description: Width.
+  message: ''
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -843,15 +852,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Групно онемогућене скрипте
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Групиши по @run-at фази
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Сакриј онемогућене скрипте
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Прикажи онемогућене скрипте
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Прикажи прво омогућене скрипте
@@ -872,6 +884,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Ажурирај
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: ''
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Само за читање
@@ -928,6 +946,9 @@ skipScriptsMsg:
   message: >-
     Онемогућили сте корисничке скрипте за ову страницу. Да бисте их покренули,
     поново учитајте картицу или се крећете по њој.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Зауставите праћење

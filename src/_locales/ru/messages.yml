@@ -178,6 +178,18 @@ descScriptTemplate:
     Поддерживаемые переменные: <{{name}}>, <{{url}}>, <{{date}}>,
     <{{date:format}}> с совместимым с MomentJS форматом, например,
     <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: группировать
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: скрыть
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 'Отключённые скрипты:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: показать
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Документация по блоку метаданных скриптов и <code>GM</code> API:'
@@ -258,10 +270,10 @@ fileInstallBlocked:
     прочитать любой локальный файл.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: алфавитному порядку
+  message: алфавитный порядок
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: порядку выполнения
+  message: порядок выполнения
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: времени обновления
@@ -444,9 +456,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
-labelFilterSort:
-  description: Label for sort filter.
-  message: Сортировать по $1
 labelGeneral:
   description: Label for general settings.
   message: Общие настройки
@@ -515,9 +524,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: Игнорировать уведомления скриптов (вкладка настроек в редакторе)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Сортировка во всплывающем окне по $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Политика конфиденциальности
@@ -614,6 +620,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Табличный вид
+labelWidth:
+  description: Width.
+  message: 'Ширина:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -764,7 +773,7 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: |-
-    Конфликт пространства имён скрипта.
+    Конфликт пространства имён скрипта. 
     Пожалуйста, смените @name и @namespace здесь или исправьте этот скрипт.
 msgNamespaceConflictRestore:
   description: >-
@@ -873,15 +882,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Группировать отключённые скрипты
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Группировать по стадии @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Скрыть отключённые скрипты
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Показать отключённые скрипты
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Сначала показать включённые скрипты
@@ -902,6 +914,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Обновление
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: Настройки всплывающего окна
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: 'Правый щелчок: настройки всплывающего окна'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Только для чтения
@@ -962,6 +980,9 @@ skipScriptsMsg:
   message: >-
     Вы отключили пользовательские скрипты для этой страницы. Чтобы запустить их,
     перезагрузите или перейдите на вкладку.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: 'Порядок сортировки:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Прекратить отслеживание

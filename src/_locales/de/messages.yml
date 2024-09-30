@@ -178,6 +178,18 @@ descScriptTemplate:
   message: >-
     Unterstützte Variablen: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
     in MomentJS-kompatiblem Format, zum Beispiel: <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: gruppieren
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ausblenden
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 'Deaktivierte Skripte:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: anzeigen
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -252,18 +264,18 @@ fileInstallBlocked:
   message: >-
     Es gibt mehrere Methoden um eine lokale Datei zu installieren oder
     Bearbeitungen in dieser zu tracken: <1> Drag-and-Drop der Datei in eine
-    geöffnete Violentmonkey-Seite oder -Popup, inklusive diesem. <2> Einen
+    geöffnete Violentmonkey-Seite oder -Pop-up, inklusive diesem. <2> Einen
     lokalen HTTP-Server für die Datei installieren und diese via
     http://localhost öffnen. <3> In den Violentmonkey-Details auf der
-    chrome://extensions-Seite "Zugriff auf Dateipfade zulassen" aktivieren. Dies
+    chrome://extensions-Seite "Zugriff auf Datei-URLs zulassen" aktivieren. Dies
     ist potenziell gefährlich, da dies jedem Benutzerskript ermöglicht jede
     lokale Datei zu lesen.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: Alphabetischer Reihenfolge
+  message: alphabetisch
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: Ausführungsreihenfolge
+  message: Ausführung
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: Zeitpunkt der letzten Aktualisierung
@@ -310,7 +322,7 @@ hintForBatchAction:
   message: für $1 gematchte Skripte
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL eingeben:'
+  message: 'Input-URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Gelöschte Skripte werden hier aufgelistet und 7 Tage aufbewahrt.
@@ -373,7 +385,7 @@ labelBackupMaintenance:
   message: Backup und Wartung
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Auf dem Symbol anzeigen: '
+  message: 'Badge:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Badge-Farben:'
@@ -451,9 +463,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
-labelFilterSort:
-  description: Label for sort filter.
-  message: Sortieren nach $1
 labelGeneral:
   description: Label for general settings.
   message: Allgemein
@@ -524,9 +533,6 @@ labelNotifyUpdatesGlobal:
   message: >-
     Skriptspezifische Benachrichtigung ignorieren ("Einstellungen"-Tab im
     Editor)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Skripte im Pop-up sortieren nach $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Datenschutzrichtlinie
@@ -623,6 +629,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tabellenansicht
+labelWidth:
+  description: Width.
+  message: 'Breite:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -888,15 +897,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Deaktivierte Skripte gruppieren
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: Nach @run-at-Phasen gruppieren
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Deaktivierte Skripte ausblenden
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Deaktivierte Skripte anzeigen
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Aktivierte Skripte zuerst anzeigen
@@ -917,6 +929,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Aktualisierung
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: Pop-up-Einstellungen
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: 'Rechtsklick: Pop-up-Einstellungen'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Schreibgeschützt
@@ -977,6 +995,9 @@ skipScriptsMsg:
   message: >-
     Sie haben Benutzerskripte auf dieser Seite deaktiviert. Um sie auszuführen,
     laden Sie den Tab neu oder navigieren Sie in ihm.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: 'Sortierungsreihenfolge:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Tracking stoppen

@@ -170,6 +170,18 @@ descScriptTemplate:
   message: >-
     Các biến được hỗ trợ: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
     với định dạng tương thích MomentJS, ví dụ như <{{date:YYYY-MM-DD}}>.
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ''
+disabledScriptsSelector:
+  description: Label of the option.
+  message: ''
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Các tài liệu về API đọc ở đây:'
@@ -425,9 +437,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Phản hồi
-labelFilterSort:
-  description: Label for sort filter.
-  message: Sắp xếp theo $1
 labelGeneral:
   description: Label for general settings.
   message: Chung
@@ -498,9 +507,6 @@ labelNotifyUpdatesGlobal:
   message: >-
     Bỏ qua thông báo trên mỗi script (thay đổi trong cài đặt ở mục chỉnh sửa
     script)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Sắp xếp scripts trong popup theo $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Chính sách bảo mật
@@ -597,6 +603,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Chế độ xem bảng
+labelWidth:
+  description: Width.
+  message: ''
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -857,15 +866,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Nhóm các script bị vô hiệu hoá
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ẩn script bị tắt
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Ẩn script bị vô hiệu hoá
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Hiển thị script được bật ở trước
@@ -886,6 +898,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Cập nhật
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: ''
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: ''
@@ -935,6 +953,9 @@ skipScripts:
   message: ''
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
   message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.

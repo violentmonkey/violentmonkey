@@ -164,6 +164,18 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: ''
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: ''
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: ''
+disabledScriptsSelector:
+  description: Label of the option.
+  message: ''
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Документація по блоку метаданих скриптів та <code>GM</code> API:'
@@ -417,9 +429,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Зворотній зв'язок
-labelFilterSort:
-  description: Label for sort filter.
-  message: Сортувати по $1
 labelGeneral:
   description: Label for general settings.
   message: Загальні налаштування
@@ -488,9 +497,6 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: Ігнорувати повідомлення скриптів (вкладка налаштувань у редакторі)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Сортувати скрипти у спливаючому вікні за $1
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Політика конфіденційності
@@ -587,6 +593,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Табличний вигляд
+labelWidth:
+  description: Width.
+  message: ''
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -840,15 +849,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Групувати відключені скрипти
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Сховати відключені скрипти
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Показати відключені скрипти
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Показувати ввімкнені скрипти першими
@@ -869,6 +881,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Оновлення
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: ''
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: ''
@@ -918,6 +936,9 @@ skipScripts:
   message: ''
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
+  message: ''
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
   message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.

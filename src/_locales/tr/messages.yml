@@ -181,6 +181,18 @@ descScriptTemplate:
   message: >-
     Desteklenen değerler: <{{name}}>, <{{url}}>, <{{date}}>, MomentJS uyumlu
     biçimde <{{date:format}}> (örn. <{{date:YYYY-AA-GG}}>).
+disabledScriptsGroup:
+  description: 'Used as "Disabled scripts: group"'
+  message: grupla
+disabledScriptsHide:
+  description: 'Used as "Disabled scripts: hide"'
+  message: gizle
+disabledScriptsSelector:
+  description: Label of the option.
+  message: 'Devre dışı betikler:'
+disabledScriptsShow:
+  description: 'Used as "Disabled scripts: show"'
+  message: göster
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Kullanıcı betiği meta veri bloku ve <code>GM</code> API belgeleri:'
@@ -253,7 +265,7 @@ fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Yerel bir dosyayı yüklemenin ve düzenlemeleri izlemenin birkaç yöntem
-    vardır:
+    vardır: 
 
     <1>Dosyayı sürükleyip açık bir Violentmonkey sayfasına veya açılır
     penceresine bırakabilirsiniz (bu sayfa dahil). <2>Dosya için yerel bir HTTP
@@ -263,10 +275,10 @@ fileInstallBlocked:
     tehlikelidir çünkü tüm kullanıcı betikleri tüm yerel dosyaları okuyabilir.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: alfabetik olarak
+  message: alfabetik
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: çalıştırma sırasına göre
+  message: çalıştırma sırası
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: son güncelleme zamanına göre
@@ -372,7 +384,7 @@ labelBackupMaintenance:
   message: Yedekleme ve Bakım
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Rozette göster: '
+  message: 'Rozet:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Rozet renkleri: '
@@ -450,9 +462,6 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Geri bildirim
-labelFilterSort:
-  description: Label for sort filter.
-  message: $1 sırala
 labelGeneral:
   description: Label for general settings.
   message: Genel
@@ -523,9 +532,6 @@ labelNotifyUpdatesGlobal:
   message: >-
     betiklerin özel bildirim ayarlarını görmezden gel (düzenleyicideki "ayarlar"
     sekmesindeki)
-labelPopupSort:
-  description: Label in the VM settings tab for script list sort order in popup
-  message: Açılır penceredeki betikleri $1 sırala
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Gizlilik Politikası
@@ -622,6 +628,9 @@ labelViewSingleColumn:
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Tablo görünümü
+labelWidth:
+  description: Width.
+  message: 'Genişlik:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -884,15 +893,18 @@ optionPopupEnabledFirst:
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: Devre dışı betikleri grupla
+  touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
   message: '@run-at aşamasına göre grupla'
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Devre dışı betikleri gizle
+  touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
   message: Devre dışı betikleri göster
+  touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
   message: Önce etkin betikleri göster
@@ -913,6 +925,12 @@ optionUpdate:
     Label of the update section in settings and notification title for script
     updates.
   message: Güncelleme
+popupSettings:
+  description: Item inside the popup's "⋮" menu
+  message: Açılır pencere ayarları
+popupSettingsHint:
+  description: Hint for the config button in the popup
+  message: 'Sağ tıklama: açılır pencere ayarları'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Salt okunur
@@ -969,6 +987,9 @@ skipScriptsMsg:
   message: >-
     Bu sayfada kullanıcı betiklerini devre dışı bıraktınız. Betikleri
     çalıştırmak isterseniz sekmeyi yenileyin veya sekmede gezinin.
+sortOrder:
+  description: Label for the script sort order in dashboard, settings, popup settings.
+  message: 'Sıralama:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: İzlemeyi durdur
