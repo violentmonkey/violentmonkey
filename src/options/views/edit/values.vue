@@ -235,11 +235,7 @@ watch(current, (val, oldVal) => {
   if (val) {
     focusedElement = getActiveElement();
     nextTick(() => {
-      const vmCode = $value.value;
-      cm = vmCode.cm;
-      if (oldVal) {
-        vmCode.updateValue(val.value); // focuses CM, which we may override in isNew below
-      }
+      cm = $value.value.cm;
       if (val.isNew) {
         const el = $key.value;
         el.setSelectionRange(0, 0);
