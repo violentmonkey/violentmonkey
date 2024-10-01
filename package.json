@@ -1,7 +1,7 @@
 {
   "name": "violentmonkey",
   "description": "Violentmonkey",
-  "version": "2.25.0",
+  "version": "2.26.0",
   "scripts": {
     "prepare": "husky install",
     "dev": "gulp dev",
@@ -114,6 +114,5 @@
       "./test/mock/index.js"
     ],
     "testEnvironment": "./test/mock/env.js"
-  },
-  "beta": 1
+  }
 }
