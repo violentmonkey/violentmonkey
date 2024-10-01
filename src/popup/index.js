@@ -137,11 +137,15 @@ function isMyTab(tab) {
 }
 
 function onResize(evt) {
-  // 1. Ignoring initial empty popup
-  // 2. Ignoring initial devicePixelRatio which is based on page zoom in this extension's tabs
   const h = innerHeight;
   if (!evt
-  || h > hPrev && document.readyState !== 'loading' && document.body.clientHeight > h) {
+  // ignoring intermediate downsize
+  || h > hPrev
+  // ignoring  initial devicePixelRatio which is based on page zoom in this extension's tabs
+    && document.readyState !== 'loading'
+  // ignoring off-by-1 e.g. due to clientHeight being fractional
+    && document.body.clientHeight - 1 > h
+  ) {
     window.onresize = null;
     store.maxHeight = h + 'px';
   }

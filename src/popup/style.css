@@ -275,7 +275,7 @@ footer {
     font-size: .8rem;
     color: var(--fill-12);
     > .menu-item {
-      min-height: 1.3rem;
+      min-height: 1.5rem;
       padding-left: $leftPaneWidth;
       > .icon {
         margin-right: .5rem;
