@@ -31,7 +31,7 @@ buttonEdit:
   message: 编辑
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 你也可以右键点击、Ctrl+点击、滚轮点击脚本名字
+  message: 你也可以右键点击、Ctrl+点击、滚轮点击脚本名称。
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: 立即清空回收站！
@@ -170,7 +170,7 @@ descScriptTemplate:
     <{{date:YYYY-MM-DD}}>。
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: 分组
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
   message: 隐藏
@@ -250,7 +250,7 @@ filterAlphabeticalOrder:
   message: 字母顺序
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: 执行顺序
+  message: 执行
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: 最近更新时间
@@ -475,7 +475,7 @@ labelMatch:
   message: '@match 规则'
 labelName:
   description: Label of script name.
-  message: 名字：
+  message: 名称：
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
   message: "在内联框架中运行:\_"
@@ -877,7 +877,7 @@ popupSettings:
   message: 弹窗设置
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 右键点击：弹窗设置
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: 只读

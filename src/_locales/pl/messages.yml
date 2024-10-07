@@ -181,16 +181,16 @@ descScriptTemplate:
     formacie zgodnym z MomentJS, np <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: grupuj
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: ukryj
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Wyłączone skrypty:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: pokaż
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -917,10 +917,10 @@ optionUpdate:
   message: Aktualizacja
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Ustawienia wyskakującego okienka
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Prawy przycisk myszy: ustawienia wyskakującego okienka'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Tylko odczyt
