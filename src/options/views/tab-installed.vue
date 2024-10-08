@@ -570,7 +570,7 @@ function handleActionToggle(script) {
  * @param {Element} [el]
  */
 async function handleActionUpdate(what, el) {
-  if (el) (el = (el.querySelector('svg') || el).classList).add('rotate');
+  if (el) (el = (el.querySelector('svg') || el.closest('svg') || el).classList).add('rotate');
   await sendCmdDirectly('CheckUpdate', what && ensureArray(what).map(s => s.props.id));
   el?.remove('rotate');
 }
