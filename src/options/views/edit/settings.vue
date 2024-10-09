@@ -1,6 +1,6 @@
 <template>
   <div class="edit-settings">
-    <h4 v-text="i18n('editLabelSettings')"></h4>
+    <h3 v-text="i18n('editLabelSettings')"></h3>
     <div class="mb-2">
       <label>
         <input type="checkbox" v-model="config.enabled">
@@ -16,7 +16,7 @@
         </td>
       </tr>
     </table>
-    <h4 v-text="i18n('editLabelMeta')"></h4>
+    <h3 v-text="i18n('editLabelMeta')"></h3>
     <!-- Using tables to auto-adjust width, which differs substantially between languages -->
     <table>
       <tr>
@@ -95,6 +95,7 @@
         </td>
       </tr>
     </table>
+    <vm-editor />
   </div>
 </template>
 
@@ -108,6 +109,7 @@ import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
   kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL,
 } from '../../utils';
+import VmEditor from '../tab-settings/vm-editor';
 
 const props = defineProps({
   script: Object,
@@ -154,8 +156,9 @@ $leftColWidth: 12rem;
     padding-left: $PAD;
     padding-right: $PAD;
   }
-  h4 {
+  h3 {
     margin: 2em 0 1em;
+    break-after: avoid-column;
   }
   table {
     border-spacing: 0 1em;
@@ -184,14 +187,9 @@ $leftColWidth: 12rem;
   tr:focus-within code {
     text-decoration: underline;
   }
-  code {
+  table code {
     background: none;
     font-weight: bold;
-  }
-  svg {
-    width: 16px;
-    height: 16px;
-    vertical-align: text-bottom;
   }
 }
 </style>
