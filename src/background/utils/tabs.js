@@ -144,7 +144,7 @@ addPublicCommands({
       // Replacing the currently focused start tab page for internal commands
       newTab = await browser.tabs.update(srcTab.id, { url, ...tabOpts }).catch(noop);
     }
-    if (!newTab) {
+    if (!newTab) for (let retry = 0; retry < 2; retry++) try {
       newTab = await browser.tabs.create({
         url,
         ...tabOpts,
@@ -155,6 +155,9 @@ addPublicCommands({
           ...openerTabIdSupported && { openerTabId: srcTab.id },
         },
       });
+    } catch (err) {
+      if (err.message.startsWith('Illegal to set private')) storeId = null;
+      else throw err; // TODO: put in storage and show in UI
     }
     if (active && newTab[kWindowId] !== windowId) {
       await browserWindows?.update(newTab[kWindowId], { focused: true });
