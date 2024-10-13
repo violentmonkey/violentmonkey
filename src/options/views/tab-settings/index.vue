@@ -200,10 +200,5 @@ onDeactivated(() => {
   ruby {
     color: var(--fill-8);
   }
-  .icon {
-    width: 16px;
-    height: 16px;
-    fill: var(--fg);
-  }
 }
 </style>
