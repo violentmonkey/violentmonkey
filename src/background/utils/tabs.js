@@ -144,7 +144,7 @@ addPublicCommands({
       // Replacing the currently focused start tab page for internal commands
       newTab = await browser.tabs.update(srcTab.id, { url, ...tabOpts }).catch(noop);
     }
-    if (!newTab) for (let retry = 0; retry < 2; retry++) try {
+    for (let retry = 0; !newTab && retry < 2; retry++) try {
       newTab = await browser.tabs.create({
         url,
         ...tabOpts,
