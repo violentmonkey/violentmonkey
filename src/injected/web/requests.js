@@ -224,8 +224,6 @@ export function onRequestCreate(opts, context, fileName) {
     events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
   }, opts, OPTS_TO_PASS));
   setOwnProp(res, 'abort', () => bridge.post('AbortRequest', id));
-  // In FF 130 a detached Promise's `then` doesn't work with `await`
-  if (IS_FIREFOX && context.async) setOwnProp(res, 'then', then);
   return res;
 }
 

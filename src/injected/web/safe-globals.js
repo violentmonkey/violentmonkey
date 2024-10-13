@@ -79,6 +79,7 @@ export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
  * or window[0] before our content script runs at document_start, https://crbug.com/1261964 */
 export const VAULT = (() => {
   let tmp;
+  let SafePromiseProto;
   let Reflect;
   let SafeObject;
   let i = -1;
@@ -158,8 +159,8 @@ export const VAULT = (() => {
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    SafePromiseConstructor = res[i += 1] || (tmp = src.Promise[PROTO]).constructor,
-    then = res[i += 1] || (srcFF || tmp).then,
+    SafePromiseConstructor = res[i += 1] || (SafePromiseProto = src.Promise[PROTO]).constructor,
+    then = res[i += 1] || (srcFF || SafePromiseProto).then,
     urlSearchParamsToString = res[i += 1] || src.URLSearchParams[PROTO].toString,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
@@ -179,5 +180,7 @@ export const VAULT = (() => {
   toStringTagSym = SafeSymbol.toStringTag;
   // Binding Promise to this realm
   SafePromise = safeBind(SafePromiseConstructor, getPrototypeOf(promiseResolve()));
+  // In FF 130+ a detached `then` doesn't work with `await`, so we use an exported `then`
+  if (IS_FIREFOX) SafePromiseProto.then = then;
   return res;
 })();
