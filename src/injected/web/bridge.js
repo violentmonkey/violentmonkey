@@ -20,7 +20,9 @@ const bridge = {
       cb = resolve;
     });
     postWithCallback(cmd, data, node, cb);
-    return res;
+    return IS_FIREFOX // In FF 130 a detached Promise's `then` doesn't work with `await`
+      ? setOwnProp(res, 'then', then)
+      : res;
   },
   /** @return {?} synchronous */
   call: postWithCallback,
