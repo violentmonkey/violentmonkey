@@ -80,7 +80,17 @@ async function maybeInstallUserJs(tabId, url) {
     commands.ConfirmInstall({ code, url, from: tab.url }, { tab });
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
-    if (tabId >= 0) browser.tabs.update(tabId, { url });
+    const error = `${VIOLENTMONKEY} installer skipped ${url}.
+Either not a userscript or the metablock comment is malformed:
+${code.length > 10e3 ? code.slice(0, 10e3) + '...' : code}`;
+    if (tabId < 0) {
+      console.warn(error);
+    } else {
+      browser.tabs.executeScript(tabId, {
+        code: `console.warn(${JSON.stringify(error)})`,
+      });
+      browser.tabs.update(tabId, { url });
+    }
   }
 }
 
