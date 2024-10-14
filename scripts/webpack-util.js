@@ -66,15 +66,9 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
     .replace(defsRe, s => defsObj[s])
   );
   const { header, footer, test } = callback(reader);
-  const opts = {
-    test,
-    banner: header,
-    entryOnly: true,
-    raw: true,
-  };
   config.plugins.push(
-    new webpack.BannerPlugin(opts),
-    new webpack.BannerPlugin({ ...opts, banner: footer, footer: true })
+    new webpack.BannerPlugin({ test, raw: true, banner: header }),
+    new webpack.BannerPlugin({ test, raw: true, banner: footer, footer: true })
   );
 }
 

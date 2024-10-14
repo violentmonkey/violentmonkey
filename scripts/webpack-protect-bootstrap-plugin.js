@@ -41,6 +41,7 @@ const MAIN_RULES = [
       `var (__webpack_module_cache__|${G.require}) = {};.*?`,
     ].join('|')})var ${G.exports} =`, 's'),
     patchBootstrap,
+    false,
   ], [
     new RegExp(`(${[
       `${G.definePropertyGetters}\\(${G.exports}, {`,
@@ -48,6 +49,7 @@ const MAIN_RULES = [
       `var __webpack_modules__ = \\({`,
     ].join('|')})(?!__proto__:)\\s*(.)`, 'g'),
     OBJ_RULE[1],
+    false,
   ],
 ];
 
