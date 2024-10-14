@@ -170,16 +170,16 @@ descScriptTemplate:
     com formato compatível com MomentJS, por exemplo <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: grupo
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: esconda
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Scripts Desativados:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: mostre
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -247,7 +247,7 @@ failureReasonNoninjectable:
     políticas, motor de pesquisa de site no Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: Violentmonkey foi reiniciado. Por favor recarregue a aba para rodar scripts
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -263,7 +263,7 @@ filterAlphabeticalOrder:
   message: Ordem alfabética
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: Ordem de execução
+  message: execução
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: Última atualização
@@ -462,7 +462,7 @@ labelHomepageURL:
   message: 'URL da página inicial:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'URL do ícone:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importar dados do script
@@ -614,7 +614,7 @@ labelViewTable:
   message: Ver como tabela
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Largura:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -905,7 +905,7 @@ optionUpdate:
   message: Atualizar
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Configurações de Popup
 popupSettingsHint:
   description: Hint for the config button in the popup
   message: ''
@@ -925,10 +925,10 @@ readonlyOptWarn:
   message: ''
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Reinstale
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Recarregue a aba
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: ''
@@ -957,7 +957,7 @@ sideMenuSettings:
   message: Configurações
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Recarregue a pagina sem os scripts
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: ''
@@ -994,13 +994,13 @@ updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Atualize scripts ($1)
 updateScript:
   description: Button to update one script.
   message: Atualizar
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Atualize todos os scripts
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: ''
