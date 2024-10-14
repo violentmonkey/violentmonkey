@@ -54,7 +54,7 @@
             <select v-for="opt in ['defaultInjectInto']" v-model="settings[opt]" :key="opt">
               <option v-for="(_, mode) in items[opt]" :key="mode" v-text="mode" />
             </select>
-            <a class="ml-1" href="https://violentmonkey.github.io/posts/inject-into-context/" target="_blank" rel="noopener noreferrer" v-text="i18n('learnInjectionMode')"></a>
+            <a class="ml-1" :href="VM_HOME + 'posts/inject-into-context/'" v-bind="EXTERNAL_LINK_PROPS" v-text="i18n('learnInjectionMode')"/>
           </label>
           <tooltip :content="i18n('labelXhrInjectHint')">
             <setting-check name="xhrInject">
@@ -77,7 +77,7 @@
             <setting-check v-for="([key, host]) in expose" :key="host"
                            :name="`expose.${key}`" class="ml-2 mr-1c valign-tb">
               <span v-text="host" />
-              <a :href="`https://${host}`" target="_blank" rel="noopener noreferrer">&nearr;</a>
+              <a :href="`https://${host}`" v-bind="EXTERNAL_LINK_PROPS">&nearr;</a>
             </setting-check>
           </locale-group>
         </div>
@@ -110,11 +110,11 @@
 
 <script>
 import { i18n } from '@/common';
-import { KNOWN_INJECT_INTO } from '@/common/consts';
+import { KNOWN_INJECT_INTO, VM_HOME } from '@/common/consts';
 import options from '@/common/options';
 import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
-import { focusMe, getActiveElement } from '@/common/ui';
+import { EXTERNAL_LINK_PROPS, focusMe, getActiveElement } from '@/common/ui';
 import { hookSettingsForUI } from '@/common/ui/util';
 
 const items = {

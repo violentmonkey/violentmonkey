@@ -147,7 +147,7 @@
               <summary><icon name="info"/></summary>
               <small>{{i18n('menuExcludeHint')}} {{i18n('labelRelated')}}<a
                 v-text="i18n('labelExcludeMatch')" target="_blank"
-                href="https://violentmonkey.github.io/api/matching/"/>
+                :href="VM_DOCS_MATCHING"/>
               </small>
             </details>
           </div>
@@ -197,7 +197,7 @@
     <div v-if="extras" ref="$extras" class="extras-menu">
       <a v-for="[url, text] in activeLinks"
          :key="url" :href="url" :data-message="url" tabindex="0" v-text="text"
-         rel="noopener noreferrer" target="_blank"/>
+         v-bind="EXTERNAL_LINK_PROPS"/>
       <div v-text="i18n('menuExclude')" tabindex="0" @click="onExclude"/>
       <div v-text="extras.data.config.removed ? i18n('buttonRestore') : i18n('buttonRemove')"
            tabindex="0"
@@ -212,6 +212,7 @@
 
 <script setup>
 import { computed, nextTick, onActivated, onMounted, reactive, ref } from 'vue';
+import { VM_DOCS_MATCHING } from '@/common/consts';
 import options from '@/common/options';
 import optionsDefaults, {
   kFiltersPopup, kPopupWidth, kUpdateEnabledScriptsOnly,
@@ -222,7 +223,7 @@ import {
 } from '@/common';
 import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
-import { getActiveElement } from '@/common/ui';
+import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';

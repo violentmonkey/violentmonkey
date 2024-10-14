@@ -17,8 +17,7 @@
          class="text-upper text-right text-red"/>
       <div v-else class="edit-hint text-right ellipsis">
         <a :href="externalEditorInfoUrl"
-           target="_blank"
-           rel="noopener noreferrer"
+           v-bind="EXTERNAL_LINK_PROPS"
            v-text="i18n('editHowToHint')"/>
       </div>
       <div class="mr-1">
@@ -83,7 +82,7 @@
       </locale-group>
       <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
       <p class="my-1" v-if="errors">
-        <a :href="urlMatching" target="_blank" rel="noopener noreferrer" v-text="urlMatching"/>
+        <a :href="VM_DOCS_MATCHING" v-bind="EXTERNAL_LINK_PROPS" v-text="VM_DOCS_MATCHING"/>
       </p>
     </div>
   </div>
@@ -95,17 +94,18 @@ import {
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
+import { VM_DOCS_MATCHING } from '@/common/consts';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
 import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
 import options from '@/common/options';
 import { getUnloadSentry } from '@/common/router';
+import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude, kOrigExcludeMatch,
   kOrigInclude, kOrigMatch, kUpdateURL,
 } from '../../utils';
 
-const urlMatching = 'https://violentmonkey.github.io/api/matching/';
 const CUSTOM_PROPS = {
   [kName]: '',
   [kHomepageURL]: '',

@@ -41,3 +41,5 @@ export const UA_PROPS = ['userAgent', 'brands', 'mobile', 'platform'];
 export const TL_AWAIT = 'topLevelAwait';
 export const UNWRAP = 'unwrap';
 export const FETCH_OPTS = 'fetchOpts';
+export const VM_HOME = 'https://violentmonkey.github.io/';
+export const VM_DOCS_MATCHING = VM_HOME + 'api/matching/';

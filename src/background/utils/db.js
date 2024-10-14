@@ -582,8 +582,8 @@ export async function updateScriptInfo(id, data) {
 function parseMetaWithErrors(src) {
   const isObj = isObject(src);
   const custom = isObj && src.custom || getDefaultCustom();
-  const meta = parseMeta(isObj ? src.code : src);
   const errors = [];
+  const meta = parseMeta(isObj ? src.code : src, false, errors);
   if (meta) {
     testerBatch(errors);
     testScript('', { meta, custom });

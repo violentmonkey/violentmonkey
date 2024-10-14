@@ -20,8 +20,8 @@
                   tabindex="0"
                   @click.prevent="handleEditScript('_new')"
                 />
-                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" target="_blank" rel="noopener noreferrer"></a>
-                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" target="_blank" rel="noopener noreferrer"></a>
+                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" v-bind="EXTERNAL_LINK_PROPS"/>
+                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" v-bind="EXTERNAL_LINK_PROPS"/>
                 <a
                   class="dropdown-menu-item"
                   v-text="i18n('buttonInstallFromURL')"
@@ -172,7 +172,7 @@
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
 import { i18n, sendCmdDirectly, debounce, ensureArray, makePause, trueJoin } from '@/common';
 import options from '@/common/options';
-import { getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
+import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';

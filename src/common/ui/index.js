@@ -3,6 +3,7 @@ import Modal from 'vueleton/lib/modal';
 import { trueJoin } from '@/common';
 import { i18n } from '@/common/util';
 import Message from './message';
+import { VM_HOME } from '@/common/consts';
 
 /** Showing unexpected errors in UI so that the users can notify us */
 addEventListener('error', e => showUnhandledError(e.error));
@@ -160,7 +161,11 @@ export const getActiveElement = () => document.activeElement;
 /** @param {MouseEvent|KeyboardEvent} e */
 export const hasKeyModifiers = e => e.shiftKey || e.ctrlKey || e.metaKey || e.altKey;
 export const externalEditorInfoUrl =
-  'https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/';
+  VM_HOME + 'posts/how-to-edit-scripts-with-your-favorite-editor/';
+export const EXTERNAL_LINK_PROPS = {
+  target: '_blank',
+  rel: 'noopener noreferrer',
+};
 const { getAsFileSystemHandle } = DataTransferItem.prototype;
 
 if (getAsFileSystemHandle) {

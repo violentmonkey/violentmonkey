@@ -1,5 +1,5 @@
 import { dumpQuery, getUniqId, loadQuery } from '@/common';
-import { FORM_URLENCODED } from '@/common/consts';
+import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
   openAuthPage,
@@ -9,7 +9,7 @@ import {
 
 const config = {
   client_id: process.env.SYNC_DROPBOX_CLIENT_ID,
-  redirect_uri: 'https://violentmonkey.github.io/auth_dropbox.html',
+  redirect_uri: VM_HOME + 'auth_dropbox.html',
 };
 
 const escRE = /[\u007f-\uffff]/g; // eslint-disable-line no-control-regex

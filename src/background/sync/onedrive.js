@@ -1,6 +1,6 @@
 // Reference: https://dev.onedrive.com/README.htm
 import { dumpQuery, noop } from '@/common';
-import { FORM_URLENCODED } from '@/common/consts';
+import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
 import { objectGet } from '@/common/object';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
@@ -10,7 +10,7 @@ import {
 const config = {
   client_id: process.env.SYNC_ONEDRIVE_CLIENT_ID,
   client_secret: process.env.SYNC_ONEDRIVE_CLIENT_SECRET,
-  redirect_uri: 'https://violentmonkey.github.io/auth_onedrive.html',
+  redirect_uri: VM_HOME + 'auth_onedrive.html',
 };
 
 const OneDrive = BaseService.extend({

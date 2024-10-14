@@ -18,7 +18,7 @@ const config = {
   // Google OAuth for native app only allows loopback IP address for callback URL.
   // The URL will be intercepted and blocked so the port doesn't matter.
   redirect_uri: 'http://127.0.0.1:45678/',
-  // redirect_uri: 'https://violentmonkey.github.io/auth_googledrive.html',
+  // redirect_uri: VM_HOME + 'auth_googledrive.html',
   scope: 'https://www.googleapis.com/auth/drive.appdata',
 };
 const UNAUTHORIZED = { status: 'UNAUTHORIZED' };

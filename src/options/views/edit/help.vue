@@ -2,8 +2,7 @@
   <div class="edit-help mb-2c">
     <div>
       <h3 v-html="i18n('editHelpDocumention')"/>
-      <a href="https://violentmonkey.github.io/api/"
-         rel="noopener noreferrer" target="_blank">violentmonkey.github.io/api/</a>
+      <a :href="API_URL" v-bind="EXTERNAL_LINK_PROPS" v-text="API_TEXT"/>
     </div>
     <div class="keyboard">
       <h3 v-text="i18n('editHelpKeyboard')"/>
@@ -14,6 +13,14 @@
     </div>
   </div>
 </template>
+
+<script>
+import { VM_HOME } from '@/common/consts';
+import { EXTERNAL_LINK_PROPS } from '@/common/ui';
+
+const API_URL = VM_HOME + 'api/';
+const API_TEXT = API_URL.split('://')[1];
+</script>
 
 <script setup>
 defineProps({

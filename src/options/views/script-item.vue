@@ -112,8 +112,7 @@
                  :disabled="!url" :content="title" align="start">
           <a
             class="btn-ghost"
-            target="_blank"
-            rel="noopener noreferrer"
+            v-bind="EXTERNAL_LINK_PROPS"
             :href="url"
             :tabIndex="url ? tabIndex : -1">
             <icon :name="icon"/>
@@ -147,7 +146,7 @@
 
 <script>
 import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
-import { getActiveElement, showConfirmation } from '@/common/ui';
+import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
