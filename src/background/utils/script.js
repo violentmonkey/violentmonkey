@@ -2,8 +2,7 @@ import {
   encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, noop,
 } from '@/common';
 import {
-  __CODE, TL_AWAIT, UNWRAP,
-  HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, USERSCRIPT_META_INTRO,
+  __CODE, HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, TL_AWAIT, UNWRAP,
 } from '@/common/consts';
 import { formatDate } from '@/common/date';
 import { mapEntry } from '@/common/object';
@@ -23,11 +22,8 @@ addOwnCommands({
   },
 });
 
-export function isUserScript(text) {
-  if (/^\s*</.test(text)) return false; // HTML
-  if (text.indexOf(USERSCRIPT_META_INTRO) < 0) return false; // Lack of meta block
-  return true;
-}
+/** @return {boolean|?RegExpExecArray} */
+export const matchUserScript = text => !/^\s*</.test(text) /*HTML*/ && METABLOCK_RE.exec(text);
 
 const arrayType = {
   default: () => [],
@@ -68,26 +64,49 @@ const metaOptionalTypes = {
   [TL_AWAIT]: booleanType,
   [UNWRAP]: booleanType,
 };
-export function parseMeta(code, includeMatchedString) {
+/**                   0        1       2          3     4 */
+const META_ITEM_RE = /(?:^|\n)(.*)\/\/([\x20\t]*)(@\S+)(.*)/g;
+export const ERR_META_SPACE_BEFORE = 'Unexpected text before "//" in ';
+export const ERR_META_SPACE_INSIDE = 'Expected a single space after "//" in ';
+
+export function parseMeta(code, includeMatchedString, errors) {
   // initialize meta
   const meta = metaTypes::mapEntry(value => value.default());
-  const match = code.match(METABLOCK_RE);
-  const metaBody = match[2];
-  if (!metaBody) return false; // TODO: `return;` + null check in all callers?
-  metaBody.replace(/(?:^|\n)\s*\/\/\x20(@\S+)(.*)/g, (_match, rawKey, rawValue) => {
-    const [keyName, locale] = rawKey.slice(1).split(':');
+  const match = matchUserScript(code);
+  if (!match) return false; // TODO: `return;` + null check in all callers?
+  if (errors) checkMetaItemErrors(match, 1, errors);
+  let parts;
+  while ((parts = META_ITEM_RE.exec(match[4]))) {
+    const [keyName, locale] = parts[3].slice(1).split(':');
     const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
     const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
-    const val = rawValue.trim();
+    const val = parts[4].trim();
     const metaType = metaTypes[key] || metaOptionalTypes[key] || defaultType;
     let oldValue = meta[key];
     if (typeof oldValue === 'undefined') oldValue = metaType.default();
+    if (errors) checkMetaItemErrors(parts, 0, errors);
     meta[key] = metaType.transform(oldValue, val);
-  });
+  }
+  if (errors) checkMetaItemErrors(match, 5, errors);
   meta.resources = meta.resource;
   delete meta.resource;
   if (includeMatchedString) meta[__CODE] = match[0];
   return meta;
+}
+
+function checkMetaItemErrors(parts, index, errors) {
+  let clipped;
+  if (parts[index + 1].match(/\S/)) {
+    errors.push(ERR_META_SPACE_BEFORE + (clipped = clipString(parts[index], 50)));
+  }
+  if (parts[index + 2] !== ' ') {
+    errors.push(ERR_META_SPACE_INSIDE + (clipped || clipString(parts[index], 50)));
+  }
+}
+
+function clipString(line, maxLen) {
+  line = line.trim();
+  return JSON.stringify(line.length > maxLen ? line.slice(0, maxLen) + '...' : line);
 }
 
 export function getDefaultCustom() {

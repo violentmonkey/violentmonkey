@@ -2,7 +2,7 @@ import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
-import { parseMeta, isUserScript } from './script';
+import { parseMeta, matchUserScript } from './script';
 import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
 
@@ -14,11 +14,11 @@ addPublicCommands({
       && await browser.tabs.get(tabId).catch(noop);
     return tab && getTabUrl(tab).startsWith(CONFIRM_URL_BASE);
   },
-  async ConfirmInstall({ code, from, url, fs }, { tab = {} }) {
+  async ConfirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
     if (!fs) {
       if (!code) code = (await request(url)).data;
       // TODO: display the error in UI
-      if (!isUserScript(code)) {
+      if (!parsed && !matchUserScript(code)) {
         throw `${i18n('msgInvalidScript')}\n\n${
           code.trim().split(/[\r\n]+\s*/, 9/*max lines*/).join('\n')
             .slice(0, 500/*max overall length*/)
@@ -77,12 +77,12 @@ async function maybeInstallUserJs(tabId, url) {
   const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
   const { data: code } = await request(url).catch(noop) || {};
   if (code && parseMeta(code).name) {
-    commands.ConfirmInstall({ code, url, from: tab.url }, { tab });
+    commands.ConfirmInstall({ code, url, from: tab.url, parsed: true }, { tab });
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
     const error = `${VIOLENTMONKEY} installer skipped ${url}.
 Either not a userscript or the metablock comment is malformed:
-${code.length > 10e3 ? code.slice(0, 10e3) + '...' : code}`;
+${code.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {

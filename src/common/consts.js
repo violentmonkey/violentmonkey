@@ -6,12 +6,21 @@ export const INFERRED = 'inferred';
 export const HOMEPAGE_URL = 'homepageURL';
 export const SUPPORT_URL = 'supportURL';
 
-// Allow metadata lines to start with WHITESPACE? '//' SPACE
-// Allow anything to follow the predefined text of the metaStart/End
-// The SPACE must be on the same line and specifically \x20 as \s would also match \r\n\t
-// Note: when there's no valid metablock, an empty string is matched for convenience
-export const USERSCRIPT_META_INTRO = '// ==UserScript==';
-export const METABLOCK_RE = /((?:^|\n)\s*\/\/\x20==UserScript==)([\s\S]*?\n)\s*\/\/\x20==\/UserScript==|$/;
+/** A relaxed check, see METABLOCK_RE description */
+export const USERSCRIPT_META_INTRO = '==UserScript==';
+/** A strictly valid metablock should start at the beginning of the line:
+ * "// ==UserScript==" with exactly one \x20 space inside.
+ * To match Tampermonkey's relaxed parsing, we allow any preceding text at line start
+ * (i.e. not just spaces for indented metablock comments, but literally anything)
+ * and inside, but we'll warn about this later in the installer/editor. */
+export const METABLOCK_RE = re`/
+# 1          2           3
+  ((?:^|\n)(.*?)\/\/([\x20\t]*)==UserScript==)
+# 4
+  ([\s\S]*?\n)
+# 5  6          7
+  ((.*?)\/\/([\x20\t]*)==\/UserScript==)
+/x`;
 export const META_STR = 'metaStr';
 export const NEWLINE_END_RE = /\n((?!\n)\s)*$/;
 export const WATCH_STORAGE = 'watchStorage';
@@ -41,5 +50,6 @@ export const UA_PROPS = ['userAgent', 'brands', 'mobile', 'platform'];
 export const TL_AWAIT = 'topLevelAwait';
 export const UNWRAP = 'unwrap';
 export const FETCH_OPTS = 'fetchOpts';
+export const ERR_BAD_PATTERN = 'Bad pattern:';
 export const VM_HOME = 'https://violentmonkey.github.io/';
 export const VM_DOCS_MATCHING = VM_HOME + 'api/matching/';

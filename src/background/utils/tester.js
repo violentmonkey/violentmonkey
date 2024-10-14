@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
-import { BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
+import { ERR_BAD_PATTERN, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from '@/common/tld';
 import { hookOptionsInit } from './options';
@@ -104,7 +104,7 @@ export class MatchTest {
       + (parts[4] !== '://' ? 'missing "://", ' : '')
       || (parts[6] == null ? 'missing "/" for path, ' : '')
     ).slice(0, -2) + ' in ';
-    throw `Bad pattern: ${parts}${rule}`;
+    throw `${ERR_BAD_PATTERN} ${parts}${rule}`;
   }
 }
 

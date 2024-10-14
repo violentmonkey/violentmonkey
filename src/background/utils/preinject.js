@@ -538,8 +538,8 @@ function prepareScript(script, env) {
     [META_STR]: [
       '',
       codeIndex,
-      tmp = (metaStrMatch.index + metaStrMatch[1].length),
-      tmp + metaStrMatch[2].length,
+      tmp = metaStrMatch && (metaStrMatch.index + metaStrMatch[1].length),
+      tmp + metaStrMatch?.[4].length,
     ],
     [RUN_AT]: runAt[id],
   };

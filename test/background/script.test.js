@@ -1,4 +1,4 @@
-import { parseMeta } from '@/background/utils/script';
+import { ERR_META_SPACE_INSIDE, parseMeta } from '@/background/utils/script';
 
 const baseMeta = {
   include: [],
@@ -44,25 +44,38 @@ test('parseMeta', () => {
 });
 
 test('parseMetaIrregularities', () => {
-  expect(parseMeta(`\
+  const baseMetaFoo = {
+    ...baseMeta,
+    name: 'foo',
+  };
+  const parseWeirdMeta = code => {
+    const errors = [];
+    const res = parseMeta(code, false, errors);
+    return errors.length ? [res, ...errors] : res;
+  };
+  expect(parseWeirdMeta(`\
   // ==UserScript==============
 // @name foo
  // @namespace bar
 // ==/UserScript===================
   `)).toEqual({
-    ...baseMeta,
-    name: 'foo',
+    ...baseMetaFoo,
     namespace: 'bar',
   });
-  expect(parseMeta(`\
+  expect(parseWeirdMeta(`\
 // ==UserScript==
 //@name foo
-// ==/UserScript==`)).toEqual(baseMeta);
-  expect(parseMeta(`\
+// ==/UserScript==`)).toEqual([baseMetaFoo,
+    ERR_META_SPACE_INSIDE + `"//@name foo"`,
+  ]);
+  expect(parseWeirdMeta(`\
 //==UserScript==
 // @name foo
-//\t==/UserScript==`)).toBeFalsy();
-  expect(parseMeta(`\
+//\t==/UserScript==`)).toEqual([baseMetaFoo,
+    ERR_META_SPACE_INSIDE + `"//==UserScript=="`,
+    ERR_META_SPACE_INSIDE + String.raw`"//\t==/UserScript=="`,
+  ]);
+  expect(parseWeirdMeta(`\
 /*
 //
   ==UserScript==

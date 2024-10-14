@@ -81,9 +81,11 @@
         <code v-text="hashPattern"/>
       </locale-group>
       <p v-for="e in errors" :key="e" v-text="e" class="text-red"/>
-      <p class="my-1" v-if="errors">
-        <a :href="VM_DOCS_MATCHING" v-bind="EXTERNAL_LINK_PROPS" v-text="VM_DOCS_MATCHING"/>
-      </p>
+      <template v-if="errors">
+        <p class="my-1" v-for="url in errorsLinks" :key="url">
+          <a :href="url" v-bind="EXTERNAL_LINK_PROPS" v-text="url"/>
+        </p>
+      </template>
     </div>
   </div>
 </template>
@@ -94,7 +96,7 @@ import {
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
-import { VM_DOCS_MATCHING } from '@/common/consts';
+import { ERR_BAD_PATTERN, VM_DOCS_MATCHING, VM_HOME } from '@/common/consts';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
 import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
@@ -191,6 +193,15 @@ const commands = {
 };
 const hotkeys = ref();
 const errors = ref();
+const errorsLinks = computed(() => {
+  let patterns = 0;
+  const errorsValue = errors.value;
+  for (const e of errorsValue) if (e.startsWith(ERR_BAD_PATTERN)) patterns++;
+  return [
+    patterns < errorsValue.length && `${VM_HOME}api/metadata-block/`,
+    patterns && VM_DOCS_MATCHING,
+  ].filter(Boolean);
+});
 const hashPattern = computed(() => { // eslint-disable-line vue/return-in-computed-property
   for (const sectionKey of ['meta', 'custom']) {
     for (const key of CUSTOM_LISTS) {
@@ -240,9 +251,12 @@ watch(script, onScript);
 
 {
   // The eslint rule is bugged as this is a block scope, not a global scope.
-  const src = props.initial; // eslint-disable-line vue/no-setup-props-destructure
-  code.value = props.initialCode; // eslint-disable-line vue/no-setup-props-destructure
+  const src = props.initial;
+  const initialCode = code.value = props.initialCode;
   script.value = deepCopy(src);
+  sendCmdDirectly('ParseMetaErrors', initialCode).then(res => {
+    errors.value = res;
+  });
   watch(() => script.value.config, onChange, { deep: true });
   watch(() => script.value.custom, onChange, { deep: true });
   watch(() => src.error, error => {

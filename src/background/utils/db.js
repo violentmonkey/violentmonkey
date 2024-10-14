@@ -98,6 +98,7 @@ addOwnCommands({
     return normalizePosition();
   },
   ParseMeta: parseMetaWithErrors,
+  ParseMetaErrors: data => parseMetaWithErrors(data).errors,
   ParseScript: parseScript,
   /** @return {Promise<void>} */
   UpdateScriptInfo({ id, config, custom }) {
