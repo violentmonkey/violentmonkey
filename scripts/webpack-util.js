@@ -1,6 +1,6 @@
 const fs = require('fs');
 const babelCore = require('@babel/core');
-const WrapperWebpackPlugin = require('wrapper-webpack-plugin');
+const webpack = require('webpack');
 
 const entryGlobals = {
   'common': [],
@@ -65,7 +65,17 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
     .join('\n')
     .replace(defsRe, s => defsObj[s])
   );
-  config.plugins.push(new WrapperWebpackPlugin(callback(reader)));
+  const { header, footer, test } = callback(reader);
+  const opts = {
+    test,
+    banner: header,
+    entryOnly: true,
+    raw: true,
+  };
+  config.plugins.push(
+    new webpack.BannerPlugin(opts),
+    new webpack.BannerPlugin({ ...opts, banner: footer, footer: true })
+  );
 }
 
 function getCodeMirrorThemes() {
