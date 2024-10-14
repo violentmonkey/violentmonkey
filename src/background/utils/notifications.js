@@ -1,6 +1,7 @@
-import { i18n, defaultImage, sendTabCmd, trueJoin, getFullUrl } from '@/common';
+import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
 import { addPublicCommands, commands } from './init';
 import { CHROME } from './ua';
+import { vetUrl } from './url';
 
 /** @type {{ [nid: string]: browser.runtime.MessageSender | function | number }} */
 const openers = {};
@@ -38,7 +39,7 @@ addPublicCommands({
     } else if (src) {
       openers[notificationId] = src;
       if (+zombieTimeout > 0) src[kZombieTimeout] = +zombieTimeout;
-      if (zombieUrl != null) src[kZombieUrl] = getFullUrl(zombieUrl, src.url);
+      if (zombieUrl != null) src[kZombieUrl] = vetUrl(zombieUrl, src.url);
     }
     return notificationId;
   },

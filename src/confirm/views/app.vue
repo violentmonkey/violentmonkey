@@ -117,9 +117,8 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
 import {
-  debounce,
-  getFullUrl, getLocaleString, getScriptHome, i18n, isRemote,
-  makePause, makeRaw, request, sendCmdDirectly, trueJoin,
+  debounce, getFullUrl, getLocaleString, getScriptHome, i18n, isRemote, makePause, sendCmdDirectly,
+  trueJoin,
 } from '@/common';
 import { keyboardService, modifiers } from '@/common/keyboard';
 import initCache from '@/common/cache';
@@ -392,12 +391,10 @@ async function getFile(url, { isBlob, useCache } = {}) {
   if (useCache && cache.has(cacheKey)) {
     return cache.get(cacheKey);
   }
-  const response = await request(url, {
+  const { data } = await sendCmdDirectly('Request', {
+    url,
     [kResponseType]: isBlob ? 'blob' : null,
   });
-  const data = isBlob
-    ? await makeRaw(response)
-    : response.data;
   if (useCache) cache.put(cacheKey, data);
   return data;
 }

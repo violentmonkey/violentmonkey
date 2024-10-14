@@ -1,9 +1,10 @@
-import { browserWindows, getActiveTab, noop, sendTabCmd, getFullUrl } from '@/common';
+import { browserWindows, getActiveTab, noop, sendTabCmd } from '@/common';
 import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { testScript } from './tester';
 import { CHROME, FIREFOX } from './ua';
+import { vetUrl } from './url';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
@@ -119,7 +120,7 @@ addPublicCommands({
     if (!/^[-\w]+:/.test(url)) {
       url = isInternal
         ? browser.runtime.getURL(url)
-        : getFullUrl(url, srcUrl);
+        : vetUrl(url, srcUrl);
     }
     if (isInternal
         && url.startsWith(EDITOR_ROUTE)

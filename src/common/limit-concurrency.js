@@ -5,8 +5,8 @@ import { makePause } from '@/common/index';
  * @param {number} max
  * @param {number} diffKeyDelay
  * @param {number} sameKeyDelay
- * @param {function(...args): string} getKey
- * @return {function(...args): Promise}
+ * @param {function(...args: any[]): string} getKey
+ * @return {function(...args: any[]): Promise}
  */
 function limitConcurrency(fn, max, diffKeyDelay, sameKeyDelay, getKey) {
   const keyPromise = {};

@@ -1,12 +1,8 @@
 import { isCdnUrlRe, isDataUri, isRemote, makeRaw, request } from '@/common';
 import { NO_CACHE } from '@/common/consts';
-import limitConcurrency from '@/common/limit-concurrency';
 import storage from './storage';
 import { getUpdateInterval } from './update';
-
-const requestLimited = limitConcurrency(request, 4, 100, 1000,
-  url => url.split('/')[2] // simple extraction of the `host` part
-);
+import { requestLimited } from './url';
 
 storage.cache.fetch = cacheOrFetch({
   init: options => ({ ...options, [kResponseType]: 'blob' }),

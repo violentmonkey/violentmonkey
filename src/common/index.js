@@ -249,13 +249,6 @@ export function getFullUrl(url, base) {
   } catch (e) {
     return `data:,${e.message} ${url}`;
   }
-  // Use protocol whitelist to filter URLs
-  if (![
-    'http:',
-    'https:',
-    'ftp:',
-    'data:',
-  ].includes(obj.protocol)) obj.protocol = 'http:';
   return obj.href;
 }
 
@@ -314,7 +307,7 @@ export function makeDataUri(raw, url) {
 
 /**
  * @param {VMReq.Response} response
- * @returns {string}
+ * @returns {Promise<string>}
  */
 export async function makeRaw(response) {
   const type = (response.headers.get('content-type') || '').split(';')[0] || '';

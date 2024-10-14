@@ -1,6 +1,6 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
-  getFullUrl, getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
+  getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
   ignoreChromeErrors,
 } from '@/common';
@@ -19,6 +19,7 @@ import storage, {
 } from './storage';
 import { storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
+import { vetUrl } from './url';
 
 let maxScriptId = 0;
 let maxScriptPosition = 0;
@@ -698,7 +699,7 @@ function buildPathMap(script, base) {
     meta.icon,
   ].reduce((map, key) => {
     if (key) {
-      const fullUrl = getFullUrl(key, baseUrl);
+      const fullUrl = vetUrl(key, baseUrl);
       if (fullUrl !== key) map[key] = fullUrl;
     }
     return map;
