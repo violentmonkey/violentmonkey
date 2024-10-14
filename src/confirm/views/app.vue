@@ -474,7 +474,7 @@ async function trackLocalFile() {
     await onFileChanged();
     stopResolve();
   }
-  if (fso) fso.unobserve(fileHandle);
+  if (fso) fso.disconnect();
   trackingPromise = tracking.value = false;
 }
 async function onFileChanged() {
