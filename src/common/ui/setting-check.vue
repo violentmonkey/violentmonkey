@@ -44,5 +44,7 @@ onBeforeUnmount(revoke);
 <style>
 .setting-check {
   display: inline-flex;
+  flex-wrap: wrap;
+  white-space: pre-wrap; /* preserving spaces in html */
 }
 </style>

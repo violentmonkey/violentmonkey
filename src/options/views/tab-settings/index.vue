@@ -75,7 +75,7 @@
         <div class="flex flex-col">
           <locale-group i18n-key="labelExposeStatus">
             <setting-check v-for="([key, host]) in expose" :key="host"
-                           :name="`expose.${key}`" class="ml-2 mr-1c valign-tb">
+                           :name="`expose.${key}`" class="ml-2 mr-1c">
               <span v-text="host" />
               <a :href="`https://${host}`" v-bind="EXTERNAL_LINK_PROPS">&nearr;</a>
             </setting-check>
@@ -169,15 +169,6 @@ onDeactivated(() => {
 <style>
 .tab-settings {
   overflow-y: auto;
-  label {
-    display: inline-block;
-    > * {
-      vertical-align: middle;
-    }
-    &.valign-tb * {
-      vertical-align: text-bottom;
-    }
-  }
   input[type="number"] {
     width: 3.5em;
     padding-left: .25em;
