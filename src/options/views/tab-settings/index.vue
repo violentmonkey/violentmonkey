@@ -23,7 +23,7 @@
       </div>
     </section>
     <section class="mb-2c">
-      <h3 v-text="i18n('labelBackupMaintenance')" />
+      <h3 v-text="i18n('labelBackupMaintenance')" :class="{bright: store.isEmpty === 1}"/>
       <vm-import></vm-import>
       <vm-export></vm-export>
       <hr>
@@ -116,6 +116,7 @@ import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
 import { EXTERNAL_LINK_PROPS, focusMe, getActiveElement } from '@/common/ui';
 import { hookSettingsForUI } from '@/common/ui/util';
+import { store } from '@/options/utils';
 
 const items = {
   autoUpdate: value => Math.max(0, Math.min(365, +value || 0)),

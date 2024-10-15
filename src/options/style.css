@@ -75,7 +75,7 @@ aside {
 section {
   padding: 0 0 $tabPadY;
   > h3 {
-    background: linear-gradient(to right, var(--fill-1), transparent);
+    background: linear-gradient(to right, var(--hbg, var(--fill-1)), transparent);
     border-top: $sectionBorder;
     line-height: 2;
     padding: 0 $tabPadX;
@@ -180,5 +180,15 @@ textarea:not([rows="1"]):not(.h100) {
       display: flex;
       white-space: normal;
     }
+  }
+}
+
+.bright {
+  --hbg: bisque;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bright {
+    --hbg: #880088; /* active badge color */
   }
 }

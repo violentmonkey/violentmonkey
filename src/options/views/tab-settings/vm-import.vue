@@ -33,7 +33,7 @@ import {
 </script>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { onActivated, onMounted, reactive, ref } from 'vue';
 import SettingCheck from '@/common/ui/setting-check';
 
 const reports = reactive([]);
@@ -50,6 +50,15 @@ onMounted(() => {
   const toggleDragDrop = initDragDrop(buttonImport.value);
   addEventListener('hashchange', toggleDragDrop);
   toggleDragDrop();
+});
+onActivated(() => {
+  if (++store.isEmpty === 2) {
+    const btn = buttonImport.value;
+    if (btn.getBoundingClientRect().y > innerHeight / 2) {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    setTimeout(() => btn.focus());
+  }
 });
 
 function pickBackup() {

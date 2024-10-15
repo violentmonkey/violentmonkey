@@ -21,11 +21,11 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { i18n } from '@/common';
 import { keyboardService } from '@/common/keyboard';
-import { store } from '../utils';
+import { setLocationHash, store } from '../utils';
 import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
@@ -60,59 +60,48 @@ function updateContext() {
 function switchTab(step) {
   const index = tabs.indexOf(current.value);
   const switchTo = tabs[(index + step + tabs.length) % tabs.length];
-  window.location.hash = switchTo?.name || '';
+  setLocationHash(switchTo?.name || '');
 }
 
 addEventListener('dragover', evt => {
   if (store.route.hash !== TAB_SETTINGS
     && /^application\/(zip|x-zip-compressed)$/.test(evt.dataTransfer.items[0]?.type)) {
-    location.hash = `#${TAB_SETTINGS}`;
+    setLocationHash(TAB_SETTINGS);
   }
 }, true);
 
-export default {
-  setup() {
-    // Speedup and deflicker for initial page load:
-    // skip rendering the aside when starting in the editor for a new script.
-    const [name, tabFunc] = store.route.paths;
-    const canRenderAside = ref(name !== SCRIPTS || (tabFunc !== '_new' && !Number(tabFunc)));
+// Speedup and deflicker for initial page load:
+// skip rendering the aside when starting in the editor for a new script.
+const [name, tabFunc] = store.route.paths;
+const canRenderAside = ref(name !== SCRIPTS || (tabFunc !== '_new' && !Number(tabFunc)));
 
-    watchEffect(() => {
-      const { title } = store;
-      document.title = title ? `${title} - ${extName}` : extName;
+watchEffect(() => {
+  const { title } = store;
+  document.title = title ? `${title} - ${extName}` : extName;
+});
+watch(() => store.route.paths, () => {
+  // First time showing the aside we need to tell v-if to keep it forever
+  canRenderAside.value = true;
+  updateContext();
+});
+onMounted(() => {
+  const disposeList = [
+    keyboardService.register('a-pageup', () => switchTab(-1), {
+      condition: conditionNotEdit,
+    }),
+    keyboardService.register('a-pagedown', () => switchTab(1), {
+      condition: conditionNotEdit,
+    }),
+  ];
+  keyboardService.enable();
+  updateContext();
+  return () => {
+    disposeList.forEach(dispose => {
+      dispose();
     });
-    watch(() => store.route.paths, () => {
-      // First time showing the aside we need to tell v-if to keep it forever
-      canRenderAside.value = true;
-      updateContext();
-    });
-    onMounted(() => {
-      const disposeList = [
-        keyboardService.register('a-pageup', () => switchTab(-1), {
-          condition: conditionNotEdit,
-        }),
-        keyboardService.register('a-pagedown', () => switchTab(1), {
-          condition: conditionNotEdit,
-        }),
-      ];
-      keyboardService.enable();
-      updateContext();
-      return () => {
-        disposeList.forEach(dispose => {
-          dispose();
-        });
-        keyboardService.disable();
-      };
-    });
-
-    return {
-      tabs,
-      current,
-      numbers,
-      canRenderAside,
-    };
-  },
-};
+    keyboardService.disable();
+  };
+});
 </script>
 
 <style src="../style.css"></style>

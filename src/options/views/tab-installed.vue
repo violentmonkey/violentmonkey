@@ -14,20 +14,11 @@
                 </a>
               </Tooltip>
               <template #content>
-                <a
-                  class="dropdown-menu-item"
-                  v-text="i18n('buttonNew')"
-                  tabindex="0"
-                  @click.prevent="handleEditScript('_new')"
-                />
-                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'OpenUserJS')" href="https://openuserjs.org/" v-bind="EXTERNAL_LINK_PROPS"/>
-                <a class="dropdown-menu-item" v-text="i18n('installFrom', 'GreasyFork')" href="https://greasyfork.org/scripts" v-bind="EXTERNAL_LINK_PROPS"/>
-                <a
-                  class="dropdown-menu-item"
-                  v-text="i18n('buttonInstallFromURL')"
-                  tabindex="0"
-                  @click.prevent="handleInstallFromURL"
-                />
+                <a class="dropdown-menu-item"
+                  v-for="([text, props], i) in NEW_LINKS" :key="i" v-text="text" v-bind="props"/>
+                <a class="dropdown-menu-item" v-if="isEmpty"
+                  v-text="`${i18n('buttonImportData')} / ${i18n('labelSync')}...`"
+                  @click="store.isEmpty = 1; setLocationHash(TAB_SETTINGS)"/>
               </template>
             </Dropdown>
             <Tooltip :content="i18n('updateScriptsAll')" placement="bottom" align="start">
@@ -177,6 +168,7 @@ import hookSetting from '@/common/hook-setting';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
 import { keyboardService, handleTabNavigation } from '@/common/keyboard';
+import { TAB_SETTINGS } from '@/common/safe-globals';
 import { loadData } from '@/options';
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
@@ -184,12 +176,22 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import {
-  createSearchRules, markRemove, performSearch, runInBatch, store, TOGGLE_OFF, TOGGLE_ON,
+  createSearchRules, markRemove, performSearch, runInBatch, setLocationHash, store, TOGGLE_OFF, TOGGLE_ON,
 } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
 
+const NEW_LINKS = [
+  [i18n('buttonNew'),
+    { tabIndex: 0, onclick: () => handleEditScript('_new') }],
+  [i18n('installFrom', 'OpenUserJS'),
+    { href: 'https://openuserjs.org/', ...EXTERNAL_LINK_PROPS }],
+  [i18n('installFrom', 'GreasyFork'),
+    { href: `https://greasyfork.org/scripts`, ...EXTERNAL_LINK_PROPS }],
+  [i18n('buttonInstallFromURL'),
+    { tabIndex: 0, onclick: handleInstallFromURL }],
+];
 const EDIT = 'edit';
 const REMOVE = 'remove';
 const RESTORE = 'restore';
@@ -268,6 +270,7 @@ let columnsForCardsMode = [];
 let narrowMediaRules;
 
 const $menuNew = ref();
+const isEmpty = ref();
 const refSearch = ref();
 const refList = ref();
 const scroller = ref();
@@ -753,7 +756,7 @@ if (screen.availWidth > 767) {
 watch(getCurrentList, refreshUI);
 watch(() => store.route.paths[1], onHashChange);
 watch(() => store.scripts, val => {
-  if (!val.length && (val = $menuNew.value)) {
+  if ((isEmpty.value = !val.length) && (val = $menuNew.value)) {
     val.focus(); // for Tab navigation and focus highlight
     val.click();
   }

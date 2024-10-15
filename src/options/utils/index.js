@@ -61,6 +61,10 @@ export async function runInBatch(fn, ...args) {
   }
 }
 
+export function setLocationHash(hash) {
+  location.hash = hash || '';
+}
+
 export function toggleBoolean(event) {
   const el = /** @type {HTMLTextAreaElement} */ event.target;
   const { selectionStart: start, selectionEnd: end, value } = el;

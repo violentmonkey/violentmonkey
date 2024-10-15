@@ -1,6 +1,6 @@
 <template>
   <section class="mb-1c">
-    <h3 v-text="i18n('labelSync')"></h3>
+    <h3 v-text="i18n('labelSync')" :class="{bright: store.isEmpty === 1}"/>
     <div v-if="state" class="flex flex-wrap center-items">
       <span v-text="i18n('labelSyncService')"></span>
       <select class="mx-1" :value="syncConfig.current" @change="onSyncChange">
