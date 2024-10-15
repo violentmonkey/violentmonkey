@@ -64,8 +64,8 @@ const metaOptionalTypes = {
   [TL_AWAIT]: booleanType,
   [UNWRAP]: booleanType,
 };
-/**                   0        1       2          3     4 */
-const META_ITEM_RE = /(?:^|\n)(.*)\/\/([\x20\t]*)(@\S+)(.*)/g;
+/**                   0         1       2          3     4 */
+const META_ITEM_RE = /(?:^|\n)(.*?)\/\/([\x20\t]*)(@\S+)(.*)/g;
 export const ERR_META_SPACE_BEFORE = 'Unexpected text before "//" in ';
 export const ERR_META_SPACE_INSIDE = 'Expected a single space after "//" in ';
 
