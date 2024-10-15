@@ -24,6 +24,7 @@ export let
   SafeProxy,
   SafeSymbol,
   SafePromiseConstructor,
+  /** May be unsafe in old bugged Chrome */
   SafePromise,
   fire,
   getWindowLength,
@@ -79,6 +80,7 @@ export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
  * or window[0] before our content script runs at document_start, https://crbug.com/1261964 */
 export const VAULT = (() => {
   let tmp;
+  let ChromePromiseBug;
   let SafePromiseProto;
   let Reflect;
   let SafeObject;
@@ -100,7 +102,9 @@ export const VAULT = (() => {
     src = res[0];
     srcWindow = src;
     // In FF some stuff from a detached iframe doesn't work, so we export it from content
-    srcFF = IS_FIREFOX && res[1];
+    if (IS_FIREFOX) srcFF = res[1];
+    // Detecting via a feature that was added in Chrome 115
+    else ChromePromiseBug = !src.document.requestStorageAccessFor;
     res = false;
   }
   if (!res) {
@@ -178,9 +182,13 @@ export const VAULT = (() => {
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
-  // Binding Promise to this realm
+  // Binding Promise to this realm (actually works only in Chrome)
   SafePromise = safeBind(SafePromiseConstructor, getPrototypeOf(promiseResolve()));
   // In FF 130+ a detached `then` doesn't work with `await`, so we use an exported `then`
   if (IS_FIREFOX) SafePromiseProto.then = then;
+  // Old Chrome before crrev.com/1142900 can't use SafePromise when iframe is removed.
+  /* We'll use the unsafe one from `window` only for userscript API stuff, not internally,
+   * and inside `try` because `Promise` may already have a broken getter. */
+  else if (ChromePromiseBug) try { SafePromise = Promise; } catch {/**/}
   return res;
 })();
