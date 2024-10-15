@@ -23,6 +23,7 @@ export let
   Object,
   SafeProxy,
   SafeSymbol,
+  /** Note that in Firefox it's reused to store the current realm's prototype of Promise */
   SafePromiseConstructor,
   /** May be unsafe in old bugged Chrome */
   SafePromise,
@@ -163,8 +164,12 @@ export const VAULT = (() => {
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
-    SafePromiseConstructor = res[i += 1] || (SafePromiseProto = src.Promise[PROTO]).constructor,
-    then = res[i += 1] || (srcFF || SafePromiseProto).then,
+    SafePromiseConstructor = res[i += 1] || (
+      (SafePromiseProto = (SafePromise = src.Promise)[PROTO], IS_FIREFOX)
+        ? SafePromise
+        : SafePromiseProto.constructor
+    ),
+    then = res[i += 1] || SafePromiseProto.then,
     urlSearchParamsToString = res[i += 1] || src.URLSearchParams[PROTO].toString,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
@@ -182,13 +187,17 @@ export const VAULT = (() => {
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
-  // Binding Promise to this realm (actually works only in Chrome)
-  SafePromise = safeBind(SafePromiseConstructor, getPrototypeOf(promiseResolve()));
-  // In FF 130+ a detached `then` doesn't work with `await`, so we use an exported `then`
-  if (IS_FIREFOX) SafePromiseProto.then = then;
-  // Old Chrome before crrev.com/1142900 can't use SafePromise when iframe is removed.
-  /* We'll use the unsafe one from `window` only for userscript API stuff, not internally,
-   * and inside `try` because `Promise` may already have a broken getter. */
-  else if (ChromePromiseBug) try { SafePromise = Promise; } catch {/**/}
+  if (ChromePromiseBug) {
+    /* Chrome pre-115 can't use SafePromise when iframe is removed, fixed in crrev.com/1142900.
+     * We'll use the unsafe one from `window` only for userscript API stuff, not internally.
+     * Getting it in a `try` because `Promise` may already have a broken getter. */
+    try { SafePromise = Promise; } catch {/**/}
+  } else if (IS_FIREFOX) {
+    // Hijacking an unused global to store the current realm's Promise prototype
+    SafePromiseConstructor = getPrototypeOf(promiseResolve());
+  } else {
+    // Chrome 115+: binding Promise to this realm
+    SafePromise = safeBind(SafePromiseConstructor, getPrototypeOf(promiseResolve()));
+  }
   return res;
 })();

@@ -166,7 +166,7 @@ function parseRaw(req, msg, propName) {
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
   let { data, url, [kResponseType]: type = '' } = opts;
-  let err;
+  let err, res;
   // XHR spec requires `url` but allows ''/null/non-string
   if (!url && !('url' in opts)) {
     err = new SafeError('Required parameter "url" is missing.');
@@ -197,7 +197,7 @@ export function onRequestCreate(opts, context, fileName) {
   // it's true by default per the standard/historical behavior of gmxhr
   const { withCredentials = true, anonymous = !withCredentials } = opts;
   // setting opts.onload and onerror before EVENTS_TO_NOTIFY
-  const res = !context.async ? {} : new SafePromise((resolve, reject) => {
+  if (context.async) res = new SafePromise((resolve, reject) => {
     const { [kOnload]: onload, [kOnerror]: onerror } = opts;
     opts[kOnload] = onload ? v => { resolve(v); onload(v); } : resolve;
     opts[kOnerror] = onerror ? v => { reject(v); onerror(v); } : reject;
@@ -223,6 +223,8 @@ export function onRequestCreate(opts, context, fileName) {
     [kXhrType]: req[kXhrType] = XHR_TYPES[type] ? type : '',
     events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
   }, opts, OPTS_TO_PASS));
+  if (!res) res = {};
+  else if (IS_FIREFOX) setPrototypeOf(res, SafePromiseConstructor);
   setOwnProp(res, 'abort', () => bridge.post('AbortRequest', id));
   return res;
 }
