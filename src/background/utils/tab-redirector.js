@@ -83,7 +83,7 @@ async function maybeInstallUserJs(tabId, url) {
     cache.put(`bypass:${url}`, true, 10e3);
     const error = `${VIOLENTMONKEY} installer skipped ${url}.
 Either not a userscript or the metablock comment is malformed:
-${code.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
+${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
