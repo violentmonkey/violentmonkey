@@ -1,4 +1,4 @@
-import { BLACKLIST, BLACKLIST_NET } from '@/common/consts';
+import { BLACKLIST, BLACKLIST_NET, FILE_GLOB_ALL } from '@/common/consts';
 
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
 export const kFiltersPopup = 'filtersPopup';
@@ -22,8 +22,8 @@ export const defaultsEditor = {
 
 export default {
   [IS_APPLIED]: true,
-  [BLACKLIST]: null,
-  [BLACKLIST_NET]: null,
+  [BLACKLIST]: FILE_GLOB_ALL,
+  [BLACKLIST_NET]: FILE_GLOB_ALL,
   [kPopupWidth]: 320,
   [kUpdateEnabledScriptsOnly]: true,
   autoUpdate: 1, // days, 0 = disable

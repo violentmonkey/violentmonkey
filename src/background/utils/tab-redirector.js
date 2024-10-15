@@ -1,4 +1,5 @@
 import { browserWindows, request, noop, i18n, getUniqId } from '@/common';
+import { FILE_GLOB_ALL } from '@/common/consts';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
@@ -143,8 +144,8 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     // 3. Firefox: onBeforeRequest does not work with file:// or moz-extension://
     '*://*/*.user.js',
     '*://*/*.user.js?*',
-    'file://*/*.user.js',
-    'file://*/*.user.js?*',
+    `${FILE_GLOB_ALL}.user.js`,
+    `${FILE_GLOB_ALL}.user.js?*`,
     `${extensionRoot}*.user.js`,
   ],
   types: ['main_frame'],
