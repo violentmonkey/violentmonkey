@@ -271,7 +271,7 @@ const isLocalUrlRe = re`/^(
 )/ix`;
 /** Cherry-picked from https://greasyfork.org/en/help/cdns */
 export const isCdnUrlRe = re`/^https:\/\/(
-  cdn(js)?\.[^/]+ |
+  (\w+-)?cdn(js)?(-\w+)?\.[^/]+ |
   bundle\.run |
   (www\.)?gitcdn\.\w+ |
   (
