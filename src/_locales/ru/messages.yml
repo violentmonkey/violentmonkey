@@ -496,7 +496,7 @@ labelLastUpdatedAt:
   message: Последний раз обновлялось в$1
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'N строки:'
+  message: '№ строки:'
 labelMatch:
   description: Label of @match rules.
   message: '@match правила соответствия'
@@ -586,7 +586,7 @@ labelSyncReauthorize:
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Выйти
+  message: Отозвать
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Синхронизировать состояние скриптов
