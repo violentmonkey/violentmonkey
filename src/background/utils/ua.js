@@ -7,6 +7,7 @@ export const {
   userAgentData: navUAD,
 } = navigator;
 const uaVer = navUA.match(/\s(?:Chrom(?:e|ium)|Firefox)\/(\d+[.0-9]*)|$/i)[1];
+const kFullVersionList = 'fullVersionList';
 
 /** @type {VMScriptGMInfoPlatform} */
 export const ua = {};
@@ -27,16 +28,16 @@ init.deps.push(
   Promise.all([
     browser.runtime.getPlatformInfo(),
     browser.runtime.getBrowserInfo?.(),
-    navUAD?.getHighEntropyValues(['fullVersionList']),
+    navUAD?.getHighEntropyValues([kFullVersionList]),
     IS_FIREFOX ? [] : browserWindows.getAll(),
   ]).then(([
     { os, arch },
     { name, version } = {},
-    uadValues,
+    { [kFullVersionList]: list, mobile } = {},
     [wnd],
   ]) => {
-    if (!version && (uadValues = uadValues?.fullVersionList) && uadValues[0]) {
-      [name, version] = uadValues.map(({ brand, version: v }) => (
+    if (!version && list?.[0]) {
+      [name, version] = list.map(({ brand, version: v }) => (
         /[^\sa-z]/i.test(brand) ? '3' : // downgrading GREASE value
           brand === 'Chromium' ? '2' + brand : // known generic value
             '1' + brand // preferring non-generic value
@@ -46,6 +47,8 @@ init.deps.push(
     ua.os = os;
     setBrowserName(name || 'chrome');
     ua.browserVersion = version || uaVer;
+    ua[kFullVersionList] = list;
+    ua.mobile = mobile;
     if (FIREFOX) FIREFOX = parseFloat(version);
     else if (wnd) checkVivaldi(wnd);
     else browserWindows.onCreated::listenOnce(checkVivaldi);
