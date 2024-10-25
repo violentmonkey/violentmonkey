@@ -2214,10 +2214,10 @@
   dependencies:
     "@babel/runtime" "^7.16.7"
 
-"@violentmonkey/types@0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.1.9.tgz#dd77c8d8c031716175229b418c88e3dff20d89ef"
-  integrity sha512-mBEHd8IOIrJW9NTSFf9474et5eduoq16Pmddg5O3MC/RElCxXay//Go0jpSz20LEpA9t0H44EHDRcXJYMBBtNg==
+"@violentmonkey/types@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.2.0.tgz#b66754f1ec74339fbc04d39ee4a1de259740b1b8"
+  integrity sha512-JRPtwhyodYKNkENciULg6v+ZtsoBR2ybYsA1KDvjw4JBzLNmvHixhd8TTl2s8eS1hU7MA1FU8kd1Ren9SCjxew==
 
 "@volar/language-core@2.4.0", "@volar/language-core@~2.4.0-alpha.18":
   version "2.4.0"
