@@ -40,9 +40,9 @@ jobs:
           yarn build
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: Publish to Edge
         run: |
