@@ -254,6 +254,8 @@ export async function requestLocalFile(url, options = {}) {
   });
 }
 
+const isDataUriRe = /^data:/i;
+const isHttpOrHttpsRe = /^https?:\/\//i;
 const isLocalUrlRe = re`/^(
   file:|
   about:|
@@ -300,15 +302,15 @@ export const isCdnUrlRe = re`/^https:\/\/(
     zstatic\.net
   )
 )\//ix`;
-export const isDataUri = url => /^data:/i.test(url);
-export const isValidHttpUrl = url => /^https?:\/\//i.test(url) && tryUrl(url);
+export const isDataUri = isDataUriRe.test.bind(isDataUriRe);
+export const isValidHttpUrl = url => isHttpOrHttpsRe.test(url) && tryUrl(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
 
 /** @returns {string|undefined} */
-export function tryUrl(str) {
+export function tryUrl(str, base) {
   try {
-    if (str && new URL(str)) {
-      return str; // throws on invalid urls
+    if (str ?? base) {
+      return new URL(str, base).href; // throws on invalid urls
     }
   } catch (e) {
     // undefined

@@ -1,4 +1,4 @@
-import { isCdnUrlRe, isRemote, makeRaw, request } from '@/common';
+import { isCdnUrlRe, isDataUri, isRemote, makeRaw, request, tryUrl } from '@/common';
 import { VM_HOME } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import { addOwnCommands } from './init';
@@ -30,18 +30,17 @@ addOwnCommands({
  */
 export function vetUrl(url, base = VM_HOME, throwOnFailure) {
   let res, err;
-  try {
-    res = new URL(url, base).href;
-    if (res.startsWith(extensionRoot) || testBlacklistNet(res)) {
-      err = 'Blacklisted';
+  if (isDataUri(url)) {
+    res = url;
+  } else {
+    res = tryUrl(url, base);
+    err = !res ? 'Invalid'
+      : (res.startsWith(extensionRoot) || testBlacklistNet(res)) && 'Blacklisted';
+    if (err) {
+      err = `${err} URL ${res || url}`;
+      if (throwOnFailure) throw err;
+      res = `data:,${err}`;
     }
-  } catch {
-    err = 'Invalid';
-  }
-  if (err) {
-    err = `${err} URL ${res || url}`;
-    if (throwOnFailure) throw err;
-    res = `data:,${err}`;
   }
   return res;
 }
