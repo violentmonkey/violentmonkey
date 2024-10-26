@@ -3,7 +3,7 @@ import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { scriptSizes, sizesPrefixRe, updateScriptMap } from './db';
-import storage, { S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
+import storage, { getStorageKeys, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
 import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
@@ -23,7 +23,7 @@ const TTL_MAIN = 3600e3;
 /** Keeping tiny info for extended period of time as it's inexpensive. */
 const TTL_TINY = 24 * 3600e3;
 const cache = initCache({ lifetime: TTL_MAIN });
-const dbKeys = initCache({ lifetime: TTL_TINY }); // 1: exists, 0: known to be absent
+export const dbKeys = new Map(); // 1: exists, 0: known to be absent
 const api = /** @type {browser.storage.StorageArea} */ storage.api;
 /** Using a simple delay with setTimeout to avoid infinite debouncing due to periodic activity */
 const FLUSH_DELAY = 100;
@@ -38,7 +38,7 @@ const { hook, fire } = initHooks();
 export const onStorageChanged = hook;
 export const clearStorageCache = () => {
   cache.destroy();
-  dbKeys.destroy();
+  dbKeys.clear();
 };
 export const storageCacheHas = cache.has;
 
@@ -46,7 +46,7 @@ export const cachedStorageApi = storage.api = {
 
   async get(keys) {
     const res = {};
-    batch(true);
+    cache.batch(true);
     keys = keys?.filter(key => {
       const cached = cache.get(key);
       const ok = cached !== undefined;
@@ -58,25 +58,25 @@ export const cachedStorageApi = storage.api = {
       if (!keys) lifetime = TTL_SKIM; // DANGER! Must be `undefined` otherwise.
       (await api.get(keys))::forEachEntry(([key, val]) => {
         res[key] = val;
-        dbKeys.put(key, 1);
+        dbKeys.set(key, 1);
         cache.put(key, deepCopy(val), lifetime);
         updateScriptMap(key, val);
       });
-      keys?.forEach(key => dbKeys.put(key, +hasOwnProperty(res, key)));
+      keys?.forEach(key => dbKeys.set(key, +hasOwnProperty(res, key)));
     }
-    batch(false);
+    cache.batch(false);
     return res;
   },
 
   async set(data, flushNow) {
     const toWrite = {};
     const keys = [];
-    batch(true);
+    cache.batch(true);
     data::forEachEntry(([key, val]) => {
       const copy = deepCopyDiff(val, cache.get(key));
       if (copy !== undefined) {
         cache.put(key, copy);
-        dbKeys.put(key, 1);
+        dbKeys.set(key, 1);
         keys.push(key);
         if (undoing) {
           toWrite[key] = val;
@@ -93,7 +93,7 @@ export const cachedStorageApi = storage.api = {
         }
       }
     });
-    batch(false);
+    cache.batch(false);
     if (!isEmpty(toWrite)) await api.set(toWrite);
     if (undoing) return;
     if (keys.length) fire(keys, data);
@@ -105,7 +105,7 @@ export const cachedStorageApi = storage.api = {
       let ok = dbKeys.get(key) !== 0;
       if (ok) {
         cache.del(key);
-        dbKeys.put(key, 0);
+        dbKeys.set(key, 0);
         if (undoing) return ok;
         if (storage[S_VALUE].toId(key)) {
           valuesToFlush[key] = null;
@@ -124,6 +124,11 @@ export const cachedStorageApi = storage.api = {
   },
 };
 
+if (!getStorageKeys) {
+  setInterval(() => {
+    dbKeys.forEach((val, key) => !val && dbKeys.delete(key));
+  }, TTL_TINY);
+}
 window[WATCH_STORAGE] = fn => {
   const id = performance.now();
   watchers[id] = fn;
@@ -163,11 +168,6 @@ function watchStorage(fn, cfg, state = true) {
   if (isEmpty(valuesToWatch)) {
     valuesToWatch = null;
   }
-}
-
-function batch(state) {
-  cache.batch(state);
-  dbKeys.batch(state);
 }
 
 async function updateScriptSizeContributor(key, val) {

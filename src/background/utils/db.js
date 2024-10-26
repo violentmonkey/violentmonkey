@@ -12,12 +12,13 @@ import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
-import { getOption, initOptions, setOption } from './options';
+import { getOption, initOptions, kOptions, kVersion, setOption } from './options';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
+  getStorageKeys,
 } from './storage';
-import { storageCacheHas } from './storage-cache';
+import { dbKeys, storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
 import { vetUrl } from './url';
 
@@ -114,11 +115,22 @@ addOwnCommands({
 });
 
 (async () => {
-  const lastVersion = await storage.base.getOne('version');
+  /** @type {string[]} */
+  let allKeys, keys;
+  if (getStorageKeys) {
+    allKeys = await getStorageKeys();
+    keys = allKeys.filter(key => {
+      dbKeys.set(key, 1);
+      return key.startsWith(S_SCRIPT_PRE);
+    });
+    keys.push(kOptions);
+  }
+  const lastVersion = (!getStorageKeys || dbKeys.has(kVersion))
+    && await storage.base.getOne(kVersion);
   const version = process.env.VM_VER;
   if (!lastVersion) await patchDB();
-  if (version !== lastVersion) storage.base.set({ version });
-  const data = await storage.base.getMulti();
+  if (version !== lastVersion) storage.base.set({ [kVersion]: version });
+  const data = await storage.base.getMulti(keys);
   const uriMap = {};
   const defaultCustom = getDefaultCustom();
   data::forEachEntry(([key, script]) => {
@@ -172,7 +184,14 @@ addOwnCommands({
     });
   }
   sortScripts();
-  vacuum(data);
+  setTimeout(async () => {
+    if (allKeys?.length) {
+      const set = new Set(keys); // much faster lookup
+      const data2 = await storage.base.getMulti(allKeys.filter(k => !set.has(k)));
+      Object.assign(data, data2);
+    }
+    vacuum(data);
+  }, 100);
   checkRemove();
   setInterval(checkRemove, TIMEOUT_24HOURS);
   resolveInit();

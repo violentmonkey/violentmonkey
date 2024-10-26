@@ -22,8 +22,8 @@ addOwnCommands({
 });
 
 const options = {};
-const STORAGE_KEY = 'options';
-const VERSION = 'version';
+export const kOptions = 'options';
+export const kVersion = 'version';
 const TPL_KEY = 'scriptTemplate';
 const TPL_OLD_VAL = `\
 // ==UserScript==
@@ -42,11 +42,11 @@ export const hookOptions = hooks.hook;
 hookOptions(data => sendCmd('UpdateOptions', data));
 
 export function initOptions(data) {
-  data = data[STORAGE_KEY] || {};
+  data = data[kOptions] || {};
   Object.assign(options, data);
   if (process.env.DEBUG) console.info('options:', options);
-  if (!options[VERSION]) {
-    setOption(VERSION, 1);
+  if (!options[kVersion]) {
+    setOption(kVersion, 1);
   }
   if (options[TPL_KEY] === TPL_OLD_VAL) {
     options[TPL_KEY] = defaults[TPL_KEY]; // will be detected by omitDefaultValue below
@@ -116,7 +116,7 @@ export function setOption(key, value, silent) {
 }
 
 function writeOptions() {
-  return storage.base.setOne(STORAGE_KEY, options);
+  return storage.base.setOne(kOptions, options);
 }
 
 function omitDefaultValue(key) {
