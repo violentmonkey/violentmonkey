@@ -302,7 +302,7 @@ export const isCdnUrlRe = re`/^https:\/\/(
     zstatic\.net
   )
 )\//ix`;
-export const isDataUri = isDataUriRe.test.bind(isDataUriRe);
+export const isDataUri = /*@__PURE__*/isDataUriRe.test.bind(isDataUriRe);
 export const isValidHttpUrl = url => isHttpOrHttpsRe.test(url) && tryUrl(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
 
