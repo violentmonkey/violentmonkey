@@ -5,6 +5,7 @@ export const kFiltersPopup = 'filtersPopup';
 export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
 export const kPopupWidth = 'popupWidth';
 export const kShowTrailingSpace = 'showTrailingSpace';
+export const kScriptTemplate = 'scriptTemplate';
 export const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
 const defaultsValueEditor = {
   [kAutocompleteOnTyping]: 100,
@@ -84,7 +85,7 @@ export default {
   editorWindow: false, // whether popup opens editor in a new window
   editorWindowPos: {}, // { left, top, width, height }
   editorWindowSimple: true, // whether to open a simplified popup or a normal browser window
-  scriptTemplate: `\
+  [kScriptTemplate]: `\
 // ==UserScript==
 // @name        New script {{name}}
 // @namespace   ${VIOLENTMONKEY} Scripts

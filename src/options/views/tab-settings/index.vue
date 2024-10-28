@@ -94,7 +94,7 @@
                      :key="i" :is="i % 2 ? 'code' : 'span'"
           /> <vm-date-info/><!--DANGER! Using the same line to preserve the space-->
         </p>
-        <setting-text name="scriptTemplate" has-reset/>
+        <setting-text :name="kScriptTemplate" has-reset/>
       </section>
 
       <vm-blacklist />
@@ -112,7 +112,7 @@
 import { i18n } from '@/common';
 import { KNOWN_INJECT_INTO, VM_HOME } from '@/common/consts';
 import options from '@/common/options';
-import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
+import { kScriptTemplate, kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
 import { EXTERNAL_LINK_PROPS, focusMe, getActiveElement } from '@/common/ui';
 import { hookSettingsForUI } from '@/common/ui/util';

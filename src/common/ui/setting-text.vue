@@ -17,7 +17,10 @@
             :disabled="disabled || !canReset"/>
     <!-- DANGER! Keep the error tag in one line to keep the space which ensures the first word
          is selected correctly without the preceding button's text on double-click. -->
-    <slot/> <span class="error text-red sep" v-text="error" v-if="json"/>
+    <slot/> <template v-if="error">
+      <span v-if="typeof error === 'string'" class="error text-red sep" v-text="error"/>
+      <ol v-else class="text-red"><li v-for="e in error" :key="e" v-text="e"/></ol>
+    </template>
   </div>
 </template>
 
@@ -31,7 +34,7 @@ const handleJSON = val => JSON.stringify(val, null, '  ');
 </script>
 
 <script setup>
-import { onBeforeUnmount, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { i18n } from '@/common';
 import { getUnloadSentry } from '@/common/router';
 import { deepEqual, objectGet } from '../object';
@@ -46,6 +49,7 @@ const props = defineProps({
   name: String,
   json: Boolean,
   disabled: Boolean,
+  getErrors: Function,
   hasSave: {
     type: Boolean,
     default: true,
@@ -53,7 +57,7 @@ const props = defineProps({
   hasReset: Boolean,
   rows: Number,
 });
-const emit = defineEmits(['bg-error', 'save']);
+const emit = defineEmits(['save']);
 const $text = ref();
 const canSave = ref();
 const canReset = ref();
@@ -106,6 +110,9 @@ watch(text, str => {
   canSave.value = _canSave = _isDirty && !err;
   if (_canSave && !props.hasSave) onSave(); // Auto save if there is no `Save` button
 });
+onMounted(async () => {
+  error.value = await props.getErrors?.();
+});
 onBeforeUnmount(() => {
   revoke();
   toggleUnloadSentry(false);
@@ -134,8 +141,13 @@ function onReset() {
     }
   }
 }
-function bgError(err) {
-  emit('bg-error', err && JSON.parse(err.message));
+function bgError({ message: m } = {}) {
+  if (m) try { m = JSON.parse(m); } catch {/**/}
+  error.value = m && (
+    m.length <= 1 && Array.isArray(m)
+      ? m[0]
+      : m
+  );
 }
 </script>
 

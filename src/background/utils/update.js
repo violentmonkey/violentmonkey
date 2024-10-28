@@ -107,7 +107,7 @@ async function downloadUpdate(script, urls, opts) {
   announce(i18n('msgCheckingForUpdate'));
   try {
     const { data } = await requestNewer(updateURL, { ...FAST_CHECK, ...opts }) || {};
-    const { version, [__CODE]: metaStr } = data ? parseMeta(data, true) : {};
+    const { version, [__CODE]: metaStr } = data ? parseMeta(data, { retMetaStr: true }) : {};
     if (compareVersion(meta.version, version) >= 0) {
       announce(i18n('msgNoUpdate'), { [kChecking]: false });
     } else if (!downloadURL) {

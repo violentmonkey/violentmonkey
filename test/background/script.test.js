@@ -50,7 +50,7 @@ test('parseMetaIrregularities', () => {
   };
   const parseWeirdMeta = code => {
     const errors = [];
-    const res = parseMeta(code, false, errors);
+    const res = parseMeta(code, { errors });
     return errors.length ? [res, ...errors] : res;
   };
   expect(parseWeirdMeta(`\

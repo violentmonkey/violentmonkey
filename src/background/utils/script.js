@@ -1,13 +1,14 @@
 import {
-  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, noop,
+  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, i18n, noop,
 } from '@/common';
 import {
   __CODE, HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, TL_AWAIT, UNWRAP,
 } from '@/common/consts';
 import { formatDate } from '@/common/date';
 import { mapEntry } from '@/common/object';
+import defaults, { kScriptTemplate } from '@/common/options-defaults';
 import { addOwnCommands, commands } from './init';
-import { getOption } from './options';
+import { getOption, hookOptionsInit } from './options';
 import { injectableRe } from './tabs';
 
 addOwnCommands({
@@ -20,6 +21,16 @@ addOwnCommands({
       name: domain || '',
     });
   },
+});
+
+hookOptionsInit((changes, firstRun) => {
+  if (!firstRun && kScriptTemplate in changes) {
+    const errors = [];
+    const tpl = changes[kScriptTemplate];
+    const meta = !tpl /*empty = default*/ || parseMeta(tpl, { errors });
+    if (!meta) errors.unshift(i18n('msgInvalidScript'));
+    if (errors.length) throw errors;
+  }
 });
 
 /** @return {boolean|?RegExpExecArray} */
@@ -69,11 +80,20 @@ const META_ITEM_RE = /(?:^|\n)(.*?)\/\/([\x20\t]*)(@\S+)(.*)/g;
 export const ERR_META_SPACE_BEFORE = 'Unexpected text before "//" in ';
 export const ERR_META_SPACE_INSIDE = 'Expected a single space after "//" in ';
 
-export function parseMeta(code, includeMatchedString, errors) {
+/**
+ * @param {string} code
+ * @param {object} [opts]
+ * @param {Array} [opts.errors] - to collect errors
+ * @param {boolean} [opts.retDefault] - returns the default empty meta if no meta is found
+ * @param {boolean} [opts.retMetaStr] - adds the matched part as [__CODE] prop in result
+ * @return {VMScript.Meta | false}
+ */
+export function parseMeta(code, { errors, retDefault, retMetaStr } = {}) {
   // initialize meta
   const meta = metaTypes::mapEntry(value => value.default());
   const match = matchUserScript(code);
-  if (!match) return false; // TODO: `return;` + null check in all callers?
+  if (!match) return retDefault ? meta : false;
+  // TODO: use `null` instead of `false` + null check in all callers?
   if (errors) checkMetaItemErrors(match, 1, errors);
   let parts;
   while ((parts = META_ITEM_RE.exec(match[4]))) {
@@ -90,7 +110,7 @@ export function parseMeta(code, includeMatchedString, errors) {
   if (errors) checkMetaItemErrors(match, 5, errors);
   meta.resources = meta.resource;
   delete meta.resource;
-  if (includeMatchedString) meta[__CODE] = match[0];
+  if (retMetaStr) meta[__CODE] = match[0];
   return meta;
 }
 
@@ -124,7 +144,7 @@ export function newScript(data) {
     name: '',
     ...data,
   };
-  const code = getOption('scriptTemplate')
+  const code = (getOption(kScriptTemplate) || defaults[kScriptTemplate])
   .replace(/{{(\w+)(?::(.+?))?}}/g, (str, name, format) => state[name] ?? (
     name !== 'date' ? str
       : format ? formatDate(format)
@@ -136,7 +156,7 @@ export function newScript(data) {
       enabled: 1,
       shouldUpdate: 1,
     },
-    meta: parseMeta(code),
+    meta: parseMeta(code, { retDefault: true }),
     props: {},
   };
   return { script, code };

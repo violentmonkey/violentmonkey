@@ -1,6 +1,6 @@
 import { debounce, initHooks, normalizeKeys, sendCmd } from '@/common';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
-import defaults from '@/common/options-defaults';
+import defaults, { kScriptTemplate } from '@/common/options-defaults';
 import { addOwnCommands, init } from './init';
 import storage from './storage';
 
@@ -24,7 +24,6 @@ addOwnCommands({
 const options = {};
 export const kOptions = 'options';
 export const kVersion = 'version';
-const TPL_KEY = 'scriptTemplate';
 const TPL_OLD_VAL = `\
 // ==UserScript==
 // @name New Script
@@ -48,11 +47,11 @@ export function initOptions(data) {
   if (!options[kVersion]) {
     setOption(kVersion, 1);
   }
-  if (options[TPL_KEY] === TPL_OLD_VAL) {
-    options[TPL_KEY] = defaults[TPL_KEY]; // will be detected by omitDefaultValue below
+  if (options[kScriptTemplate] === TPL_OLD_VAL) {
+    options[kScriptTemplate] = defaults[kScriptTemplate]; // will be detected by omitDefaultValue below
   }
   if (Object.keys(options).map(omitDefaultValue).some(Boolean)) {
-    delete options[`${TPL_KEY}Edited`]; // TODO: remove this in 2023
+    delete options[`${kScriptTemplate}Edited`]; // TODO: remove this in 2023
     writeOptionsLater();
   }
 }
