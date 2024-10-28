@@ -80,10 +80,10 @@ buttonReplaceAll:
   message: Tutti
 buttonReset:
   description: Button to reset to default values.
-  message: Ripristina
+  message: Inizializza
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: Ripristina le impostazioni
+  message: Inizializza impostazioni
 buttonRestore:
   description: Button to restore a removed script.
   message: Ripristina
@@ -98,7 +98,7 @@ buttonSaved:
   message: Salvato
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: Mostra lo stato dell'editor
+  message: Mostra stato editor
 buttonSupport:
   description: Button to open support page.
   message: Pagina di assistenza
@@ -114,40 +114,40 @@ buttonUpdateAll:
   touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Svuota database
+  message: Ripulisci database
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Dati eliminati
+  message: Dati ripuliti
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Eliminanzione dei dati in corso...
+  message: Ripulisco dati…
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
     L'aggiornamento automatico è disattivato per questo script!
-    Cliccando su OK verrà aggiornato comunque.
+    Fai clic su OK per aggiornarlo comunque.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: >-
+  message: |-
     Ci sono modifiche non salvate!
-
-    Cliccando OK non verranno salvate. Cliccando Annulla tornerai alle
-    modifiche.
+    Fai clic su OK per scartarle o annulla per rimanere.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
   message: >-
-    Ripristina tutte le modifiche eseguite al database (importazioni,
+    Annulla tutte le modifiche eseguite al database (importazioni,
     aggiornamenti, modifiche e personalizzazioni)
 descBlacklist:
   description: Description for the global injection blacklist.
   message: >-
-    Negli URL che non corrispondono a questa lista non verranno iniettati
-    script.
+    Lista nera iniezione (gli script non verranno eseguiti nei siti
+    corrispondenti)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Lista nera reti (gli script non si connetteranno ai siti corrispondenti e ai
+    loro cookie)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -165,10 +165,21 @@ descEditorOptions:
     rel="noopener noreferrer">elenco completo</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Le opzioni booleane possono essere attivate o disattivate facendo doppio
+    clic sul valore: <code>vero</code> = attivo, <code>falso</code> =
+    disattivato. Le opzioni numeriche che terminano con <code>ritardo</code>,
+    <code>intervallo</code>, <code>ritmo</code> e <code>tempo</code> sono in
+    millisecondi.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Opzioni non standard: <code>autocompleteOnTyping</code> è un ritardo in
+    millisecondi per visualizzare suggerimenti di autocompletamento dopo
+    l'inserimento (<code>0</code> = disattiva),
+    <code>killTrailingSpaceOnSave</code> rimuove automaticamente gli spazi alla
+    fine di ogni riga al salvataggio, <code>showTrailingSpace</code> mostra
+    tutti gli spazi terminali come punti.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -176,16 +187,16 @@ descScriptTemplate:
     con un formato compatibile con MomentJS, ad esempio <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: gruppo
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: nascondi
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Script disattivati:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: mostra
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentazione sul blocco di metadati userscript e API <code>GM</code>:'
@@ -200,7 +211,7 @@ editLabelMeta:
   message: Metadati personalizzati
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Impostazioni dello script
+  message: Impostazioni script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
   message: Riga troppo lunga
@@ -231,13 +242,13 @@ editValueAllHint:
   message: Mostra/modifica l'intero archivio dei valori dello script
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: Un gestore di userscript libero che supporta un sacco di browser
+  message: Un gestore di userscript open source che supporta un sacco di browser
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Aggiunto alla lista nera dalle impostazioni di Violentmonkey
+  message: Aggiunto alla lista nera nelle impostazioni di Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
@@ -249,7 +260,9 @@ failureReasonNoninjectable:
     criteri di gruppo locali, un sito motore di ricerca in Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey è stato riavviato. Ricarica la pagina per eseguire gli
+    userscript.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
@@ -262,10 +275,10 @@ fileInstallBlocked:
     leggere qualsiasi file locale.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ordine alfabetico
+  message: alfabetico
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ordine di esecuzione
+  message: esecuzione
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ultimo aggiornamento
@@ -283,7 +296,7 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: dimensione
+  message: dimensioni
 genericError:
   description: Label for generic error.
   message: Errore
@@ -312,7 +325,7 @@ hintForBatchAction:
   message: per $1 script corrispondenti
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'URL dello script:'
+  message: 'URL input:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Gli script rimossi sono elencati qui e verranno conservati per 7 giorni.
@@ -379,13 +392,13 @@ labelBackupMaintenance:
   message: Backup e manutenzione
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Mostra sull''icona:'
+  message: 'Badge:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 'Colori icona:'
+  message: 'Colori badge:'
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: niente
+  message: nessuno
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
   message: numero di script in esecuzione
@@ -397,7 +410,7 @@ labelBlacklist:
   message: Lista nera
 labelContributors:
   description: Label for link to contributors.
-  message: Collaboratori allo sviluppo
+  message: Collaboratori
 labelCurrentLang:
   description: Label of current language.
   message: 'Lingua attuale: '
@@ -418,7 +431,7 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL di download:'
+  message: 'URL download:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: Modifica valore script
@@ -470,7 +483,7 @@ labelHomepageURL:
   message: 'URL pagina principale:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'URL icona:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importa dati script
@@ -526,18 +539,18 @@ labelNotifyUpdatesGlobal:
   message: ignora notifica per singoli script (scheda "impostazioni" dell'editor)
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: Politica sulla riservatezza
+  message: Politica sulla privacy
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: Reinstallazione dello script
+  message: Reinstallazione script
 labelRelated:
   description: Label of related links.
   message: 'Link correlati: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Rimosso il giorno $1
+  message: Rimosso alle $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Sostituisci con: '
@@ -552,7 +565,7 @@ labelScriptTemplate:
   message: Modello script personalizzato
 labelSearch:
   description: Label for search input in search box.
-  message: 'Cerca per: '
+  message: 'Cerca: '
 labelSearchScript:
   description: Placeholder for script search box.
   message: Cerca script...
@@ -622,7 +635,7 @@ labelViewTable:
   message: Vista tabella
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Larghezza:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -695,7 +708,7 @@ menuMatchedFrameScripts:
   message: Script solo per sub-frame
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Script
+  message: Script corrispondenti
 menuNewScript:
   description: Menu item to create a new script.
   message: Crea un nuovo script
@@ -915,10 +928,10 @@ optionUpdate:
   message: Aggiorna
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Impostazioni finestre a comparsa
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Clic tasto destro: impostazioni finestre a comparsa'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Modalità solo lettura
@@ -930,7 +943,7 @@ readonlyNote:
     aggiornamenti o consentire le modifiche.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: Consenti le modifiche
+  message: Consenti modifiche
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
   message: (il prossimo aggiornamento sovrascriverà le tue modifiche)
@@ -939,7 +952,7 @@ reinstall:
   message: Reinstalla
 reloadTab:
   description: Label of action to reload the tab
-  message: Ricarica la scheda
+  message: Ricarica scheda
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: >-
@@ -982,7 +995,7 @@ skipScriptsMsg:
     scheda o navigando tra i link, gli script verranno riattivati.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Ordine:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Smetti di rilevare modifiche
@@ -1043,10 +1056,10 @@ updateScript:
   message: Aggiorna
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Aggiorna tutti gli script
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Aggiorna gli script della scheda attuale
 valueLabelKey:
   description: Label for key of a script value.
   message: Chiave (stringa)

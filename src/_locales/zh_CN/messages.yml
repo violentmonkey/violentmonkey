@@ -139,7 +139,7 @@ descBlacklist:
   message: 注入黑名单（脚本不会在匹配的网站上运行）
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: 网络黑名单（脚本不会连接到匹配的网站及其 cookie）
+  message: 网络黑名单（脚本不会连接到匹配的网站及其 Cookie）
 descCustomCSS:
   description: Description of custom CSS section.
   message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。
@@ -161,8 +161,8 @@ descEditorOptionsVM:
   message: >-
     非标准选项：<code>autocompleteOnTyping</code>
     是在打字后显示自动完成提示的延迟时间（以毫秒计，<code>0</code>
-    表示停用），<code>killTrailingSpaceOnSave</code>在保存时自动移除每一行的尾随空格
-    ，<code>showTrailingSpace</code>将尾随空格显示为点 。
+    表示停用），<code>killTrailingSpaceOnSave</code>
+    在保存时自动移除每一行的尾随空格，<code>showTrailingSpace</code>将尾随空格显示为点。
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -176,7 +176,7 @@ disabledScriptsHide:
   message: 隐藏
 disabledScriptsSelector:
   description: Label of the option.
-  message: 禁用脚本：
+  message: 禁用的脚本：
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: 显示
@@ -250,7 +250,7 @@ filterAlphabeticalOrder:
   message: 字母顺序
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: 执行
+  message: 执行顺序
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: 最近更新时间
@@ -274,10 +274,10 @@ genericError:
   message: 错误
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: 关
+  message: 关闭
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: 开
+  message: 开启
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: 使用全局设置
@@ -292,7 +292,7 @@ helpForLocalFile:
   message: 显示拖放本地脚本的详细说明
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: '针对 $1匹配的脚本 '
+  message: 对 $1 匹配的脚本
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：
@@ -434,7 +434,7 @@ labelGeneral:
   message: 通用
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Help with translation
+  message: 帮助翻译
 labelHomepage:
   description: Label for home page in about tab.
   message: 主页
@@ -809,8 +809,8 @@ msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
   message: >-
     当页面载入时，如果脚本不存在或与网址不匹配，这种情况通常发生在像是 fb 或 instagram
-    这类使用假导航的单页应用网站中。您可以重新载入分页以执行脚本。要修正脚本，请对整个网站使用 @match，然后利用 MutationObserver 或
-    window.navigation API 来侦测变化。
+    这类使用假导航的单页应用网站中。您可以重新载入标签页以执行脚本。要修正脚本，请使用 @match 匹配整个网站，然后利用
+    MutationObserver 或 window.navigation API 来侦测变化。
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: 脚本已更新。
