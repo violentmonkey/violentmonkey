@@ -386,13 +386,15 @@ async function loadDeps() {
 function closeTab() {
   sendCmdDirectly('TabClose');
 }
-async function getFile(url, { isBlob, useCache } = {}) {
+async function getFile(url, opts) {
+  const { isBlob, useCache } = opts || {};
   const cacheKey = isBlob ? `blob+${url}` : `text+${url}`;
   if (useCache && cache.has(cacheKey)) {
     return cache.get(cacheKey);
   }
   const { data } = await sendCmdDirectly('Request', {
     url,
+    vet: !!opts, // TODO: add a blacklist for installation URLs?
     [kResponseType]: isBlob ? 'blob' : null,
   });
   if (useCache) cache.put(cacheKey, data);
