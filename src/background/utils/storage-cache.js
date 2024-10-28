@@ -3,7 +3,7 @@ import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { scriptSizes, sizesPrefixRe, updateScriptMap } from './db';
-import storage, { getStorageKeys, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
+import storage, { S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
 import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
@@ -124,11 +124,9 @@ export const cachedStorageApi = storage.api = {
   },
 };
 
-if (!getStorageKeys) {
-  setInterval(() => {
-    dbKeys.forEach((val, key) => !val && dbKeys.delete(key));
-  }, TTL_TINY);
-}
+setInterval(() => {
+  dbKeys.forEach((val, key) => !val && dbKeys.delete(key));
+}, TTL_TINY);
 window[WATCH_STORAGE] = fn => {
   const id = performance.now();
   watchers[id] = fn;
