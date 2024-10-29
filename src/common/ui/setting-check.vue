@@ -46,5 +46,8 @@ onBeforeUnmount(revoke);
   display: inline-flex;
   flex-wrap: wrap;
   white-space: pre-wrap; /* preserving spaces in html */
+  > :nth-child(2) {
+    flex: 1 1 min-content; /* wrapping inside the label so it stays in the same row as [x] */
+  }
 }
 </style>

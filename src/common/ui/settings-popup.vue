@@ -4,7 +4,7 @@
   </div>
   <div class="ml-2c flex flex-col">
     <!-- ml-2c indents children after the first one for visual grouping -->
-    <setting-check name="editorWindow" class="mr-2" ref="$EW">
+    <setting-check name="editorWindow" ref="$EW">
       <tooltip :content="EDITOR_WINDOW_HINT" :disabled="!EDITOR_WINDOW_HINT">
         <span v-text="i18n('optionEditorWindow')"/>
       </tooltip>
