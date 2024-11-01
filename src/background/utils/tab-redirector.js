@@ -38,8 +38,9 @@ addPublicCommands({
     cache.put(`confirm-${confirmKey}`, { incognito, url, from, tabId, fs, ff: FIREFOX });
     const confirmUrl = CONFIRM_URL_BASE + confirmKey;
     const { [kWindowId]: windowId } = canReplaceCurTab
-      ? await browser.tabs.update(tabId, { url: confirmUrl })
-      : await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
+      // The tab may have been closed already, in which case we'll open a new tab
+      && await browser.tabs.update(tabId, { url: confirmUrl }).catch(noop)
+      || await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
     if (active && windowId !== tab[kWindowId]) {
       await browserWindows?.update(windowId, { focused: true });
     }
