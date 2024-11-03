@@ -156,7 +156,9 @@ addOwnCommands({
         id,
         uri,
       };
-      script.custom = Object.assign({}, defaultCustom, script.custom);
+      const {pathMap} = script.custom = Object.assign({}, defaultCustom, script.custom);
+      // Patching the bug in 2.27.0 where data: URI was saved as invalid in pathMap
+      if (pathMap) for (const url in pathMap) if (isDataUri(url)) delete pathMap[url];
       maxScriptId = Math.max(maxScriptId, id);
       maxScriptPosition = Math.max(maxScriptPosition, getInt(script.props.position));
       (script.config.removed ? removedScripts : aliveScripts).push(script);
