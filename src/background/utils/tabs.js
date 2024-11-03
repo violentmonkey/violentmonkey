@@ -1,4 +1,4 @@
-import { browserWindows, getActiveTab, noop, sendTabCmd } from '@/common';
+import { browserWindows, getActiveTab, makePause, noop, sendTabCmd } from '@/common';
 import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
@@ -158,6 +158,7 @@ addPublicCommands({
       });
     } catch (err) {
       if (err.message.startsWith('Illegal to set private')) storeId = null;
+      else if (err.message.startsWith('Tabs cannot be edited')) await makePause(100);
       else throw err; // TODO: put in storage and show in UI
     }
     if (active && newTab[kWindowId] !== windowId) {
