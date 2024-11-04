@@ -148,7 +148,7 @@ descCustomCSS:
   description: Description of custom CSS section.
   message: >-
     Пользовательский CSS для страниц настроек и установки скриптов. Если вы не
-    знаете зачем это нужно, пожалуйста, не редактируйте.
+    знаете, зачем это нужно, пожалуйста, не редактируйте.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
