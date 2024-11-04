@@ -1,6 +1,6 @@
 import {
   isRemote, compareVersion, debounce, throttle,
-  loadQuery, dumpQuery,
+  loadQuery, dumpQuery, getLocaleString,
 } from '@/common';
 
 jest.useFakeTimers();
@@ -154,4 +154,18 @@ test('loadQuery/dumpQuery', () => {
   const obj = loadQuery(str);
   expect(obj).toEqual({ a: '|#,', b: '', c: '' });
   expect(dumpQuery(obj)).toEqual(normalized);
+});
+
+test('getLocaleString', () => {
+  const meta = {
+    'name': 'name without locale',
+    'name:zh': 'name for zh',
+    'name:zh-CN': 'name for zh-CN',
+    'name:zh-TW': 'name for zh-TW',
+  };
+  expect(getLocaleString(meta, 'name', ['zh-CN', 'zh'])).toBe('name for zh-CN');
+  expect(getLocaleString(meta, 'name', ['zh', 'zh-CN'])).toBe('name for zh');
+  expect(getLocaleString(meta, 'name', ['zh-Hant-TW', 'zh-Hant', 'zh'])).toBe('name for zh-TW');
+  expect(getLocaleString(meta, 'name', ['zh-Hant', 'zh'])).toBe('name for zh');
+  expect(getLocaleString(meta, 'name', ['en', 'en-US'])).toBe('name without locale');
 });
