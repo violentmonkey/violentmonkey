@@ -138,10 +138,12 @@ confirmUndoImport:
     nhật, chỉnh sửa, tùy chỉnh)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: URL trong danh sách này sẽ không bị bỏ qua.
+  message: Danh sách đen chặn tiêm mã (script sẽ không chạy trong các trang web khớp)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Danh sách đen mạng (các script sẽ không kết nối đến các trang web khớp và
+    cookie của chúng).
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -164,7 +166,11 @@ descEditorOptionsGeneric:
     <code>Time</code> tính bằng mili giây.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Các tùy chọn không chuẩn: 1autocompleteOnTyping1 là độ trễ tính bằng mili
+    giây để hiển thị gợi ý tự động hoàn thành sau khi nhập (202 = tắt),
+    3killTrailingSpaceOnSave3 tự động xóa khoảng trắng ở cuối mỗi dòng khi lưu,
+    4showTrailingSpace4 hiển thị khoảng trắng ở cuối dòng dưới dạng dấu chấm.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -172,16 +178,16 @@ descScriptTemplate:
     với định dạng tương thích MomentJS, ví dụ như <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: Nhóm
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: Ẩn
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Tập lệnh bị vô hiệu hóa:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: Hiện
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Các tài liệu về API đọc ở đây:'
@@ -255,10 +261,10 @@ fileInstallBlocked:
     kỳ tập lệnh người dùng nào cũng có thể đọc bất kỳ tệp cục bộ nào.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: thứ tự bảng chứ cái
+  message: Theo bảng chữ cái
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: thứ tự thực thi
+  message: Thực thi
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: cập nhật cuối
@@ -291,7 +297,9 @@ genericUseGlobal:
   message: Sử dụng cài đặt khuyên dùng
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Mẫu "#" (dấu thăng) chỉ hoạt động khi mở trang web lần đầu hoặc tải lại tab:
+    $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Thùng rác
@@ -300,7 +308,7 @@ helpForLocalFile:
   message: Hiển thị hướng dẫn cho việc kéo và thả các tập lệnh cục bộ.
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: Đối với các tập lệnh khớp với $1
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
@@ -362,7 +370,7 @@ labelBackupMaintenance:
   message: Sao lưu và bảo trì
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Hiển thị ở huy hiệu: '
+  message: 'Huy hiệu:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Màu huy hiệu: '
@@ -413,7 +421,7 @@ labelEditor:
   message: Trình chỉnh sửa
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: Chỉ bật kịch bản
 labelExclude:
   description: Label of @exclude rules.
   message: Bỏ qua
@@ -433,7 +441,11 @@ labelFastFirefoxInject:
   message: Chế độ $1 thay thế trong Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Kể từ Firefox 59, phương pháp tiêm thay thế cho 1 kịch bản nhanh hơn chế độ
+    mặc định. Tương tự như "Sync Page Mode", nó cũng làm tăng mức tiêu thụ bộ
+    nhớ, vì vậy nếu kịch bản của bạn hoạt động tốt mà không có tùy chọn này, bạn
+    có thể muốn vô hiệu hóa nó.
 labelFeedback:
   description: Label of link to feedback page.
   message: Phản hồi
@@ -451,7 +463,7 @@ labelHomepageURL:
   message: 'Liên kết trang chủ:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'URL biểu tượng:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Nhập dữ liệu script
@@ -584,7 +596,7 @@ labelSyncUsername:
   message: 'Tài khoản:'
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Thẻ (cách nhau bằng dấu cách):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Giao diện: '
@@ -605,7 +617,7 @@ labelViewTable:
   message: Chế độ xem bảng
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Chiều rộng:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -754,7 +766,7 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Thiếu tài nguyên bắt buộc.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
@@ -764,7 +776,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: "Một tập lệnh có cùng @name và @namespace đã được cài đặt.\n\n\_"
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -869,7 +881,7 @@ optionPopupGroupDisabled:
   touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Nhóm theo giai đoạn @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ẩn script bị tắt
@@ -900,31 +912,35 @@ optionUpdate:
   message: Cập nhật
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Cài đặt menu ngữ cảnh
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Nhấp chuột phải: cài đặt menu ngữ cảnh (popup)'
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Chỉ đọc
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Tập lệnh tự động cập nhật chỉ được phép đọc trừ khi bạn tắt cập nhật hoặc
+    cho phép chỉnh sửa.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Cho phép chỉnh sửa
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (Cập nhật tiếp theo sẽ ghi đè chúng)
 reinstall:
   description: Button to reinstall a script
   message: Cài đặt lại
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Tải lại trang
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Nếu được bật, tab đang hoạt động sẽ được tải lại khi phát hiện có thay đổi
+    và tập lệnh này khớp với URL của tab.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -950,16 +966,18 @@ sideMenuSettings:
   message: Cài đặt
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: "Tải lại trang không có tập lệnh người dùng\n\n\_"
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Bạn đã tắt userscript (tập lệnh người dùng) cho trang này. Để chạy chúng,
+    hãy tải lại hoặc điều hướng tab.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Thứ tự sắp xếp:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Dừng theo dõi
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Màu huy hiệu bình thường
@@ -976,27 +994,34 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    Phím 1Enter1 thêm văn bản vào lịch sử tự động hoàn thànhTất cả các điều kiện
+    không phân biệt chữ hoa chữ thườngCác điều kiện phân tách bằng dấu cách có
+    thể được kết hợpTìm kiếm theo siêu dữ liệu: 2"Kịch bản tuyệt vời" "Mô
+    tả"2Tìm kiếm theo thẻ: 3#thẻ1 #thẻ23Tìm kiếm theo tên kịch bản: 4name:"tên
+    tuyệt vời"4Tìm kiếm theo mã kịch bản: 5code:"mã tuyệt vời"5Tìm kiếm phủ
+    định: 6!#thẻ2 !name:"không mong muốn"6Biểu thức chính quy: 7/\w+?/7,
+    8/\w+?/gi8, 9name:/\w+?/9, 10name+re:"\w+? có khoảng trắng"10
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Theo dõi chỉnh sửa bên ngoài
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Giữ trang này mở để theo dõi các chỉnh sửa của bạn trong tệp cục bộ
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Cập nhật tập lệnh ($1)
 updateScript:
   description: Button to update one script.
   message: Cập nhật
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Cập nhật tất cả tập lệnh
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Cập nhật các tập lệnh của tab hiện tại
 valueLabelKey:
   description: Label for key of a script value.
   message: Khóa (chuỗi)
