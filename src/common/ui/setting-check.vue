@@ -49,5 +49,8 @@ onBeforeUnmount(revoke);
   > :nth-child(2) {
     flex: 1 1 min-content; /* wrapping inside the label so it stays in the same row as [x] */
   }
+  .vl-dropdown-menu & {
+    width: max-content; /* CSS bug(?) workaround for absolutely positioned containers */
+  }
 }
 </style>
