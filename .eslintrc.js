@@ -26,7 +26,7 @@ module.exports = {
     'no-use-before-define': ['error', {
       'functions': false,
       'classes': true,
-      'variables': true,
+      'variables': false, // allowing for upper scopes
       'allowNamedExports': true,
     }],
     // copied from airbnb-base, replaced 4 with 8
