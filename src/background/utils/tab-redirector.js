@@ -52,7 +52,7 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 const whitelistRe = re`/^https:\/\/(
   (greas|sleaz)yfork\.org\/scripts\/[^/]*\/code|
-  update\.(greas|sleaz)yfork\.org\/scripts\/\d+|
+  update\.(greas|sleaz)yfork\.org\/scripts|
   openuserjs\.org\/install\/[^/]*|
   github\.com\/[^/]*\/[^/]*\/(
     raw\/[^/]*|
