@@ -94,13 +94,14 @@ addPublicCommands({
     const srcUrl = src.url;
     const isInternal = !srcUrl || srcUrl.startsWith(extensionRoot);
     // only incognito storeId may be specified when opening in an incognito window
-    const { incognito, [kWindowId]: windowId } = srcTab;
+    const { incognito } = srcTab;
     const canOpenIncognito = !incognito || IS_FIREFOX || !/^(chrome[-\w]*):/.test(url);
     const tabOpts = {
       // normalizing as boolean because the API requires strict types
       active: !!active,
       pinned: !!pinned,
     };
+    let windowId = srcTab[kWindowId];
     let newTab;
     // Chrome can't open chrome-xxx: URLs in incognito windows
     // TODO: for src._removed maybe create a new window if cookieStoreId of active tab is different
@@ -157,8 +158,11 @@ addPublicCommands({
         },
       });
     } catch (err) {
-      if (err.message.startsWith('Illegal to set private')) storeId = null;
-      else if (err.message.startsWith('Tabs cannot be edited')) await makePause(100);
+      const m = err.message;
+      if (m.startsWith('Illegal to set private')) storeId = null;
+      else if (m.startsWith('No tab')) srcTab.id = null;
+      else if (m.startsWith('No window')) windowId = null;
+      else if (m.startsWith('Tabs cannot be edited')) await makePause(100);
       else throw err; // TODO: put in storage and show in UI
     }
     if (active && newTab[kWindowId] !== windowId) {
