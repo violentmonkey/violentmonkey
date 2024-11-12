@@ -82,7 +82,6 @@ export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
 export const VAULT = (() => {
   let tmp;
   let ChromePromiseBug;
-  let SafePromiseProto;
   let Reflect;
   let SafeObject;
   let i = -1;
@@ -164,12 +163,12 @@ export const VAULT = (() => {
     parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
+    SafePromise = res[i += 1] || src.Promise,
     SafePromiseConstructor = res[i += 1] || (
-      (SafePromiseProto = (SafePromise = src.Promise)[PROTO], IS_FIREFOX)
-        ? SafePromise
-        : SafePromiseProto.constructor
+      tmp = SafePromise[PROTO],
+      IS_FIREFOX ? SafePromise : tmp.constructor
     ),
-    then = res[i += 1] || SafePromiseProto.then,
+    then = res[i += 1] || tmp.then,
     urlSearchParamsToString = res[i += 1] || src.URLSearchParams[PROTO].toString,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
