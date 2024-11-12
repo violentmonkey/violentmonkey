@@ -151,14 +151,36 @@ export function leftpad(input, length, pad = '0') {
 }
 
 /**
+ * @param {string} browserLang  Language tags from RFC5646 (`[lang]-[script]-[region]-[variant]`, all parts are optional)
+ * @param {string} locale  `<lang>`, `<lang>-<region>`
+ */
+function localeMatch(browserLang, metaLocale) {
+  const bParts = browserLang.toLowerCase().split('-');
+  const mParts = metaLocale.toLowerCase().split('-');
+  let bi = 0;
+  let mi = 0;
+  while (bi < bParts.length && mi < mParts.length) {
+    if (bParts[bi] === mParts[mi]) mi += 1;
+    bi += 1;
+  }
+  return mi === mParts.length;
+}
+
+/**
  * Get locale attributes such as `@name:zh-CN`
  */
-export function getLocaleString(meta, key) {
-  const localeMeta = navigator.languages
-  // Use `lang.toLowerCase()` since v2.6.5
-  .map(lang => meta[`${key}:${lang}`] || meta[`${key}:${lang.toLowerCase()}`])
-  .find(Boolean);
-  return localeMeta || meta[key] || '';
+export function getLocaleString(meta, key, languages = navigator.languages) {
+  // zh, zh-cn, zh-tw
+  const mls = Object.keys(meta)
+    .filter(metaKey => metaKey.startsWith(key + ':'))
+    .map(metaKey => metaKey.slice(key.length + 1))
+    .sort((a, b) => b.length - a.length);
+  let bestLocale;
+  for (const lang of languages) {
+    bestLocale = mls.find(ml => localeMatch(lang, ml));
+    if (bestLocale) break;
+  }
+  return meta[bestLocale ? `${key}:${bestLocale}` : key] || '';
 }
 
 /**
