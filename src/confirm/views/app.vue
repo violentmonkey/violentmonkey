@@ -50,6 +50,7 @@
               <dd v-text="list" class="ellipsis"/>
             </dl>
           </div>
+          <div v-if="!script && message" v-text="message" class="warning"/>
         </div>
       </div>
       <div class="flex" v-if="script">
@@ -95,7 +96,7 @@
                class="status stretch-self flex center-items ml-2"/>
         </div>
       </div>
-      <div class="incognito" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
+      <div class="warning" v-if="info.incognito" v-text="i18n('msgIncognitoChanges')"/>
     </div>
     <div class="frame-block flex-1 pos-rel">
       <vm-externals
@@ -158,7 +159,7 @@ const isLocal = computed(() => !isRemote(info.value.url));
 const lists = ref();
 const listsShown = ref(true);
 const message = ref('');
-const scriptName = ref('...');
+const scriptName = ref('\xA0');
 const reinstall = ref(false);
 const reloadTab = ref(false);
 const safeIcon = ref();
@@ -406,8 +407,9 @@ async function getScript(url) {
       ? await (await fileHandle.getFile()).text()
       : cachedCodePromise && await cachedCodePromise || await getFile(url);
   } catch (e) {
-    message.value = i18n('msgErrorLoadingData');
-    throw url;
+    // eslint-disable-next-line no-ex-assign
+    if ((e = e.message)?.startsWith('{')) try { e = 'HTTP ' + JSON.parse(e).status; } catch {/**/}
+    message.value = i18n('msgErrorLoadingData') + (e ? '\n' + e : '');
   } finally {
     cachedCodePromise = null;
   }
@@ -643,7 +645,8 @@ $vertLayoutThresholdMinus1: 1800px;
       }
     }
   }
-  .incognito {
+  .warning {
+    white-space: pre-line;
     padding: .25em 0;
     color: red;
   }
@@ -676,7 +679,7 @@ $vertLayoutThresholdMinus1: 1800px;
     --btn-border-hover: #35699f;
   }
   @media (prefers-color-scheme: dark) {
-    .incognito {
+    .warning {
       color: orange;
     }
     &:not(.reinstall) {
