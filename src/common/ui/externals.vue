@@ -3,7 +3,7 @@
     <div v-if="!install || all.length > 1" class="select"
          ref="$list" focusme @keydown="moveIndex" @scroll="saveScroll"
          :data-has-main="install ? '' : null">
-      <dl v-for="([type, url, contents], i) of all" :key="i"
+      <dl v-for="([type, url, fullUrl, contents], i) of all" :key="i"
           class="flex"
           :class="{
             active: index === i,
@@ -13,7 +13,7 @@
           @click="contents !== false && (index = i)">
         <dt v-text="type"/>
         <dd class="ellipsis flex-1">
-          <a :href="url" target="_blank">&nearr;</a>
+          <a :href="fullUrl" target="_blank">&nearr;</a>
           <span v-text="decodeURIComponent(url)"/>
         </dd>
         <dd v-if="contents" v-text="formatLength(contents, type)" class="ml-2"/>
@@ -40,7 +40,8 @@
 
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, ref, watchEffect } from 'vue';
-import { dataUri2text, formatByteLength, i18n, makeDataUri, sendCmdDirectly } from '@/common';
+import { dataUri2text, formatByteLength, getFullUrl, i18n, makeDataUri, sendCmdDirectly }
+  from '@/common';
 import VmCode from '@/common/ui/code';
 import { focusMe, hasKeyModifiers } from '@/common/ui/index';
 
@@ -55,11 +56,22 @@ const data = ref({});
 
 const all = computed(() => {
   const { code, deps = dependencies.value, url: mainUrl } = props.install || {};
-  const { require = [], resources = {} } = props.value.meta || {};
+  const { custom: { pathMap = {} } = {}, meta } = props.value;
+  const { require = [], resources = {} } = meta || {};
   return [
     ...mainUrl ? [[i18n('editNavCode'), mainUrl, code]] : [],
-    ...require.map(url => ['@require', url, deps[`0${url}`]]),
-    ...Object.entries(resources).map(([id, url]) => [`@resource ${id}`, url, deps[`1${url}`]]),
+    ...require.map(url => [
+      '@require',
+      url,
+      pathMap[url] || getFullUrl(url, mainUrl),
+      deps[`0${url}`],
+    ]),
+    ...Object.entries(resources).map(([id, url]) => [
+      `@resource ${id}`,
+      url,
+      pathMap[url] || getFullUrl(url, mainUrl),
+      deps[`1${url}`],
+    ]),
   ];
 });
 

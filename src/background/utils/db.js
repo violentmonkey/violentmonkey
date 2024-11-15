@@ -687,7 +687,8 @@ export async function parseScript(src) {
   if (!getScriptHome(script) && isRemote(src.from)) {
     script.custom.homepageURL = src.from;
   }
-  if (isRemote(src.url)) script.custom.lastInstallURL = src.url;
+  // Allowing any http url including localhost as the user may keep multiple scripts there
+  if (isValidHttpUrl(src.url)) script.custom.lastInstallURL = src.url;
   script.custom.tags = script.custom.tags?.split(/\s+/).map(normalizeTag).filter(Boolean).join(' ').toLowerCase();
   if (!srcUpdate) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
