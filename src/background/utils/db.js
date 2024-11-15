@@ -787,6 +787,7 @@ export async function fetchResources(script, src) {
  */
 async function fetchResource(src, type, url) {
   if (!src.reuseDeps && !isRemote(url)
+  || src.update
   || await storage[type].getOne(url) == null) {
     const { portId } = src;
     if (portId) postToPort(depsPorts, portId, [url]);
