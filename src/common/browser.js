@@ -213,8 +213,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
 
 export default browser;
 
-/** @this {object} browser api event
- * @return {Promise<?>} listener's first parameter */
+/** @this {object} browser api event like browser.tabs.onRemoved */
 export function listenOnce(cb) {
   const event = this;
   const onceFn = data => {
