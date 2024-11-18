@@ -1,1006 +1,948 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: 应用
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
-  message: 取消
+  message: ''
 buttonCheckForUpdates:
   description: Button to check a script for updates.
-  message: 检查更新
+  message: ''
   touched: false
 buttonClose:
   description: Button to close window.
-  message: 关闭
+  message: ''
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
-  message: 确认安装
+  message: ''
   touched: false
 buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
-  message: 确认重新安装
+  message: ''
   touched: false
 buttonDisable:
   description: Button to disable a script.
-  message: 禁用
+  message: ''
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
-  message: 下载主题
+  message: ''
   touched: false
 buttonEdit:
   description: Button to edit a script.
-  message: 编辑
+  message: ''
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: 你也可以右键点击、Ctrl+点击、滚轮点击脚本名称。
+  message: ''
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: 立即清空回收站！
+  message: ''
 buttonEnable:
   description: Button to enable a script.
-  message: 启用
+  message: ''
 buttonExportData:
   description: Button to open the data export dialog.
-  message: 导出为zip文件
+  message: ''
 buttonFilter:
   description: Button to show filters menu.
-  message: 筛选
+  message: ''
   touched: false
 buttonHome:
   description: Button to open homepage.
-  message: 主页
+  message: ''
 buttonImportData:
   description: Button to choose a file for data import.
-  message: 从zip文件导入
+  message: ''
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: 通过地址安装
+  message: ''
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
-  message: 选项
+  message: ''
   touched: false
 buttonNew:
   description: Button to create a new script.
-  message: 新建
+  message: ''
 buttonOK:
   description: OK button on dialog.
-  message: 完成
+  message: ''
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: 回收站
+  message: ''
 buttonRemove:
   description: Button to remove a script.
-  message: 移除
+  message: ''
 buttonReplace:
   description: Button to replace the current match.
-  message: 替换
+  message: ''
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: 所有
+  message: ''
 buttonReset:
   description: Button to reset to default values.
-  message: 重置
+  message: ''
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: 重置设置
+  message: ''
 buttonRestore:
   description: Button to restore a removed script.
-  message: 还原
+  message: ''
 buttonSave:
   description: Button to save modifications of a script.
-  message: 保存
+  message: ''
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: 保存并关闭
+  message: ''
 buttonSaved:
   description: Button text after saving.
-  message: 已保存
+  message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: 显示编辑器状态
+  message: ''
 buttonSupport:
   description: Button to open support page.
-  message: 支持页面
+  message: ''
 buttonUndo:
   description: Button to undo removement of a script.
-  message: 撤销
+  message: ''
 buttonUpdate:
   description: Button to update a script.
-  message: 更新
+  message: ''
 buttonUpdateAll:
   description: Check all scripts for updates.
-  message: 全部更新
+  message: ''
   touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: 整理数据库
+  message: ''
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: 数据已整理
+  message: ''
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: 正在整理...
+  message: ''
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: |-
-    此脚本的自动更新已被禁用！
-    点击确认继续更新。
+  message: ''
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: |-
-    修改尚未保存！
-    点击确定放弃修改或点击取消停留此页面。
+  message: ''
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: 撤销所有数据变更（导入、更新、编辑、自定义）
+  message: ''
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: 注入黑名单（脚本不会在匹配的网站上运行）
+  message: ''
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: 网络黑名单（脚本不会连接到匹配的网站及其 Cookie）
+  message: ''
 descCustomCSS:
   description: Description of custom CSS section.
-  message: 这里可以为管理页面和脚本安装页面设置自定义CSS。如果你不确定它的意思，请不要修改。
+  message: ''
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: >-
-    在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 <code>{"indentUnit":2,
-    "smartIndent":true}</code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
-    href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">完整列表</a>。
+  message: ''
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: >-
-    布尔选项可以通过双击值来切换：<code>true</code> 表示启用，<code>false</code> 表示停用。以
-    <code>Delay</code>、<code>Interval</code>、<code>Rate</code>、<code>Time</code>
-    结尾的数值选项单位为毫秒。
+  message: ''
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: >-
-    非标准选项：<code>autocompleteOnTyping</code>
-    是在打字后显示自动完成提示的延迟时间（以毫秒计，<code>0</code>
-    表示停用），<code>killTrailingSpaceOnSave</code>
-    在保存时自动移除每一行的尾随空格，<code>showTrailingSpace</code>将尾随空格显示为点。
+  message: ''
 descScriptTemplate:
   description: Description of script template section.
-  message: >-
-    支持的变量：<{{name}}>、<{{url}}>、<{{date}}>、<{{date:format}}> 使用 MomentJS 支持的格式，如
-    <{{date:YYYY-MM-DD}}>。
+  message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: 分组
+  message: ''
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: 隐藏
+  message: ''
 disabledScriptsSelector:
   description: Label of the option.
-  message: 禁用的脚本：
+  message: ''
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: 显示
+  message: ''
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
+  message: ''
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: 快捷键：
+  message: ''
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: 使用其他编辑器？
+  message: ''
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: 自定义元数据
+  message: ''
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: 脚本设置
+  message: ''
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: 此行过长
+  message: ''
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: |-
-    此行过长所以文本被折叠以避免编辑时卡顿。
-    你可以在高级设置中修改这个限制，比如：
-    "maxDisplayLength": 20000
+  message: ''
 editNavCode:
   description: Label of code tab in script editor.
-  message: 代码
+  message: ''
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: 设置
+  message: ''
 editNavValues:
   description: Label of values tab in script editor.
-  message: 数据
+  message: ''
 editValueAll:
   description: Button to show/edit the entire script value storage.
-  message: 全部
+  message: ''
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: 展示/编辑脚本的所有数据
+  message: ''
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: 一个开源的用户脚本管理器，支持很多浏览器
+  message: ''
 extName:
   description: Name of this extension.
-  message: 暴力猴
+  message: ''
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: 暴力猴黑名单设置阻止运行
+  message: ''
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: |-
-    暴力猴无法在当前页面执行用户脚本
-    （常见原因：浏览器/扩展内置页面、被策略屏蔽、Opera 下的搜索页面需要特殊设置）
+  message: ''
 failureReasonRestarted:
   description: Shown in the popup.
-  message: 暴力猴已重新启动。请重新载入标签页以执行用户脚本。
+  message: ''
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: >-
-    有几种方法可以在本地文件中安装或跟踪编辑： <1> 将文件拖放到打开的暴力猴页面或弹出窗口中，包括此页面。 <2>为此文件安装本地 HTTP
-    服务器并通过 http://localhost 打开它。 <3> 在 chrome://extensions 页面中为暴力猴启用“允许访问文件
-    URL”。但这是危险的，因为任何用户脚本都可以读取任何本地文件。
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: 字母顺序
+  message: ''
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: 执行顺序
+  message: ''
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: 最近更新
+  message: ''
 filterScopeAll:
   description: Option in dashboard's search scope filter.
-  message: 全部
+  message: ''
   touched: false
 filterScopeCode:
   description: Option in dashboard's search scope filter.
-  message: 代码
+  message: ''
   touched: false
 filterScopeName:
   description: Option in dashboard's search scope filter.
-  message: 名字
+  message: ''
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: 大小
+  message: ''
 genericError:
   description: Label for generic error.
-  message: 错误
+  message: ''
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: 关闭
+  message: ''
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: 开启
+  message: ''
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: 使用全局设置
+  message: ''
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: '"#" 模式仅在首次打开网站或重新加载标签页时有效： $1'
+  message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: 回收站
+  message: ''
 helpForLocalFile:
   description: Label of the checkbox.
-  message: 显示拖放本地脚本的详细说明
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: 对 $1 匹配的脚本
+  message: ''
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 请输入地址：
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: 此处列出已删除的脚本，并将保留7天。
+  message: ''
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: 使用@downloadURL
+  message: ''
 hintVacuum:
   description: Hint for vacuuming data.
-  message: 丢弃多余的数据，并尝试重新获取缺失的资源。
+  message: ''
 install:
   description: Label for button to install a script.
-  message: 安装
+  message: ''
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: 从$1安装
+  message: ''
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: 安装完成后关闭
+  message: ''
   touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: 源文件页应在Firefox68或更高版本中保持打开。
+  message: ''
 labelAbout:
   description: Label shown on top of the about page.
-  message: 关于暴力猴
+  message: ''
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: 高级
+  message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: 允许更新
+  message: ''
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 作者：
+  message: ''
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: 从菜单开启或关闭脚本后自动刷新当前页面
+  message: ''
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
     disabled.
-  message: 当前脚本在你刷新页面前将保持运行
+  message: ''
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: 每 $1 天检查一次脚本更新，0 表示禁用
+  message: ''
 labelBackup:
   description: Label of the import/export section in settings.
-  message: 备份
+  message: ''
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: 备份和维护
+  message: ''
 labelBadge:
   description: Label for option to show number on badge.
-  message: 徽标：
+  message: ''
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: 徽标颜色：
+  message: ''
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: 无
+  message: ''
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: 执行脚本次数
+  message: ''
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: 执行脚本个数
+  message: ''
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: 黑名单
+  message: ''
 labelContributors:
   description: Label for link to contributors.
-  message: 贡献者
+  message: ''
 labelCurrentLang:
   description: Label of current language.
-  message: 当前语言：
+  message: ''
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: 自定义样式
+  message: ''
 labelDataExport:
   description: Section title of data export.
-  message: 数据导出
+  message: ''
   touched: false
 labelDataImport:
   description: Section title of data import.
-  message: 数据导入
+  message: ''
   touched: false
 labelDonate:
   description: Label of link to donate page.
-  message: 捐助
+  message: ''
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 下载更新地址：
+  message: ''
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: 编辑数据
+  message: ''
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: 正在编辑脚本数据
+  message: ''
 labelEditor:
   description: Label for Editor settings
-  message: 编辑器
+  message: ''
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: 仅启用项
+  message: ''
 labelExclude:
   description: Label of @exclude rules.
-  message: '@exclude 规则'
+  message: ''
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: '@exclude-match 规则'
+  message: ''
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: 导出脚本数据
+  message: ''
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 在用户脚本收录站点上暴露已安装的版本信息：$1
+  message: ''
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: 在 Firefox 中切换 $1 模式
+  message: ''
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: >-
-    从 Firefox 59 开始，可以切换到此种比默认方案更快的 <document-start> 注入方式。和“同步 page
-    模式”类似，它也会增加内存消耗，所以如果在不开启此功能的情况下你的脚本依然正常运行，则可以考虑禁用。
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
-  message: 反馈
+  message: ''
 labelGeneral:
   description: Label for general settings.
-  message: 通用
+  message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: 帮助翻译
+  message: ''
 labelHomepage:
   description: Label for home page in about tab.
-  message: 主页
+  message: ''
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 主页地址：
+  message: ''
 labelIconURL:
   description: Label for the input.
-  message: 图标地址：
+  message: ''
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: 导入脚本数据
+  message: ''
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: 导入设置
+  message: ''
 labelInclude:
   description: Label of @include rules.
-  message: '@include 规则'
+  message: ''
 labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: 注入模式：
+  message: ''
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: 安装脚本
+  message: ''
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: 保留原有规则
+  message: ''
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: 最后更新于 $1
+  message: ''
 labelLineNumber:
   description: Label for line number jumper.
-  message: 行号：
+  message: ''
 labelMatch:
   description: Label of @match rules.
-  message: '@match 规则'
+  message: ''
 labelName:
   description: Label of script name.
-  message: 名称：
+  message: ''
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: "在内联框架中运行:\_"
+  message: ''
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: 名称为空
+  message: ''
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: 未找到脚本！
+  message: ''
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ，然后提示：
+  message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: 脚本更新时提示
+  message: ''
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: 忽略每个脚本的提示（编辑器中的“设置”页）
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: 隐私策略
+  message: ''
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: 重新安装脚本
+  message: ''
 labelRelated:
   description: Label of related links.
-  message: 相关链接：
+  message: ''
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: 于 $1 删除
+  message: ''
 labelReplace:
   description: Label for replace input in search box.
-  message: 替换：
+  message: ''
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 运行时机：
+  message: ''
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: （默认）
+  message: ''
 labelScriptTemplate:
   description: Label for custom script template.
-  message: 自定义脚本模板
+  message: ''
 labelSearch:
   description: Label for search input in search box.
-  message: 查找：
+  message: ''
 labelSearchScript:
   description: Placeholder for script search box.
-  message: 搜索脚本...
+  message: ''
 labelSettings:
   description: Label shown on the top of settings page
-  message: 设置
+  message: ''
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: 显示执行序号
+  message: ''
 labelSync:
   description: Label for sync options.
-  message: 同步
+  message: ''
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: 使用匿名账号
+  message: ''
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: 授权
+  message: ''
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: 授权中
+  message: ''
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: 无
+  message: ''
 labelSyncPassword:
   description: Label for input to hold password.
-  message: 密码：
+  message: ''
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: 授权失效后自动重新授权
+  message: ''
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: 取消授权
+  message: ''
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: 同步脚本状态
+  message: ''
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 服务器地址：
+  message: ''
 labelSyncService:
   description: Label for sync service select.
-  message: 同步到
+  message: ''
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 用户名：
+  message: ''
 labelTags:
   description: Label for custom tags.
-  message: 标签（空格分隔）：
+  message: ''
 labelTheme:
   description: Label for the visual theme option.
-  message: '主题:'
+  message: ''
 labelTranslator:
   description: Label of translator.
-  message: 翻译者：
+  message: ''
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 检查更新地址：
+  message: ''
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: 单列视图
+  message: ''
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: 表格视图
+  message: ''
 labelWidth:
   description: Width.
-  message: 宽度：
+  message: ''
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: 同步 $1 模式
+  message: ''
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: >-
-    仅当您有一个脚本需要在页面开始加载前运行，并且目前它运行得太晚时才启用。就像 Tampermonkey
-    中的即时注入模式一样，这个选项使用的是被废弃的同步 XHR，所以在  Chrome/Chromium
-    中，您会在开发者控制台看到警告，尽管您可以安全地忽略它们，因为在这种情况下的不利影响可以忽略不计。 您可以通过右键点击其中一个来永久隐藏这些警告。
+  message: ''
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: （隐身模式和禁用 Cookie 的网站除外）
+  message: ''
 lastSync:
   description: Label for last sync timestamp.
-  message: 最近同步时间为 $1
+  message: ''
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: 了解更多黑名单规则。
+  message: ''
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: 了解更多注入模式。
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
-  message: 脚本命令
+  message: ''
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: 打开控制台
+  message: ''
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: 排除...
+  message: ''
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: |-
-    如果你在设置中开启了相关选项，那么当前标签页将会自动重载。
-    其他标签页则需要手动刷新才能应用这些更新。
-    在脚本编辑器中的“设置”页可以进行更多配置。
+  message: ''
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: 反馈
+  message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: 为此站点查找脚本
+  message: ''
 menuInjectionFailed:
   description: Injection error.
-  message: 部分脚本无法注入。
+  message: ''
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: 使用“auto”模式重试
+  message: ''
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: 匹配但禁用的脚本
+  message: ''
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: 仅在frame中执行的脚本
+  message: ''
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: 匹配的脚本
+  message: ''
 menuNewScript:
   description: Menu item to create a new script.
-  message: 创建新脚本
+  message: ''
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: 脚本已禁用
+  message: ''
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: 脚本已启用
+  message: ''
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: 正在检查更新...
+  message: ''
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: 单击打开 MomentJS 文档。允许的标记：$1。使用 [方括号] 保护明文文本。
+  message: ''
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: 获取资源发生错误！
+  message: ''
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: 获取脚本发生错误！
+  message: ''
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: 获取更新信息失败。
+  message: ''
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: 加载脚本数据发生错误。
+  message: ''
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: 加载脚本依赖发生错误。
+  message: ''
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: 已导入$1个脚本。
+  message: ''
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: 你在隐身模式下进行的修改也会应用到主配置中
+  message: ''
 msgInstalled:
   description: Message shown when a script is installed.
-  message: 脚本已安装。
+  message: ''
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: 脚本不合法！
+  message: ''
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
     loaded.
-  message: 脚本数据已加载。
+  message: ''
   touched: false
 msgLoading:
   description: Message shown in the options page before script list is loaded.
-  message: 加载中 ...
+  message: ''
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: 正在加载脚本数据...
+  message: ''
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: 正在加载脚本依赖...（$1/$2）
+  message: ''
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: 依赖的资源缺失。
+  message: ''
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: 脚本命名空间冲突，请修改@name和@namespace！
+  message: ''
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: 已经安装了一个拥有同样的 @name 和 @namespace 的脚本。
+  message: ''
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: 发现新版本。
+  message: ''
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: 未发现新版本。
+  message: ''
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: 更新脚本失败。点击打开他们。
+  message: ''
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: 请重新保存或安装这些脚本：
+  message: ''
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: （代码一致）
+  message: ''
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: 黑名单已更新！
+  message: ''
   touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: 自定义样式已更新！
+  message: ''
   touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: 编辑器配置已更新！
+  message: ''
   touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: 自定义脚本模板已更新！
+  message: ''
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: 脚本【$1】已更新！
+  message: ''
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ' 显示/隐藏'
+  message: ''
 msgSyncError:
   description: Message shown when sync failed.
-  message: 同步出错！
+  message: ''
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: 正在初始化...
+  message: ''
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: 初始化失败！
+  message: ''
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: 还没有授权。
+  message: ''
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: 即将开始同步...
+  message: ''
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: 正在同步...
+  message: ''
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: 语法错误？
+  message: ''
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: >-
-    当页面载入时，如果脚本不存在或与网址不匹配，这种情况通常发生在像是 fb 或 instagram
-    这类使用假导航的单页应用网站中。您可以重新载入标签页以执行脚本。要修正脚本，请使用 @match 匹配整个网站，然后利用
-    MutationObserver 或 window.navigation API 来侦测变化。
+  message: ''
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: 脚本已更新。
+  message: ''
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: 正在更新...
+  message: ''
 noValues:
   description: Label shown when there is no value for current script.
-  message: 没有存储数据
+  message: ''
 optionEditorWindow:
   description: Label for the option in settings
-  message: 从弹窗打开编辑器时创建新的窗口
+  message: ''
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: 编辑器窗口的位置只会在调整窗口大小或保存时记住
+  message: ''
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: 隐藏地址栏
+  message: ''
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: 弹出式菜单和图标
+  message: ''
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: 启用项优先
+  message: ''
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
-  message: 分组禁用的脚本
+  message: ''
   touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: 按照 @run-at 阶段分组
+  message: ''
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
-  message: 隐藏禁用的脚本
+  message: ''
   touched: false
 optionPopupShowDisabled:
   description: Option to show disabled scripts in popup.
-  message: 显示禁用的脚本
+  message: ''
   touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: 先显示被启用的脚本
+  message: ''
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: "UI 主题:\_"
+  message: ''
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: 自动
+  message: ''
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: 深色
+  message: ''
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: 浅色
+  message: ''
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: 更新
+  message: ''
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: 弹窗设置
+  message: ''
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: 右键点击：弹窗设置
+  message: ''
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: 只读
+  message: ''
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: 除非禁用更新或允许编辑，否则自动更新的脚本是只读的。
+  message: ''
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: 允许编辑
+  message: ''
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: （下次更新将覆盖它们）
+  message: ''
 reinstall:
   description: Button to reinstall a script
-  message: 重装
+  message: ''
 reloadTab:
   description: Label of action to reload the tab
-  message: 刷新标签页
+  message: ''
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: 如果勾选，则在检测到脚本更新且匹配当前标签页的 URL 时，将自动刷新当前标签页。
+  message: ''
 removeAllScripts:
   description: Button to remove all scripts
-  message: 删除所有脚本
+  message: ''
   touched: false
 removeAllScriptsConfirm:
   description: Confirmation shown after clicking the `Remove all scripts` button.
-  message: |-
-    移动所有脚本到回收站？
-    它在一段时间后会自动清空。你也可以打开它并主动清空。
+  message: ''
   touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: 区分大小写
+  message: ''
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: 使用正则表达式
+  message: ''
 sideMenuAbout:
   description: 'Side menu: About'
-  message: 关于
+  message: ''
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: 已安装的脚本
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: 设置
+  message: ''
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: 刷新标签页并禁用用户脚本
+  message: ''
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: 你已在当前页面禁用用户脚本，刷新或跳转页面后将会重新启用。
+  message: ''
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: 排序方式：
+  message: ''
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: 停止跟踪
+  message: ''
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: 正常情况下的徽标颜色
+  message: ''
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: 页面无法注入脚本（列入黑名单或不支持）时的徽标颜色
+  message: ''
 titleSearchHint:
   description: Hover title for search icon in dashboard.
-  message: |-
-    * <Enter> 键把文本加入自动补全历史
-    * 支持正则表达式：/re/ 和 /re/flags
+  message: ''
   touched: false
 titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: >-
-    * <kbd>Enter</kbd> 键会将搜索内容加入自动补全历史
-
-    * 所有条件不区分大小写
-
-    * 多个条件可以通过空格分开组合使用
-
-    * 搜索元数据：<code>"Awesome Script" "Description"</code>
-
-    * 搜索标签：<code>#tag1 #tag2</code>
-
-    * 搜索脚本名称：<code>name:"awesome name"</code>
-
-    * 搜索脚本代码：<code>code:"awesome code"</code>
-
-    * 排除搜索：<code>!#tag2 !name:"unwanted"</code>
-
-    * 正则表达式：<code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
-  message: 跟踪外部编辑
+  message: ''
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: 保持此页面打开以跟踪本地文件中所做的编辑
+  message: ''
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: 更新脚本（$1）
+  message: ''
 updateScript:
   description: Button to update one script.
-  message: 更新
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: 更新所有脚本
+  message: ''
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: 更新当前选项卡的脚本
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
-  message: 键名（字符串）
+  message: ''
 valueLabelValue:
   description: Label for value of a script value.
-  message: 键值（作为JSON序列化）
+  message: ''
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: 所有数据（JSON格式）
+  message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
-  message: 访问网站
+  message: ''
   touched: false
