@@ -160,7 +160,7 @@ descEditorOptions:
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
   message: >-
-    Булевые параметры можно переключать двойным щелчком на значении:
+    Логические параметры можно переключать двойным щелчком на значении:
     <code>true</code> = включено, <code>false</code> = отключено. Числовые
     параметры, заканчивающиеся на <code>Delay</code>, <code>Interval</code>,
     <code>Rate</code>, <code>Time</code>, указываются в миллисекундах.
@@ -270,10 +270,10 @@ fileInstallBlocked:
     прочитать любой локальный файл.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: алфавитный порядок
+  message: алфавитному порядку
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: порядок выполнения
+  message: порядку выполнения
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: времени обновления
@@ -317,7 +317,7 @@ helpForLocalFile:
   message: Показать инструкцию по перетаскиванию локальных скриптов
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: для сопоставления скриптов $1
+  message: применить к данным ($1) скриптам
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введите URL-адрес:'
@@ -493,7 +493,7 @@ labelKeepOriginal:
   message: Сохранить исходное соответствие
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Последний раз обновлялось в$1
+  message: 'Дата последнего обновления: $1'
 labelLineNumber:
   description: Label for line number jumper.
   message: '№ строки:'
@@ -537,7 +537,7 @@ labelRelated:
   message: 'Справочные ссылки: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Удалён в $1
+  message: 'Дата удаления: $1'
 labelReplace:
   description: Label for replace input in search box.
   message: 'Заменить на: '
@@ -561,7 +561,7 @@ labelSettings:
   message: Настройки
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: Показывать номера порядка выполнения
+  message: Показать номера порядка выполнения
 labelSync:
   description: Label for sync options.
   message: Синхронизация
@@ -619,7 +619,7 @@ labelViewSingleColumn:
   message: Один столбец
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: Табличный вид
+  message: Таблица
 labelWidth:
   description: Width.
   message: 'Ширина:'
@@ -845,9 +845,9 @@ msgSyntaxError:
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
   message: >-
-    Скрипт не существовал или не соответствовал URL при загрузке страницы, что
-    случается на сайтах с одностраничным приложением, таких как ФБ или
-    Instagram, которые используют фальшивую навигацию. Вы можете перезагрузить
+    Скрипт не существовал или не совпал по URL-адресу при загрузке страницы, что
+    случается на сайтах с одностраничным приложением, таких как Фейсбук или
+    IИнстаграм, которые используют фальшивую навигацию. Вы можете перезагрузить
     вкладку, чтобы запустить скрипт. Чтобы исправить скрипт, используйте @match
     для всего сайта, а затем находите изменения с помощью MutationObserver или
     API window.navigation.
@@ -982,7 +982,7 @@ skipScriptsMsg:
     перезагрузите или перейдите на вкладку.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: 'Порядок сортировки:'
+  message: 'Сортировка по:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Прекратить отслеживание
@@ -1005,21 +1005,21 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * Клавиша <kbd>Enter</kbd> добавляет текст в историю автозаполнения.
+    * Клавиша <kbd>Enter</kbd> добавляет текст в историю автозаполнения
 
     * Все условия не зависят от регистра
 
     * Условия, разделённые пробелами, можно комбинировать
 
-    * Поиск по метаданным: <code>"Awesome Script" "Description"</code>
+    * Поиск по метаданным: <code>"Отличный скрипт" "Описание"</code>
 
     * Поиск по тегам: <code>#tag1 #tag2</code>
 
-    * Поиск по имени скрипта: <code>name: "awesome name"</code>
+    * Поиск по имени скрипта: <code>name: "прекрасное имя"</code>
 
-    * Поиск по коду скрипта: <code>code: "awesome code"</code>
+    * Поиск по коду скрипта: <code>code: "замечательный код"</code>
 
-    * Отрицательный поиск: <code>!#tag2 !name: "unwanted"</code>
+    * Отрицательный поиск: <code>!#tag2 !name: "нежелательное"</code>
 
     * Регулярные выражения: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? с пробелом"</code>
