@@ -534,7 +534,7 @@ labelSettings:
   message: 設定
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: 実行順に表示
+  message: 実行順を表示
 labelSync:
   description: Label for sync options.
   message: 同期
