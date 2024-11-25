@@ -245,6 +245,8 @@ export function handleHotkeyOrMenu(id, tab) {
     openDashboard('');
   } else if (id === 'newScript') {
     commands.OpenEditor();
+  } else if (id === 'toggleInjection') {
+    setOption(IS_APPLIED, !isApplied);
   } else if (id === 'updateScripts') {
     commands.CheckUpdate();
   } else if (id === 'updateScriptsInTab') {

@@ -42,6 +42,8 @@ permissions:
   - cookies
 commands:
   _execute_browser_action: {}
+  toggleInjection:
+    description: __MSG_toggleInjection__
   dashboard:
     description: __MSG_menuDashboard__
   settings:
