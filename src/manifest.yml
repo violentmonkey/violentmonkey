@@ -6,7 +6,10 @@ author: Gerald
 homepage_url: 'https://violentmonkey.github.io/'
 icons:
   '16': public/images/icon16.png
+  '32': public/images/icon32.png
   '48': public/images/icon48.png
+  '64': public/images/icon64.png
+  '96': public/images/icon96.png
   '128': public/images/icon128.png
 default_locale: en
 browser_action:
@@ -14,6 +17,10 @@ browser_action:
   default_icon:
     '16': public/images/icon16b.png
     '32': public/images/icon32b.png
+    '48': public/images/icon48b.png
+    '64': public/images/icon64b.png
+    '96': public/images/icon96b.png
+    '128': public/images/icon128b.png
   default_title: __MSG_extName__
   default_popup: popup/index.html
 background:

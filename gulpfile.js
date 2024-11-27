@@ -96,10 +96,8 @@ async function createIcons() {
     .toFile(`${dist}/icon16${type}.png`);
   };
   return Promise.all([
-    handle(48),
-    handle(128),
     ...types.map(handle16),
-    ...[32, 38].flatMap(size => types.map(t => handle(size, ...t))),
+    ...[32, 38, 48, 64, 96, 128].flatMap(size => types.map(t => handle(size, ...t))),
   ]);
 }
 
