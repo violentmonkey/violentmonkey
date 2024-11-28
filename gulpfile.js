@@ -101,7 +101,7 @@ async function createIcons() {
     // 32px dashboard icon (recycled) + 2xDPI browser_action desktop
     // 38px dashboard icon (normal) + 1.5xDPI browser_action Android
     // 48px 2xDPI browser_action Android
-    ...[32, 38, 48].flatMap(size => types.map(t => handle(size, ...t))),
+    ...[32, 38, 48, 64].flatMap(size => types.map(t => handle(size, ...t))),
   ]);
 }
 
