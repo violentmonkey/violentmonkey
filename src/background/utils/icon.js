@@ -7,10 +7,10 @@ import { popupTabs } from './popup-tracker';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
-import { FIREFOX } from './ua';
+import { FIREFOX, ua } from './ua';
 
 /** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
-const SIZES = [16, 32];
+const SIZES = ua.mobile ? [32, 38, 48] : [16, 32];
 /** Caching own icon to improve dashboard loading speed, as well as browserAction API
  * (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab). */
 const iconCache = {};

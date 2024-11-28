@@ -14,6 +14,8 @@ browser_action:
   default_icon:
     '16': public/images/icon16b.png
     '32': public/images/icon32b.png
+    '38': public/images/icon38b.png # for Android 1.5xDPI
+    '48': public/images/icon48b.png # for Android 2xDPI
   default_title: __MSG_extName__
   default_popup: popup/index.html
 background:

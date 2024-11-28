@@ -96,10 +96,12 @@ async function createIcons() {
     .toFile(`${dist}/icon16${type}.png`);
   };
   return Promise.all([
-    handle(48),
     handle(128),
     ...types.map(handle16),
-    ...[32, 38].flatMap(size => types.map(t => handle(size, ...t))),
+    // 32px dashboard icon (recycled) + 2xDPI browser_action desktop
+    // 38px dashboard icon (normal) + 1.5xDPI browser_action Android
+    // 48px 2xDPI browser_action Android
+    ...[32, 38, 48].flatMap(size => types.map(t => handle(size, ...t))),
   ]);
 }
 

@@ -10,7 +10,9 @@ const uaVer = navUA.match(/\s(?:Chrom(?:e|ium)|Firefox)\/(\d+[.0-9]*)|$/i)[1];
 const kFullVersionList = 'fullVersionList';
 
 /** @type {VMScriptGMInfoPlatform} */
-export const ua = {};
+export const ua = {
+  mobile: navUAD ? navUAD.mobile : navUA.includes('Android'),
+};
 /** @type {number|void} This value can be trusted because the only way to spoof it in Chrome/ium
  * is to manually open devtools for the background page in device emulation mode.
  * Using `void` for numeric comparisons like CHROME < 100 to be false in Firefox */
@@ -33,7 +35,7 @@ init.deps.push(
   ]).then(([
     { os, arch },
     { name, version } = {},
-    { [kFullVersionList]: list, mobile } = {},
+    { [kFullVersionList]: list } = {},
     [wnd],
   ]) => {
     if (!version && list?.[0]) {
@@ -48,7 +50,6 @@ init.deps.push(
     setBrowserName(name || 'chrome');
     ua.browserVersion = version || uaVer;
     ua[kFullVersionList] = list;
-    ua.mobile = mobile;
     if (FIREFOX) FIREFOX = parseFloat(version);
     else if (wnd) checkVivaldi(wnd);
     else browserWindows.onCreated::listenOnce(checkVivaldi);
