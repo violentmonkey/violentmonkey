@@ -9,8 +9,12 @@ import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabs
 import { testBlacklist } from './tester';
 import { FIREFOX, ua } from './ua';
 
-/** We don't set 19px because FF and Vivaldi scale it down to 16px instead of our own crisp 16px */
-const SIZES = ua.mobile ? [32, 38, 48] : [16, 32];
+/** 1x + HiDPI 1.5x, 2x */
+const SIZES = !FIREFOX
+  ? [16, 32]
+  : ua.mobile
+    ? [32, 38, 48] // 1x, 1.5x, 2x
+    : [16, 32, 48, 64]; // 16+32: toolbar, 32+48+64: extensions panel
 /** Caching own icon to improve dashboard loading speed, as well as browserAction API
  * (e.g. Chrome wastes 40ms in our extension's process to read 4 icons for every tab). */
 const iconCache = {};
