@@ -188,13 +188,14 @@ export function getLocaleString(meta, key, languages = navigator.languages) {
  * @returns {string | undefined}
  */
 export function getScriptHome(script) {
-  let meta;
-  return script.custom[HOMEPAGE_URL]
+  let custom, meta;
+  return (custom = script.custom)[HOMEPAGE_URL]
     || (meta = script.meta)[HOMEPAGE_URL]
     || script[INFERRED]?.[HOMEPAGE_URL]
     || meta.homepage
     || meta.website
-    || meta.source;
+    || meta.source
+    || custom.from;
 }
 
 /**

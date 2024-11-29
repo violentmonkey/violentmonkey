@@ -174,6 +174,8 @@ declare namespace VMScript {
   }
   type Custom = {
     name?: string;
+    /** Installation web page that will be used for inferring a missing @homepageURL */
+    from?: string;
     downloadURL?: string;
     homepageURL?: string;
     lastInstallURL?: string;

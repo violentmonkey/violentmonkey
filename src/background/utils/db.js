@@ -652,7 +652,7 @@ export async function parseScript(src) {
     update.message = i18n('msgInstalled');
     aliveScripts.push(script);
   }
-  const { config, props } = script;
+  const { config, custom, props } = script;
   const uri = getNameURI({ meta, props: {id} });
   if (oldScript) {
     // Do not allow script with same name and namespace
@@ -684,12 +684,13 @@ export async function parseScript(src) {
   config.shouldUpdate = getInt(config.shouldUpdate);
   script.meta = meta;
   props.uri = getNameURI(script); // DANGER! Must be after props.position and meta assignments.
+  delete custom.from; // remove the old installation URL if any
   if (!getScriptHome(script) && isRemote(src.from)) {
-    script.custom.homepageURL = src.from;
+    custom.from = src.from; // to avoid overriding script's `meta` for homepage in a future version
   }
   // Allowing any http url including localhost as the user may keep multiple scripts there
-  if (isValidHttpUrl(src.url)) script.custom.lastInstallURL = src.url;
-  script.custom.tags = script.custom.tags?.split(/\s+/).map(normalizeTag).filter(Boolean).join(' ').toLowerCase();
+  if (isValidHttpUrl(src.url)) custom.lastInstallURL = src.url;
+  custom.tags = custom.tags?.split(/\s+/).map(normalizeTag).filter(Boolean).join(' ').toLowerCase();
   if (!srcUpdate) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);
