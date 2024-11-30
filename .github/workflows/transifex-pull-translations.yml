@@ -3,33 +3,37 @@ name: Download translations from Transifex
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * 1'
+    - cron: '0 0 * * 1'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install deps
+
+      - name: Install dependencies
         run: yarn
+
       - name: Update translations
         run: node scripts/transifex.mjs pull
         env:
           TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
+
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: i18n-patch
-          commit-message: 'chore: update locale files from Transifex'
+          commit-message: 'chore: Update locale files from Transifex'
           title: Update locale files from Transifex
           body: >-
             Violentmonkey updates translations from Transifex every week automatically.
 
-            If you want to help translate into your language, please visit [the transifex platform](https://www.transifex.com/projects/p/violentmonkey-nex/resource/messagesjson/).
+            If you want to help translate into your language, please visit [the transifex platform](https://explore.transifex.com/violentmonkey/violentmonkey-nex/).
