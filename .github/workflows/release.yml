@@ -14,7 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 250
+          fetch-depth: 250  # for `action-helper`
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,14 +39,26 @@ jobs:
           SYNC_ONEDRIVE_CLIENT_SECRET: ${{ secrets.SYNC_ONEDRIVE_CLIENT_SECRET }}
         run: |
           mkdir -p $ASSETS_DIR $TEMP_DIR
+
+          # Create source zip
           git archive @ --format=zip > $TEMP_DIR/$SOURCE_ZIP
           export | grep SYNC_ | sed -e 's/^declare -x //' > .env \
             && zip -u $TEMP_DIR/$SOURCE_ZIP .env && rm .env
+
+          # Build for release, also upload to GitHub assets
           yarn build
+          # Build one more time to make sure the output is the same
           mv dist $TEMP_DIR/dist && yarn build && diff -qr dist $TEMP_DIR/dist
+          
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
+
+          # Build for CWS beta, append `BETA` to version name
+          # Same as `BETA=1 yarn build` but only manifest is changed by now
           BETA=1 npx gulp manifest
           cd dist && zip -r ../$TEMP_DIR/$ASSET_CWS_BETA_ZIP . && cd ..
+
+          # Build for AMO unlisted, append `BETA` to version name and set update_url for FF
+          # Same as `yarn build:selfHosted` but only manifest is changed by now
           TARGET=selfHosted BETA=1 npx gulp manifest
           cd dist && zip -r ../$TEMP_DIR/$ASSET_SELF_HOSTED_ZIP . && cd ..
 
@@ -64,7 +77,7 @@ jobs:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AMO_PUBLISH: true
+          AMO_PUBLISH: true  # Try to publish if not exist
 
       - name: Publish to CWS
         continue-on-error: true
