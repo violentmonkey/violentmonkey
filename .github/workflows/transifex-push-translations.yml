@@ -10,16 +10,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # if PR with label `i18n` is merged
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'i18n')
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'i18n'))
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Install deps
         run: yarn
+
       - name: Upload translations
         run: node scripts/transifex.mjs push
         env:
