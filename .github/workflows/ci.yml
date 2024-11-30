@@ -3,27 +3,31 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [master]
+    branches:
+      - master
     tags-ignore:
-      - 'v*' # version-tagged commits are releases which have their own workflow
+      - 'v*'
     paths-ignore:
-      - '.github/**' # this ci.yml is also excluded so you need to re-run it explicitly if necessary
+      - '.github/**'
       - src/types.d.ts
       - LICENSE
       - README.md
   pull_request:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v1 # v1 keeps tags
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 100 # for revision index in version and the `has-changed-path` action
-      - uses: actions/setup-node@v3
+          fetch-depth: 100
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -36,12 +40,15 @@ jobs:
           SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
           SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
           SYNC_ONEDRIVE_CLIENT_SECRET: ${{ secrets.SYNC_ONEDRIVE_CLIENT_SECRET }}
-        run: yarn && yarn build
+        run: |
+          yarn
+          yarn build
 
       - name: Get version and SHA
         run: node scripts/action-helper.js ci
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
           name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
@@ -50,10 +57,11 @@ jobs:
 
       - name: Upload to Transifex - check src
         if: github.event_name == 'push' || github.event.pull_request.merged == true
-        uses: marceloprado/has-changed-path@v1.0.1
+        uses: MarceloPrado/has-changed-path@v1.0.1
         id: changed-path-src
         with:
           paths: src
+
       - name: Upload to Transifex
         if: steps.changed-path-src.outputs.changed == 'true'
         run: node scripts/transifex.mjs update
