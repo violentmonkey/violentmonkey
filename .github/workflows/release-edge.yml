@@ -9,14 +9,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-
-      - uses: actions/checkout@v1 # v1 keeps tags
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 250 # for `action-helper`
-          # persist-credentials: false # not implemented in v1
+          fetch-depth: 250
 
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -40,7 +41,8 @@ jobs:
           yarn build
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
 
-      - uses: denoland/setup-deno@v2
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
