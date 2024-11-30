@@ -6,9 +6,9 @@ on:
     branches:
       - master
     tags-ignore:
-      - 'v*'
+      - 'v*'  # Version-tagged commits are releases which have their own workflow
     paths-ignore:
-      - '.github/**'
+      - '.github/**'  # This ci.yml is also excluded so you need to re-run it explicitly if necessary
       - src/types.d.ts
       - LICENSE
       - README.md
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 100
+          fetch-depth: 100  # For revision index in version and the `has-changed-path` action
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
