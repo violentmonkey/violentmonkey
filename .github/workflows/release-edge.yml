@@ -14,7 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 250
+          fetch-depth: 250  # for `action-helper`
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
