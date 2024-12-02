@@ -971,6 +971,9 @@ titleSearchHintV2:
 
     * 正则表达式：<code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: 跟踪外部编辑

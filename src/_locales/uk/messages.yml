@@ -962,6 +962,9 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: ''
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: ''

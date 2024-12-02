@@ -1030,6 +1030,9 @@ titleSearchHintV2:
 
     * Düzenli ifadeler: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: Kullanıcı betiği enjeksiyonunu aç/kapat
 trackEdits:
   description: Button in a script installation dialog.
   message: Harici düzenlemeleri izle

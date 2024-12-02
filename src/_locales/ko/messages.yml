@@ -971,6 +971,9 @@ titleSearchHintV2:
 
     * 정규표현식: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: 외부 편집 추적

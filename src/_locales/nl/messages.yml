@@ -1022,6 +1022,9 @@ titleSearchHintV2:
 
     * Reguliere uitdrukkingen: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? met spatie"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: Gebruikersscriptinjectie aan/uit
 trackEdits:
   description: Button in a script installation dialog.
   message: Externe bewerkingen bijhouden

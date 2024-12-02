@@ -1039,6 +1039,9 @@ titleSearchHintV2:
 
     * Reguläre Ausdrücke: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re::"\w+? with space"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: Benutzerskript-Injektion umschalten
 trackEdits:
   description: Button in a script installation dialog.
   message: Externe Bearbeitungen tracken
