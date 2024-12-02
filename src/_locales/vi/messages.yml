@@ -1002,6 +1002,9 @@ titleSearchHintV2:
     tuyệt vời"4Tìm kiếm theo mã kịch bản: 5code:"mã tuyệt vời"5Tìm kiếm phủ
     định: 6!#thẻ2 !name:"không mong muốn"6Biểu thức chính quy: 7/\w+?/7,
     8/\w+?/gi8, 9name:/\w+?/9, 10name+re:"\w+? có khoảng trắng"10
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Theo dõi chỉnh sửa bên ngoài

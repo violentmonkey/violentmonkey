@@ -1038,6 +1038,9 @@ titleSearchHintV2:
     * puoi usare espressioni regolari: <code>/\w+?/</code>,
     <code>/\w+?/gi</code>, <code>name:/\w+?/</code>, <code>name+re:"\w+? with
     space"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Rileva modifiche esterne

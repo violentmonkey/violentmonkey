@@ -1015,6 +1015,9 @@ titleSearchHintV2:
 
     * Reguljära uttryck: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? med mellanslag"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Spåra externa redigeringar

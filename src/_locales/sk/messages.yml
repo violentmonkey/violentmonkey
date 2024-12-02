@@ -1025,6 +1025,9 @@ titleSearchHintV2:
 
     * Regulárne výrazy: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? s medzerou"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: Prepnúť injektovanie používateľského skriptu
 trackEdits:
   description: Button in a script installation dialog.
   message: Sledovať externé úpravy

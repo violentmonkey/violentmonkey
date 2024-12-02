@@ -1023,6 +1023,9 @@ titleSearchHintV2:
 
     * Регулярные выражения: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? с пробелом"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: Переключить инъекцию пользовательского скрипта
 trackEdits:
   description: Button in a script installation dialog.
   message: Отслеживать внешние правки

@@ -1023,6 +1023,9 @@ titleSearchHintV2:
 
     * Reguláris kifejezések: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? szóközzel elválasztva"</code>
+toggleInjection:
+  description: Label for a keyboard shortcut.
+  message: ''
 trackEdits:
   description: Button in a script installation dialog.
   message: Külső módosítások nyomon követése
