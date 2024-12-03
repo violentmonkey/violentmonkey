@@ -9,14 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-
-      - uses: actions/checkout@v1 # v1 keeps tags
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 250 # for `action-helper`
-          # persist-credentials: false # not implemented in v1
+          fetch-depth: 250  # for `action-helper`
+          persist-credentials: false
 
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -40,7 +42,6 @@ jobs:
 
           # Create source zip
           git archive @ --format=zip > $TEMP_DIR/$SOURCE_ZIP
-          # Include .env to ensure the output is reproducible
           export | grep SYNC_ | sed -e 's/^declare -x //' > .env \
             && zip -u $TEMP_DIR/$SOURCE_ZIP .env && rm .env
 
@@ -48,7 +49,7 @@ jobs:
           yarn build
           # Build one more time to make sure the output is the same
           mv dist $TEMP_DIR/dist && yarn build && diff -qr dist $TEMP_DIR/dist
-
+          
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
 
           # Build for CWS beta, append `BETA` to version name
@@ -76,8 +77,7 @@ jobs:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Try to publish if not exist
-          AMO_PUBLISH: true
+          AMO_PUBLISH: true  # Try to publish if not exist
 
       - name: Publish to CWS
         continue-on-error: true
@@ -97,8 +97,8 @@ jobs:
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
 
-      - name: Create/Update Release
+      - name: Create/Update release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';
+          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())'

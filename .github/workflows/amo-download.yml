@@ -13,10 +13,13 @@ jobs:
   amo-download:
     if: ${{ github.event.client_payload.version || github.event.inputs.version }}
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -37,11 +40,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update updates.json
-        uses: JamesIves/github-pages-deploy-action@4.1.0
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: updates
           folder: ${{ env.TEMP_DIR }}/updates
-          commit-message: Update to ${{ env.VERSION }} 🚀
+          commit-message: "Update to ${{ env.VERSION }} 🚀"
 
       - name: Upload assets
         env:
