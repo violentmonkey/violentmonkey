@@ -3,14 +3,14 @@ buttonApply:
   message: ''
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: Atcelt
 buttonCheckForUpdates:
   description: Button to check a script for updates.
   message: ''
   touched: false
 buttonClose:
   description: Button to close window.
-  message: ''
+  message: Aizvērt
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: ''
@@ -21,14 +21,14 @@ buttonConfirmReinstallation:
   touched: false
 buttonDisable:
   description: Button to disable a script.
-  message: ''
+  message: Atspējot
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
   description: Button to edit a script.
-  message: ''
+  message: Rediģēt
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
   message: ''
@@ -37,20 +37,20 @@ buttonEmptyRecycleBin:
   message: ''
 buttonEnable:
   description: Button to enable a script.
-  message: ''
+  message: Iespējot
 buttonExportData:
   description: Button to open the data export dialog.
-  message: ''
+  message: Eksportēt kā zip arhīvu
 buttonFilter:
   description: Button to show filters menu.
   message: ''
   touched: false
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: Mājas lapa
 buttonImportData:
   description: Button to choose a file for data import.
-  message: ''
+  message: Importēt zip arhīvu
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: ''
@@ -63,7 +63,7 @@ buttonNew:
   message: ''
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: Labi
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: ''
@@ -87,25 +87,25 @@ buttonRestore:
   message: ''
 buttonSave:
   description: Button to save modifications of a script.
-  message: ''
+  message: Saglabāt
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: ''
+  message: Saglabāt & Aizvērt
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Saglabāts
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: ''
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: Atbalsta lapa
 buttonUndo:
   description: Button to undo removement of a script.
   message: ''
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: Atjaunināt
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: ''
@@ -159,7 +159,7 @@ disabledScriptsHide:
   message: ''
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Atspējotie skripti:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: ''
@@ -180,7 +180,7 @@ editLabelSettings:
   message: ''
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: Rinda ir pārāk gara
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: ''
@@ -189,7 +189,7 @@ editNavCode:
   message: ''
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: Iestatījumi
 editNavValues:
   description: Label of values tab in script editor.
   message: ''
@@ -205,7 +205,7 @@ extDescription:
   message: ''
 extName:
   description: Name of this extension.
-  message: ''
+  message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: ''
@@ -222,7 +222,7 @@ fileInstallBlocked:
   message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: alfabētiski
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: ''
@@ -246,10 +246,10 @@ filterSize:
   message: ''
 genericError:
   description: Label for generic error.
-  message: ''
+  message: Kļūda
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: ''
+  message: izslēgts
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
   message: ''
@@ -326,7 +326,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Dublēšana un apkope
 labelBadge:
   description: Label for option to show number on badge.
   message: ''
@@ -389,7 +389,7 @@ labelExcludeMatch:
   message: ''
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: ''
+  message: Eksportēt skripta datus
 labelExposeStatus:
   description: Option in advanced settings.
   message: ''
@@ -410,7 +410,7 @@ labelHelpTranslate:
   message: ''
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: Mājas lapa
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: ''
@@ -422,7 +422,7 @@ labelImportScriptData:
   message: ''
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: Importēt iestatījumus
 labelInclude:
   description: Label of @include rules.
   message: ''
@@ -504,7 +504,7 @@ labelSearchScript:
   message: ''
 labelSettings:
   description: Label shown on the top of settings page
-  message: ''
+  message: Iestatījumi
 labelShowOrder:
   description: Label for option in dashboard -> script list
   message: ''
@@ -547,7 +547,7 @@ labelSyncUsername:
   message: ''
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Birkas (atdalīt ar atstarpi):'
 labelTheme:
   description: Label for the visual theme option.
   message: ''
@@ -568,7 +568,7 @@ labelViewTable:
   message: ''
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Platums:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -777,7 +777,7 @@ msgTardyMatch:
   message: ''
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: ''
+  message: Skripts atjaunināts.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: ''
@@ -818,7 +818,7 @@ optionPopupShowDisabled:
   touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: Vispirms rādīt iespējotos skriptus
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
   message: ''
@@ -835,7 +835,7 @@ optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: ''
+  message: Atjaunināt
 popupSettings:
   description: Item inside the popup's "⋮" menu
   message: ''
@@ -859,7 +859,7 @@ reinstall:
   message: ''
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Pārlādēt cilni
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
   message: ''
@@ -879,19 +879,21 @@ searchUseRegex:
   message: ''
 sideMenuAbout:
   description: 'Side menu: About'
-  message: ''
+  message: Par
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: ''
+  message: Iestatījumi
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Pārlādēt lapu bez lietotājskriptiem
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Jūs atspējojāt lietotājskriptus šai lapai. Lai tos izmantotu, atkārtoti
+    ielādējiet vai pārvietojieties pa cilni.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
   message: ''
@@ -929,7 +931,7 @@ updateListedCmd:
   message: ''
 updateScript:
   description: Button to update one script.
-  message: ''
+  message: Atjaunināt
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: ''
