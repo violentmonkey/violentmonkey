@@ -676,7 +676,7 @@ msgCheckingForUpdate:
   message: 正在检查更新...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: 单击打开 MomentJS 文档。允许的标记：$1。使用 [方括号] 保护明文文本。
+  message: 单击打开 MomentJS 文档。允许的标记：$1。使用 [方括号] 包裹明文文本。
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -854,10 +854,10 @@ optionPopupShowDisabled:
   touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: 先显示被启用的脚本
+  message: 优先显示启用的脚本
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: "UI 主题:\_"
+  message: 'UI 主题: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: 自动
@@ -973,7 +973,7 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: 切换用户脚本注入
 trackEdits:
   description: Button in a script installation dialog.
   message: 跟踪外部编辑
