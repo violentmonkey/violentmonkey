@@ -32,4 +32,4 @@ jobs:
           body: >-
             Violentmonkey updates translations from Transifex every week automatically.
 
-            If you want to help translate into your language, please visit [the transifex platform](https://www.transifex.com/projects/p/violentmonkey-nex/resource/messagesjson/).
+            If you want to help translate into your language, please join [our transifex project](https://explore.transifex.com/violentmonkey/violentmonkey-nex/).
