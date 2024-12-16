@@ -1022,7 +1022,7 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Przełącz tryb wstrzykiwania skryptu użytkownika
 trackEdits:
   description: Button in a script installation dialog.
   message: Śledź zmiany zewnętrzne
