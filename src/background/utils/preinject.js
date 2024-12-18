@@ -61,7 +61,7 @@ const contentScriptsAPI = browser.contentScripts;
 const cache = initCache({
   lifetime: 5 * 60e3,
   onDispose(val) {
-    val[CSAPI_REG]?.then(reg => reg.unregister());
+    if (IS_FIREFOX) unregisterScriptFF(val);
     cache.del(val[MORE]);
   },
 });
@@ -112,7 +112,7 @@ export const reloadAndSkipScripts = async tab => {
   if (!tab) tab = await getActiveTab();
   const tabId = tab.id;
   const bag = cache.get(getKey(tab.url, true));
-  const reg = bag && unregisterScriptFF(bag);
+  const reg = IS_FIREFOX && bag && unregisterScriptFF(bag);
   skippedTabs[tabId] = 1;
   if (reg) await reg;
   clearFrameData(tabId);
@@ -186,6 +186,7 @@ addPublicCommands({
     [MORE]: moreKey,
     url,
   }, src) {
+    if (!isApplied) return; // the user disabled injection right after page started loading
     const { tab, [kFrameId]: frameId } = src;
     const isTop = src[kTop];
     const tabId = tab.id;
@@ -386,15 +387,18 @@ function prepare(cacheKey, url, isTop) {
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
   const env = getScriptsByURL(url, isTop, errors);
+  const res = env || bagNoOp;
+  cache.put(cacheKey, res); // must be called before prepareBag overwrites it synchronously
   if (env) {
     env[PROMISE] = prepareBag(cacheKey, url, isTop,
       env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors);
   }
-  return cache.put(cacheKey, env || bagNoOp);
+  return res;
 }
 
 async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   if (env[PROMISE]) await env[PROMISE];
+  if (!isApplied) return; // the user disabled injection while we awaited
   cache.batch(true);
   const bag = { [INJECT]: inject };
   const { allIds, [MORE]: envDelayed } = env;
