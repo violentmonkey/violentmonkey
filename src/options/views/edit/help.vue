@@ -18,7 +18,7 @@
 import { VM_HOME } from '@/common/consts';
 import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 
-const API_URL = VM_HOME + 'api/';
+const API_URL = VM_HOME + 'api/gm/';
 const API_TEXT = API_URL.split('://')[1];
 </script>
 
