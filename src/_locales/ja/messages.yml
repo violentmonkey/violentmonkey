@@ -424,7 +424,7 @@ labelFastFirefoxInject:
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    <document-start> スクリプトのFirefox 59
+    <document-start> スクリプトのFireFox 59
     以降での別の挿入方法で、標準の方法より高速です。同期ページモードと同じくメモリ消費量が増加するので、このオプションを使わずにスクリプトが正常に動作するなら無効にします。
 labelFeedback:
   description: Label of link to feedback page.
@@ -972,7 +972,7 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: ユーザースクリプト挿入の切替
 trackEdits:
   description: Button in a script installation dialog.
   message: 外部での編集を追跡

@@ -857,7 +857,7 @@ optionShowEnabledFirst:
   message: 优先显示启用的脚本
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: 'UI 主题: '
+  message: 'UI 主题:'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: 自动
