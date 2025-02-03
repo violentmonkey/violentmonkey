@@ -133,13 +133,17 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Mengembalikan semua perubahan yang dibuat pada basis data (mengimpor,
+    memperbarui, mengedit, menyesuaikan)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: URL yang cocok di dalam daftar ini tidak akan diinjeksi skrip.
+  message: Daftar hitam injeksi (skrip tidak akan berjalan di situs yang cocok)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Daftar hitam jaringan (skrip tidak akan terhubung ke situs yang cocok dan
+    cookie mereka)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -160,7 +164,10 @@ descEditorOptions:
     "Gaya Khusus" di bawah.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Opsi Boolean dapat dialihkan dengan mengklik dua kali pada nilai: 1true1 =
+    diaktifkan, 2false2 = dinonaktifkan. Opsi numerik yang diakhiri dengan
+    3Delay3, 4Interval4, 5Rate5, 6Time6 dalam milidetik.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
   message: ''
