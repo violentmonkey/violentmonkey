@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Вимкнути
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -152,7 +152,7 @@ descEditorOptions:
   message: >-
     Опції для редактора CodeMirror та його доповнень у форматі JSON, наприклад
     <code>{"indentUnit":2, "smartIndent":true}</code> Майте на увазі, що деякі
-    опції можуть не працювати в Violentmonkey. Дивитись <a
+    опції можуть не працювати в MCPMonkey. Дивитись <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">повний список</a>.
 descEditorOptionsGeneric:
@@ -222,20 +222,20 @@ editValueAllHint:
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: >-
-    Violentmonkey дозволяє користувачеві автоматично вводити скрипти в сторінки,
+    MCPMonkey дозволяє користувачеві автоматично вводити скрипти в сторінки,
     щоб змінювати їх вигляд чи поведінку.
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Чорний список Violentmonkey
+  message: Чорний список MCPMonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey не може запускати користувацькі скрипти на цій сторінці
+    MCPMonkey не може запускати користувацькі скрипти на цій сторінці
 
     (типові приклади: інтерфейс браузера, розширення, заблоковані через
     політики, пошуковий двигун в Opera)
@@ -324,7 +324,7 @@ installOptionTrackTooltip:
     новішому.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Про додаток Violentmonkey
+  message: Про додаток MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -340,7 +340,7 @@ labelAutoReloadCurrentTab:
   message: Оновити поточну вкладку після ввімкнення/вимкнення скрипта.
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Поточні скрипти працюватимуть до перезавантаження вкладки.
   touched: false
@@ -672,10 +672,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Створити новий скрипт
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Скрипти вимкнені
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Скрипти ввімкнені
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -687,14 +687,14 @@ msgDateFormatInfo:
     Використовуйте [квадратні дужки] для захисту буквального тексту.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Помилка вилучення ресурсу!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Помилка завантаження скрипта!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Не вдається перевірити наявність оновлень.
 msgErrorLoadingData:
   description: >-
@@ -995,6 +995,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Усі значення (у форматі JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Відвідати веб-сайт
   touched: false

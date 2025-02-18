@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Desativar
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: Baixar temas
   touched: false
 buttonEdit:
@@ -154,7 +154,7 @@ descEditorOptions:
   message: >-
     Opções personalizadas para CodeMirror e addons em objeto JSON como
     <code>{"indentUnit":2, "smartIndent":true}</code> no entanto  note que
-    alguns deles podem não funcionar no Violentmonkey. Consulte à <a
+    alguns deles podem não funcionar no MCPMonkey. Consulte à <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
 descEditorOptionsGeneric:
@@ -232,30 +232,30 @@ extDescription:
     muitos navegadores
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Configurações de Lista negra do Violentmonkey
+  message: Configurações de Lista negra do MCPMonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey não pode executar scripts de usuários nesta página
+    MCPMonkey não pode executar scripts de usuários nesta página
 
     (Como exemplos comuns á interface do navegador, uma extensão bloqueada via
     políticas, motor de pesquisa de site no Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey foi reiniciado. Por favor recarregue a aba para rodar scripts
+  message: MCPMonkey foi reiniciado. Por favor recarregue a aba para rodar scripts
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Existem vários métodos para instalar ou rastrear edições em um arquivo
     local: <1> Arraste e solte o arquivo em uma página ou pop-up aberto do
-    Violentmonkey, incluindo este. <2> Instale um servidor HTTP local para este
+    MCPMonkey, incluindo este. <2> Instale um servidor HTTP local para este
     arquivo e abra-o via http://localhost. <3> Habilite "Permitir acesso a URLs
-    de arquivos" nos detalhes do Violentmonkey na página chrome://extensions.
+    de arquivos" nos detalhes do MCPMonkey na página chrome://extensions.
     Isto é perigoso porque qualquer script de usuário pode ler qualquer arquivo
     local.
 filterAlphabeticalOrder:
@@ -337,7 +337,7 @@ installOptionTrackTooltip:
     novos.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Sobre o Violentmonkey
+  message: Sobre o MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -353,7 +353,7 @@ labelAutoReloadCurrentTab:
   message: Recarregar a aba atual após ligar/desligar um script do menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Os scripts atuais continuarão em execução até que você recarregue a aba
   touched: false
@@ -692,10 +692,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Crie um novo script
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Scripts desativados
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Scripts ativados
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -707,14 +707,14 @@ msgDateFormatInfo:
     [colchetes]  para proteger texto literal.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Erro na busca de recurso!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Erro na busca de script!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Falha na busca de informações de atualizações.
 msgErrorLoadingData:
   description: >-
@@ -1017,6 +1017,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Todos os valores (serializados como JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Visite o site
   touched: false

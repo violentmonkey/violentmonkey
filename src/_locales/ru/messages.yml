@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Отключить
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: Скачать темы
   touched: false
 buttonEdit:
@@ -154,7 +154,7 @@ descEditorOptions:
   message: >-
     Опции для редактора CodeMirror и его дополнений в формате JSON, например,
     <code>{"indentUnit":2, "smartIndent":true}</code>. Имейте в виду, что
-    некоторые опции могут не работать в Violentmonkey. См. <a
+    некоторые опции могут не работать в MCPMonkey. См. <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">полный список</a>.
 descEditorOptionsGeneric:
@@ -240,32 +240,32 @@ extDescription:
     браузеров
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Чёрный список Violentmonkey
+  message: Чёрный список MCPMonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey не может запускать скрипты на этой странице
+    MCPMonkey не может запускать скрипты на этой странице
 
     (частые случаи: интерфейс браузера, расширение, заблокировано политикой,
     сайт поисковой системы в Opera)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey был перезапущен. Пожалуйста, перезагрузите вкладку, чтобы
+    MCPMonkey был перезапущен. Пожалуйста, перезагрузите вкладку, чтобы
     запустить пользовательские скрипты.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Существует несколько способов установки или отслеживания правок в локальном
-    файле: <1>Перетащите файл на открытую страницу Violentmonkey или во
+    файле: <1>Перетащите файл на открытую страницу MCPMonkey или во
     всплывающее окно, включая это. <2>Установите локальный HTTP-сервер для этого
     файла и откройте его через http://localhost. <3>Включите «Разрешить
-    открывать локальные файлы по ссылкам» в сведениях Violentmonkey на странице
+    открывать локальные файлы по ссылкам» в сведениях MCPMonkey на странице
     chrome://extensions. Это опасно, так как любой пользовательский скрипт может
     прочитать любой локальный файл.
 filterAlphabeticalOrder:
@@ -347,7 +347,7 @@ installOptionTrackTooltip:
   message: Вкладка исходного файла должна оставаться открытой в Firefox 68 и новее.
 labelAbout:
   description: Label shown on top of the about page.
-  message: О расширении Violentmonkey
+  message: О расширении MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -363,7 +363,7 @@ labelAutoReloadCurrentTab:
   message: Обновить текущую вкладку при включении или отключении скрипта из меню
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Текущие скрипты будут работать до перезагрузки вкладки.
   touched: false
@@ -699,10 +699,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Создать новый скрипт
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Скрипты отключены
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Скрипты включены
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -714,14 +714,14 @@ msgDateFormatInfo:
     Используйте [квадратные скобки] для защиты буквенного текста.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Ошибка при получении ресурса!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Ошибка при получении скрипта!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Не удалось получить сведения об обновлениях.
 msgErrorLoadingData:
   description: >-
@@ -1058,6 +1058,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Все значения (в формате JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Сайт расширения
   touched: false

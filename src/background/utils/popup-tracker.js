@@ -70,7 +70,7 @@ async function augmentSetPopup(data, src, key) {
 
 async function isInjectable(tabId, badgeData) {
   return badgeData[INJECT]
-    && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
+    && await sendTabCmd(tabId, MCPMONKEY, null, { [kFrameId]: 0 })
     || (
       await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
       .catch(() => [])

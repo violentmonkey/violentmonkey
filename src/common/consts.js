@@ -51,6 +51,6 @@ export const TL_AWAIT = 'topLevelAwait';
 export const UNWRAP = 'unwrap';
 export const FETCH_OPTS = 'fetchOpts';
 export const ERR_BAD_PATTERN = 'Bad pattern:';
-export const VM_HOME = 'https://violentmonkey.github.io/';
+export const VM_HOME = 'https://github.com/kstrikis/MCPMonkey';
 export const VM_DOCS_MATCHING = VM_HOME + 'api/matching/';
 export const FILE_GLOB_ALL = 'file://*/*';

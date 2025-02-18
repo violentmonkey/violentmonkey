@@ -35,7 +35,7 @@ export const bindEvents = (srcId, destId, bridge) => {
       try { e = e::getDetail(); } catch (err) { return; }
       if (!e) {
         e = createNullObj();
-        e.data = `[${VIOLENTMONKEY}] Non-cloneable property e.g. a DOM node or function.`;
+        e.data = `[${MCPMONKEY}] Non-cloneable property e.g. a DOM node or function.`;
       }
       if (cloneInto) e = cloneInto(e, window);
       if (e.node && (incomingNodeEvent = e)) return;

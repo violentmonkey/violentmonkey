@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: 停用
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: 下載佈景主題
   touched: false
 buttonEdit:
@@ -147,7 +147,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     CodeMirror 和外掛程式的自訂選項，使用 JSON 物件進行設定，例如 <code>{"indentUnit":2,
-    "smartIndent":true}</code>。請注意， 某些選項在 Violentmonkey 中可能無法運作。詳細的選項，請參考<a
+    "smartIndent":true}</code>。請注意， 某些選項在 MCPMonkey 中可能無法運作。詳細的選項，請參考<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完整清單</a>。
 descEditorOptionsGeneric:
@@ -224,28 +224,28 @@ extDescription:
   message: 開放原始碼且支援多種瀏覽器的使用者腳本管理器
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: 在 Violentmonkey 的設定中被列入黑名單
+  message: 在 MCPMonkey 的設定中被列入黑名單
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: |-
-    Violentmonkey 無法在此頁面執行使用者腳本
+    MCPMonkey 無法在此頁面執行使用者腳本
 
     （常見情形可能是由於頁面屬於瀏覽器的使用者介面、擴充功能、被安全政策封鎖，
     或者是 Opera 瀏覽器中的搜尋引擎網站）
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey 已經重新啟動。請重新載入分頁以執行使用者腳本。
+  message: MCPMonkey 已經重新啟動。請重新載入分頁以執行使用者腳本。
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
-    您可以使用以下幾種方法來安裝或追蹤本機檔案的編輯：<1> 直接將檔案拖放到已開啟的 Violentmonkey 頁面或彈出視窗中， 包含這個視窗。
+    您可以使用以下幾種方法來安裝或追蹤本機檔案的編輯：<1> 直接將檔案拖放到已開啟的 MCPMonkey 頁面或彈出視窗中， 包含這個視窗。
     <2> 為該檔案架設一個本機 HTTP 伺服器，然後透過 http://localhost 的網址來存取它。 <3> 透過 Chrome
-    瀏覽器的「擴充功能」頁面 chrome://extensions，啟用 Violentmonkey 的「允許存取檔案網址」。請注意，此操作具有風險，
+    瀏覽器的「擴充功能」頁面 chrome://extensions，啟用 MCPMonkey 的「允許存取檔案網址」。請注意，此操作具有風險，
     因為這將允許所有使用者腳本讀取您電腦上的任何檔案。
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -324,7 +324,7 @@ installOptionTrackTooltip:
   message: 在 Firefox 68 和更新版本中，原始碼檔案的分頁應保持開啟。
 labelAbout:
   description: Label shown on top of the about page.
-  message: 關於 Violentmonkey
+  message: 關於 MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -340,7 +340,7 @@ labelAutoReloadCurrentTab:
   message: 從選單開啟或關閉腳本後自動重新整理目前頁面
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: 目前執行的腳本會持續運作，直到您重新載入分頁為止
   touched: false
@@ -671,10 +671,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: 新增腳本
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: 腳本已停用
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: 腳本已啟用
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -684,14 +684,14 @@ msgDateFormatInfo:
   message: 點選此處以瀏覽 MomentJS 相關文件。允許的格式：$1。 若需保留文字的原意，請將其置於 [方括號] 內。
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: 取得資源時發生錯誤！
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: 取得腳本時發生錯誤！
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: 取得更新資訊失敗。
 msgErrorLoadingData:
   description: >-
@@ -1012,6 +1012,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: 所有值（序列化為 JSON）
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: 瀏覽網站
   touched: false

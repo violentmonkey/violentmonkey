@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Désactiver
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -98,7 +98,7 @@ buttonSaved:
   message: ''
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: Afficher la configuration de l’éditeur
+  message: Afficher la configuration de l'éditeur
 buttonSupport:
   description: Button to open support page.
   message: Page de support
@@ -127,7 +127,7 @@ confirmManualUpdate:
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
-    Les modifications n’ont pas étés sauvegardées !
+    Les modifications n'ont pas étés sauvegardées !
     Cliquez sur OK pour les rejeter ou annuler pour rester
 confirmUndoImport:
   description: >-
@@ -143,15 +143,15 @@ descBlacklistNet:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personnalisée pour la page d’options et pour la page d’installation de
+    CSS personnalisée pour la page d'options et pour la page d'installation de
     script. Si vous n'êtes pas certain·e de ce que vous faites, veuillez ne pas
-    l’éditer.
+    l'éditer.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     Options personnalisées pour CodeMirror et extensions dans un objet JSON
     comme<code>{"indentUnit":2, "smartIndent":true}</code>, cependant notez que
-    certaines peuvent ne pas marcher dans Violentmonkey. Voir la<a
+    certaines peuvent ne pas marcher dans MCPMonkey. Voir la<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">liste complète</a>. Pour utiliser un thème
     CodeMirror, spécifiez son nom de fichier comme <code>"theme":
@@ -202,7 +202,7 @@ editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: >-
     Cette ligne est trop longue donc son texte est replié pour éviter les délais
-    pendant l’édition.
+    pendant l'édition.
 
     Vous pouvez ajuster la limite dans les paramètres avancés, par exemple:
 
@@ -228,15 +228,15 @@ extDescription:
   message: Un gestionnaire de scipts utilisateurs qui supporte beaucoup de navigateurs
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Sur la liste noire des paramètres de Violentmonkey
+  message: Sur la liste noire des paramètres de MCPMonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: "Violentmonkey ne peut pas lancer de scripts utilisateurs\nsur cette page (exemples courants\_: page du navigateur\nou d’une extension)"
+  message: "MCPMonkey ne peut pas lancer de scripts utilisateurs\nsur cette page (exemples courants\_: page du navigateur\nou d'une extension)"
 failureReasonRestarted:
   description: Shown in the popup.
   message: ''
@@ -248,7 +248,7 @@ filterAlphabeticalOrder:
   message: ordre alphabétique
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ordre d’exécution
+  message: ordre d'exécution
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: dernière mise à jour
@@ -313,18 +313,18 @@ installFrom:
   message: Installer depuis $1
 installOptionClose:
   description: Option to close confirm window after installation.
-  message: Fermer après l’installation
+  message: Fermer après l'installation
   touched: false
 installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
   message: >-
-    L’onglet du fichier source devrait être maintenu ouvert sur Firefox 68 et
+    L'onglet du fichier source devrait être maintenu ouvert sur Firefox 68 et
     plus.
 labelAbout:
   description: Label shown on top of the about page.
-  message: À propos de Violentmonkey
+  message: À propos de MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -338,11 +338,11 @@ labelAuthor:
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: >-
-    Recharger l’onglet courant après avoir activé/désactivé un script dans le
+    Recharger l'onglet courant après avoir activé/désactivé un script dans le
     menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: >-
     Les scripts actuels vont continuer à s'exécuter jusqu'à ce que vous
@@ -371,10 +371,10 @@ labelBadgeNone:
   message: Rien
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: Le nombre de scripts en cours d’exécution
+  message: Le nombre de scripts en cours d'exécution
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: Le nombre de scripts uniques en cours d’exécution
+  message: Le nombre de scripts uniques en cours d'exécution
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Liste noire
@@ -439,7 +439,7 @@ labelFastFirefoxInjectHint:
     mieux sans cette option.
 labelFeedback:
   description: Label of link to feedback page.
-  message: Retour d’expérience
+  message: Retour d'expérience
 labelGeneral:
   description: Label for general settings.
   message: Général
@@ -448,10 +448,10 @@ labelHelpTranslate:
   message: Aider à traduire
 labelHomepage:
   description: Label for home page in about tab.
-  message: Page d’accueil
+  message: Page d'accueil
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: "URL de la page d’accueil\_: "
+  message: "URL de la page d'accueil\_: "
 labelIconURL:
   description: Label for the input.
   message: ''
@@ -468,13 +468,13 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: "Mode d’injection\_: "
+  message: "Mode d'injection\_: "
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Installation du script
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Garder l’original
+  message: Garder l'original
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Dernière mise à jour le $1
@@ -568,7 +568,7 @@ labelSyncPassword:
   message: "Mot de passe\_: "
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: Réautoriser automatiquement à l’expiration
+  message: Réautoriser automatiquement à l'expiration
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
@@ -584,7 +584,7 @@ labelSyncService:
   message: Synchroniser sur
 labelSyncUsername:
   description: Label for input to hold username.
-  message: "Nom d’utilisateur\_: "
+  message: "Nom d'utilisateur\_: "
 labelTags:
   description: Label for custom tags.
   message: ''
@@ -636,7 +636,7 @@ learnBlacklist:
   message: En apprendre plus sur les motifs de la liste noire.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: En savoir plus sur les modes d’injection
+  message: En savoir plus sur les modes d'injection
 menuCommands:
   description: Menu item to list script commands.
   message: Commandes de script
@@ -663,13 +663,13 @@ menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: Retour d’expérience
+  message: Retour d'expérience
 menuFindScripts:
   description: Menu item to find scripts for a site.
   message: Chercher des scripts pour ce site
 menuInjectionFailed:
   description: Injection error.
-  message: Impossible d’injecter certains scripts.
+  message: Impossible d'injecter certains scripts.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
   message: Réessayer en mode « auto »
@@ -688,10 +688,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Créer un nouveau script
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Scripts désactivés
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Scripts activés
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -703,14 +703,14 @@ msgDateFormatInfo:
     Utilisez [les crochets] pour protéger le texte littéral.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: "Erreur lors de la récupération de la ressource\_!"
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: "Erreur de récupération du script\_!"
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Échec de récupération des informations de mise à jour.
 msgErrorLoadingData:
   description: >-
@@ -763,7 +763,7 @@ msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: "Conflit d’espace de nom du script\_! Veuillez modifier @name et @namespace"
+  message: "Conflit d'espace de nom du script\_! Veuillez modifier @name et @namespace"
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
@@ -798,7 +798,7 @@ msgSavedCustomCSS:
   touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
-  message: Les options de l’éditeur de texte sont mises à jour.
+  message: Les options de l'éditeur de texte sont mises à jour.
   touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
@@ -818,7 +818,7 @@ msgSyncInit:
   message: Initialisation…
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: "Erreur d’initialisation\_!"
+  message: "Erreur d'initialisation\_!"
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
   message: Pas encore autorisé.
@@ -842,20 +842,20 @@ msgUpdating:
   message: Mise à jour…
 noValues:
   description: Label shown when there is no value for current script.
-  message: Aucune valeur n’est enregistrée
+  message: Aucune valeur n'est enregistrée
 optionEditorWindow:
   description: Label for the option in settings
-  message: Ouvrir l’éditeur depuis la popup dans une nouvelle fenêtre
+  message: Ouvrir l'éditeur depuis la popup dans une nouvelle fenêtre
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
   message: >-
-    La position de la fenêtre de l’éditeur sera enregistré uniquement lors d’un
-    redimensionnement ou d’une sauvegarde
+    La position de la fenêtre de l'éditeur sera enregistré uniquement lors d'un
+    redimensionnement ou d'une sauvegarde
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: Cacher l’omnibox
+  message: Cacher l'omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
   message: Menu et icône popup
@@ -1009,6 +1009,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Toutes les valeurs (sérialisées en JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Aller sur le site web
   touched: false

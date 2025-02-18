@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: 無効化
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -147,7 +147,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     CodeMirrorやそのアドオン用の設定は、JSONオブジェクトとして<code>{"indentUnit":2,
-    "smartIndent":true}</code> のように指定します。 一部の設定はViolentmonkeyでは動作しないことがあります。<a
+    "smartIndent":true}</code> のように指定します。 一部の設定はMCPMonkeyでは動作しないことがあります。<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完全な解説</a>をご覧ください。
 descEditorOptionsGeneric:
@@ -224,7 +224,7 @@ extDescription:
   message: 幅広いブラウザに対応のオープンソースのユーザースクリプト管理ツール
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: ブロックリストに登録済み
@@ -237,13 +237,13 @@ failureReasonNoninjectable:
     (一般例: ブラウザーのUI、拡張機能、ポリシーにてブロック済み、Operaの検索サイト)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey が再起動しました。タブを再読込みし、ユーザースクリプトを実行してください。
+  message: MCPMonkey が再起動しました。タブを再読込みし、ユーザースクリプトを実行してください。
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
-    パソコン内のファイルをインストールし追跡する方法が数種類あります:<1> 開いている Violentmonkey
+    パソコン内のファイルをインストールし追跡する方法が数種類あります:<1> 開いている MCPMonkey
     のページやポップアップにファイルをドラッグ＆ドロップ。ここでも可能。 <2> ファイル用のローカルのHTTPサーバーをインストールし
-    http://localhost 経由でファイルを開く。 <3> chrome://extensions ページを開き、Violentmonkey
+    http://localhost 経由でファイルを開く。 <3> chrome://extensions ページを開き、MCPMonkey
     の「詳細」から「ファイルのURLへのアクセスを許可」を有効化します。しかしこれは危険です。ユーザースクリプトがパソコン内のファイルを読み込む可能性があります。
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -322,7 +322,7 @@ installOptionTrackTooltip:
   message: Firefox 68 以降では、入力元ファイルのタブは開いたままにしてください。
 labelAbout:
   description: Label shown on top of the about page.
-  message: Violentmonkey について
+  message: MCPMonkey について
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -338,7 +338,7 @@ labelAutoReloadCurrentTab:
   message: メニューからスクリプトの有効/無効を切り替えたときに表示中のタブを更新する
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: 現在のスクリプトは、タブを再ロードするまで実行され続けます。
   touched: false
@@ -449,7 +449,7 @@ labelImportScriptData:
   message: スクリプトデータのインポート
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Violentmonkey の設定もインポート
+  message: MCPMonkey の設定もインポート
 labelInclude:
   description: Label of @include rules.
   message: 実行するページのURL (@include)
@@ -664,10 +664,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: スクリプトを新規作成
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: スクリプト無効
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: スクリプト有効
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -677,14 +677,14 @@ msgDateFormatInfo:
   message: 'クリックで MomentJS の説明を開きます。可能な記法: $1.  [各括弧] 内の文字列はそのままになります。'
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: リソース取得中にエラー発生！
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: スクリプト取得中にエラー発生！
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: 更新情報の取得に失敗しました。
 msgErrorLoadingData:
   description: >-
@@ -916,7 +916,7 @@ searchUseRegex:
   message: 正規表現を使用
 sideMenuAbout:
   description: 'Side menu: About'
-  message: Violentmonkey について
+  message: MCPMonkey について
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: インストール済み
@@ -1003,6 +1003,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: すべての値 (JSONとしてシリアル化)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: ウェブサイトを開く
   touched: false

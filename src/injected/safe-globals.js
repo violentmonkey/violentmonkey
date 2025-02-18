@@ -81,7 +81,7 @@ export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom();
 
 /** args is [tags?, ...rest] */
 export const log = (level, ...args) => {
-  let s = `[${VIOLENTMONKEY}]`;
+  let s = `[${MCPMONKEY}]`;
   if (args[0]) args[0]::forEach(tag => { s += `[${tag}]`; });
   args[0] = s;
   safeApply(logging[level], logging, args);

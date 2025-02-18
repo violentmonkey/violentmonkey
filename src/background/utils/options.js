@@ -27,7 +27,7 @@ export const kVersion = 'version';
 const TPL_OLD_VAL = `\
 // ==UserScript==
 // @name New Script
-// @namespace Violentmonkey Scripts
+// @namespace MCPMonkey Scripts
 // @match {{url}}
 // @grant none
 // ==/UserScript==

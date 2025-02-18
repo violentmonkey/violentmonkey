@@ -53,7 +53,7 @@ async function init() {
 }
 
 addBackgroundHandlers({
-  [VIOLENTMONKEY]: () => true,
+  [MCPMONKEY]: () => true,
 }, true);
 
 addBackgroundHandlers({

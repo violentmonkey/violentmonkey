@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Dezactivează
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: Descarcă teme
   touched: false
 buttonEdit:
@@ -153,7 +153,7 @@ descEditorOptions:
   message: >-
     Opțiuni personalizate pentru CodeMirror și suplimente în obiecte JSON precum
     <code>{"indentUnit":2, "smartIndent":true}</code> Cu toate acestea, reține
-    că unele dintre ele pot să nu funcționeze în Violentmonkey. Vezi <a
+    că unele dintre ele pot să nu funcționeze în MCPMonkey. Vezi <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completă</a>.
 descEditorOptionsGeneric:
@@ -240,33 +240,33 @@ extDescription:
   message: Un manager de userscripturi, open source, care suportă o grămadă de browsere
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Trecut în lista neagră din setările Violentmonkey
+  message: Trecut în lista neagră din setările MCPMonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey nu poate rula userscripturi în această pagină
+    MCPMonkey nu poate rula userscripturi în această pagină
 
     (exemple uzuale: interfața de utilizator a browserului, o extensie, blocat
     via politici, un site al unui motor de căutare în Opera)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey a fost repornit. Te rugăm să reîncarci fila pentru a rula
+    MCPMonkey a fost repornit. Te rugăm să reîncarci fila pentru a rula
     userscripturi.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Există mai multe metode de instalare sau de urmărire a editărilor într-un
-    fișier local: <1> Trage și plasează fișierul într-o pagină Violentmonkey
+    fișier local: <1> Trage și plasează fișierul într-o pagină MCPMonkey
     deschisă sau într-o fereastră pop-up, inclusiv aceasta. <2> Instalează un
     server HTTP local pentru acest fișier și deschide-l prin http://localhost.
     <3> Activează „Permite accesul la adresele URL de fișiere” în detaliile
-    pentru Violentmonkey din pagina chrome://extensions. Acest lucru este
+    pentru MCPMonkey din pagina chrome://extensions. Acest lucru este
     periculos, deoarece orice userscript poate citi orice fișier local.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -351,7 +351,7 @@ installOptionTrackTooltip:
     versiunile mai noi.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Despre Violentmonkey
+  message: Despre MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -367,7 +367,7 @@ labelAutoReloadCurrentTab:
   message: Reîncarcă fila actuală după activarea/dezactivarea unui script din meniu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Scripturile actuale vor continua să ruleze până când reîncarci fila
   touched: false
@@ -708,10 +708,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Creează un script nou
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Scripturi dezactivate
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Scripturi activate
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -723,14 +723,14 @@ msgDateFormatInfo:
     Folosește [paranteze pătrate] pentru a proteja textul literal.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Eroare la preluarea resursei!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Eroare la preluarea scriptului!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Eșec la preluarea informațiilor de actualizare.
 msgErrorLoadingData:
   description: >-
@@ -1065,6 +1065,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Toate valorile (serializate ca JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Vizitează site-ul web
   touched: false

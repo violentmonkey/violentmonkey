@@ -89,7 +89,7 @@ async function maybeInstallUserJs(tabId, url, isWhitelisted) {
     confirmInstall({ code, url, from: tab.url, parsed: true }, { tab });
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
-    const error = `${VIOLENTMONKEY} installer skipped ${url}.
+    const error = `${MCPMONKEY} installer skipped ${url}.
 Either not a userscript or the metablock comment is malformed:
 ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {

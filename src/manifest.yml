@@ -3,7 +3,7 @@ version: __VERSION__
 manifest_version: 2
 description: __MSG_extDescription__
 author: Gerald
-homepage_url: 'https://violentmonkey.github.io/'
+homepage_url: 'https://github.com/kstrikis/MCPMonkey'
 icons:
   '16': public/images/icon16.png
   '48': public/images/icon48.png

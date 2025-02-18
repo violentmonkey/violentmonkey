@@ -36,7 +36,7 @@ export default {
   badgeColor: '#880088',
   badgeColorBlocked: '#888888',
   exportValues: true,
-  exportNameTemplate: '[violentmonkey]_YYYY-MM-DD_HH.mm.ss',
+  exportNameTemplate: '[mcpmonkey]_YYYY-MM-DD_HH.mm.ss',
   [EXPOSE]: { // use percent-encoding for '.'
     'greasyfork%2Eorg': true,
     'sleazyfork%2Eorg': false,
@@ -88,7 +88,7 @@ export default {
   [kScriptTemplate]: `\
 // ==UserScript==
 // @name        New script {{name}}
-// @namespace   ${VIOLENTMONKEY} Scripts
+// @namespace   ${MCPMONKEY} Scripts
 // @match       {{url}}
 // @grant       none
 // @version     1.0

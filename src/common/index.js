@@ -133,9 +133,9 @@ export async function sendMessageRetry(payload, maxDuration = 10e3) {
       }
     }
     // Not using setTimeout which may be cleared by the web page
-    await browser.storage.local.get(VIOLENTMONKEY);
+    await browser.storage.local.get(MCPMONKEY);
   }
-  throw new Error(VIOLENTMONKEY + ' cannot connect to the background page.');
+  throw new Error(MCPMONKEY + ' cannot connect to the background page.');
 }
 
 export function ignoreNoReceiver(err) {

@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Disable
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: Download themes
   touched: false
 buttonEdit:
@@ -154,18 +154,18 @@ descEditorOptions:
   message: >-
     Custom options for CodeMirror and addons in JSON object like
     <code>{"indentUnit":2, "smartIndent":true}</code> however note that some of
-    them may not work in Violentmonkey. See <a
+    them may not work in MCPMonkey. See <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full list</a>.
 descEditorOptionsGeneric:
-  description: Description of editor options in VM settings.
+  description: Description of editor options in MCPMonkey settings.
   message: >-
     Boolean options may be toggled by double-clicking on the value:
     <code>true</code> = enabled, <code>false</code> = disabled. Numeric options
     ending with <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
     <code>Time</code> are in milliseconds.
 descEditorOptionsVM:
-  description: Description of nonstandard editor options in VM settings.
+  description: Description of nonstandard editor options in MCPMonkey settings.
   message: >-
     Nonstandard options: <code>autocompleteOnTyping</code> is a delay in
     milliseconds to display autocomplete hints after typing (<code>0</code> =
@@ -234,30 +234,30 @@ extDescription:
   message: An open source userscript manager that supports a lot of browsers
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Blacklisted in Violentmonkey's settings
+  message: Blacklisted in MCPMonkey's settings
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey cannot run userscripts in this page
+    MCPMonkey cannot run userscripts in this page
 
     (common examples: browser UI, an extension, blocked via policies, a search
     engine site in Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey was restarted. Please reload the tab to run userscripts.
+  message: MCPMonkey was restarted. Please reload the tab to run userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     There are several methods to install or track edits in a local file: <1>
-    Drag'n'drop the file into an open Violentmonkey page or popup, including
+    Drag'n'drop the file into an open MCPMonkey page or popup, including
     this one. <2> Install a local HTTP server for this file and open it via
     http://localhost. <3> Enable "Allow access to file URLs" in details for
-    Violentmonkey in chrome://extensions page. This is dangerous because any
+    MCPMonkey in chrome://extensions page. This is dangerous because any
     userscript may read any local file.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -338,7 +338,7 @@ installOptionTrackTooltip:
   message: The source file tab should be kept open in Firefox 68 and newer.
 labelAbout:
   description: Label shown on top of the about page.
-  message: About Violentmonkey
+  message: About MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -354,7 +354,7 @@ labelAutoReloadCurrentTab:
   message: Reload current tab after switching on/off a script from menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Current scripts will keep running until you reload the tab
   touched: false
@@ -690,29 +690,29 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Scripts disabled
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Scripts enabled
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: Checking for updates...
 msgDateFormatInfo:
-  description: Help text of the info icon in VM settings for the export file name.
+  description: Help text of the info icon in MCPMonkey settings for the export file name.
   message: >-
     Click to open MomentJS documentation. Allowed tokens: $1. Use [square
     brackets] to protect literal text.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Error fetching resource!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Error fetching script!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Failed fetching update information.
 msgErrorLoadingData:
   description: >-
@@ -1044,6 +1044,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: All values (serialized as JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Visit Website
   touched: false

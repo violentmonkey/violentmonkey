@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Devre dışı bırak
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -156,7 +156,7 @@ descEditorOptions:
   message: >-
     CodeMirror için ve JSON eklentileri için <code>{"indentUnit":2,
     "smartIndent":true}</code> gibi özelleştirilmiş ayarlar. Bazılarının
-    Violentmonkey'de çalışmayabileceğini unutmayın. Tüm listeyi görmek için <a
+    MCPMonkey'de çalışmayabileceğini unutmayın. Tüm listeyi görmek için <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">tıklayın</a>.
 descEditorOptionsGeneric:
@@ -243,23 +243,23 @@ extDescription:
     yöneticisi
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Violentmonkey ayarlarında kara listede
+  message: MCPMonkey ayarlarında kara listede
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey bu sayfada kullanıcı betiklerini çalıştıramıyor
+    MCPMonkey bu sayfada kullanıcı betiklerini çalıştıramıyor
 
     (olağan şüpheliler: tarayıcı arayüzü, uzantı sayfası, ilkeler aracılığıyla
     engelleme, Opera'da arama motoru sayfası)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey yeniden başlatıldı. Kullanıcı betiklerini çalıştırmak için
+    MCPMonkey yeniden başlatıldı. Kullanıcı betiklerini çalıştırmak için
     lütfen sekmeyi yenileyin.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
@@ -267,10 +267,10 @@ fileInstallBlocked:
     Yerel bir dosyayı yüklemenin ve düzenlemeleri izlemenin birkaç yöntem
     vardır: 
 
-    <1>Dosyayı sürükleyip açık bir Violentmonkey sayfasına veya açılır
+    <1>Dosyayı sürükleyip açık bir MCPMonkey sayfasına veya açılır
     penceresine bırakabilirsiniz (bu sayfa dahil). <2>Dosya için yerel bir HTTP
     sunucusu kurup http://localhost üzerinden açabilirsiniz.
-    <3>chrome://extensions sayfasındaki Violentmonkey ayrıntılarında "Dosya
+    <3>chrome://extensions sayfasındaki MCPMonkey ayrıntılarında "Dosya
     URL'lerine erişime izin ver" seçeneğini etkinleştirebilirsiniz. Ancak bu
     tehlikelidir çünkü tüm kullanıcı betikleri tüm yerel dosyaları okuyabilir.
 filterAlphabeticalOrder:
@@ -352,7 +352,7 @@ installOptionTrackTooltip:
   message: Firefox 68 ve sonrasında kaynak dosyası sekmesi açık tutulmalıdır.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Violentmonkey hakkında
+  message: MCPMonkey hakkında
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -368,7 +368,7 @@ labelAutoReloadCurrentTab:
   message: Bir betiği menüden kapattığımda/açtığımda geçerli sekmeyi yenile
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Geçerli betikler sayfa yenilenene kadar çalışmaya devam edecektir
   touched: false
@@ -710,10 +710,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Yeni betik oluştur
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Betikler devre dışı
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Betikler etkin
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -725,14 +725,14 @@ msgDateFormatInfo:
     Metinleri korumak için [köşeli parantez] kullanabilirsiniz.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Kaynak getirilirken hata oluştu!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Betik getirilirken hata oluştu!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Güncelleme bilgileri alınamadı.
 msgErrorLoadingData:
   description: >-
@@ -1063,6 +1063,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Tüm değerler (JSON biçiminde serileştirilmiş)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Siteyi ziyaret et
   touched: false

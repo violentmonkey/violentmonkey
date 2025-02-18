@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Wyłącz
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: Pobierz motywy
   touched: false
 buttonEdit:
@@ -156,7 +156,7 @@ descEditorOptions:
   message: >-
     Niestandardowe opcje dla CodeMirror i dodatków w obiekcie JSON, takie jak
     <code>{"indentUnit":2, "smartIndent":true}</code>, należy jednak pamiętać,
-    że niektóre z nich mogą nie działać w Violentmonkey. Zobacz <a
+    że niektóre z nich mogą nie działać w MCPMonkey. Zobacz <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">pełną listę</a>.
 descEditorOptionsGeneric:
@@ -243,23 +243,23 @@ extDescription:
     wiele przeglądarek.
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: ' Zablokowano w czarnej liście w ustawieniach Violentmonkey''a'
+  message: ' Zablokowano w czarnej liście w ustawieniach MCPMonkey''a'
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey nie może uruchamiać skryptów użytkownika na tej stronie
+    MCPMonkey nie może uruchamiać skryptów użytkownika na tej stronie
 
     (pospolite przykłady: interfejs przeglądarki, rozszerzenia, zablokowane
     przez zasady, strona wyszukiwarki w Operze)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey został ponownie uruchomiony. Załaduj ponownie kartę, aby
+    MCPMonkey został ponownie uruchomiony. Załaduj ponownie kartę, aby
     uruchomić skrypty użytkownika.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
@@ -347,7 +347,7 @@ installOptionTrackTooltip:
     Firefoksa w wersjach 68 i nowszych.
 labelAbout:
   description: Label shown on top of the about page.
-  message: O rozszerzeniu Violentmonkey
+  message: O rozszerzeniu MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -363,7 +363,7 @@ labelAutoReloadCurrentTab:
   message: Odświeżaj bieżącą kartę po włączeniu/wyłączeniu skryptu z menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Bieżące skrypty będą działać do momentu ponownego załadowania karty
   touched: false
@@ -704,10 +704,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Utwórz nowy skrypt
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Skrypty wyłączone
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Skrypty włączone
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -719,14 +719,14 @@ msgDateFormatInfo:
     [nawiasów kwadratowych], aby chronić tekst dosłowny.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Błąd pobierania zasobu!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Błąd przy pobieraniu skryptu!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Błąd podczas pobierania informacji o aktualizacjach.
 msgErrorLoadingData:
   description: >-
@@ -1053,6 +1053,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Wszystkie wartości (serializowane jako JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Odwiedź stronę internetową rozszerzenia
   touched: false

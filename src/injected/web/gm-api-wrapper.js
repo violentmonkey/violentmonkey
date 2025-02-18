@@ -91,7 +91,7 @@ export function makeGmApiWrapper(script) {
     gmInfo[INJECT_INTO] = bridge.mode;
     gmInfo.platform = safeCopy(bridge.ua);
     gmInfo.script = meta;
-    gmInfo.scriptHandler = VIOLENTMONKEY;
+    gmInfo.scriptHandler = MCPMONKEY;
     gmInfo.version = process.env.VM_VER;
     setOwnProp(gmInfo, 'userAgent', getUA, true, 'get');
     setOwnProp(gmInfo, 'userAgentData', getUAData, true, 'get');

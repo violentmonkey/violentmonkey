@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Onemogući
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -209,7 +209,7 @@ extDescription:
   message: Omogućava korištenje korisničkih skripti u web pregledniku.
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
   message: ''
@@ -301,7 +301,7 @@ installOptionTrackTooltip:
   message: ''
 labelAbout:
   description: Label shown on top of the about page.
-  message: O Violentmonkey
+  message: O MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -317,7 +317,7 @@ labelAutoReloadCurrentTab:
   message: Ponovo učitaj trenutni tab nakon klika na on/off skripte iz menia
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: ''
   touched: false
@@ -637,10 +637,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: ''
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Skripta je onemogućena
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Skripte omogućene
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -650,14 +650,14 @@ msgDateFormatInfo:
   message: ''
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: ''
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Greška pri dohvaćanju skripte!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Neuspjelo dohvaćanje informacija o obnovama.
 msgErrorLoadingData:
   description: >-
@@ -950,6 +950,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: ''
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: ''
   touched: false

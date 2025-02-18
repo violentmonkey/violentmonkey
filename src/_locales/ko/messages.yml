@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: 비활성화
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -147,7 +147,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     CodeMirror와 애드온의 설정은 <code>{"indentUnit":2, "smartIndent":true}</code> 와 같은
-    JSON 오브젝트로 할 수 있으며 몇몇 설정은 Violentmonkey 에서 작동하지 않을 수 있습니다. <a
+    JSON 오브젝트로 할 수 있으며 몇몇 설정은 MCPMonkey 에서 작동하지 않을 수 있습니다. <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">전체 목록</a>을 확인하세요.
 descEditorOptionsGeneric:
@@ -225,24 +225,24 @@ extDescription:
   message: 유저스크립트를 실행합니다.
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Violentmonkey 블랙리스트 목록에 추가되어 있습니다
+  message: MCPMonkey 블랙리스트 목록에 추가되어 있습니다
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: |-
-    Violentmonkey가 이 페이지의 유저스크립트를 실행하지 못했습니다
+    MCPMonkey가 이 페이지의 유저스크립트를 실행하지 못했습니다
     (대표적인 원인 예시: 브라우저 UI, 확장 기능, 정책, Opera 내 검색엔진 사이트)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey가 재시작되었습니다. 유저스크립트를 실행하려면 탭을 새로고침하세요.
+  message: MCPMonkey가 재시작되었습니다. 유저스크립트를 실행하려면 탭을 새로고침하세요.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
-    로컬 파일의 변경사항을 적용하거나 추적하는 방법이 몇 가지 있습니다. <1> 파일을 이 페이지처럼 열려 있는 Violentmonkey
+    로컬 파일의 변경사항을 적용하거나 추적하는 방법이 몇 가지 있습니다. <1> 파일을 이 페이지처럼 열려 있는 MCPMonkey
     페이지나 팝업으로 끌어다 놓습니다. <2> 이 파일의 로컬 HTTP 서버를 설치한 뒤 http://localhost 주소로 파일을
     엽니다. <3> chrome://extensions 페이지의 확장 세부정보에서 "파일 URL에 대한 액세스 허용"을 켭니다. 이 방식은
     모든 유저스크립트에서 모든 파일에 접근할 수 있게 되므로 위험합니다.
@@ -323,7 +323,7 @@ installOptionTrackTooltip:
   message: 소스 파일 탭은 Firefox 68 이상에서 열린 상태로 유지되어야 합니다.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Violentmonkey에 대해서
+  message: MCPMonkey에 대해서
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -339,7 +339,7 @@ labelAutoReloadCurrentTab:
   message: 메뉴에서 스크립트를 끄거나 켜면 해당 탭을 새로고침
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: 탭을 새로고침할 때까지 현재 스크립트가 계속 실행됩니다.
   touched: false
@@ -668,10 +668,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: 새 스크립트 만들기
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: 스크립트 비활성화됨
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: 스크립트 활성화됨
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -681,14 +681,14 @@ msgDateFormatInfo:
   message: 'MomentJS 문서를 열려면 클릭합니다. 허용된 토큰 : $1. 리터럴 텍스트를 보호하려면 [대괄호]를 사용하세요.'
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: 리소스를 받아오는 중 오류가 발생했습니다!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: 스크립트를 받아오는 중 오류가 발생했습니다!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: 업데이트 정보를 받아오는 데 실패했습니다.
 msgErrorLoadingData:
   description: >-
@@ -1004,6 +1004,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: 모든 값 (JSON 직렬화)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: 웹 사이트 방문
   touched: false

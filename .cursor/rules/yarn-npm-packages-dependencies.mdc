@@ -1,0 +1,7 @@
+---
+description: Installing dependencies using yarn
+globs: package.json
+---
+Always use `yarn`, never `npm`.
+Never modify package.json manually.
+Always use `yarn` to add, remove, install, update, or downgrade packages.

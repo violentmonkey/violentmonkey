@@ -13,7 +13,7 @@ const envs = {
     `v${version}`,
   ].filter(Boolean).join(' '),
   RELEASE_PREFIX: [
-    'Violentmonkey',
+    'MCPMonkey',
     beta && 'beta',
   ].filter(Boolean).join('-'),
   PRERELEASE: !!beta,

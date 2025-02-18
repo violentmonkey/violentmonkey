@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: 禁用
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: 下载主题
   touched: false
 buttonEdit:
@@ -147,7 +147,7 @@ descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
     在 JSON 对象中为 CodeMirror 和附加组件提供自定义选项，如 <code>{"indentUnit":2,
-    "smartIndent":true}</code>，但请注意，其中一些选项在 Violentmonkey 中可能不起作用。 查看<a
+    "smartIndent":true}</code>，但请注意，其中一些选项在 MCPMonkey 中可能不起作用。 查看<a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">完整列表</a>。
 descEditorOptionsGeneric:
@@ -338,7 +338,7 @@ labelAutoReloadCurrentTab:
   message: 从菜单开启或关闭脚本后自动刷新当前页面
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: 当前脚本在你刷新页面前将保持运行
   touched: false
@@ -666,10 +666,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: 创建新脚本
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: 脚本已禁用
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: 脚本已启用
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -679,14 +679,14 @@ msgDateFormatInfo:
   message: 单击打开 MomentJS 文档。允许的标记：$1。使用 [方括号] 包裹明文文本。
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: 获取资源发生错误！
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: 获取脚本发生错误！
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: 获取更新信息失败。
 msgErrorLoadingData:
   description: >-
@@ -1004,6 +1004,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: 所有数据（JSON格式）
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: 访问网站
   touched: false

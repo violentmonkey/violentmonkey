@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Kikapcsol
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -158,7 +158,7 @@ descEditorOptions:
   message: >-
     Egyedi beállítások a CodeMirror és bővítményei számára JSON objektumként,
     mint például: <code>{"indentUnit":2, "smartIndent":true}</code> Megeshet,
-    hogy van amelyik nem működik a Violentmonkey-n belül. Itt a <a
+    hogy van amelyik nem működik a MCPMonkey-n belül. Itt a <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">teljes lista</a>.
 descEditorOptionsGeneric:
@@ -234,16 +234,16 @@ extDescription:
   message: Egy nyílt forráskódú userscript menedzser, ami rengeteg böngészőt támogat!
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Ez az oldal szerepel a Violentmonkey beállításainak feketelistáján
+  message: Ez az oldal szerepel a MCPMonkey beállításainak feketelistáján
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    A Violentmonkey nem tud futtatni userscript-et ezen az oldalon
+    A MCPMonkey nem tud futtatni userscript-et ezen az oldalon
 
     (gyakori példák erre: böngésző felhasználói felülete, egy bővítményé,
     házirend által blokkolt, keresőmotor oldala Opera-ban)
@@ -254,10 +254,10 @@ fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Több módja is létezik helyi fájloknak a telepítésére, vagy szerkesztésük
-    követésére: <1> Húzd a fájlt egy megnyitott Violentmonkey oldalra vagy
+    követésére: <1> Húzd a fájlt egy megnyitott MCPMonkey oldalra vagy
     felugró menüre, beleértve ezt is. <2> Telepíts egy helyi HTTP szervert ehhez
     a fájlhoz és nyisd meg azt a http://localhost-on keresztül. <3> Engedélyezd
-    a "Fájl URL-ek elérése"-t a Violentmonkey részleteiben a böngésző
+    a "Fájl URL-ek elérése"-t a MCPMonkey részleteiben a böngésző
     'Kiegészítők' oldalán. Ez veszélyes, mert így bármelyik szkript elérhet
     bármilyen helyi fájlt.
 filterAlphabeticalOrder:
@@ -355,7 +355,7 @@ labelAutoReloadCurrentTab:
   message: Aktuális lap újratöltése egy szkript ki/bekapcsolása után a menüben
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: A jelenlegi szkriptek futni fognak addig, amíg újra nem lesz töltve a lap
   touched: false
@@ -697,10 +697,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Új szkript készítése
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Szkript kikapcsolva
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Szkript bekapcsolva
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -712,14 +712,14 @@ msgDateFormatInfo:
     Használj [szögletes zárójeleket] az egyszerű szöveg megóvásához.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Hiba az erőforrás lekérésekor!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Hiba a szkript lekérésekor!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: A frissítési információk lekérése nem sikerült.
 msgErrorLoadingData:
   description: >-
@@ -1056,6 +1056,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Összes érték (JSON-ként sorosítva)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Látogasd meg a honlapot
   touched: false

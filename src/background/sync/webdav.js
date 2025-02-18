@@ -124,7 +124,7 @@ const WebDAV = BaseService.extend({
       this.properties.serverUrl = null;
       return false;
     }
-    this.properties.serverUrl = `${url}${VIOLENTMONKEY}/`;
+    this.properties.serverUrl = `${url}${MCPMONKEY}/`;
     const { anonymous, username, password } = config;
     if (anonymous) return true;
     if (!username || !password) return false;

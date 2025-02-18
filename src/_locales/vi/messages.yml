@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Vô hiệu hoá
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: Tải xuống chủ đề
   touched: false
 buttonEdit:
@@ -154,7 +154,7 @@ descEditorOptions:
   message: >-
     Tùy chọn cài đặt cho CodeMirror và addons trong đối tượng JSON
     như<code>{"indentUnit":2, "smartIndent":true}</code> . Tuy nhiên, lưu ý rằng
-    một số cài đặt có thể không hoạt động trong Violentmonkey. <a
+    một số cài đặt có thể không hoạt động trong MCPMonkey. <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">Xem chi tiết.</a>
 descEditorOptionsGeneric:
@@ -236,28 +236,28 @@ extDescription:
   message: Hỗ trợ chạy userscript trên trình duyệt.
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Đã ở trong danh sách đen của Violentmonkey
+  message: Đã ở trong danh sách đen của MCPMonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: Violentmonkey không hoạt động ở đây.
+  message: MCPMonkey không hoạt động ở đây.
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey đã được khởi động lại. Vui lòng tải lại tab để chạy
+    MCPMonkey đã được khởi động lại. Vui lòng tải lại tab để chạy
     userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Có một số phương pháp để cài đặt hoặc theo dõi chỉnh sửa trong một tệp cục
-    bộ: <1> Kéo và thả tệp vào một trang hoặc cửa sổ Violentmonkey đang mở, bao
+    bộ: <1> Kéo và thả tệp vào một trang hoặc cửa sổ MCPMonkey đang mở, bao
     gồm cả trang này. <2> Cài đặt một máy chủ HTTP cục bộ cho tệp này và mở nó
     qua http://localhost. <3> Bật "Cho phép truy cập vào URL tệp" trong chi tiết
-    cho Violentmonkey trong trang chrome://extensions. Điều này nguy hiểm vì bất
+    cho MCPMonkey trong trang chrome://extensions. Điều này nguy hiểm vì bất
     kỳ tập lệnh người dùng nào cũng có thể đọc bất kỳ tệp cục bộ nào.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -338,7 +338,7 @@ installOptionTrackTooltip:
   message: Bạn cần Firefox 68 hoặc phiên bản cao hơn để mở.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Thông tin Violentmonkey
+  message: Thông tin MCPMonkey
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -354,7 +354,7 @@ labelAutoReloadCurrentTab:
   message: Tải lại trang khi bật/tắt script từ menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: Những script hiện tại sẽ vẫn tiếp tục chạy cho đến khi bạn tải lại thẻ
   touched: false
@@ -696,10 +696,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Tạo script mới
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Đã vô hiệu hoá script
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Đã kích hoạt script
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -711,14 +711,14 @@ msgDateFormatInfo:
     vuông ngoặc] để bảo vệ văn bản theo nghĩa đen.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Lỗi nạp tài nguyên
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Có lỗi khi tìm phiên bản mới!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Tìm kiếm thông tin cập nhật thất bại.
 msgErrorLoadingData:
   description: >-
@@ -1035,6 +1035,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Tất cả giá trị (đã đưa về dạng JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: Truy cập trang web
   touched: false

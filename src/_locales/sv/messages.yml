@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Inaktivera
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in MCPMonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -154,7 +154,7 @@ descEditorOptions:
   message: >-
     Anpassade alternativ för CodeMirror och tillägg i JSON-objekt som
     <code>{"indentUnit":2, "smartIndent":true}</code> Observera att vissa av dem
-    kanske inte fungerar i Violentmonkey. Se <a
+    kanske inte fungerar i MCPMonkey. Se <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full lista</a>.
 descEditorOptionsGeneric:
@@ -238,30 +238,30 @@ extDescription:
   message: En användarskripthanterare med öppen källkod som stöder många webbläsare
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: MCPMonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Svartlistad i Violentmonkey's inställningar
+  message: Svartlistad i MCPMonkey's inställningar
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey kan inte köra användarskript på den här sidan
+    MCPMonkey kan inte köra användarskript på den här sidan
 
     (vanliga exempel: webbläsar-UI, tillägg, blockerad via policyer, en
     sökmotorsida i Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey har startats om. Ladda om fliken för att köra användarskript.
+  message: MCPMonkey har startats om. Ladda om fliken för att köra användarskript.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Det finns flera metoder för att installera eller spåra redigeringar i en
-    lokal fil: <1> Dra och släpp filen till en öppen Violentmonkey-sida eller
+    lokal fil: <1> Dra och släpp filen till en öppen MCPMonkey-sida eller
     popup, inklusive denna. <2> Installera en lokal HTTP-server för denna fil
     och öppna den via http://localhost. <3> Aktivera "Tillåt åtkomst till
-    filwebbadresser" i detaljer för Violentmonkey på sidan chrome://extensions.
+    filwebbadresser" i detaljer för MCPMonkey på sidan chrome://extensions.
     Detta är farligt eftersom alla användarskript kan läsa alla lokala filer.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -360,7 +360,7 @@ labelAutoReloadCurrentTab:
     menyn
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after MCPMonkey is switched off if auto-reload is
     disabled.
   message: ''
   touched: false
@@ -697,10 +697,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Skapa ett nytt skript
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of MCPMonkey, when disabled.
   message: Skript inaktiverade
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of MCPMonkey, when enabled.
   message: Skript aktiverade
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -712,14 +712,14 @@ msgDateFormatInfo:
     [hakparenteser] för att skydda det som är text.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when MCPMonkey fails fetching a resource/require/icon of
     the script.
   message: Fel vid hämtning av resurs!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when MCPMonkey fails fetching a new version of the script.
   message: Det gick inte att hämta skriptet!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when MCPMonkey fails fetching version data of the script.
   message: Det gick inte att hämta uppdateringsinformationen!
 msgErrorLoadingData:
   description: >-
@@ -1048,6 +1048,6 @@ valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Alla värden (serialiserade som JSON)
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open MCPMonkey website.
   message: ''
   touched: false

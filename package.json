@@ -1,6 +1,6 @@
 {
-  "name": "violentmonkey",
-  "description": "Violentmonkey",
+  "name": "mcpmonkey",
+  "description": "MCPMonkey",
   "version": "2.30.0",
   "scripts": {
     "prepare": "husky install",
@@ -90,12 +90,12 @@
   "author": "Gerald <i@gerald.top>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/violentmonkey/violentmonkey.git"
+    "url": "https://github.com/kstrikis/MCPMonkey.git"
   },
   "bugs": {
-    "url": "https://github.com/violentmonkey/violentmonkey/issues"
+    "url": "https://github.com/kstrikis/MCPMonkey/issues"
   },
-  "homepage": "https://github.com/violentmonkey/violentmonkey",
+  "homepage": "https://github.com/kstrikis/MCPMonkey",
   "license": "MIT",
   "dependencies": {
     "@violentmonkey/shortcut": "^1.2.6",
