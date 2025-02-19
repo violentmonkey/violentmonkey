@@ -85,7 +85,7 @@ async function doImportBackup(file) {
   report('', '', 'info'); // deps
   const uriMap = {};
   const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
-  const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
+  const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'mcpmonkey');
   const vm = vmEntry && await readContents(vmEntry) || {};
   const importSettings = options.get('importSettings') && vm.settings;
   const scripts = vm.scripts || {};

@@ -29,7 +29,7 @@ import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 const name = extensionManifest.name;
 const version = process.env.VM_VER;
 const language = browser.i18n.getUILanguage();
-const GITHUB = 'https://github.com/violentmonkey/violentmonkey/';
+const GITHUB = 'https://github.com/kstrikis/MCPMonkey/';
 const LINKS = {
   [VM_HOME]: i18n('labelHomepage'),
   [GITHUB + 'issues']: i18n('labelFeedback'),

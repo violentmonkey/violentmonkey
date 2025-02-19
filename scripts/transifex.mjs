@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import spawn from 'cross-spawn';
 import yaml from 'js-yaml';
 
-const PROJECT_ID = 'o:violentmonkey:p:violentmonkey-nex';
+const PROJECT_ID = 'o:mcpmonkey:p:mcpmonkey-nex';
 const RESOURCE_ID = `${PROJECT_ID}:r:messagesjson`;
 const RESOURCE_FILE = 'src/_locales/en/messages.yml';
 const request = limitConcurrency(doRequest, 5);

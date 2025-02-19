@@ -10,8 +10,8 @@ const beta = isBeta();
 
 async function handleAddon() {
   const manifest = await readManifest();
-  const fileName = `violentmonkey-${version}${beta ? 'b' : ''}.xpi`;
-  const url = `https://github.com/violentmonkey/violentmonkey/releases/download/v${version}/${fileName}`;
+  const fileName = `mcpmonkey-${version}${beta ? 'b' : ''}.xpi`;
+  const url = `https://github.com/kstrikis/MCPMonkey/releases/download/v${version}/${fileName}`;
 
   if (await hasAsset(fileName)) {
     // Throw an error so `updates.json` won't be updated in the next step.
@@ -22,7 +22,7 @@ async function handleAddon() {
     process.env.TEMP_DIR,
     Math.random().toString(36).slice(2, 8).toString(),
   );
-  const releaseUrl = `https://github.com/violentmonkey/violentmonkey/releases/tag/v${version}`;
+  const releaseUrl = `https://github.com/kstrikis/MCPMonkey/releases/tag/v${version}`;
   await signAddon({
     apiKey: process.env.AMO_KEY,
     apiSecret: process.env.AMO_SECRET,
@@ -87,7 +87,7 @@ main().then(
   () => {
     notifyReleaseStatus({
       title: `AMO Release Success: ${process.env.RELEASE_NAME}`,
-      description: `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${process.env.VERSION}.`,
+      description: `See the changelog at https://github.com/kstrikis/MCPMonkey/releases/tag/v${process.env.VERSION}.`,
     });
   },
   (err) => {

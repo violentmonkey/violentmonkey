@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
-          name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
+          name: 'MCPmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
           path: 'dist/*'
           if-no-files-found: error
 

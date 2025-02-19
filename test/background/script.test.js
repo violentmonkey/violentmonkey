@@ -14,7 +14,7 @@ test('parseMeta', () => {
   expect(parseMeta(`\
 // ==UserScript==
 // @name New Script
-// @namespace Violentmonkey Scripts
+// @namespace MCPMonkey Scripts
 // @description This is a script
 // @version 1.0
 // @match *://*/*
@@ -22,7 +22,7 @@ test('parseMeta', () => {
 // ==/UserScript==
 `)).toEqual(Object.assign({}, baseMeta, {
     name: 'New Script',
-    namespace: 'Violentmonkey Scripts',
+    namespace: 'MCPMonkey Scripts',
     description: 'This is a script',
     version: '1.0',
     match: ['*://*/*'],
@@ -31,13 +31,13 @@ test('parseMeta', () => {
   expect(parseMeta(`\
 // ==UserScript==
 // @name New Script
-// @namespace Violentmonkey Scripts
+// @namespace MCPMonkey Scripts
 // @match *://*/*
 // @noframes
 // ==/UserScript==
 `)).toEqual(Object.assign({}, baseMeta, {
     name: 'New Script',
-    namespace: 'Violentmonkey Scripts',
+    namespace: 'MCPMonkey Scripts',
     match: ['*://*/*'],
     noframes: true,
   }));

@@ -9,7 +9,7 @@ assignees: ''
 
 <!-- Please search the existing issues first as the problem may be already reported.
      Please verify the bug is not fixed in the latest beta:
-     https://github.com/violentmonkey/violentmonkey/releases -->
+     https://github.com/kstrikis/MCPMonkey/releases -->
 
 ### Sequence of actions: <!-- e.g. install userscript, open example.com, click page -->
 1.
@@ -25,4 +25,4 @@ assignees: ''
 #### Environment:
 - OS: Windows
 - Browser: Chrome 123 <!-- specify the real version -->
-- Violentmonkey Version:
+- MCPMonkey Version:

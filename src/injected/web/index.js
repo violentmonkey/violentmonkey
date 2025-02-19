@@ -109,7 +109,7 @@ addHandlers({
   Expose(allowGetScriptVer) {
     const key = 'external';
     const obj = window[key];
-    (isObject(obj) ? obj : (window[key] = {}))[VIOLENTMONKEY] = {
+    (isObject(obj) ? obj : (window[key] = {}))[MCPMONKEY] = {
       version: process.env.VM_VER,
       isInstalled: (name, namespace) => (
         allowGetScriptVer

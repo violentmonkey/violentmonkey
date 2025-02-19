@@ -30,6 +30,4 @@ jobs:
           commit-message: 'chore: update locale files from Transifex'
           title: Update locale files from Transifex
           body: >-
-            Violentmonkey updates translations from Transifex every week automatically.
-
-            If you want to help translate into your language, please join [our transifex project](https://explore.transifex.com/violentmonkey/violentmonkey-nex/).
+            MCPmonkey updates translations from Transifex every week automatically. (Actually, it's the Violentmonkey project that does this.).

@@ -112,7 +112,7 @@ async function exportData() {
       lastUpdated,
     };
     if (withValues) {
-      // `values` are related to scripts by `props.id` in Violentmonkey,
+      // `values` are related to scripts by `props.id` in MCPMonkey,
       // but by the global `props.uri` when exported.
       const values = data.values[script.props.id];
       if (values) vm.values[script.props.uri] = values;
@@ -125,7 +125,7 @@ async function exportData() {
     };
   });
   files.push({
-    name: 'violentmonkey',
+    name: 'mcpmonkey',
     content: JSON.stringify(vm, null, 2), // prettify to help users diff or view it
   });
   const zip = await loadZip();

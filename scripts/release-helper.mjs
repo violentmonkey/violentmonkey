@@ -39,7 +39,7 @@ function listCommits() {
   return `${prevTag}:\n${list}\n\nCommit log: ${
     process.env.GITHUB_SERVER_URL || 'https://github.com'
   }/${
-    process.env.GITHUB_REPOSITORY || 'violentmonkey/violentmonkey'
+    process.env.GITHUB_REPOSITORY || 'kstrikis/MCPmonkey'
   }/compare/${tagRange}`;
 }
 

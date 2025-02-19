@@ -78,7 +78,7 @@ onMounted(async () => {
   let fromHook;
   watch(hintShown, toggleStateHint);
   watch(theme, async val => {
-    if (fromHook) { // Do nothing if triggered by a duplicate Violentmonkey tab or sync
+    if (fromHook) { // Do nothing if triggered by a duplicate MCPMonkey tab or sync
       fromHook = false;
       return;
     }
