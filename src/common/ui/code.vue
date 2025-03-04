@@ -496,6 +496,11 @@ onMounted(() => {
     ...theme && { theme },
     ...internalOpts, // internal options passed via `props` have the highest priority
   };
+  if(Object.prototype.hasOwnProperty.call(opts, 'hintOptions')) {
+    if(Object.prototype.hasOwnProperty.call(opts.hintOptions, 'word')){
+      opts.hintOptions.word = new RegExp(opts.hintOptions.word);
+    }
+  }
   const cmWrapper = $cmWrapper.value;
   cm = CodeMirror(cmWrapper, opts);
   initialize();
