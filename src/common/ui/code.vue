@@ -125,7 +125,7 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  mode: String,
+  mode: [String, Object],
   commands: {
     type: Object,
     default: null,
@@ -491,11 +491,16 @@ onMounted(() => {
   const internalOpts = props.cmOptions || {};
   const opts = {
     ...cmDefaults,
+    mode: props.mode || cmDefaults.mode,
     ...userOpts,
     ...theme && { theme },
     ...internalOpts, // internal options passed via `props` have the highest priority
-    mode: props.mode || cmDefaults.mode,
   };
+  if(Object.prototype.hasOwnProperty.call(opts, 'hintOptions')) {
+    if(Object.prototype.hasOwnProperty.call(opts.hintOptions, 'word')){
+      opts.hintOptions.word = new RegExp(opts.hintOptions.word);
+    }
+  }
   const cmWrapper = $cmWrapper.value;
   cm = CodeMirror(cmWrapper, opts);
   initialize();
