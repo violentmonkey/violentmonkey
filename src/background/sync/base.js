@@ -2,7 +2,9 @@ import {
   debounce, normalizeKeys, request, noop, makePause, ensureArray, sendCmd,
   buffer2string, getRandomString,
 } from '@/common';
-import { TIMEOUT_HOUR } from '@/common/consts';
+import {
+  TIMEOUT_HOUR, NO_CACHE,
+} from '@/common/consts';
 import {
   forEachEntry, objectSet, objectPick,
 } from '@/common/object';
@@ -338,7 +340,7 @@ export const BaseService = serviceFactory({
     progress.total += 1;
     onStateChange();
     return lastFetch.then(() => {
-      options = Object.assign({}, options);
+      options = Object.assign({}, NO_CACHE, options);
       options.headers = Object.assign({}, this.headers, options.headers);
       let { url } = options;
       if (url.startsWith('/')) url = (options.prefix ?? this.urlPrefix) + url;
