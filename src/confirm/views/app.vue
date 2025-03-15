@@ -201,6 +201,7 @@ let disposeList;
 let guard;
 /** @type {VM.ConfirmCache} */
 let infoVal;
+let lastScriptId;
 let requireCache, requireUrls;
 let resourceCache, resourceUrls;
 let trackingPromise;
@@ -432,17 +433,19 @@ async function installScript(evt, parsedMeta) {
       reloadTab: reloadTab.value,
       reuseDeps: !!confirmedTime,
       bumpDate: true,
+      id: tracking.value && lastScriptId,
     });
     const time = new Date().toLocaleTimeString(['fr']);
     const time0 = confirmedTime || (confirmedTime = time);
     message.value = `${update.message} ${time0}${time0 === time ? '' : ` --> ${time}`}`;
     installed.value = true;
+    lastScriptId = update.props.id;
     if (btnId === '+track') {
       message.value = i18n('trackEditsNote')
         + (infoVal.ff >= 68 ? ' ' + i18n('installOptionTrackTooltip') : '');
       trackLocalFile();
     } else if (btnId === '+edit') {
-      location.href = extensionOptionsPage + ROUTE_SCRIPTS + '/' + update.props.id;
+      location.href = extensionOptionsPage + ROUTE_SCRIPTS + '/' + lastScriptId;
     } else if (btnId === '+close') {
       closeTab();
     }
