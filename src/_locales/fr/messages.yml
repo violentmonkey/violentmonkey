@@ -83,7 +83,7 @@ buttonReset:
   message: Réinitialiser
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Réinitialiser la configuration
 buttonRestore:
   description: Button to restore a removed script.
   message: Restaurer
@@ -95,7 +95,7 @@ buttonSaveClose:
   message: Sauvegarder et fermer
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Sauvegardé
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Afficher la configuration de l’éditeur
@@ -123,7 +123,9 @@ buttonVacuuming:
   message: Nettoyage des données…
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Les mises à jour automatiques sont désactivées pour ce script !
+    Cliquez sur OK pour le mettre à jour quand même.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -133,17 +135,23 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Annuler toutes les modifications apportées à la base de données
+    (importation, mise à jour, édition, personnalisation)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Les scripts se seront pas injectés dans les URL filtrées par cette liste.
+  message: >-
+    Liste noire d'injection (les scripts ne seront pas exécutés dans les sites
+    correspondants)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Liste noire du réseau (les scripts ne se connecteront pas aux sites
+    correspondants et à leurs cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    CSS personnalisée pour la page d’options et pour la page d’installation de
+    CSS personnalisé pour la page d’options et pour la page d’installation de
     script. Si vous n'êtes pas certain·e de ce que vous faites, veuillez ne pas
     l’éditer.
 descEditorOptions:
@@ -151,7 +159,7 @@ descEditorOptions:
   message: >-
     Options personnalisées pour CodeMirror et extensions dans un objet JSON
     comme<code>{"indentUnit":2, "smartIndent":true}</code>, cependant notez que
-    certaines peuvent ne pas marcher dans Violentmonkey. Voir la<a
+    certaines peuvent ne pas marcher dans Violentmonkey. Voir la <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">liste complète</a>. Pour utiliser un thème
     CodeMirror, spécifiez son nom de fichier comme <code>"theme":
@@ -161,25 +169,38 @@ descEditorOptions:
     le champ « Style personnalisé » ci-dessous.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Les options booléennes peuvent être activées en double-cliquant sur la
+    valeur : <code>true</code> = activé, <code>false</code> = désactivé. Les
+    options numériques se terminant par <code>Delay</code>,
+    <code>Interval</code>, <code>Rate</code>, <code>Time</code> sont exprimées
+    en millisecondes.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Options non standard : <code>autocompleteOnTyping</code> est un délai
+    exprimé en millisecondes pour l'affichage des indices de la saisie
+    semi-automatique après la frappe (<code>0</code> = désactivé),
+    <code>killTrailingSpaceOnSave</code> supprime automatiquement les espaces de
+    fin de ligne lors de l'enregistrement, <code>showTrailingSpace</code>
+    affiche les espaces de fin de ligne sous forme de points.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variables supportées : <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    avec un format compatible avec MomentJS, par exemple <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: grouper
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: masquer
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Scripts désactivés :'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: montrer
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentation on userscript metadata block and <code>GM</code> API:'
@@ -225,7 +246,7 @@ editValueAllHint:
   message: Montrer/éditer toutes les données stockées du script
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: Un gestionnaire de scipts utilisateurs qui supporte beaucoup de navigateurs
+  message: Un gestionnaire de scripts utilisateur qui supporte beaucoup de navigateurs
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -236,19 +257,29 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: "Violentmonkey ne peut pas lancer de scripts utilisateurs\nsur cette page (exemples courants\_: page du navigateur\nou d’une extension)"
+  message: "Violentmonkey ne peut pas lancer de scripts utilisateur\nsur cette page (exemples courants\_: page du navigateur\nou d’une extension)"
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Violentmonkey a été redémarré. Veuillez recharger l'onglet pour exécuter les
+    scripts utilisateur.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Il existe plusieurs méthodes pour installer ou suivre les modifications dans
+    un fichier local : <1> Glissez-déposez le fichier dans une page ou une
+    fenêtre contextuelle ouverte de Violentmonkey, y compris celle-ci. <2>
+    Installez un serveur HTTP local pour ce fichier et ouvrez-le via
+    http://localhost. <3>  Activez l'option « Autoriser l'accès aux URL de
+    fichiers » dans les détails de Violentmonkey sur la page
+    chrome://extensions. Ceci est dangereux car n'importe quel script
+    utilisateur peut lire n'importe quel fichier local.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ordre alphabétique
+  message: alphabétique
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ordre d’exécution
+  message: exécution
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: dernière mise à jour
@@ -281,16 +312,18 @@ genericUseGlobal:
   message: utiliser le paramètre global
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Les motifs « # » ne fonctionnent que lors de l'ouverture initiale du site ou
+    du rechargement de l'onglet : $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Corbeille
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Montrer les instructions pour les scripts locaux glissés-déposés
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: pour les $1 scripts correspondants
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: "URL source\_: "
@@ -307,7 +340,7 @@ hintVacuum:
     dans le cache.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Installer
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Installer depuis $1
@@ -359,10 +392,10 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Sauvegarde et maintenance
 labelBadge:
   description: Label for option to show number on badge.
-  message: "Montrer sur le badge\_: "
+  message: 'Badge :'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Couleurs des badges\_: '
@@ -425,7 +458,7 @@ labelExportScriptData:
   message: Exporter les données du script
 labelExposeStatus:
   description: Option in advanced settings.
-  message: "Exposer la version installée sur les sites de scripts utilisateurs\_: $1"
+  message: "Exposer la version installée sur les sites de scripts utilisateur\_: $1"
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
   message: Mode alternatif $1 sur Firefox
@@ -454,13 +487,13 @@ labelHomepageURL:
   message: "URL de la page d’accueil\_: "
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'URL de l''icône :'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importer les données du script
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Importer les paramètres
+  message: Importer une configuration
 labelInclude:
   description: Label of @include rules.
   message: Règles @include
@@ -587,7 +620,7 @@ labelSyncUsername:
   message: "Nom d’utilisateur\_: "
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Tags (séparés par des espaces) :'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Thème :'
@@ -608,7 +641,7 @@ labelViewTable:
   message: Vue du mode tableau
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Largeur :'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -627,7 +660,7 @@ labelXhrInjectHint:
     eux.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (sauf incognito et sites avec cookies désactivés)
 lastSync:
   description: Label for last sync timestamp.
   message: Dernière synchronisation le $1
@@ -683,7 +716,7 @@ menuMatchedFrameScripts:
   message: Scripts uniquement pour les sub-frames
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Scripts associés
+  message: 'Scripts associés '
 menuNewScript:
   description: Menu item to create a new script.
   message: Créer un nouveau script
@@ -833,7 +866,13 @@ msgSyntaxError:
   message: Erreur de syntaxe
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Le script n'existait pas ou ne correspondait pas à l'URL lorsque la page a
+    été chargée, ce qui se produit sur les sites à page unique comme Facebook ou
+    Instagram qui utilisent une fausse navigation. Vous pouvez recharger
+    l'onglet pour exécuter le script. Pour corriger le script, utilisez @match
+    pour l'ensemble du site, puis détectez les changements à l'aide de
+    MutationObserver ou de l'API window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script mis à jour.
@@ -899,31 +938,36 @@ optionUpdate:
   message: Mettre à jour
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Paramètres des fenêtres popup
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Clic droit : paramètres de la fenêtre popup'
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Lecture seule
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Les scripts mis à jour automatiquement sont en lecture seule, sauf si vous
+    désactivez les mises à jour ou si vous autorisez la modification.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Autoriser les modifications
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (les prochaines mises à jour les écraseront)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Réinstaller
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Recharger l'onglet
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Si cette option est activée, l'onglet actif sera rechargé lorsque des
+    changements seront détectés et que ce script correspondra à l'URL de
+    l'onglet.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -949,16 +993,18 @@ sideMenuSettings:
   message: Configuration
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Recharger la page sans script utilisateur
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Vous avez désactivé les scripts utilisateur pour cette page. Pour les
+    exécuter, rechargez la page ou naviguez dans l'onglet.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Ordre de tri :'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Arrêter le suivi
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Couleur normale du badge
@@ -975,30 +1021,59 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * La touche <kbd>Entrée</kbd> ajoute le texte à l'historique de
+    l'autocomplétion.
+
+
+    * Toutes les conditions sont insensibles à la casse
+
+
+    * Les conditions séparées par des espaces peuvent être combinées
+
+
+    * Recherche par métadonnées : <code>"Awesome Script" "Description"</code> 
+
+
+    * Recherche par tags : <code>#tag1 #tag2</code> 
+
+
+    * Recherche par nom de script : <code>name : "awesome name"</code> 
+
+
+    * Recherche par code du script : <code>code : "awesome code"</code> 
+
+
+    * Recherche négative : <code>!#tag2 !name : "unwanted" 
+
+
+    * Expressions régulières : <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re :"\w+ ? avec espace"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Activer/désactiver l'injection de scripts utilisateur
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Suivre les modifications externes
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Gardez cette page ouverte pour suivre vos modifications dans le fichier
+    local.
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Mettre à jour les scripts ($1)
 updateScript:
   description: Button to update one script.
   message: Mettre à jour
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Mettre à jour tous les scripts
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Mettre à jour les scripts de l'onglet actuel
 valueLabelKey:
   description: Label for key of a script value.
   message: Clé (chaine de caractères)
