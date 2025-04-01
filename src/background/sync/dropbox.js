@@ -174,7 +174,7 @@ const Dropbox = BaseService.extend({
     return this.prepare();
   },
 });
-register(Dropbox);
+if (config.client_id) register(Dropbox);
 
 function normalize(item) {
   return {

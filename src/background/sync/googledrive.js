@@ -217,7 +217,7 @@ const GoogleDrive = BaseService.extend({
     });
   },
 });
-register(GoogleDrive);
+if (config.client_id && config.client_secret) register(GoogleDrive);
 
 function normalize(item) {
   return {

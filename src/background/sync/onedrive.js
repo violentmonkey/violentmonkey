@@ -156,7 +156,7 @@ const OneDrive = BaseService.extend({
     });
   },
 });
-register(OneDrive);
+if (config.client_id && config.client_secret) register(OneDrive);
 
 function normalize(item) {
   return {
