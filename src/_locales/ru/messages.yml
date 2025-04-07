@@ -317,7 +317,7 @@ helpForLocalFile:
   message: Показать инструкцию по перетаскиванию локальных скриптов
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: применить к данным ($1) скриптам
+  message: применить к этим ($1) скриптам
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введите URL-адрес:'

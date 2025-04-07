@@ -1,16 +1,16 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: تطبيق
 buttonCancel:
   description: Cancel button on dialog.
-  message: ''
+  message: إلغاء
 buttonCheckForUpdates:
   description: Button to check a script for updates.
   message: ''
   touched: false
 buttonClose:
   description: Button to close window.
-  message: ''
+  message: إغلاق
 buttonConfirmInstallation:
   description: Button to confirm installation of a script.
   message: ''
@@ -21,33 +21,35 @@ buttonConfirmReinstallation:
   touched: false
 buttonDisable:
   description: Button to disable a script.
-  message: ''
+  message: تعطيل
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
   touched: false
 buttonEdit:
   description: Button to edit a script.
-  message: ''
+  message: تعديل
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    يمكنك أيضًا النقر بزر الفأرة الأيمن أو النقر بالزر الأيمن أو النقر بالزر
+    CTRL أو النقر بالعجلة على اسم السكريبت.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: أفرغ سلة المحذوفات الآن!
 buttonEnable:
   description: Button to enable a script.
-  message: ''
+  message: تفعيل
 buttonExportData:
   description: Button to open the data export dialog.
-  message: ''
+  message: تصدير إلى zip
 buttonFilter:
   description: Button to show filters menu.
   message: ''
   touched: false
 buttonHome:
   description: Button to open homepage.
-  message: ''
+  message: الصفحة الرئيسية
 buttonImportData:
   description: Button to choose a file for data import.
   message: ''
@@ -60,22 +62,22 @@ buttonInstallOptions:
   touched: false
 buttonNew:
   description: Button to create a new script.
-  message: ''
+  message: جديد
 buttonOK:
   description: OK button on dialog.
-  message: ''
+  message: موافق
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: ''
 buttonRemove:
   description: Button to remove a script.
-  message: ''
+  message: إزالة
 buttonReplace:
   description: Button to replace the current match.
   message: ''
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: ''
+  message: الكل
 buttonReset:
   description: Button to reset to default values.
   message: ''
@@ -410,7 +412,7 @@ labelHelpTranslate:
   message: ''
 labelHomepage:
   description: Label for home page in about tab.
-  message: ''
+  message: الصفحة الرئيسية
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: ''
