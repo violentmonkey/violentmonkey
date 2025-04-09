@@ -34,7 +34,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
   const cmStartState = CodeMirror.startState;
   const cmPass = CodeMirror.Pass;
 
-  const jsMode = CodeMirror.getMode(config, { name: 'javascript' });
+  const jsMode = CodeMirror.getMode(config, { name: 'javascript', globalVars: config.globalVars });
   const jsTokenQuasi = (() => {
     // create a new stream of a non-ending (1st line of a multiline)
     // string template to obtain tokenQuasi tokenizer
