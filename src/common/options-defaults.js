@@ -101,4 +101,5 @@ export default {
   valueEditor: defaultsValueEditor,
   /** @type {'' | 'dark' | 'light'} */
   uiTheme: '',
+  allowNativeMessaging: false,
 };

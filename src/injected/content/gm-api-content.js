@@ -8,6 +8,7 @@ const { toLowerCase } = '';
 const { [IDS]: ids } = bridge;
 let setPopupThrottle;
 let isPopupShown;
+const ports = new Map();
 
 addBackgroundHandlers({
   async PopupShown(state) {
@@ -51,6 +52,41 @@ addHandlers({
   UnregisterMenu({ id, key }) {
     delete menus[id]?.[key];
     sendSetPopup(true);
+  },
+
+  NativeConnect({ id, app, handle }) {
+    // TODO check global settings for allowNativeMessaging
+    browser.permissions.request({permissions: ['nativeMessaging']}).then(res=>{
+      if (!res) return;
+      const port = browser.runtime.connectNative(app);
+      port.onMessage.addListener(msg => sendCmd('NativeConnectionEvent', {
+        [IDS]: ids,
+        [INJECT_INTO]: bridge[INJECT_INTO],
+        handle,
+        event: "message",
+        msg,
+      }));
+      port.onDisconnect.addListener(msg => sendCmd('NativeConnectionEvent', {
+        [IDS]: ids,
+        [INJECT_INTO]: bridge[INJECT_INTO],
+        handle,
+        event: "disconnect",
+      }));
+      ports.set(handle, port);
+    });
+  },
+
+  NativePostMessage({handle, msg}) {
+    const port = ports.get(handle);
+    if (port) port.postMessage(msg);
+  },
+
+  NativeDisconnect({handle}) {
+    const port = ports.get(handle);
+    if (port) {
+      port.disconnect();
+      ports.delete(handle);
+    }
   },
 });
 

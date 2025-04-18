@@ -4,7 +4,9 @@ import { commands, storages } from './store';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
-import { changeHooks, decodeValue, dumpValue } from './gm-values';
+import { changeHooks, decodeValue, dumpValue, loadValues } from './gm-values';
+import { jsonDump } from './util';
+import { nativeConnect } from "./native";
 
 const resolveOrReturn = (context, val) => (
   context.async ? promiseResolve(val) : val
@@ -156,6 +158,17 @@ export const GM_API_CTX = {
   GM_notification: createNotification,
   GM_xmlhttpRequest: GM4_ALIAS.xmlHttpRequest = function (opts) {
     return onRequestCreate(nullObjFrom(opts), this);
+  },
+  /**
+   * @this {GMContext}
+   * @param {String} app
+   */
+  GM_nativeConnect(apps) {
+    return function(app) {
+      if (app in apps) {
+        return nativeConnect(this.id, app);
+      }
+    }
   },
 };
 

@@ -49,10 +49,12 @@ export function makeGmApiWrapper(script) {
   assign(gm, componentUtils);
   defineGmInfoProps(makeGmInfo, 'get');
   for (let name of grant) {
-    let fn, fnGm4, gmName, gm4name;
+    let fn, fnGm4, gmName, gm4name, extra;
+    if (name.startsWith('GM_nativeConnect')) [name, ...extra] = name.split(' ');
     if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
     || (fn = GM_API_CTX[gmName = gm4name ? `GM_${gm4name}` : name])
     || (fn = GM_API_CTX_GM4ASYNC[gmName]) && (!gm4name || (fnGm4 = fn))) {
+      if (name === 'GM_nativeConnect') fn = fn(extra);
       fn = safeBind(fnGm4 || fn,
         fnGm4
           ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
