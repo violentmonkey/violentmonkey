@@ -138,10 +138,14 @@ confirmUndoImport:
     editare, personalizare)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Scripturile nu vor fi injectate în URL-urile corespondente acestei liste.
+  message: >-
+    Lista neagră pentru injectare (scripturile nu vor rula în site-urile
+    coincidente)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Lista neagră pentru rețea (scripturile nu se vor conecta la site-urile
+    coincidente și la cookie-urile acestora)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -180,16 +184,16 @@ descScriptTemplate:
     <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: grupează-le
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: ascunde-le
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Scripturi dezactivate:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: afișează-le
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -243,7 +247,7 @@ extName:
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Trecut în lista neagră din setările Violentmonkey
+  message: Trecut în lista neagră în setările Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
@@ -270,10 +274,10 @@ fileInstallBlocked:
     periculos, deoarece orice userscript poate citi orice fișier local.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ordinea alfabetică
+  message: alfabetică
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ordinea executării
+  message: executare
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: momentul ultimei actualizări
@@ -385,7 +389,7 @@ labelBackupMaintenance:
   message: Backup și mentenanță
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Afișează pe insignă: '
+  message: 'Insignă:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Culori pentru insignă:'
@@ -477,7 +481,7 @@ labelHomepageURL:
   message: 'URL pentru pagina de start:'
 labelIconURL:
   description: Label for the input.
-  message: 'URL-ul pictogramei:'
+  message: 'URL pentru pictogramă:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importă datele scripturilor
@@ -629,7 +633,7 @@ labelViewTable:
   message: Vizualizare tip listă
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Lățime:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -929,10 +933,10 @@ optionUpdate:
   message: Actualizare
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Setări pentru popup
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Clic dreapta: setări pentru popup'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Numai pentru citire
@@ -991,7 +995,7 @@ skipScriptsMsg:
     reîncarcă sau navighează în filă.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Ordine de sortare:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Oprește urmărirea
@@ -1034,7 +1038,7 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Comută injectarea de userscripturi
 trackEdits:
   description: Button in a script installation dialog.
   message: Urmărește editările externe
@@ -1054,7 +1058,7 @@ updateScriptsAll:
   message: Actualizează toate scripturile
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Actualizează scripturile filei actuale
 valueLabelKey:
   description: Label for key of a script value.
   message: Cheie (șir de caractere)
