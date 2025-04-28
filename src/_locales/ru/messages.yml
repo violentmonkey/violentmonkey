@@ -439,7 +439,7 @@ labelExcludeMatch:
   message: '@exclude-match правила исключения соответствий'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Экспорт данных скриптов
+  message: Экспортировать данные скриптов
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов: $1'
@@ -473,10 +473,10 @@ labelIconURL:
   message: 'Адрес значка:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: Импорт данных скрипта
+  message: Импортировать данные скриптов
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Импорт настроек
+  message: Импортировать настройки
 labelInclude:
   description: Label of @include rules.
   message: '@include правила включения'
