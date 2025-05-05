@@ -363,7 +363,7 @@ labelAuthor:
   message: 'Autor: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z menu
+  message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z ponuky
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
