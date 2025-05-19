@@ -53,14 +53,14 @@ buttonImportData:
   message: Importēt zip arhīvu
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: ''
+  message: Uzstādīt no URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: ''
   touched: false
 buttonNew:
   description: Button to create a new script.
-  message: ''
+  message: Jauns
 buttonOK:
   description: OK button on dialog.
   message: Labi
@@ -84,7 +84,7 @@ buttonResetSettings:
   message: ''
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: Atjaunot
 buttonSave:
   description: Button to save modifications of a script.
   message: Saglabāt
@@ -102,7 +102,7 @@ buttonSupport:
   message: Atbalsta lapa
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: Atsaukt
 buttonUpdate:
   description: Button to update a script.
   message: Atjaunināt
@@ -168,7 +168,7 @@ editHelpDocumention:
   message: ''
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'Īsinājumtaustiņi:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
   message: ''
@@ -177,7 +177,7 @@ editLabelMeta:
   message: ''
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: Skripta iestatījumi
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
   message: Rinda ir pārāk gara
@@ -243,7 +243,7 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: izmēra
 genericError:
   description: Label for generic error.
   message: Kļūda
@@ -252,7 +252,7 @@ genericOff:
   message: izslēgts
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: ''
+  message: ieslēgts
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
   message: ''
@@ -282,10 +282,10 @@ hintVacuum:
   message: ''
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Uzstādīt
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: Uzstādīt no $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: ''
@@ -304,10 +304,10 @@ labelAdvanced:
   message: ''
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: ''
+  message: Atļaut atjaunināt
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: ''
+  message: 'Izstrādāja: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: ''
@@ -368,7 +368,7 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: ''
+  message: 'Lejupielādes URL:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
   message: ''
@@ -380,7 +380,7 @@ labelEditor:
   message: ''
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: tikai iespējotos skriptus
 labelExclude:
   description: Label of @exclude rules.
   message: ''
@@ -407,7 +407,7 @@ labelGeneral:
   message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: Palīdziet iztulkot
 labelHomepage:
   description: Label for home page in about tab.
   message: Mājas lapa
@@ -416,10 +416,10 @@ labelHomepageURL:
   message: ''
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'Ikonas URL:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: Ievietot skripta datus
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Importēt iestatījumus
@@ -442,13 +442,13 @@ labelLastUpdatedAt:
   message: ''
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'Rindas Nr.: '
 labelMatch:
   description: Label of @match rules.
   message: ''
 labelName:
   description: Label of script name.
-  message: ''
+  message: 'Nosaukums:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
   message: ''
@@ -466,13 +466,13 @@ labelNotifyThisUpdated:
   message: ''
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: Paziņot par skriptu atjauninājumiem
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: Konfidencialitātes politika
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
@@ -513,7 +513,7 @@ labelSync:
   message: ''
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: Izmantot anonīmu kontu
 labelSyncAuthorize:
   description: Label for button to authorize a service.
   message: ''
@@ -525,7 +525,7 @@ labelSyncDisabled:
   message: ''
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'Parole: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
@@ -544,13 +544,13 @@ labelSyncService:
   message: ''
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'Lietotājvārds: '
 labelTags:
   description: Label for custom tags.
   message: 'Birkas (atdalīt ar atstarpi):'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Motīvs: '
 labelTranslator:
   description: Label of translator.
   message: ''
@@ -562,10 +562,10 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Viena kolonna
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Tabulas skats
 labelWidth:
   description: Width.
   message: 'Platums:'
@@ -631,13 +631,13 @@ menuMatchedScripts:
   message: ''
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: Izveidot jaunu skriptu
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: ''
+  message: Skripti atspējoti
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: ''
+  message: Skripti iespējoti
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
   message: ''
@@ -675,7 +675,7 @@ msgIncognitoChanges:
   message: ''
 msgInstalled:
   description: Message shown when a script is installed.
-  message: ''
+  message: Skripts uzstādīts.
 msgInvalidScript:
   description: Message shown when script is invalid.
   message: ''
@@ -714,7 +714,7 @@ msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: ''
+  message: Pieejama jauna versija.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
   message: ''
@@ -838,7 +838,7 @@ optionUpdate:
   message: Atjaunināt
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Uznirstošo logu iestatījumi
 popupSettingsHint:
   description: Hint for the config button in the popup
   message: ''
@@ -873,16 +873,16 @@ removeAllScriptsConfirm:
   touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: Reģistrjutīgs
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: Lietot regulāro izteiksmi
 sideMenuAbout:
   description: 'Side menu: About'
   message: Par
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: ''
+  message: Uzstādītie skripti
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Iestatījumi
@@ -896,7 +896,7 @@ skipScriptsMsg:
     ielādējiet vai pārvietojieties pa cilni.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Kārtot pēc:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: ''
