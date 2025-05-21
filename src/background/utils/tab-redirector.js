@@ -51,8 +51,8 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 const whitelistRe = re`/^https:\/\/(
-  (greas|sleaz)yfork\.org\/scripts\/[^/]*\/code|
-  update\.(greas|sleaz)yfork\.org\/scripts|
+  (greas|sleaz)yfork\.(org|cc)\/scripts\/[^/]*\/code|
+  update\.(greas|sleaz)yfork\.(org|cc)\/scripts|
   openuserjs\.org\/install\/[^/]*|
   github\.com\/[^/]*\/[^/]*\/(
     raw\/[^/]*|
@@ -66,7 +66,7 @@ const whitelistRe = re`/^https:\/\/(
 )\/[^/]*?\.user\.js  ([?#]|$)  /ix`;
 const blacklistRe = re`/^https?:\/\/(
   (gist\.)?github\.com|
-  ((greas|sleaz)yfork|openuserjs)\.org
+  ((greas|sleaz)yfork|openuserjs)\.(org|cc)
 )\//ix`;
 const resolveVirtualUrl = url => (
   `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`

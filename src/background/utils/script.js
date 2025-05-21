@@ -221,7 +221,7 @@ function inferScriptSupportUrl(script, home = getScriptHome(script)) {
   let u = home && home.match(re`/
     ^https:\/\/(?:
       (?:
-        (greas|sleaz)yfork\.org(?:\/(?!scripts)[^/]+)? |
+        (greas|sleaz)yfork\.(?:org|cc)(?:\/(?!scripts)[^/]+)? |
         openuserjs\.org
       )(?=\/scripts\/) |
       github\.com
