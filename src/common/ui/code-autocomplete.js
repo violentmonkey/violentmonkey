@@ -3,7 +3,7 @@ import { defaultsEditor, kAutocompleteOnTyping as ID } from '@/common/options-de
 
 const OPTIONS = 'options';
 const STATE = 'state';
-const HINT_OPTIONS = 'hintOptions';
+export const HINT_OPTIONS = 'hintOptions';
 const COMPLETE_SINGLE = 'completeSingle';
 const PICKED = 'picked';
 const TIMER = 'timer';

@@ -109,6 +109,7 @@ CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, watchEffect } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import ToggleButton from '@/common/ui/toggle-button';
+import { HINT_OPTIONS } from './code-autocomplete';
 
 let cm;
 let maxDisplayLength;
@@ -494,9 +495,12 @@ onMounted(() => {
     ...userOpts,
     ...theme && { theme },
     ...internalOpts, // internal options passed via `props` have the highest priority
-    mode: props.mode || cmDefaults.mode,
+    mode: props.mode || userOpts.mode || cmDefaults.mode,
   };
   const cmWrapper = $cmWrapper.value;
+  const ho = opts[HINT_OPTIONS];
+  const hoWord = ho?.word;
+  if (hoWord) try { ho.word = new RegExp(hoWord); } catch {/**/}
   cm = CodeMirror(cmWrapper, opts);
   initialize();
   onActive(true); // DANGER! Must precede expandKeyMap.
