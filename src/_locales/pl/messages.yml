@@ -263,16 +263,23 @@ failureReasonRestarted:
     uruchomić skrypty użytkownika.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Istnieje kilka sposobów instalacji lub śledzenia zmian w pliku lokalnym: <1>
+    Przeciągnij i upuść plik na otwartą stronę lub okno Violentmonkey (także
+    tutaj). <2> Skonfiguruj lokalny serwer HTTP i otwórz plik przez
+    http://localhost. <3> Włącz "Zezwalaj na dostęp do adresów URL plików" w
+    szczegółach rozszerzenia Violentmonkey na stronie chrome://extensions. Jest
+    to ryzykowne, ponieważ każdy skrypt użytkownika będzie mógł odczytywać
+    lokalne pliki.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: kolejności alfabetycznej
+  message: alfabetycznie
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: kolejności wykonywania
+  message: według kolejności wykonywania
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: czasu ostatniej aktualizacji
+  message: według daty ostatniej aktualizacji
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Wszędzie
@@ -287,7 +294,7 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: rozmiaru
+  message: według rozmiaru
 genericError:
   description: Label for generic error.
   message: Błąd
@@ -379,7 +386,7 @@ labelBackupMaintenance:
   message: Kopia zapasowa i konserwacja
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Wyświetl na plakietce: '
+  message: 'Pokaż na plakietce:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Kolory plakietki:'
@@ -851,7 +858,13 @@ msgSyntaxError:
   message: Błąd składni?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Skrypt nie istniał lub nie pasował do bieżącego adresu URL w momencie
+    ładowania strony. Dzieje się tak na stronach typu Single-Page Application
+    (SPA), takich jak Facebook lub Instagram, gdzie nawigacja odbywa się bez
+    przeładowania strony. Odśwież kartę by uruchomić skrypt albo zastosuj @match
+    dla całej strony i wykrywaj zmiany za pomocą MutationObserver lub
+    window.navigation API.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skrypt zaktualizowany.
@@ -979,7 +992,7 @@ skipScriptsMsg:
     ponownie lub nawiguj w karcie.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: 'Kolejność sortowania:'
+  message: 'Sortuj:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Przestań śledzić
