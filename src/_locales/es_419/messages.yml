@@ -32,8 +32,8 @@ buttonEdit:
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
   message: >-
-    También puedes hacer clic derecho, clic en Ctrl, clic de la rueda en el
-    nombre del script.
+    También puedes hacer clic derecho, Ctrl + clic o clic con la rueda del mouse
+    en el nombre del script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: ¡Vaciar papelera de reciclaje ahora!
@@ -83,7 +83,7 @@ buttonReset:
   message: Restablecer
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Restablecer configuración
 buttonRestore:
   description: Button to restore a removed script.
   message: Restaurar
@@ -95,7 +95,7 @@ buttonSaveClose:
   message: Guardar y cerrar
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Guardado
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Mostrar estado del editor
@@ -123,7 +123,9 @@ buttonVacuuming:
   message: Vaciando datos...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    ¡La actualización automática está deshabilitada para este script!
+    Haz clic en Aceptar para actualizarlo de todos modos.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -133,13 +135,19 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Revertir todos los cambios realizados en la base de datos (importaciones,
+    actualizaciones, ediciones y personalizaciones)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Las URLs que coincidan en esta lista no serán inyectadas por los scripts.
+  message: >-
+    Lista negra de inyección (los scripts no se ejecutarán en los sitios que
+    coincidan)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Lista negra de red (los scripts no se conectarán a los sitios que coincidan
+    ni a sus cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -152,33 +160,40 @@ descEditorOptions:
     <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo ten en cuenta
     que algunas de ellas pueden no funcionar en Violentmonkey. Ver <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">lista completa</a>. Para usar un tema
-    personalizado de CodeMirror, especifica su nombre de archivo como
-    <code>"theme": "3024-day"</code> aquí y pega el <a
-    href="https://github.com/codemirror/CodeMirror/tree/master/theme"
-    target="_blank" rel="noopener noreferrer">CSS del tema actual</a> en la
-    entrada "Estilo personalizado" de abajo.
+    rel="noopener noreferrer">lista completa</a>. 
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Las opciones booleanas pueden alternarse haciendo doble clic sobre el valor:
+    <code>true</code> = habilitado, <code>false</code> = deshabilitado. Las
+    opciones numéricas que terminan en <code>Delay</code>,
+    <code>Interval</code>, <code>Rate</code>, <code>Time</code> están expresadas
+    en milisegundos.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Opciones no estándar: <code>autocompleteOnTyping</code> es un retardo en
+    milisegundos para mostrar sugerencias de autocompletado después de escribir
+    (<code>0</code> = deshabilitar), <code>killTrailingSpaceOnSave</code>
+    elimina automáticamente los espacios al final de cada línea al guardar,
+    <code>showTrailingSpace</code> muestra los espacios finales como puntos.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variables compatibles: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    con un formato compatible con MomentJS, por ejemplo <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: agrupar
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: ocultar
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Scripts deshabilitados:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: mostrar
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -223,7 +238,7 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: Mostrar/editar todo los valores de almacenamiento del script
+  message: Mostrar/editar todos los valores almacenados del script
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: >-
@@ -246,13 +261,20 @@ failureReasonNoninjectable:
     de políticas, un sitio de motor de búsqueda en Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: Violentmonkey se reinició. Recarga la pestaña para ejecutar los userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Hay varios métodos para instalar o rastrear ediciones en un archivo local:
+    <1> Arrastra y suelta el archivo en una página abierta o menú emergente de
+    Violentmonkey (incluida esta). <2> Instala un servidor HTTP local para ese
+    archivo y ábrelo desde http://localhost. <3> Activa la opción “Permitir el
+    acceso a las URL del archivo” en los detalles de Violentmonkey en la página
+    chrome://extensions. Esto es peligroso, ya que cualquier userscript podría
+    leer cualquier archivo local.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: orden alfabético
+  message: alfabéticamente
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: orden de ejecución
@@ -294,10 +316,10 @@ headerRecycleBin:
   message: Papelera de reciclaje
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Mostrar las instrucciones para scripts locales arrastrados y soltados
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: para $1 scripts coincidentes
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Ingrese la URL:'
@@ -314,7 +336,7 @@ hintVacuum:
     la memoria caché.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Instalar
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Instalar desde $1
@@ -364,7 +386,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Copia de seguridad y mantenimiento
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostrar en el icono de la extensión: '
@@ -433,10 +455,14 @@ labelExposeStatus:
   message: 'Exponer la versión instalada en los sitios del catálogo de userscripts: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Modo $1 alternativo en Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Un método de inyección alternativo para scripts <document-start> disponible
+    desde Firefox 59, más rápido que el modo predeterminado. Al igual que el
+    "modo page sincrónico", también incrementa el uso de memoria, por lo que
+    podrías desactivarlo si tus scripts funcionan correctamente sin esta opción.
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
@@ -454,7 +480,7 @@ labelHomepageURL:
   message: 'URL de la página principal:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'URL del ícono:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Importar datos del script
@@ -545,7 +571,7 @@ labelSettings:
   message: Configuración
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: Mostrar posiciones de las órdenes de ejecución
+  message: Mostrar las posiciones del orden de ejecución
 labelSync:
   description: Label for sync options.
   message: Sincronizar
@@ -585,7 +611,7 @@ labelSyncUsername:
   message: 'Nombre de usuario: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Etiquetas (separadas por un espacio):'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema:'
@@ -600,13 +626,13 @@ labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: Columna única
+  message: Una sola columna
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
   message: Vista de tabla
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Ancho:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -625,7 +651,7 @@ labelXhrInjectHint:
     en una de ellas.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (excepto en modo incógnito y en sitios con cookies deshabilitadas)
 lastSync:
   description: Label for last sync timestamp.
   message: Última sincronización en $1
@@ -653,8 +679,7 @@ menuExcludeHint:
     La pestaña actual se recargará automáticamente si habilitaste esta opción en
     la configuración general.
 
-    Para aplicar los cambios a todas las demás pestañas, recargarlas
-    manualmente.
+    Para aplicar los cambios en las demás pestañas, recárgalas manualmente.
 
     Utiliza la pestaña "Configuración" del editor para mayor flexibilidad.
 menuFeedback:
@@ -768,7 +793,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Ya hay un script instalado con el mismo @name y @namespace.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -779,7 +804,7 @@ msgNoUpdate:
   message: No se han encontrado actualizaciones.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Error al actualizar los scripts. Haz clic para abrirlos.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
@@ -845,7 +870,7 @@ noValues:
   message: No se almacena ningún valor
 optionEditorWindow:
   description: Label for the option in settings
-  message: Abrir editor desde ventana emergente en una ventana nueva
+  message: Abrir el editor desde el menú emergente en una nueva ventana
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
@@ -868,7 +893,7 @@ optionPopupGroupDisabled:
   touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Agrupar por etapa @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Ocultar deshabilitados
@@ -899,31 +924,35 @@ optionUpdate:
   message: Actualizar
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Configuración del menú emergente
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Clic derecho: configuración del menú emergente'
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Solo lectura
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Este script con actualizaciones automáticas es de solo lectura, a menos que
+    desactives las actualizaciones o habilites la edición.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Permitir ediciones
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (la próxima actualización las sobrescribirá)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Reinstalar
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Recargar página
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Si está habilitado, se recargará la pestaña actual cuando se detecten
+    cambios y este script coincida con la URL de la pestaña.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -949,16 +978,18 @@ sideMenuSettings:
   message: Configuración
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Recargar la página sin userscripts
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Has desactivado los userscripts para esta página. Para ejecutarlos, recarga
+    o navega en la pestaña.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Ordenar por:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Dejar de rastrear
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Color normal del icono
@@ -977,30 +1008,48 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * La tecla <kbd>Enter</kbd> agrega el texto al historial de autocompletado
+
+    * Todas las condiciones no distinguen mayúsculas/minúsculas
+
+    * Las condiciones separadas por espacios se pueden combinar
+
+    * Búsqueda por metadatos: <code>"Awesome Script" "Description"</code>
+
+    * Búsqueda por etiquetas: <code>#tag1 #tag2</code>
+
+    * Búsqueda por nombre del script: <code>name:"awesome name"</code>
+
+    * Búsqueda por código del script: <code>code:"awesome code"</code>
+
+    * Búsqueda excluyendo resultados: <code>!#tag2 !name:"unwanted"</code>
+
+    * Expresiones regulares: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Activar o desactivar inyección de userscripts
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Rastrear ediciones externas
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Mantén esta página abierta para rastrear tus ediciones en el archivo local
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Actualizar scripts ($1)
 updateScript:
   description: Button to update one script.
   message: Actualizar
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Actualizar todos los scripts
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Actualizar scripts de la pestaña actual
 valueLabelKey:
   description: Label for key of a script value.
   message: Clave (cadena)
