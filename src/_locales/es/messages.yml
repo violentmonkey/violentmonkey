@@ -83,7 +83,7 @@ buttonReset:
   message: Restablecer
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Restablecer configuración
 buttonRestore:
   description: Button to restore a removed script.
   message: Restaurar
@@ -161,19 +161,21 @@ descEditorOptionsVM:
   message: ''
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Variables compatibles: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    con un formato compatible con MomentJS, por ejemplo <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: agrupar
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: ocultar
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Scripts deshabilitados:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: mostrar
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: >-
@@ -357,7 +359,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Copia de seguridad y mantenimiento
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Mostrar en el icono de la extensión:'
@@ -599,7 +601,7 @@ labelViewTable:
   message: Vista de tabla
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Ancho:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -906,10 +908,10 @@ readonlyNote:
   message: ''
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Permitir ediciones
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (la próxima actualización las sobrescribirá)
 reinstall:
   description: Button to reinstall a script
   message: ''
@@ -992,7 +994,7 @@ updateScript:
   message: Actualizar
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Actualizar todos los scripts
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: ''
