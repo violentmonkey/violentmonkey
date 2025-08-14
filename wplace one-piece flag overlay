@@ -1,0 +1,98 @@
+javascript:(function(){
+    // Coordinates for Tonle Mekong in Siem Reap (adjust as needed)
+    const targetX = 1000;  // Replace with actual x coordinate
+    const targetY = 1000;  // Replace with actual y coordinate
+    
+    // Prompt user for image URL
+    const imageUrl = prompt('Enter URL of your song frame image:', 'https://www.google.com/search?q=one+piece+flag&oq=on&gs_lcrp=EgZjaHJvbWUqDggAEEUYOxhDGIAEGIoFMg4IABBFGDsYQxiABBiKBTIICAEQRRgnGDsyCAgCEEUYJxg7MgYIAxBFGDkyDQgEEAAYkQIYgAQYigUyBggFEEUYPTIGCAYQRRg9MgwIBxAAGEMYgAQYigUyDQgIEAAYkQIYgAQYigUyEggJEC4YQxjUAhixAxiABBiKBTISCAoQLhhDGNQCGLEDGIAEGIoFMgwICxAAGEMYgAQYigUyCggMEAAYsQMYgAQyCggNEAAYsQMYgAQyCggOEAAYsQMYgATSAQgxMzE3ajBqOagCALACAQ&client=ms-android-oppo-rvo3&sourceid=chrome-mobile&ie=UTF-8#imgrc=gqz4gpdYciaeUM&imgdii=NDAEwf6uUvudpM');
+    if (!imageUrl) return;
+    
+    // Create overlay container
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.zIndex = '9999';
+    
+    // Create image element with your specified dimensions
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.style.position = 'absolute';
+    img.style.transform = 'translate(-50%, -50%)';
+    img.style.left = targetX + 'px';
+    img.style.top = targetY + 'px';
+    img.style.width = '100px'; // Set width to 100px
+    img.style.height = '50px'; // Set height to 50px
+    img.style.objectFit = 'contain'; // Preserve aspect ratio
+    img.style.opacity = '0.7'; // Adjust transparency
+    
+    // Add controls
+    const controls = document.createElement('div');
+    controls.style.position = 'fixed';
+    controls.style.bottom = '20px';
+    controls.style.left = '20px';
+    controls.style.zIndex = '10000';
+    controls.style.pointerEvents = 'auto';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Remove Overlay';
+    closeBtn.style.padding = '8px';
+    closeBtn.style.margin = '4px';
+    closeBtn.style.fontSize = '14px';
+    closeBtn.onclick = function() {
+        document.body.removeChild(overlay);
+        document.body.removeChild(controls);
+    };
+    
+    const moveBtn = document.createElement('button');
+    moveBtn.textContent = 'Move Overlay';
+    moveBtn.style.padding = '8px';
+    moveBtn.style.margin = '4px';
+    moveBtn.style.fontSize = '14px';
+    moveBtn.onclick = function() {
+        let isDragging = false;
+        img.style.pointerEvents = 'auto';
+        
+        function startDrag(e) {
+            isDragging = true;
+            e.preventDefault();
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+            img.style.left = x + 'px';
+            img.style.top = y + 'px';
+        }
+        
+        function endDrag() {
+            isDragging = false;
+            img.style.pointerEvents = 'none';
+            // Remove event listeners
+            img.removeEventListener('mousedown', startDrag);
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            img.removeEventListener('touchstart', startDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', endDrag);
+        }
+        
+        img.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', endDrag);
+        img.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', endDrag);
+    };
+    
+    controls.appendChild(moveBtn);
+    controls.appendChild(closeBtn);
+    
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+    document.body.appendChild(controls);
+})();
