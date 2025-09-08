@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Εφαρμογή
 buttonCancel:
   description: Cancel button on dialog.
   message: Ακύρωση
@@ -31,16 +31,18 @@ buttonEdit:
   message: Επεξεργασία
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    Εναλλακτικά, μπορείτε να κάνετε δεξί κλικ, κλικ κρατώντας το πλήκτρο Ctrl
+    πατημένο ή κλικ με τη ροδέλα του ποντικιού στο όνομα του script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: Άδειασμα κάδου ανακύκλωσης τώρα!
+  message: Άδειασμα κάδου ανακύκλωσης
 buttonEnable:
   description: Button to enable a script.
   message: Ενεργοποίηση
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Εξαγωγή σε zip
+  message: Εξαγωγή σε αρχείο zip
 buttonFilter:
   description: Button to show filters menu.
   message: Φίλτρα
@@ -50,10 +52,10 @@ buttonHome:
   message: Αρχική σελίδα
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Εισαγωγή από zip
+  message: Εισαγωγή από αρχείο zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Εγκατάσταση από URL
+  message: Εγκατάσταση από διεύθυνση URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Επιλογές
@@ -63,10 +65,10 @@ buttonNew:
   message: Νέο
 buttonOK:
   description: OK button on dialog.
-  message: Εντάξει
+  message: ΟΚ
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: Κάδος Ανακύκλωσης
+  message: Κάδος ανακύκλωσης
 buttonRemove:
   description: Button to remove a script.
   message: Αφαίρεση
@@ -81,7 +83,7 @@ buttonReset:
   message: Επαναφορά
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Επαναφορά όλων των ρυθμίσεων
 buttonRestore:
   description: Button to restore a removed script.
   message: Επαναφορά
@@ -90,13 +92,13 @@ buttonSave:
   message: Αποθήκευση
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Αποθήκευση και Κλείσιμο
+  message: Αποθήκευση και κλείσιμο
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Αποθηκεύτηκε
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: Εμφάνιση κατάστασης επεξεργαστή κώδικα
+  message: Εμφάνιση κατάστασης επεξεργαστή κειμένου
 buttonSupport:
   description: Button to open support page.
   message: Βοήθεια
@@ -115,75 +117,105 @@ buttonVacuum:
   message: Εκκαθάριση βάσης δεδομένων
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Δεδομένα διαγράφηκαν
+  message: Η εκκαθάριση ολοκληρώθηκε
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Διαγραφή δεδομένων...
+  message: Εκκαθάριση...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: >-
+    Αυτό το script δεν ενημερώνεται αυτόματα!
+
+    Κάντε κλικ στο κουμπί «ΟΚ» αν θέλετε να πραγματοποιήσετε την ενημέρωση ούτως
+    ή άλλως.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: |-
-    'Οι αλλαγές δεν αποθηκεύτηκαν!'
-    'Πατήστε Εντάξει για να τις απορρίψετε ή Άκυρο για να παραμείνετε.'
+  message: >-
+    Οι αλλαγές δεν έχουν αποθηκευτεί!
+
+    Κάντε κλικ στο κουμπί «ΟΚ» για να τις απορρίψετε ή στο κουμπί «Άκυρο» για να
+    παραμείνετε σε αυτή τη σελίδα.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Αναίρεση όλων των αλλαγών που πραγματοποιήθηκαν στη βάση δεδομένων
+    (εισαγωγή, ενημέρωση, επεξεργασία και προσαρμογή)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: >-
-    Στα URL που ταιριάζουν σε αυτήν την λίστα δεν θα εκτελούνται σενάρια
-    εντολών.
+  message: Injection blacklist (τα scripts δε θα τρέχουν στις παρακάτω ιστοσελίδες)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Blacklist δικτύου (τα scripts δε θα συνδέονται στις παρακάτω ιστοσελίδες
+    ούτε θα έχουν πρόσβαση στα cookies τους)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    'Προσαρμοσμένη CSS για την σελίδα των επιλογών και την σελίδα εγκατάστασης
-    σεναρίων. Αν δεν είστε σίγουρος(η) τι είναι αυτό, παρακαλώ μην το αλλάξετε.'
+    Προσαρμοσμένος κώδικας CSS για τη σελίδα ρυθμίσεων και την σελίδα
+    εγκατάστασης script. Αν δεν είστε σίγουρος(η) τι είναι αυτό, παρακαλώ μην το
+    αλλάξετε.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    Επιλογές για το CodeMirror και για πρόσθετα σε αντικείμενα JSON, όπως το
+    <code>{"indentUnit":2, "smartIndent":true}</code>. Μερικές από τις επιλογές
+    ενδέχεται να μη λειτουργούν με το Violentmonkey. Δείτε <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">την πλήρη λίστα εδώ</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Μπορείτε να τροποποιήσετε τις τιμές αληθείας (boolean) κάνοντας διπλό κλικ
+    στην αντίστοιχη τιμή: <code>true</code> = ενεργοποιημένο, <code>false</code>
+    = απενεργοποιημένο. Οι αριθμητικές τιμές των επιλογών που λήγουν σε
+    <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
+    <code>Time</code> αναφέρονται σε χρόνο και μετριούνται σε χιλιοστά του
+    δευτερολέπτου (milliseconds).
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Άτυπες επιλογές: η τιμή της επιλογής <code>autocompleteOnTyping</code> είναι
+    η καθυστέρηση σε χιλιοστά του δευτερολέπτου πριν την εμφάνιση υποδείξεων
+    αυτόματης συμπλήρωσης (<code>0</code> = απενεργοποίηση επιλογής), η επιλογή
+    <code>killTrailingSpaceOnSave</code> αφαιρεί αυτόματα μετά την αποθήκευση
+    τυχόν διαστήματα στο τέλος του κειμένου, ενώ τέλος η επιλογή
+    <code>showTrailingSpace</code> επιτρέπει την προβολή των διαστημάτων στο
+    τέλος του κειμένου ως τελείες.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    Υποστηριζόμενες μεταβλητές: <{{name}}>, <{{url}}>, <{{date}}>,
+    <{{date:format}}>. Η μορφή πρέπει να είναι συμβατή με το πακέτο MomentJS,
+    για παράδειγμα <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: ομαδοποίηση
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: απόκρυψη
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Απενεργοποιημένα script:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: εμφάνιση
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: Οδηγίες για τα μεταδεδομένα και το <code>GM</code> API
+  message: Οδηγίες για τα μεταδεδομένα και τεκμηρίωση για το <code>GM</code> API
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: 'Συντομεύσεις πληκτρολογίου:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: Θέλετε να χρησιμοποιήσετε έναν άλλο επεξεργαστή κώδικα;
+  message: Θέλετε να χρησιμοποιήσετε κάποιον άλλο επεξεργαστή κώδικα;
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Προσαρμοσμένα μεταδεδομένα
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: Ρυθμίσεις δέσμης ενεργειών
+  message: Ρυθμίσεις script
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
   message: Αυτή η γραμμή είναι πολύ μεγάλη
@@ -191,9 +223,10 @@ editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: >-
     Αυτή η γραμμή περιέχει υπερβολικά πολλούς χαρακτήρες και δεν εμφανίζεται
-    ολόκληρη για να μην υπάρχουν καθυστερήσεις στην επεξεργασία.
+    ολόκληρη προκειμένου να μην υπάρξουν καθυστερήσεις στην επεξεργασία.
 
-    Μπορείτε να προσαρμόσετε το όριο στις προχωρημένες ρυθμίσεις, π.χ.:
+    Μπορείτε να τροποποιήσετε το όριο στις ρυθμίσεις για προχωρημένους, όπως στο
+    εξής παράδειγμα:
 
     "maxDisplayLength": 20000
 editNavCode:
@@ -211,34 +244,50 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Εμφάνιση/επεξεργασία όλων των αποθηκευμένων τιμών του script
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: Προσφέρει υποστήριξη για σενάρια χρηστών για τους φυλλομετρητές.
+  message: >-
+    Μία ανοιχτού κώδικα επέκταση διαχείρισης userscript, η οποία προσφέρει
+    υποστήριξη για πολλά διαφορετικά προγράμματα περιήγησης
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: ''
+  message: Αποκλεισμένη από τις ρυθμίσεις του Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Το Violentmonkey δεν μπορεί να εκτελέσει τα userscripts σε αυτήν τη σελίδα
+    Το Violentmonkey δεν μπορεί να εκτελέσει  userscripts σε αυτήν τη σελίδα
 
-    (πιθανότατα βρίσκεστε σε μία σελίδα είτε του περιηγητή σας είτε μία
-    επέκτασης)
+    (πιθανότατα βρίσκεστε σε μία από τις εξής σελίδες: σελίδα διεπαφής του
+    προγράμματος περιήγησης, σελίδα μιας επέκτασης, σελίδα αποκλεισμένη από
+    κάποια πολιτική του προγράμματος περιήγησης, ιστοσελίδα μηχανής αναζήτησης
+    στο Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Έγινε επανεκκίνηση του Violentmonkey. Παρακαλούμε επαναφορτώστε την καρτέλα
+    προκειμένου να εκτελεστούν τα userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Υπάρχουν πολλοί τρόποι να εγκαταστήσετε ή να παρακολουθήσετε τις αλλαγές σε
+    ένα τοπικό αρχείο: <1>Μεταφέρετε και αποθέστε το αρχείο σε μία ανοιχτή
+    σελίδα του Violentmonkey, όπως αυτή εδώ. <2>Εγκαταστήστε έναν τοπικό
+    διακομιστή HTTP για αυτό το αρχείο και ανοίξτε τον μέσω της διεύθυνσης URL
+    http://localhost. <3>Μεταβείτε στη σελίδα chrome://extensions, κάντε κλικ
+    στο κουμπί «Λεπτομέρειες» κάτω από την επέκταση Violentmonkey και στη
+    συνέχεια ενεργοποιήστε την επιλογή «Να επιτρέπεται η πρόσβαση σε διευθύνσεις
+    URL αρχείων». Σημειώνουμε, πάντως, πως η ενεργοποίηση αυτής της ρύθμισης
+    είναι επικίνδυνη επειδή δίνει σε κάθε userscript τη δυνατότητα ανάγνωσης
+    όλων των τοπικών αρχείων.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: αλφαβητική σειρά
+  message: αλφαβητικά
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: σειρά εκτέλεσης
@@ -259,34 +308,36 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: μέγεθος
 genericError:
   description: Label for generic error.
   message: Σφάλμα
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: ''
+  message: απενεργοποιημένο
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: ''
+  message: ενεργοποιημένο
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: χρήση καθολικής ρύθμισης
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Τα μοτίβα "#" λειτουργούν μόνο κατά το αρχικό άνοιγμα μιας ιστοσελίδας ή με
+    την επαναφόρτωση μιας καρτέλας: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Κάδος Ανακύκλωσης
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Εμφάνιση οδηγιών για τα τοπικά script που έχουν μεταφερθεί και αποτεθεί
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: θα εφαρμοστεί σε $1 script
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: 'Εισαγωγή URL:'
+  message: 'Εισάγετε τη διεύθυνση URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Τα scripts που διαγράφονται φαίνονται εδώ και διατηρούνται για 7 ημέρες.
@@ -296,11 +347,11 @@ hintUseDownloadURL:
 hintVacuum:
   description: Hint for vacuuming data.
   message: >-
-    Απόρριψη των περιττών και προσπάθεια επαναφόρτωσης των πόρων που λείπουν
-    στην cache.
+    Απόρριψη των περιττών δεδομένων και προσπάθεια επαναφόρτωσης των πόρων που
+    λείπουν στη μνήμη cache.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Εγκατάσταση
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Εγκατάσταση από $1
@@ -312,7 +363,9 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: >-
+    Η καρτέλα του πρωτότυπου αρχείου πρέπει να μένει ανοιχτή στις νεότερες
+    εκδόσεις του Firefox (68 και εξής).
 labelAbout:
   description: Label shown on top of the about page.
   message: Περί του Violentmonkey
@@ -322,15 +375,15 @@ labelAdvanced:
   message: Για προχωρημένους
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: Επιτρέψτε αναβαθμίσεις
+  message: Να επιτρέπεται ο έλεγχος για ενημερώσεις
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Συγγραφέας: '
+  message: 'Συντάκτης: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
   message: >-
     Επαναφόρτωση τρέχουσας καρτέλας μετά την ενεργοποίηση/απενεργοποίηση ενός
-    σεναρίου από το μενού
+    script από το μενού
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -340,42 +393,42 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: >-
-    Έλεγχος για ενημερώσεις κάθε $1 ημέρα/ημέρες, χρησιμοποιήστε 0 για
-    απενεργοποίηση
+    Έλεγχος για ενημερώσεις κάθε $1 ημέρα/ημέρες (πληκτρολογήστε 0 για
+    απενεργοποίηση)
 labelBackup:
   description: Label of the import/export section in settings.
   message: ''
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Αντίγραφα ασφαλείας και συντήρηση
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Εμφάνιση στο εικονίδιο: '
+  message: 'Σήμα:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'Χρώματα σήματος: '
 labelBadgeNone:
   description: Option to display nothing on badge.
   message: τίποτα
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: αριθμός των σεναρίων που εκτελούνται
+  message: πλήθος script που εκτελούνται
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: αριθμός των μοναδικών σεναρίων που εκτελούνται
+  message: πλήθος μοναδικών script που εκτελούνται
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: Μαύρη λίστα
+  message: Blacklist
 labelContributors:
   description: Label for link to contributors.
   message: Συνεισφέροντες
 labelCurrentLang:
   description: Label of current language.
-  message: 'Τρέχουσα Γλώσσα: '
+  message: 'Τρέχουσα γλώσσα: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: Προσαρμοσμένο Στυλ
+  message: Προσαρμοσμένο στυλ
 labelDataExport:
   description: Section title of data export.
   message: Εξαγωγή Δεδομένων
@@ -390,10 +443,10 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: 'URL Λήψης:'
+  message: 'Διεύθυνση URL λήψης:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Επεξεργασία τιμής script
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
   message: Επεξεργασία αποθηκευτικού χώρου του script
@@ -402,7 +455,7 @@ labelEditor:
   message: Επεξεργαστής κώδικα
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: Ενημέρωση μόνο των ενεργοποιημένων script
 labelExclude:
   description: Label of @exclude rules.
   message: Κανόνες @exclude
@@ -411,22 +464,31 @@ labelExcludeMatch:
   message: Κανόνες @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Εξαγωγή δεδομένων σεναρίου
+  message: Εξαγωγή δεδομένων script
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: >-
+    Εμφάνιση της εγκατεστημένης έκδοσης σε ιστοσελίδες με καταλόγους userscript:
+    $1
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: Εναλλακτική λειτουργία $1 για Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Ένας εναλλακτικός τρόπος εκτέλεσης για τα script που χρησιμοποιούν το
+    <document-start>, διαθέσιμος στις νεότερες εκδόσεις του Firefox (59 και
+    εξής) και ο οποίος είναι γρηγορότερος από τον προεπιλεγμένο. Όπως και με την
+    επιλογή «Λειτουργία συγχρονισμένης σελίδας», η ρύθμιση αυτή έχει ως
+    αποτέλεσμα τη δέσμευση περισσότερης μνήμης. Σε περίπτωση, δηλαδή, που τα
+    script λειτουργούν κανονικά χωρίς αυτή τη ρύθμιση, ίσως είναι καλύτερο να
+    την απενεργοποιήσετε.
 labelFeedback:
   description: Label of link to feedback page.
   message: Σχόλια
 labelGeneral:
   description: Label for general settings.
-  message: Γενικές
+  message: Γενικές ρυθμίσεις
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Βοηθήστε στη μετάφραση
@@ -435,13 +497,13 @@ labelHomepage:
   message: Αρχική σελίδα
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: 'URL Αρχικής Σελίδας:'
+  message: 'Διεύθυνση URL αρχικής σελίδας:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'Διεύθυνση URL εικονιδίου:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: Εισαγωγή script
+  message: Εισαγωγή δεδομένων script
 labelImportSettings:
   description: Label for option to import settings from zip file.
   message: Ρυθμίσεις εισαγωγής
@@ -452,13 +514,13 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: ''
+  message: 'Λειτουργία εφαρμογής (injection mode): '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: Σενάριο εγκατάστασης
+  message: Γίνεται εγκατάσταση του script
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: Κρατήστε τα αρχικά
+  message: Διατήρηση πρωτοτύπου
 labelLastUpdatedAt:
   description: Label shown on last updated time.
   message: Τελευταία ενημέρωση στις $1
@@ -473,25 +535,25 @@ labelName:
   message: 'Όνομα:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'Εκτέλεση στα frames: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: Χωρίς Όνομα
+  message: Χωρίς όνομα
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Δεν βρέθηκε σενάριο.
+  message: Δε βρέθηκε κανένα script.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ' Ειδοποιήσεις:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: Ειδοποίηση ενημερώσεων σεναρίου
+  message: Εμφάνιση ειδοποιήσεων όταν υπάρχει διαθέσιμη ενημέρωση script
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: αγνόηση των ρυθμίσεων κάθε script για ειδοποιήσεις
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Πολιτική Απορρήτου
@@ -499,7 +561,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: Γίνεται επανεγκατάσταση του script
 labelRelated:
   description: Label of related links.
   message: 'Σχετικοί σύνδεσμοι: '
@@ -511,13 +573,13 @@ labelReplace:
   message: 'Αντικατάσταση με: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: 'Εκτέλεση κατά: '
+  message: 'Run-at: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Προκαθορισμένο)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: Προσαρμοσμένα πρότυπα script
 labelSearch:
   description: Label for search input in search box.
   message: 'Αναζήτηση για: '
@@ -529,7 +591,7 @@ labelSettings:
   message: Ρυθμίσεις
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Εμφάνιση της σειράς εκτέλεσης των script
 labelSync:
   description: Label for sync options.
   message: Συγχρονισμός
@@ -538,94 +600,116 @@ labelSyncAnonymous:
   message: Χρήση ανώνυμου λογαριασμού
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Εξουσιοδότησε
+  message: Εξουσιοδότηση
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Εξουσιοδότηση
+  message: Εξουσιοδότηση...
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: Κανένας
+  message: Να μη γίνεται συγχρονισμός
 labelSyncPassword:
   description: Label for input to hold password.
-  message: 'Κωδικός:'
+  message: 'Κωδικός πρόσβασης:'
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: Αυτόματη επανεξουσιοδότηση όταν λήξει
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: Ανάκληση
+  message: Ανάκληση εξουσιοδότησης
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: Κατάσταση συγχρονισμού σεναρίου
+  message: Κατάσταση συγχρονισμού script
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'Διεύθυνση URL διακομιστή:'
+  message: 'Διεύθυνση URL διακομιστή: '
 labelSyncService:
   description: Label for sync service select.
   message: Συγχρονισμός σε
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 'Όνομα χρήστη:'
+  message: 'Όνομα χρήστη: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'Ετικέτες (διαχωρισμένες με διαστήματα):'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'Θέμα: '
 labelTranslator:
   description: Label of translator.
   message: 'Μεταφραστής: '
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: 'URL Ενημέρωσης:'
+  message: 'Διεύθυνση URL λήψης ενημερώσεων:'
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: Εμφάνιση σε μία στήλη
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: Εμφάνιση σε μορφή πίνακα
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Πλάτος:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Λειτουργία συγχρονισμένου $1
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    Ενεργοποιήστε αυτή τη ρύθμιση μόνο αν κάποιο script χρειάζεται να εκτελεστεί
+    πριν τη φόρτωση της σελίδας και προς το παρόν εκτελείται σε πολύ
+    μεταγενέστερο χρόνο. Όπως και στη λειτουργία Instant injection στην επέκταση
+    Tampermonkey, αυτή η επιλογή χρησιμοποιεί το συγχρονισμένο (synchronous) και
+    πλέον απαρχαιωμένο XHR. Αυτό έχει ως αποτέλεσμα την εμφάνιση προειδοποιήσεων
+    στην κονσόλα των εργαλείων για προγραμματιστές στο Chrome/Chromium, τις
+    οποίες όμως μπορείτε να αγνοήσετε με ασφάλεια, αφού η χρήση του XHR στη
+    συγκεκριμένη περίπτωση έχει αμελητέα επίδραση στις επιδόσεις του
+    προγράμματος περιήγησης. Μάλιστα, μπορείτε να αποκρύψετε όλες τις σχετικές
+    προειδοποιήσεις κάνοντας δεξί κλικ σε μια από αυτές.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: >-
+    (εκτός από καρτέλες ανώνυμης περιήγησης και ιστοσελίδες με απενεργοποιημένα
+    cookies)
 lastSync:
   description: Label for last sync timestamp.
-  message: Τελευταίος συγχρονισμός στις $1
+  message: Ο τελευταίος συγχρονισμός πραγματοποιήθηκε στις $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: Μάθετε περισσότερα για τα πρότυπα της μαύρης λίστας.
+  message: Μάθετε περισσότερα για τα πρότυπα της blacklist.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: >-
+    Μάθετε περισσότερα για της λειτουργίες εκτέλεσης των script (injection
+    modes)
 menuCommands:
   description: Menu item to list script commands.
   message: Εντολές σεναρίου
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: Άνοιγμα Ταμπλό
+  message: Άνοιγμα πίνακα ελέγχου
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: Εξαίρεση...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    Αν έχετε ενεργοποιήσει αυτή την επιλογή στις γενικές ρυθμίσεις, θα
+    πραγματοποιηθεί αυτόματη επαναφόρτωση αυτής της καρτέλας.
+
+    Για να εφαρμόσετε τις αλλαγές που έχετε πραγματοποιήσει σε όλες τις
+    υπόλοιπες καρτέλες, επαναφορτώστε καθεμία από αυτές.
+
+    Χρησιμοποιήστε την καρτέλα «Ρυθμίσεις» του επεξεργαστή κώδικα για
+    περισσότερη ευελιξία.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
@@ -633,76 +717,79 @@ menuFeedback:
   message: Σχόλια
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Βρείτε σενάρια γι᾽ αυτήν την σελίδα
+  message: Βρείτε script για αυτή την σελίδα
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: Δεν ήταν δυνατή η εκτέλεση ορισμένων script
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: ''
+  message: Εκ νέου προσπάθεια στη λειτουργία «auto»
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: Απενεργοποιημένα script που αντιστοιχούν
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: Script που εκτελούνται σε sub-frames
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: Σενάρια που ταιριάζουν
+  message: Script που αντιστοιχούν
 menuNewScript:
   description: Menu item to create a new script.
   message: Δημιουργία νέου script
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: Σενάρια απενεργοποιήθηκαν
+  message: Τα script απενεργοποιήθηκαν
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: Σενάρια ενεργοποιήθηκαν
+  message: Τα script ενεργοποιήθηκαν
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: Έλεγχος για αναβαθμίσεις...
+  message: Έλεγχος για ενημερώσεις...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    Κάντε κλικ εδώ για να ανοίξετε την τεκμηρίωση του MomentJS σε νέα καρτέλα.
+    Επιτρέπονται τα εξής tokens: $1. Χρησιμοποιήστε [αγκύλες] για να
+    περικλείσετε απλό κείμενο.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: Σφάλμα λήψης σεναρίου (resource)!
+  message: Δεν ήταν δυνατή η λήψη ενός πόρου του script!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: Σφάλμα λήψης σεναρίου!
+  message: Δεν ήταν δυνατή η λήψη του script!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: Αδυναμία λήψης πληροφοριών ενημέρωσης.
+  message: Δεν ήταν δυνατή η λήψη πληροφοριών ενημέρωσης.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: Σφάλμα φόρτωσης δεδομένων σεναρίων.
+  message: Δεν ήταν δυνατή η φόρτωση των δεδομένων του script.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: Σφάλμα φόρτωσης εξαρτήσεων.
+  message: Δεν ήταν δυνατή η φόρτωση των εξαρτήσεων (dependencies) του script.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: $1 αντικείμενο(α) εισήχθησαν.
+  message: $1 αντικείμενο(α) εισήχθη(σαν).
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
   message: >-
-    Οι αλλαγές που θα κάνετε στην ανώνυμη περιήγηση θα εφαρμοστούν και στο
-    κυρίως προφίλ σας.
+    Οι αλλαγές που θα πραγματοποιήσετε στην ανώνυμη περιήγηση θα εφαρμοστούν και
+    στο κυρίως προφίλ σας.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: Σενάριο εγκαταστάθηκε.
+  message: Το script εγκαταστάθηκε.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: Μη έγκυρο σενάριο!
+  message: Μη έγκυρο script!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
@@ -715,7 +802,7 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: Φόρτωση δεδομένων σεναρίου...
+  message: Φόρτωση δεδομένων script...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Φόρτωση εξαρτήσεων... ($1/$2)
@@ -723,38 +810,40 @@ msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: Απουσιάζουν απαραίτητοι πόροι
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: >-
-    Σύγκρουση χώρου ονόματος σεναρίου! Παρακαλώ αλλάξτε το @name και το
-    @namespace.
+    Ένα script με ίδιο όνομα με αυτό είναι ήδη εγκατεστημένο.
+
+    Παρακαλούμε είτε χρησιμοποιήστε διαφορετικό @name και @namespace είτε
+    επεξεργαστείτε το script.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Ένα script με ίδιο @name και @namespace είναι ήδη εγκατεστημένο.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: Βρέθηκε νέα έκδοση.
+  message: Μια νέα έκδοση είναι διαθέσιμη.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: Δεν βρέθηκε ενημέρωση.
+  message: Δε βρέθηκε καμία ενημέρωση.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: Δεν ήταν δυνατή η ενημέρωση των script. Κάντε κλικ για να τα ανοίξετε.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'Παρακαλούμε αποθηκεύστε ξανά ή εγκαταστήστε εκ νέου τα εξής script:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: (ο κώδικας παρέμεινε ίδιος)
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: Η Μαύρη λίστα ενημερώθηκε.
@@ -773,67 +862,80 @@ msgSavedScriptTemplate:
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: Το σενάριο [$1] είναι ενημερωμένο!
+  message: Το script [$1] είναι ενημερωμένο!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
   message: Εμφάνιση/απόκρυψη
 msgSyncError:
   description: Message shown when sync failed.
-  message: Σφάλμα συγχρονισμού!
+  message: Δεν ήταν δυνατός ο συγχρονισμός!
 msgSyncInit:
   description: Message shown when sync service is initializing.
   message: Αρχικοποίηση...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: Σφάλμα αρχικοποίησης!
+  message: Δεν ήταν δυνατή η αρχικοποίηση!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: Δεν έχει παρασχεθεί εξουσιοδότηση.
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Ο συγχρονισμός θα ξεκινήσει σύντομα...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Συγχρονισμός σε εξέλιξη...
+  message: Ο συγχρονισμός βρίσκεται σε εξέλιξη...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: Συντακτικό σφάλμα;
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Το script δεν υπήρχε ή δεν υπήρξε αντιστοιχία με τη διεύθυνση URL της
+    ιστοσελίδας όταν αυτή φορτώθηκε αρχικά, γεγονός που συμβαίνει με τις
+    ιστοσελίδες της μορφής Single-Page Application (εφαρμογές μίας σελίδας) όπως
+    το Facebook και το Instagram, οι οποίες χρησιμοποιούν ένα είδος «ψεύτικης»
+    πλοήγησης. Μπορείτε να επαναφορτώσετε την καρτέλα για να εκτελέσετε το
+    script. Εναλλακτικά, μπορείτε να επεξεργαστείτε το script αλλάζοντας τον
+    κανόνα @match ώστε να περιλαμβάνει κάθε σελίδα του τομέα και τροποποιώντας
+    τον κώδικα ώστε τυχόν αλλαγές στη διεύθυνση URL να παρακολουθούνται - για
+    τον σκοπό αυτό, μπορείτε να χρησιμοποιήσετε την κλάση MutationObserver και
+    το API window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: Σενάριο ενημερώθηκε.
+  message: Το script ενημερώθηκε.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
   message: Ενημέρωση...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: Καμία τιμή δεν έχει αποθηκευτεί στον χώρο αποθήκευσης του script
 optionEditorWindow:
   description: Label for the option in settings
-  message: Άνοιγμα επεξεργαστή από το αναδυόμενο παράθυρο σε νέο παράθυρο
+  message: Άνοιγμα επεξεργαστή κώδικα από το αναδυόμενο παράθυρο σε νέο παράθυρο
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: >-
+    Η θέση του παραθύρου του επεξεργαστή κώδικα θα αποθηκεύεται κάθε φορά που
+    αλλάζετε το μέγεθος του παραθύρου και κάθε φορά που κάνετε αποθήκευση το
+    script
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: Απόκρυψη omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: Αναδυόμενο παράθυρο μενού και εικονίδιο
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: Πρώτα τα ενεργοποιημένα
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: ''
   touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Ομαδοποίηση με βάση την τιμή του @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Απόκρυψη απενεργοποιημένων
@@ -844,19 +946,19 @@ optionPopupShowDisabled:
   touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Εμφάνιση των ενεργοποιημένων σεναρίων πρώτα
+  message: Εμφάνιση των ενεργοποιημένων script πρώτα
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'Θέμα διεπαφής χρήστη: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: να εντοπίζεται αυτόματα
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: σκουρόχρωμο
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: ανοιχτόχρωμο
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
@@ -864,31 +966,41 @@ optionUpdate:
   message: Ενημέρωση
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Ρυθμίσεις αναδυόμενου παραθύρου
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Δεξί κλικ: ρυθμίσεις αναδυόμενου παραθύρου'
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Μόνο για ανάγνωση
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Αυτό το script λαμβάνει ενημερώσεις αυτόματα και για τον λόγο αυτό βρίσκεται
+    σε λειτουργία μόνο ανάγνωσης. Για να απενεργοποιήσετε αυτή τη λειτουργία,
+    απενεργοποιήστε τον έλεγχο για ενημερώσεις σε αυτό το script η ενεργοποιήστε
+    την επιλογή «Να επιτρέπεται η επεξεργασία».
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Να επιτρέπεται η επεξεργασία
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: >-
+    (η εγκατάσταση της επόμενης ενημέρωσης θα αντικαταστήσει τυχόν αλλαγές που
+    θα πραγματοποιήσετε)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Επανεγκατάσταση
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Επαναφόρτωση καρτέλας
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Εάν η επιλογή αυτή είναι ενεργοποιημένα, η ενεργή καρτέλα θα ανανεώνεται
+    κάθε φορά που εντοπίζονται αλλαγές στο script, υπό την προϋπόθεση πως η
+    διεύθυνση URL της καρτέλας ταιριάζει με τους κανόνες @match και @include του
+    script.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -908,28 +1020,32 @@ sideMenuAbout:
   message: Σχετικά
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: Εγκατεστημένα σενάρια
+  message: Εγκατεστημένα script
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Ρυθμίσεις
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Επαναφορά της καρτέλας χωρίς userscripts
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Έχετε απενεργοποιήσει τα userscripts για αυτή τη σελίδα. Για να τα
+    εκτελέσετε ξανά, επαναφορτώστε την καρτέλα ή πλοηγηθείτε σε αυτήν.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Ταξινόμηση:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Διακοπή παρακολούθησης
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: Κανονικό χρώμα σήματος
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: >-
+    Χρώμα σήματος όταν δεν εκτελούνται script επειδή η ιστοσελίδα είναι στη
+    λίστα blacklist ή επειδή δεν υποστηρίζεται η εκτέλεση script σε αυτήν
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''
@@ -938,33 +1054,55 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * Το πλήκτρο <kbd>Enter</kbd> προσθέτει το κείμενο στο ιστορικό αυτόματης
+    συμπλήρωσης
+
+    * Σε όλους τους όρους γίνεται διάκριση πεζών-κεφαλαίων
+
+    * Όροι που διαχωρίζονται με διαστήματα μπορούν να ενωθούν
+
+    * Αναζήτηση με βάση τα μεταδεδομένα: <code>"Awesome Script"
+    "Description"</code>
+
+    * Αναζήτηση με βάση της ετικέτες: <code>#tag1 #tag2</code>
+
+    * Αναζήτηση με βάση το όνομα του script: <code>name:"awesome name"</code>
+
+    * Αναζήτηση με βάση τον κώδικα του script: <code>code:"awesome code"</code>
+
+    * Αντίστροφη αναζήτηση: <code>!#tag2 !name:"unwanted"</code>
+
+    * Regular expressions: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Εναλλαγή εφαρμογής (injection) userscript
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Παρακολούθηση αλλαγών από άλλες πηγές
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Κρατήστε αυτή τη σελίδα ανοικτή για να παρακολουθείτε τις αλλαγές που κάνετε
+    σε τοπικό αρχείο
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Ενημέρωση script ($1)
 updateScript:
   description: Button to update one script.
   message: Ενημέρωση
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Ενημέρωση όλων των scripts
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Ενημέρωση των script που εκτελούνται σε αυτήν την καρτέλα
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: Κλειδί (συμβολοσειρά)
 valueLabelValue:
   description: Label for value of a script value.
   message: Τιμή (σε μορφή JSON)
