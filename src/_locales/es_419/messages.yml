@@ -389,7 +389,7 @@ labelBackupMaintenance:
   message: Copia de seguridad y mantenimiento
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Mostrar en el icono de la extensión: '
+  message: 'Icono:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Colores del icono: '
