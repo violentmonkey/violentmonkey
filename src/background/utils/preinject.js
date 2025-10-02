@@ -476,6 +476,7 @@ function prepareScript(script, env) {
   const startIIFE = topLevelAwait ? 'await(async' : '(';
   const numGrants = grant.length;
   const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
+  const shouldUpdate = !!script.config.shouldUpdate;
   // Storing slices separately to reuse JS-internalized strings for code in our storage cache
   const injectedCode = [];
   const metaCopy = meta::mapEntry(null, pluralizeMeta);
@@ -490,6 +491,24 @@ function prepareScript(script, env) {
       metaCopy[key] = tmp;
     }
   }
+  metaCopy.options = { // TM-compatibility
+    check_for_updates: shouldUpdate,
+    inject_into: custom[INJECT_INTO] || null,
+    noframes: custom.noframes ?? null,
+    override: {
+      merge_excludes: !!custom.origExclude,
+      merge_includes: !!custom.origInclude,
+      merge_matches: !!custom.origMatch,
+      merge_exclude_matches: !!custom.origExcludeMatch,
+      use_excludes: custom.exclude || [],
+      use_includes: custom.include || [],
+      use_matches: custom.match || [],
+      use_exclude_matches: custom.excludeMatch || [],
+    },
+    run_at: custom[RUN_AT] || null,
+    tags: custom.tags?.split(' ').filter(Boolean) || [],
+    user_modified: script.props.lastModified || 0,
+  };
   if (wrap) {
     // TODO: push winKey/dataKey as separate chunks so we can change them for each injection?
     injectedCode.push('window.', winKey, '=',
@@ -532,7 +551,7 @@ function prepareScript(script, env) {
     code: '',
     displayName,
     gmi: {
-      scriptWillUpdate: !!script.config.shouldUpdate,
+      scriptWillUpdate: shouldUpdate,
       uuid: props.uuid,
     },
     id,
