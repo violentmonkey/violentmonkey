@@ -2,7 +2,7 @@ import {
   getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd
 } from '@/common';
 import {
-  __CODE, TL_AWAIT, UNWRAP,
+  __CODE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
@@ -30,6 +30,7 @@ let isApplied;
 let injectInto;
 let ffInject;
 let xhrInject = false; // must be initialized for proper comparison when toggling
+let xhrInjectKey;
 
 const sessionId = getUniqId();
 const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
@@ -299,6 +300,7 @@ function toggleXhrInject(enable) {
   if (enable) enable = injectInto !== CONTENT;
   if (xhrInject === enable) return;
   xhrInject = enable;
+  xhrInjectKey ??= extensionRoot.match(XHR_COOKIE_RE)[1];
   cache.destroy();
   API_HEADERS_RECEIVED.removeListener(onHeadersReceived);
   if (enable) {
@@ -369,7 +371,7 @@ function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, [kFrameId]: frame
   ]));
   responseHeaders.push({
     name: kSetCookie,
-    value: `"${process.env.INIT_FUNC_NAME}"=${blobUrl.split('/').pop()}; SameSite=Lax`,
+    value: `${xhrInjectKey}=${blobUrl.split('/').pop()}; SameSite=Lax`,
   });
   setTimeout(URL.revokeObjectURL, 60e3, blobUrl);
   return { [kResponseHeaders]: responseHeaders };

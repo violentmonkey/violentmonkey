@@ -5,7 +5,7 @@ import './notifications';
 import './requests';
 import './tabs';
 import { sendCmd } from './util';
-import { isEmpty } from '../util';
+import { isEmpty, XHR_COOKIE_RE } from '../util';
 import { Run, finish } from './cmd-run';
 
 const { [IDS]: ids } = bridge;
@@ -91,12 +91,12 @@ async function getDataFF(viaMessaging) {
 
 function getXhrInjection() {
   try {
-    const quotedKey = `"${INIT_FUNC_NAME}"`;
+    const key = VM_UUID.match(XHR_COOKIE_RE)[1];
     // Accessing document.cookie may throw due to CSP sandbox
-    const cookieValue = document.cookie.split(`${quotedKey}=`)[1];
+    const cookieValue = document.cookie.split(`${key}=`)[1];
     const blobId = cookieValue && cookieValue.split(';', 1)[0];
     if (blobId) {
-      document.cookie = `${quotedKey}=0; max-age=0; SameSite=Lax`; // this removes our cookie
+      document.cookie = `${key}=0; max-age=0; SameSite=Lax`; // this removes our cookie
       const xhr = new XMLHttpRequest();
       const url = `blob:${VM_UUID}${blobId}`;
       xhr.open('get', url, false); // `false` = synchronous
