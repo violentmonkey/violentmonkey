@@ -154,7 +154,7 @@
           <div class="submenu-commands">
             <div
               class="menu-item menu-area"
-              v-for="({ autoClose = true, text, title }, key) in store.commands[item.id]"
+              v-for="({ autoClose = true, safeIcon, text, title }, key) in store.commands[item.id]"
               :key
               :tabIndex
               :cmd.prop="[item.id, key, autoClose]"
@@ -163,7 +163,8 @@
               @mouseup="onCommand"
               @keydown.enter="onCommand"
               @keydown.space="onCommand">
-              <icon name="command" />
+              <img v-if="safeIcon" class="icon" :src="safeIcon">
+              <icon v-else name="command" />
               <div class="flex-auto ellipsis" v-text="text" />
             </div>
           </div>

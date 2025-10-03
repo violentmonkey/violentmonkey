@@ -1,7 +1,7 @@
 import '@/common/browser';
 import { sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
-import { loadScriptIcon } from '@/common/load-script-icon';
+import { loadCommandIcon, loadScriptIcon } from '@/common/load-script-icon';
 import { mapEntry } from '@/common/object';
 import { isTouch, render } from '@/common/ui';
 import '@/common/ui/style';
@@ -46,7 +46,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
   }
   // Ensuring top script's menu wins over a per-frame menu with different commands
-  store.commands = Object.assign(data.menus, !isTop && store.commands);
+  const commands = store.commands = Object.assign(data.menus, !isTop && store.commands);
   const idMapAllFrames = store.idMap;
   const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
   const idMapOld = idMapAllFrames[frameId] || (idMapAllFrames[frameId] = {});
@@ -83,6 +83,12 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
         store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
       }
     });
+  }
+  for (const scriptId in commands) {
+    const scriptCommands = commands[scriptId];
+    for (const id in scriptCommands) {
+      loadCommandIcon(scriptCommands[id], store);
+    }
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
   if (!hPrev) {

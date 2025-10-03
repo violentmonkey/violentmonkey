@@ -1,4 +1,4 @@
-import { isDataUri, isValidHttpUrl, noop, sendCmdDirectly } from '@/common/index';
+import { isDataUri, isValidHttpUrl, noop, sendCmdDirectly } from '@/common';
 
 // TODO: convert this into a component tag e.g. <safe-icon>
 const KEY = 'safeIcon';
@@ -35,4 +35,23 @@ export async function loadScriptIcon(script, store, showDefault) {
     }
   }
   return script[KEY];
+}
+
+/**
+ * Sets script's safeIcon property after the image is successfully loaded
+ * @param {{}} cmdOpts
+ * @param {{cache?:{}}} store
+ */
+export async function loadCommandIcon(cmdOpts, store) {
+  const { icon } = cmdOpts;
+  const cache = store.cache ??= {};
+  if (icon && !(KEY in cmdOpts)) {
+    cmdOpts[KEY] = null; // creating an observable property
+    let url = cache[icon] || isDataUri(icon) && icon;
+    if (!url && isValidHttpUrl(icon)) {
+      url = cache[icon] = sendCmdDirectly('GetImageData', icon).catch(noop);
+    }
+    if (isObject(url)) url = await url;
+    cmdOpts[KEY] = cache[icon] = url || null;
+  }
 }
