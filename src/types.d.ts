@@ -344,26 +344,7 @@ declare namespace VMInjection {
     injectInto: VMScriptInjectInto;
     key: { data: string, win: string };
     /** `resources` is still an object, converted later in makeGmApiWrapper */
-    meta: VMScript.Meta | VMScriptGMInfoScriptMeta | {
-      options: {
-        check_for_updates: boolean,
-        inject_into?: VMScriptInjectInto,
-        noframes: NumBoolNull,
-        override: {
-          merge_excludes: boolean,
-          merge_includes: boolean,
-          merge_matches: boolean,
-          merge_exclude_matches: boolean,
-          use_excludes: string[],
-          use_includes: string[],
-          use_matches: string[],
-          use_exclude_matches: string[],
-        },
-        run_at?: RunAt,
-        tags: string[],
-        user_modified?: number,
-      },
-    };
+    meta: VMScript.Meta | VMScriptGMInfoScriptMeta;
     metaStr: (string|number)[];
     pathMap: StringMap;
     runAt?: RunAt;

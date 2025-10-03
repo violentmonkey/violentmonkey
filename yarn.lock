@@ -2214,10 +2214,12 @@
   dependencies:
     "@babel/runtime" "^7.16.7"
 
-"@violentmonkey/types@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.2.0.tgz#b66754f1ec74339fbc04d39ee4a1de259740b1b8"
-  integrity sha512-JRPtwhyodYKNkENciULg6v+ZtsoBR2ybYsA1KDvjw4JBzLNmvHixhd8TTl2s8eS1hU7MA1FU8kd1Ren9SCjxew==
+"@violentmonkey/types@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.3.1.tgz#b6bbd0e4074e16b214d258a0fcba95ecc986a40c"
+  integrity sha512-40pq15SRSgTU5JAL0f6NabSH5Q6OIgm2IUF1j0eSm1QMkJgsH/bNU72qW2QNAPa9MSRnoyfKoiY0bcDdnztIMw==
+  dependencies:
+    user-agent-data-types "^0.4.2"
 
 "@volar/language-core@2.4.0", "@volar/language-core@~2.4.0-alpha.18":
   version "2.4.0"
@@ -9934,6 +9936,11 @@ use@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"
   integrity sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==
+
+user-agent-data-types@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/user-agent-data-types/-/user-agent-data-types-0.4.2.tgz#3bbd3662022c3fb9d0c2f7449b6cdd412a3f9e0d"
+  integrity sha512-jXep3kO/dGNmDOkbDa8ccp4QArgxR4I76m3QVcJ1aOF0B9toc+YtSXtX5gLdDTZXyWlpQYQrABr6L1L2GZOghw==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
