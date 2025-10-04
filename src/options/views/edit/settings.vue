@@ -7,15 +7,15 @@
         <span v-text="i18n('buttonEnable')"/>
       </label>
     </div>
-    <VMSettingsUpdate v-bind="{script}"/>
-    <table>
-      <tr>
-        <td v-text="i18n('labelTags')"></td>
-        <td>
-          <input type="text" v-model="custom.tags" :disabled="readOnly">
-        </td>
-      </tr>
-    </table>
+    <VMSettingsUpdate v-bind="{script}" class="mb-2"/>
+    <div class="flex flex-wrap mr-1c tags">
+      <span v-text="i18n('labelTags')" />
+      <input ref="tagsInput" v-model="custom.tags" :disabled="readOnly" @focus.once="onTagsFocused">
+      <button v-if="!store.tags" @click.once="onTagsFocused" class="sep">...</button>
+      <span v-else @click="onTagClicked" class="mr-1c">
+        <a v-for="tag in store.tags" :key="tag" v-text="tag" tabindex="0" />
+      </span>
+    </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <!-- Using tables to auto-adjust width, which differs substantially between languages -->
     <table>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { computed, shallowRef } from 'vue';
+import { computed, nextTick, ref, shallowRef } from 'vue';
 import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
 import { objectPick } from '@/common/object';
@@ -107,6 +107,7 @@ import VMSettingsUpdate from './settings-update';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
   kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL,
+  store, updateTags,
 } from '../../utils';
 
 const props = defineProps({
@@ -128,6 +129,7 @@ const placeholders = computed(() => {
     [kDownloadURL]: meta[kDownloadURL] || script.custom.lastInstallURL,
   };
 });
+const tagsInput = ref();
 const textInputs = [
   [kName, i18n('labelName')],
   [kHomepageURL, i18n('labelHomepageURL')],
@@ -141,6 +143,26 @@ const textAreas = [
   [kExclude, kOrigExclude, ...highlightMetaKeys(i18n('labelExclude'))],
   [kExcludeMatch, kOrigExcludeMatch, ...highlightMetaKeys(i18n('labelExcludeMatch'))],
 ];
+
+function onTagClicked({ target }) {
+  if (target.tagName !== 'A') return;
+  const obj = props.script.custom;
+  const curText = obj.tags;
+  const elInput = /**@type {HTMLInputElement}*/ tagsInput.value;
+  const { selectionEnd, selectionStart } = elInput;
+  const tag =
+    (!selectionStart || curText[selectionStart - 1] === ' ' ? '' : ' ') +
+    target.textContent +
+    (curText[selectionEnd] === ' ' ? '' : ' ');
+  const i = selectionStart + tag.length;
+  obj.tags = curText.slice(0, selectionStart) + tag + curText.slice(selectionEnd);
+  elInput.focus();
+  nextTick(() => elInput.setSelectionRange(i, i));
+}
+
+function onTagsFocused() {
+  if (!store.tags) updateTags();
+}
 </script>
 
 <style>
@@ -192,6 +214,19 @@ $leftColWidth: 12rem;
     width: 16px;
     height: 16px;
     vertical-align: text-bottom;
+  }
+  .tags {
+    a:hover {
+      text-decoration: underline;
+    }
+    button {
+      line-height: normal; /* to preserve height when <button> is removed */
+    }
+    input {
+      field-sizing: content;
+      padding-right: 1em;
+      flex: 1;
+    }
   }
 }
 </style>

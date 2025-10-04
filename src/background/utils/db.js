@@ -1,6 +1,6 @@
 import {
   compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
-  getScriptName, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
+  getScriptName, getScriptsTags, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
   ignoreChromeErrors,
 } from '@/common';
@@ -75,6 +75,7 @@ addOwnCommands({
   GetScriptCode(id) {
     return storage[S_CODE][Array.isArray(id) ? 'getMulti' : 'getOne'](id);
   },
+  GetTags: () => getScriptsTags(aliveScripts),
   /** @return {Promise<void>} */
   async MarkRemoved({ id, removed }) {
     if (!removed) {

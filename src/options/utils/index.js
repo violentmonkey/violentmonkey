@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { sendCmdDirectly } from '@/common';
+import { getScriptsTags, sendCmdDirectly } from '@/common';
 import { route } from '@/common/router';
 
 export * from './search';
@@ -77,4 +77,10 @@ export function toggleBoolean(event) {
     el.dispatchEvent(new Event('input'));
     el.onblur = () => el.dispatchEvent(new Event('change'));
   }
+}
+
+export async function updateTags() {
+  store.tags = store.id
+    ? await sendCmdDirectly('GetTags')
+    : getScriptsTags(store.scripts);
 }

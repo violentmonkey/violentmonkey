@@ -67,6 +67,14 @@ export function getScriptPrettyUrl(script, displayName) {
   }`;
 }
 
+export function getScriptsTags(scripts) {
+  const uniq = new Set();
+  for (const { custom: { tags } } of scripts) {
+    if (tags) tags.split(/\s+/).forEach(uniq.add, uniq);
+  }
+  return [...uniq].sort();
+}
+
 /**
  * @param {VMScript} script
  * @param {Object} [opts]

@@ -8,7 +8,7 @@ import options from '@/common/options';
 import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
-import { kDescription, kName, kStorageSize, performSearch, store } from './utils';
+import { kDescription, kName, kStorageSize, performSearch, store, updateTags } from './utils';
 import App from './views/app';
 
 // Same order as getSizes and sizesPrefixRe
@@ -86,6 +86,7 @@ async function requestData(id) {
     (script.config.removed ? removedScripts : scripts).push(script);
   });
   // now we can render
+  store.id = id;
   store.scripts = scripts;
   store.removedScripts = removedScripts;
   store.loading = false;
@@ -114,14 +115,17 @@ function initMain() {
       const script = store.scripts[i1] || store.removedScripts[i2]
         || update.meta && store.canRenderScripts && {}; // a new script was just saved or installed
       if (!script) return; // We're in editor that doesn't have data for all scripts
+      const removed = update.config?.removed;
+      const editingTags = store.id && store.tags;
+      const tagsChanged = editingTags && (script.custom.tags || '') !== (update.custom?.tags || '');
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const { search } = store;
       Object.assign(script, update);
       if (script.error && !update.error) script.error = null;
       initScript(script, sizes, code);
       if (search) performSearch([script], search.rules);
-      if (update.config?.removed != null) {
-        if (update.config.removed) {
+      if (removed != null) {
+        if (removed) {
           // Note that we don't update store.scripts even if a script is removed,
           // because we want to keep the removed script there to allow the user
           // to undo an accidental removal.
@@ -138,6 +142,9 @@ function initMain() {
         script.message = '';
         const list = script.config.removed ? 'removedScripts' : SCRIPTS;
         store[list] = [...store[list], script];
+      }
+      if (editingTags && (tagsChanged || removed != null)) {
+        updateTags();
       }
     },
     RemoveScripts(ids) {
