@@ -1,10 +1,11 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser, HOMEPAGE_URL, INFERRED, RUN_AT_RE, SUPPORT_URL } from './consts';
+import { browser } from './consts';
 import { deepCopy } from './object';
-import { blob2base64, i18n, isDataUri, tryUrl } from './util';
 
 export { normalizeKeys } from './object';
+export * from './script';
+export * from './string';
 export * from './util';
 
 if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
@@ -21,11 +22,6 @@ export const ignoreChromeErrors = () => chrome.runtime.lastError;
 export const browserWindows = !process.env.IS_INJECTED && browser.windows;
 export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** @return {'0' | '1' | ''} treating source as abstract truthy/falsy to ensure consistent result */
-export const nullBool2string = v => v ? '1' : v == null ? '' : '0';
-/** Will be encoded to avoid splitting the URL in devtools UI */
-const BAD_URL_CHAR = /[#/?]/g;
-/** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */
-const replaceWithFullWidthForm = s => String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
 const PORT_ERROR_RE = /(Receiving end does not exist)|The message port closed before|moved into back\/forward cache|$/;
 
 export function initHooks() {
@@ -144,150 +140,6 @@ export function ignoreNoReceiver(err) {
   }
 }
 
-export function leftpad(input, length, pad = '0') {
-  let num = input.toString();
-  while (num.length < length) num = `${pad}${num}`;
-  return num;
-}
-
-/**
- * @param {string} browserLang  Language tags from RFC5646 (`[lang]-[script]-[region]-[variant]`, all parts are optional)
- * @param {string} locale  `<lang>`, `<lang>-<region>`
- */
-function localeMatch(browserLang, metaLocale) {
-  const bParts = browserLang.toLowerCase().split('-');
-  const mParts = metaLocale.toLowerCase().split('-');
-  let bi = 0;
-  let mi = 0;
-  while (bi < bParts.length && mi < mParts.length) {
-    if (bParts[bi] === mParts[mi]) mi += 1;
-    bi += 1;
-  }
-  return mi === mParts.length;
-}
-
-/**
- * Get locale attributes such as `@name:zh-CN`
- */
-export function getLocaleString(meta, key, languages = navigator.languages) {
-  // zh, zh-cn, zh-tw
-  const mls = Object.keys(meta)
-    .filter(metaKey => metaKey.startsWith(key + ':'))
-    .map(metaKey => metaKey.slice(key.length + 1))
-    .sort((a, b) => b.length - a.length);
-  let bestLocale;
-  for (const lang of languages) {
-    bestLocale = mls.find(ml => localeMatch(lang, ml));
-    if (bestLocale) break;
-  }
-  return meta[bestLocale ? `${key}:${bestLocale}` : key] || '';
-}
-
-/**
- * @param {VMScript} script
- * @returns {string | undefined}
- */
-export function getScriptHome(script) {
-  let custom, meta;
-  return (custom = script.custom)[HOMEPAGE_URL]
-    || (meta = script.meta)[HOMEPAGE_URL]
-    || script[INFERRED]?.[HOMEPAGE_URL]
-    || meta.homepage
-    || meta.website
-    || meta.source
-    || custom.from;
-}
-
-/**
- * @param {VMScript} script
- * @returns {string | undefined}
- */
-export function getScriptSupportUrl(script) {
-  return script.meta[SUPPORT_URL] || script[INFERRED]?.[SUPPORT_URL];
-}
-
-/**
- * @param {VMScript} script
- * @returns {string}
- */
-export function getScriptIcon(script) {
-  return script.custom.icon || script.meta.icon;
-}
-
-/**
- * @param {VMScript} script
- * @returns {string}
- */
-export function getScriptName(script) {
-  return script.custom.name || getLocaleString(script.meta, 'name')
-    || `#${script.props.id ?? i18n('labelNoName')}`;
-}
-
-/** @returns {VMInjection.RunAt} without "document-" */
-export function getScriptRunAt(script) {
-  return `${script.custom[RUN_AT] || script.meta[RUN_AT] || ''}`.match(RUN_AT_RE)?.[1] || 'end';
-}
-
-/** URL that shows the name of the script and opens in devtools sources or in our editor */
-export function getScriptPrettyUrl(script, displayName) {
-  return `${
-    extensionRoot
-  }${
-    // When called from prepareScript, adding a space to group scripts in one block visually
-    displayName && IS_FIREFOX ? '%20' : ''
-  }${
-    encodeURIComponent((displayName || getScriptName(script))
-    .replace(BAD_URL_CHAR, replaceWithFullWidthForm))
-  }.user.js#${
-    script.props.id
-  }`;
-}
-
-/**
- * @param {VMScript} script
- * @param {Object} [opts]
- * @param {boolean} [opts.all] - to return all two urls [checkUrl, downloadUrl]
- * @param {boolean} [opts.allowedOnly] - check shouldUpdate
- * @param {boolean} [opts.enabledOnly]
- * @return {string[] | string}
- */
-export function getScriptUpdateUrl(script, { all, allowedOnly, enabledOnly } = {}) {
-  if ((!allowedOnly || script.config.shouldUpdate)
-  && (!enabledOnly || script.config.enabled)) {
-    const { custom, meta } = script;
-    /* URL in meta may be set to an invalid value to enforce disabling of the automatic updates
-     * e.g. GreasyFork sets it to `none` when the user installs an old version.
-     * We'll show such script as non-updatable. */
-    const downloadURL = tryUrl(custom.downloadURL || meta.downloadURL || custom.lastInstallURL);
-    const updateURL = tryUrl(custom.updateURL || meta.updateURL || downloadURL);
-    const url = downloadURL || updateURL;
-    if (url) return all ? [downloadURL, updateURL] : url;
-  }
-}
-
-export function getFullUrl(url, base) {
-  let obj;
-  try {
-    obj = new URL(url, base);
-  } catch (e) {
-    return `data:,${e.message} ${url}`;
-  }
-  return obj.href;
-}
-
-export function encodeFilename(name) {
-  // `escape` generated URI has % in it
-  return name.replace(/[-\\/:*?"<>|%\s]/g, (m) => {
-    let code = m.charCodeAt(0).toString(16);
-    if (code.length < 2) code = `0${code}`;
-    return `-${code}`;
-  });
-}
-
-export function decodeFilename(filename) {
-  return filename.replace(/-([0-9a-f]{2})/g, (_m, g) => String.fromCharCode(parseInt(g, 16)));
-}
-
 export async function getActiveTab(windowId = -2 /*chrome.windows.WINDOW_ID_CURRENT*/) {
   return (
     await browser.tabs.query({
@@ -307,47 +159,4 @@ export function makePause(ms) {
   return ms < 0
     ? Promise.resolve()
     : new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export function trueJoin(separator) {
-  return this.filter(Boolean).join(separator);
-}
-
-/**
- * @param {string} raw - raw value in storage.cache
- * @param {string} [url]
- * @returns {?string}
- */
-export function makeDataUri(raw, url) {
-  if (isDataUri(url)) return url;
-  if (/^(i,|image\/)/.test(raw)) { // workaround for bugs in old VM, see 2e135cf7
-    const i = raw.lastIndexOf(',');
-    const type = raw.startsWith('image/') ? raw.slice(0, i) : 'image/png';
-    return `data:${type};base64,${raw.slice(i + 1)}`;
-  }
-  return raw;
-}
-
-/**
- * @param {VMReq.Response} response
- * @returns {Promise<string>}
- */
-export async function makeRaw(response) {
-  const type = (response.headers.get('content-type') || '').split(';')[0] || '';
-  const body = await blob2base64(response.data);
-  return `${type},${body}`;
-}
-
-export function loadQuery(string) {
-  const res = {};
-  if (string) {
-    new URLSearchParams(string).forEach((val, key) => {
-      res[key] = val;
-    });
-  }
-  return res;
-}
-
-export function dumpQuery(dict) {
-  return `${new URLSearchParams(dict)}`;
 }
