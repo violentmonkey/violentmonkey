@@ -11,7 +11,7 @@
     <div class="flex flex-wrap mr-1c tags">
       <span v-text="i18n('labelTags')" />
       <input ref="tagsInput" v-model="custom.tags" :disabled="readOnly" @focus.once="onTagsFocused">
-      <button v-if="!store.tags" @click.once="onTagsFocused" class="sep">...</button>
+      <button v-if="!store.tags" @click.once="onTagsFocused">...</button>
       <span v-else @click="onTagClicked" class="mr-1c">
         <a v-for="tag in store.tags" :key="tag" v-text="tag" tabindex="0" />
       </span>

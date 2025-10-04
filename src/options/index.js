@@ -86,14 +86,12 @@ async function requestData(id) {
     (script.config.removed ? removedScripts : scripts).push(script);
   });
   // now we can render
-  store.id = id;
   store.scripts = scripts;
   store.removedScripts = removedScripts;
-  store.loading = false;
+  if (store.loaded !== 'all') store.loaded = !!id || 'all';
 }
 
 function initMain() {
-  store.loading = true;
   loadData();
   Object.assign(handlers, {
     ScriptsUpdated() {
@@ -116,8 +114,7 @@ function initMain() {
         || update.meta && store.canRenderScripts && {}; // a new script was just saved or installed
       if (!script) return; // We're in editor that doesn't have data for all scripts
       const removed = update.config?.removed;
-      const editingTags = store.id && store.tags;
-      const tagsChanged = editingTags && (script.custom.tags || '') !== (update.custom?.tags || '');
+      const oldTags = script.custom.tags;
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const { search } = store;
       Object.assign(script, update);
@@ -143,9 +140,10 @@ function initMain() {
         const list = script.config.removed ? 'removedScripts' : SCRIPTS;
         store[list] = [...store[list], script];
       }
-      if (editingTags && (tagsChanged || removed != null)) {
-        updateTags();
-      }
+      if (store.tags && (
+        removed != null ||
+        (oldTags || '') !== (script.custom.tags || '')
+      )) updateTags();
     },
     RemoveScripts(ids) {
       store.removedScripts = store.removedScripts.filter(script => !ids.includes(script.props.id));

@@ -11,7 +11,8 @@ export const store = reactive({
   canRenderScripts: [SCRIPTS, TAB_RECYCLE, ''].includes(route.hash),
   scripts: [],
   removedScripts: [],
-  loading: false,
+  /** @type {'all' | boolean} */
+  loaded: false,
   /** Whether removed scripts need to be filtered from `store.scripts`. */
   needRefresh: false,
   sync: [],
@@ -80,7 +81,7 @@ export function toggleBoolean(event) {
 }
 
 export async function updateTags() {
-  store.tags = store.id
+  store.tags = store.loaded !== 'all'
     ? await sendCmdDirectly('GetTags')
     : getScriptsTags(store.scripts);
 }

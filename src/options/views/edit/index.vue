@@ -302,6 +302,7 @@ onActivated(() => {
 
 onDeactivated(() => {
   document.body.classList.remove('edit-open');
+  store.tags =
   store.title = null;
   toggleUnloadSentry(false);
   disposeList?.forEach(dispose => dispose());

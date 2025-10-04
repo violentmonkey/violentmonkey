@@ -305,7 +305,7 @@ const draggable = computed(() => isTouch && draggableRaw.value);
 const currentSortCompare = computed(() => filterOptions.sort[filters.sort]?.compare);
 const selectedScript = computed(() => state.filteredScripts[state.focusedIndex]);
 const message = computed(() => {
-  if (store.loading) {
+  if (!store.loaded) {
     return null;
   }
   if (state.search.rules.length ? !state.sortedScripts.find(s => s.$cache.show !== false) : !state.sortedScripts.length) {
@@ -774,7 +774,7 @@ onMounted(() => {
   // Ensure the correct UI is shown when mounted:
   // * on subsequent navigation via history back/forward;
   // * on first initialization in some weird case the scripts got loaded early.
-  if (!store.loading) refreshUI();
+  if (store.loaded) refreshUI();
   // Extract --columns-cards and --columns-table from `:root` or `html` selector. CustomCSS may override it.
   if (!columnsForCardsMode.length) {
     const style = customCssElem?.textContent.match(/--columns-(cards|table)\b/)
