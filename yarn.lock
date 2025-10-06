@@ -2214,7 +2214,7 @@
   dependencies:
     "@babel/runtime" "^7.16.7"
 
-"@violentmonkey/types@0.3.1":
+"@violentmonkey/types@^0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@violentmonkey/types/-/types-0.3.1.tgz#b6bbd0e4074e16b214d258a0fcba95ecc986a40c"
   integrity sha512-40pq15SRSgTU5JAL0f6NabSH5Q6OIgm2IUF1j0eSm1QMkJgsH/bNU72qW2QNAPa9MSRnoyfKoiY0bcDdnztIMw==
