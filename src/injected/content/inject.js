@@ -154,7 +154,7 @@ export async function injectScripts(data, info, isXml) {
       [MORE]: more,
       url: IS_FIREFOX && location.href,
     });
-  const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
+  const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
   const hasInvoker = contLists;
   if (hasInvoker) {
     setupContentInvoker();
