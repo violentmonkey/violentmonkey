@@ -572,7 +572,7 @@ function prepareScript(script, env) {
 
 function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   let code;
-  let wantsPage = 0;
+  let wantsPage;
   const toContent = [];
   for (const scr of scripts) {
     const metaStr = scr[META_STR];
@@ -586,13 +586,12 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
     } else {
       metaStr[0] = '';
       code = forceContent ? ID_BAD_REALM : scr[__CODE];
-      if (!forceContent) wantsPage = 1;
+      if (!forceContent) wantsPage = true;
     }
     scr.code = code;
   }
   if (bag) {
-    bag[INJECT][PAGE] = wantsPage
-      + ((!wantsPage || IS_FIREFOX) && triagePageRealm(bag[MORE]) ? 2 : 0);
+    bag[INJECT][PAGE] = wantsPage || triagePageRealm(bag[MORE]);
   }
   if (toContent[0]) {
     // Processing known feedback without waiting for InjectionFeedback message.
