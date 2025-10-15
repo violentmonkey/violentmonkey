@@ -4,6 +4,7 @@ import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util'
 import { Run } from './cmd-run';
 
 const bridgeIds = bridge[IDS];
+const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
 let bridgeInfo;
 let contLists;
@@ -65,7 +66,7 @@ export function injectPageSandbox(data) {
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
-      if (!IS_FIREFOX || addVaultExports(window.wrappedJSObject[vaultId])) {
+      if (!IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
         startHandshake();
       }
     });
@@ -148,12 +149,7 @@ export async function injectScripts(data, info, isXml) {
     .filter(scr => triageScript(scr) === CONTENT)
     .map(scr => [scr.id, scr.key.data]);
   const moreData = (more || toContent.length)
-    && sendCmd('InjectionFeedback', {
-      [FORCE_CONTENT]: !pageInjectable,
-      [CONTENT]: toContent,
-      [MORE]: more,
-      url: IS_FIREFOX && location.href,
-    });
+    && sendFeedback(toContent, more);
   const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
   const hasInvoker = contLists;
   if (hasInvoker) {
@@ -175,6 +171,10 @@ export async function injectScripts(data, info, isXml) {
       });
       await 0; // let the site's listeners on `window` run first
     }
+    if (IS_FIREFOX && !nonce && pageInjectable && didPageLoseInjectability(toContent, data)) {
+      pageInjectable = false;
+      sendFeedback(toContent);
+    }
     for (const scr of data[SCRIPTS]) {
       triageScript(scr);
     }
@@ -186,6 +186,37 @@ export async function injectScripts(data, info, isXml) {
   }
   // release for GC
   bridgeInfo = contLists = pageLists = VMInitInjection = null;
+}
+
+function didPageLoseInjectability(toContent, data) {
+  toContent.length = 0;
+  for (const scr of data[SCRIPTS]) {
+    const realm = scr[INJECT_INTO];
+    if (realm === PAGE
+    || realm === AUTO && bridge[INJECT_INTO] !== CONTENT) {
+      scr[INJECT_INTO] = CONTENT;
+      safePush(toContent, [scr.id, scr.key.data]);
+    }
+  }
+  if (toContent.length) {
+    const testId = safeGetUniqId();
+    const obj = window[kWrappedJSObject];
+    inject({ code: `window["${testId}"]=1` });
+    if (obj[testId]) {
+      delete obj[testId];
+    } else {
+      return true;
+    }
+  }
+}
+
+function sendFeedback(toContent, more) {
+  return sendCmd('InjectionFeedback', {
+    [FORCE_CONTENT]: !pageInjectable,
+    [CONTENT]: toContent,
+    [MORE]: more,
+    url: IS_FIREFOX && location.href,
+  });
 }
 
 function triageScript(script) {
