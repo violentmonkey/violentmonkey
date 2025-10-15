@@ -278,8 +278,8 @@ declare interface VMInjection extends VMInjectionDisabled, VMInjectionFlags {
   /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
   more: string;
   nonce?: string;
-  /** `page` mode will be necessary */
-  page: boolean;
+  /** `page` mode will be necessary, bit 0: at start/body, bit 1: at end/idle */
+  page: number;
   scripts: VMInjection.Script[];
   sessionId: string;
 }

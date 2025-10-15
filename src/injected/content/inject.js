@@ -14,6 +14,7 @@ let pageInjectable;
 let frameEventWnd;
 /** @type {ShadowRoot} */
 let injectedRoot;
+let invokeContent;
 let nonce;
 
 // https://bugzil.la/1408996
@@ -129,6 +130,7 @@ export function injectPageSandbox(data) {
  */
 export async function injectScripts(data, info, isXml) {
   const { errors, [MORE]: more } = data;
+  const BODY = 'body';
   const CACHE = 'cache';
   if (errors) {
     logging.warn(errors);
@@ -151,15 +153,26 @@ export async function injectScripts(data, info, isXml) {
   const moreData = (more || toContent.length)
     && sendFeedback(toContent, more);
   const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
-  const hasInvoker = contLists;
-  if (hasInvoker) {
-    setupContentInvoker();
-  }
+  const wasInjectableFF = IS_FIREFOX && !nonce && pageInjectable;
+  const pageBodyScripts = pageLists?.[BODY];
   tardyQueue = createNullObj();
   // Using a callback to avoid a microtask tick when the root element exists or appears.
   await onElement('*', injectAll, 'start');
-  if (pageLists?.body || contLists?.body) {
-    await onElement('body', injectAll, 'body');
+  if (pageBodyScripts || contLists?.[BODY]) {
+    await onElement(BODY, !wasInjectableFF || !pageBodyScripts ? injectAll : arg => {
+      if (didPageLoseInjectability(toContent, pageBodyScripts)) {
+        pageLists = null;
+        contLists ??= createNullObj();
+        const arr = contLists[BODY];
+        if (arr) {
+          for (const scr of pageBodyScripts) safePush(arr, scr);
+        } else {
+          contLists[BODY] = pageBodyScripts;
+        }
+        sendFeedback(toContent);
+      }
+      injectAll(arg);
+    }, BODY);
   }
   if (more && (data = await moreData)) {
     assign(bridge[CACHE], data[CACHE]);
@@ -171,15 +184,11 @@ export async function injectScripts(data, info, isXml) {
       });
       await 0; // let the site's listeners on `window` run first
     }
-    if (IS_FIREFOX && !nonce && pageInjectable && didPageLoseInjectability(toContent, data)) {
-      pageInjectable = false;
+    if (wasInjectableFF && didPageLoseInjectability(toContent, data[SCRIPTS])) {
       sendFeedback(toContent);
     }
     for (const scr of data[SCRIPTS]) {
       triageScript(scr);
-    }
-    if (contLists && !hasInvoker) {
-      setupContentInvoker();
     }
     await injectAll('end');
     await injectAll('idle');
@@ -188,9 +197,9 @@ export async function injectScripts(data, info, isXml) {
   bridgeInfo = contLists = pageLists = VMInitInjection = null;
 }
 
-function didPageLoseInjectability(toContent, data) {
+function didPageLoseInjectability(toContent, scripts) {
   toContent.length = 0;
-  for (const scr of data[SCRIPTS]) {
+  for (const scr of scripts) {
     const realm = scr[INJECT_INTO];
     if (realm === PAGE
     || realm === AUTO && bridge[INJECT_INTO] !== CONTENT) {
@@ -198,16 +207,16 @@ function didPageLoseInjectability(toContent, data) {
       safePush(toContent, [scr.id, scr.key.data]);
     }
   }
-  if (toContent.length) {
+  let res = toContent.length;
+  if (res && pageInjectable) { // may have been cleared when handling pageBodyScriptsFF
     const testId = safeGetUniqId();
     const obj = window[kWrappedJSObject];
     inject({ code: `window["${testId}"]=1` });
-    if (obj[testId]) {
-      delete obj[testId];
-    } else {
-      return true;
-    }
+    res = obj[testId] !== 1;
+    if (res) pageInjectable = false;
+    else delete obj[testId];
   }
+  return res;
 }
 
 function sendFeedback(toContent, more) {
@@ -307,6 +316,9 @@ function inject(item, iframeCb) {
 }
 
 function injectAll(runAt) {
+  if (contLists && !invokeContent) {
+    setupContentInvoker();
+  }
   let res;
   for (let inPage = 1; inPage >= 0; inPage--) {
     const realm = inPage ? PAGE : CONTENT;
@@ -340,7 +352,7 @@ async function injectPageList(runAt) {
 }
 
 function setupContentInvoker() {
-  const invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
+  invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
     const fn = realm === CONTENT
