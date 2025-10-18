@@ -16,6 +16,8 @@ let frameEventWnd;
 let injectedRoot;
 let invokeContent;
 let nonce;
+let getAttribute;
+let querySelector;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -155,6 +157,10 @@ export async function injectScripts(data, info, isXml) {
   const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
   const wasInjectableFF = IS_FIREFOX && !nonce && pageInjectable;
   const pageBodyScripts = pageLists?.[BODY];
+  if (wasInjectableFF) {
+    getAttribute = Element[PROTO].getAttribute;
+    querySelector = document.querySelector;
+  }
   tardyQueue = createNullObj();
   // Using a callback to avoid a microtask tick when the root element exists or appears.
   await onElement('*', injectAll, 'start');
@@ -198,22 +204,32 @@ export async function injectScripts(data, info, isXml) {
 }
 
 function didPageLoseInjectability(toContent, scripts) {
-  toContent.length = 0;
+  let res;
+  if (!toContent) { // self-invoked
+    pageInjectable = false;
+  } else if (
+    !(res = document::querySelector('meta[http-equiv="content-security-policy" i]')) ||
+    !res::getAttribute('content')
+  ) {
+    return; // no CSP element in DOM, [un]reasonably assuming it's not removed
+  } else {
+    toContent.length = 0;
+  }
   for (const scr of scripts) {
     const realm = scr[INJECT_INTO];
     if (realm === PAGE
     || realm === AUTO && bridge[INJECT_INTO] !== CONTENT) {
-      scr[INJECT_INTO] = CONTENT;
-      safePush(toContent, [scr.id, scr.key.data]);
+      if (toContent) safePush(toContent, [scr.id, scr.key.data]);
+      else scr[INJECT_INTO] = CONTENT;
     }
   }
-  let res = toContent.length;
+  res = toContent?.length;
   if (res && pageInjectable) { // may have been cleared when handling pageBodyScriptsFF
     const testId = safeGetUniqId();
     const obj = window[kWrappedJSObject];
     inject({ code: `window["${testId}"]=1` });
     res = obj[testId] !== 1;
-    if (res) pageInjectable = false;
+    if (res) didPageLoseInjectability(null, scripts);
     else delete obj[testId];
   }
   return res;
