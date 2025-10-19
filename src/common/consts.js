@@ -55,3 +55,5 @@ export const VM_HOME = 'https://violentmonkey.github.io/';
 export const VM_DOCS_MATCHING = VM_HOME + 'api/matching/';
 export const FILE_GLOB_ALL = 'file://*/*';
 export const XHR_COOKIE_RE = /:\W+([-\w]+)/; // extracts ://id in Chrome, ://{id} in Firefox
+/** @type {(str: string, opts?: {}) => Uint8Array} */
+export const U8_fromBase64 = process.env.IS_INJECTED !== 'injected-web' && Uint8Array.fromBase64;

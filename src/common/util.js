@@ -1,12 +1,10 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { NO_CACHE } from '@/common/consts';
+import { NO_CACHE, U8_fromBase64 } from '@/common/consts';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
 const NON_ASCII_RE = /[\x80-\xFF]/;
-/** @type {(str: string, opts?: {}) => Uint8Array} */
-const U8_fromBase64 = Uint8Array.fromBase64;
 
 export function memoize(func) {
   const cacheMap = /*@__PURE__*/Object.create(null);

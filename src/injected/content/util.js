@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { sendMessage } from '@/common';
+import { U8_fromBase64 } from '../util';
 
 export * from './util-task';
 
@@ -64,15 +65,20 @@ export const decodeResource = (raw, isBlob) => {
   // TODO: do the check in BG and cache/store the result because safe-guarding all the stuff
   // regexp picks from an instance internally is inordinately complicated
   if (/[\x80-\xFF]/::regexpTest(res)) {
-    const len = res.length;
-    const bytes = new SafeUint8Array(len);
-    for (let i = 0; i < len; i += 1) {
-      bytes[i] = safeCharCodeAt(res, i);
+    if (U8_fromBase64) {
+      res = U8_fromBase64(mimeData);
+    } else {
+      const len = res.length;
+      const bytes = new SafeUint8Array(len);
+      for (let i = 0; i < len; i += 1) {
+        bytes[i] = safeCharCodeAt(res, i);
+      }
+      res = bytes;
     }
-    res = isBlob ? bytes : new SafeTextDecoder()::tdDecode(bytes);
+    if (!isBlob) res = new SafeTextDecoder()::tdDecode(res);
   }
   return isBlob
-    ? createObjectURL(new SafeBlob([res], { type: mimeType }))
+    ? createObjectURL(new SafeBlob([res], { __proto__: null, type: mimeType }))
     : res;
 };
 

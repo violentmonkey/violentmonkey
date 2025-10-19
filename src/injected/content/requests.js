@@ -1,6 +1,6 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import { sendCmd } from './util';
-import { UA_PROPS } from '../util';
+import { U8_fromBase64, UA_PROPS } from '../util';
 
 const {
   fetch: safeFetch,
@@ -14,6 +14,7 @@ const getTypedArrayBuffer = describeProperty(getPrototypeOf(SafeUint8Array[PROTO
 const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
 const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
 const fdAppend = SafeFormData[PROTO].append;
+const U8_set = SafeUint8Array[PROTO].set;
 const CHUNKS = 'chunks';
 const LOAD = 'load';
 const LOADEND = 'loadend';
@@ -182,11 +183,17 @@ function processChunk(req, data, msg) {
     setOwnProp(req[CHUNKS] || (req[CHUNKS] = ['']), msg ? msg.i : 0, data);
     return;
   }
-  data = safeAtob(data);
+  data = U8_fromBase64 ? U8_fromBase64(data) : safeAtob(data);
   const len = data.length;
-  const arr = req[CHUNKS] || (req[CHUNKS] = new SafeUint8Array(msg ? msg.size : len));
-  for (let pos = msg?.chunk || 0, i = 0; i < len;) {
-    arr[pos++] = safeCharCodeAt(data, i++);
+  const lenAll = msg ? msg.size : len;
+  let arr = req[CHUNKS];
+  if (!arr && U8_fromBase64 && len === lenAll) {
+    req[CHUNKS] = /**@type{Uint8Array}*/data;
+  } else {
+    arr ??= req[CHUNKS] = new SafeUint8Array(lenAll);
+    let pos = msg?.chunk || 0;
+    if (U8_fromBase64) arr::U8_set(/**@type{Uint8Array}*/data, pos);
+    else for (let i = 0; i < len;) arr[pos++] = safeCharCodeAt(data, i++);
   }
 }
 
