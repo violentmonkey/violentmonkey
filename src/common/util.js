@@ -3,6 +3,10 @@
 import { NO_CACHE } from '@/common/consts';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
+const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
+const NON_ASCII_RE = /[\x80-\xFF]/;
+/** @type {(str: string, opts?: {}) => Uint8Array} */
+const U8_fromBase64 = Uint8Array.fromBase64;
 
 export function memoize(func) {
   const cacheMap = /*@__PURE__*/Object.create(null);
@@ -97,13 +101,19 @@ export function buffer2string(buf, offset = 0, length = 1e99) {
  * @param {Blob} blob
  * @param {number} [offset]
  * @param {number} [length]
- * @return {Promise<string>} base64-encoded contents
+ * @return {string | Promise<string>} base64-encoded contents
  */
 export function blob2base64(blob, offset = 0, length = 1e99) {
   if (offset || length < blob.size) {
     blob = blob.slice(offset, offset + length);
   }
-  return !blob.size ? '' : new Promise(resolve => {
+  if (!blob.size) {
+    return '';
+  }
+  if (U8_fromBase64) {
+    return blob.arrayBuffer().then(buf => new Uint8Array(buf).toBase64());
+  }
+  return new Promise(resolve => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onload = () => {
@@ -116,14 +126,20 @@ export function blob2base64(blob, offset = 0, length = 1e99) {
 export function dataUri2text(url) {
   const i = url.indexOf(','); // a non-base64 data: uri may have many `,`
   const meta = url.slice(0, i);
-  url = decodeURIComponent(url.slice(i + 1));
-  url = /(^|;)\s*base64\s*(;|$)/.test(meta) ? atob(url) : url;
-  return /[\x80-\xFF]/.test(url)
-    ? new TextDecoder().decode(string2uint8array(url))
-    : url;
+  const body = url.slice(i + 1);
+  const isB64 = HAS_BASE64_RE.test(meta);
+  const decoded = isB64 ? atob(body) : decodeURIComponent(body);
+  return NON_ASCII_RE.test(decoded)
+    ? new TextDecoder().decode(string2uint8array(decoded, isB64 && body))
+    : decoded;
 }
 
-export function string2uint8array(str) {
+export function string2uint8array(str, b64str) {
+  if (b64str) {
+    if (U8_fromBase64) return U8_fromBase64(b64str);
+    str ??= atob(b64str);
+  }
+  // 5x times faster than fetch() which serializes+deserializes the result over IPC
   const len = str.length;
   const array = new Uint8Array(len);
   for (let i = 0; i < len; i += 1) {
