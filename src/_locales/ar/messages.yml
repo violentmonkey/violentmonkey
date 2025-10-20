@@ -32,8 +32,8 @@ buttonEdit:
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
   message: >-
-    يمكنك أيضًا النقر بزر الفأرة الأيمن أو النقر بالزر الأيمن أو النقر بالزر
-    CTRL أو النقر بالعجلة على اسم السكريبت.
+    يمكنك أيضًا النقر بزر الماوس الأيمن، أو Ctrl+نقر، أو نقر عجلة الماوس على اسم
+    السكربت.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: أفرغ سلة المحذوفات الآن!
@@ -42,7 +42,7 @@ buttonEnable:
   message: تفعيل
 buttonExportData:
   description: Button to open the data export dialog.
-  message: تصدير إلى zip
+  message: تصدير إلى ملف مضغوط (zip)
 buttonFilter:
   description: Button to show filters menu.
   message: ''
@@ -52,10 +52,10 @@ buttonHome:
   message: الصفحة الرئيسية
 buttonImportData:
   description: Button to choose a file for data import.
-  message: ''
+  message: استيراد من ملف مضغوط (zip)
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: ''
+  message: تثبيت من عنوان URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: ''
@@ -68,169 +68,212 @@ buttonOK:
   message: موافق
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: سلة المحذوفات
 buttonRemove:
   description: Button to remove a script.
   message: إزالة
 buttonReplace:
   description: Button to replace the current match.
-  message: ''
+  message: استبدال
 buttonReplaceAll:
   description: Button to replace all matches.
   message: الكل
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: إعادة تعيين
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: إعادة تعيين الإعدادات
 buttonRestore:
   description: Button to restore a removed script.
-  message: ''
+  message: استعادة
 buttonSave:
   description: Button to save modifications of a script.
-  message: ''
+  message: حفظ
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: ''
+  message: حفظ وإغلاق
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: تم الحفظ
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: عرض حالة المحرر
 buttonSupport:
   description: Button to open support page.
-  message: ''
+  message: صفحة الدعم
 buttonUndo:
   description: Button to undo removement of a script.
-  message: ''
+  message: تراجع
 buttonUpdate:
   description: Button to update a script.
-  message: ''
+  message: تحديث
 buttonUpdateAll:
   description: Check all scripts for updates.
   message: ''
   touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: ''
+  message: تنظيف قاعدة البيانات
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: ''
+  message: تم تنظيف البيانات
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: ''
+  message: جارٍ تنظيف البيانات...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    التحديث التلقائي معطّل لهذا السكربت!
+    انقر "موافق" لتحديثه على أي حال.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: ''
+  message: |-
+    لم يتم حفظ التعديلات!
+    انقر "موافق" لتجاهلها أو "إلغاء" للبقاء.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    هل تريد التراجع عن جميع التغييرات التي أجريتها على قاعدة البيانات
+    (الاستيراد، التحديث، التعديل، التخصيص)؟
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: ''
+  message: قائمة الحظر للحقن (لن يتم تشغيل السكربتات في المواقع المطابقة)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    قائمة الحظر الشبكية (لن تتصل السكربتات بالمواقع المطابقة ولا بملفات تعريف
+    الارتباط الخاصة بها)
 descCustomCSS:
   description: Description of custom CSS section.
-  message: ''
+  message: >-
+    CSS مخصص لصفحة الإعدادات وصفحة تثبيت السكربتات. إذا لم تكن متأكدًا من الغرض
+    من هذا الحقل، فالرجاء عدم تعديله.
 descEditorOptions:
   description: Description of editor options JSON section.
-  message: ''
+  message: >-
+    خيارات مخصصة لـ CodeMirror والإضافات الخاصة به بصيغة كائن JSON مثل
+    <code>{"indentUnit":2, "smartIndent":true}</code>، مع ملاحظة أن بعضها قد لا
+    يعمل في Violentmonkey. راجع <a
+    href="https://codemirror.net/doc/manual.html#config" target="_blank"
+    rel="noopener noreferrer">القائمة الكاملة</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    يمكن تبديل الخيارات المنطقية (Boolean) بالنقر المزدوج على القيمة:
+    <code>true</code> = مفعّل، <code>false</code> = معطّل. الخيارات الرقمية التي
+    تنتهي بـ <code>Delay</code> أو <code>Interval</code> أو <code>Rate</code> أو
+    <code>Time</code> تكون بوحدة الملي ثانية.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    خيارات غير قياسية: <code>autocompleteOnTyping</code> هو تأخير بالمللي ثانية
+    لعرض اقتراحات الإكمال التلقائي بعد الكتابة (<code>0</code> = تعطيل)،
+    <code>killTrailingSpaceOnSave</code> يزيل تلقائيًا المسافات الزائدة في نهاية
+    كل سطر عند الحفظ، و<code>showTrailingSpace</code> يعرض المسافات الزائدة
+    كنقاط.
 descScriptTemplate:
   description: Description of script template section.
-  message: ''
+  message: >-
+    المتغيرات المدعومة: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
+    بصيغة متوافقة مع MomentJS، على سبيل المثال <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: مجموعة
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: إخفاء
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'السكربتات المعطّلة:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: عرض
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
-  message: ''
+  message: >-
+    الوثائق الخاصة بكتلة البيانات الوصفية للسكربتات وواجهة برمجة
+    <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
-  message: ''
+  message: 'اختصارات لوحة المفاتيح:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: هل ترغب في استخدام محرر آخر؟
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: ''
+  message: بيانات وصفية مخصصة
 editLabelSettings:
   description: Settings section in settings tab of script editor.
-  message: ''
+  message: إعدادات السكربت
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: السطر طويل جدًّا
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
-  message: ''
+  message: |-
+    هذا السطر طويل جدًّا، لذا تم طي نصه لتجنب التأخير أثناء التعديل.
+    يمكنك ضبط الحد في الإعدادات المتقدمة، على سبيل المثال:
+    "maxDisplayLength": 20000
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: الكود
 editNavSettings:
   description: Label of settings tab in script editor.
-  message: ''
+  message: الإعدادات
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: القيم
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: عرض/تعديل كامل مساحة تخزين القيم الخاصة بالسكربت
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: ''
+  message: مدير سكربتات مفتوح المصدر يدعم العديد من المتصفحات
 extName:
   description: Name of this extension.
-  message: ''
+  message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: ''
+  message: موجود في قائمة الحظر في إعدادات Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: >-
+    لا يمكن لـ Violentmonkey تشغيل سكربتات المستخدم في هذه الصفحة
+
+    (أمثلة شائعة: واجهة المتصفح، إضافة، محظور عبر سياسات، موقع محرك بحث في
+    Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    تم إعادة تشغيل Violentmonkey. يُرجى إعادة تحميل علامة التبويب لتشغيل سكربتات
+    المستخدم.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    توجد عدة طرق لتثبيت ملف محلي أو تتبع تعديلاته: <1> اسحب الملف وأفلته في صفحة
+    Violentmonkey المفتوحة أو في النافذة المنبثقة، بما في ذلك هذه الصفحة. <2> قم
+    بتشغيل خادم HTTP محلي لهذا الملف وافتحه عبر http://localhost. <3> فعّل خيار
+    "السماح بالوصول إلى عناوين الملفات" في صفحة تفاصيل Violentmonkey في
+    chrome://extensions. هذا الخيار خطير لأن أي سكربت مستخدم قد يقرأ أي ملف
+    محلي.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: ''
+  message: أبجدي
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: ترتيب التنفيذ
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: وقت آخر تحديث
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: ''
@@ -245,49 +288,51 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: ''
+  message: الحجم
 genericError:
   description: Label for generic error.
-  message: ''
+  message: خطأ
 genericOff:
   description: To indicate something is turned off or disabled, similar to "no".
-  message: ''
+  message: معطّل
 genericOn:
   description: To indicate something is turned on or enabled, similar to "yes".
-  message: ''
+  message: مفعّل
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: استخدام الإعداد العام
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    أنماط "#" تعمل فقط عند فتح الموقع أول مرة أو عند إعادة تحميل علامة التبويب:
+    $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: سلة المحذوفات
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: عرض التعليمات الخاصة بالسكربتات المحلية التي تم سحبها وإفلاتها
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: لـ $1 سكربتًا مطابقًا
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
-  message: ''
+  message: 'أدخل عنوان URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: ''
+  message: السكربتات المحذوفة مدرجة هنا وستُحتفظ بها لمدة 7 أيام.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
-  message: ''
+  message: استخدم @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: ''
+  message: تجاهل الزوائد ومحاولة إعادة تحميل الموارد المفقودة من الذاكرة المؤقتة.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: تثبيت
 installFrom:
   description: Label for button to install script from a userscript site.
-  message: ''
+  message: تثبيت من $1
 installOptionClose:
   description: Option to close confirm window after installation.
   message: ''
@@ -296,23 +341,23 @@ installOptionTrackTooltip:
   description: >-
     Tooltip in Firefox 68+ for the option to track the loading local file before
     window is closed.
-  message: ''
+  message: يجب ترك علامة تبويب الملف المصدر مفتوحة في Firefox 68 والإصدارات الأحدث.
 labelAbout:
   description: Label shown on top of the about page.
   message: ''
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
-  message: ''
+  message: متقدم
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
-  message: ''
+  message: السماح بالتحديث
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: ''
+  message: 'المؤلف: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: ''
+  message: إعادة تحميل علامة التبويب الحالية بعد تفعيل/تعطيل سكربت من القائمة
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -321,41 +366,41 @@ labelAutoReloadCurrentTabDisabled:
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: ''
+  message: التحقق من تحديثات السكربتات كل $1 يوم/أيام، استخدم 0 لتعطيل الميزة
 labelBackup:
   description: Label of the import/export section in settings.
   message: ''
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: النسخ الاحتياطي والصيانة
 labelBadge:
   description: Label for option to show number on badge.
-  message: ''
+  message: 'الشارة:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
-  message: ''
+  message: 'ألوان الشارة: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: ''
+  message: بدون
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: ''
+  message: عدد السكربتات قيد التشغيل
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: ''
+  message: عدد السكربتات الفريدة قيد التشغيل
 labelBlacklist:
   description: Label for global blacklist settings in security section.
-  message: ''
+  message: قائمة الحظر
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: المساهمون
 labelCurrentLang:
   description: Label of current language.
-  message: ''
+  message: 'اللغة الحالية: '
 labelCustomCSS:
   description: Label for custom CSS section.
-  message: ''
+  message: نمط مخصص
 labelDataExport:
   description: Section title of data export.
   message: ''
@@ -370,317 +415,337 @@ labelDonate:
   touched: false
 labelDownloadURL:
   description: Label of script @downloadURL in custom meta data.
-  message: ''
+  message: 'عنوان التنزيل:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: تعديل قيمة السكربت
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: تعديل مساحة تخزين السكربت
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: المحرر
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
-  message: ''
+  message: السكربتات المفعّلة فقط
 labelExclude:
   description: Label of @exclude rules.
-  message: ''
+  message: قواعد @exclude
 labelExcludeMatch:
   description: Label of @exclude-match rules.
-  message: ''
+  message: قواعد @exclude-match
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: ''
+  message: تصدير بيانات السكربت
 labelExposeStatus:
   description: Option in advanced settings.
-  message: ''
+  message: 'إظهار الإصدار المثبت على مواقع كتالوج سكربتات المستخدم: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: وضع $1 بديل في Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    طريقة حقن بديلة لسكربتات <document-start> بدءًا من Firefox 59، أسرع من الوضع
+    الافتراضي. مثل "وضع الصفحة المتزامن"، فإنه يزيد أيضًا من استهلاك الذاكرة،
+    لذا قد ترغب في تعطيله إذا كانت سكربتاتك تعمل بشكل صحيح دونه.
 labelFeedback:
   description: Label of link to feedback page.
-  message: ''
+  message: ملاحظات
 labelGeneral:
   description: Label for general settings.
-  message: ''
+  message: عام
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: ''
+  message: المساعدة في الترجمة
 labelHomepage:
   description: Label for home page in about tab.
   message: الصفحة الرئيسية
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
-  message: ''
+  message: 'عنوان الصفحة الرئيسية:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'عنوان الأيقونة:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: ''
+  message: استيراد بيانات السكربت
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: ''
+  message: استيراد الإعدادات
 labelInclude:
   description: Label of @include rules.
-  message: ''
+  message: قواعد @include
 labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: ''
+  message: 'وضع الحقن: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
-  message: ''
+  message: جارٍ تثبيت السكربت
 labelKeepOriginal:
   description: Option to keep the original match or ignore rules.
-  message: ''
+  message: الاحتفاظ بالأصل
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: ''
+  message: آخر تحديث في $1
 labelLineNumber:
   description: Label for line number jumper.
-  message: ''
+  message: 'رقم السطر: '
 labelMatch:
   description: Label of @match rules.
-  message: ''
+  message: قواعد @match
 labelName:
   description: Label of script name.
-  message: ''
+  message: 'الاسم:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: ''
+  message: 'التشغيل في الإطارات: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
-  message: ''
+  message: بدون اسم
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: ''
+  message: لم يتم العثور على أي سكربت.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: '، ثم إشعار:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
-  message: ''
+  message: إشعار بتحديثات السكربتات
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: ''
+  message: تجاهل إشعارات كل سكربت على حدة (من علامة التبويب "الإعدادات" في المحرر)
 labelPrivacyPolicy:
   description: Label of link to privacy policy
-  message: ''
+  message: سياسة الخصوصية
 labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: ''
+  message: إعادة تثبيت السكربت
 labelRelated:
   description: Label of related links.
-  message: ''
+  message: 'روابط ذات صلة: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: ''
+  message: تمت إزالته في $1
 labelReplace:
   description: Label for replace input in search box.
-  message: ''
+  message: 'استبدال بـ: '
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
-  message: ''
+  message: 'Run-At: '
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
-  message: ''
+  message: (افتراضي)
 labelScriptTemplate:
   description: Label for custom script template.
-  message: ''
+  message: قالب سكربت مخصص
 labelSearch:
   description: Label for search input in search box.
-  message: ''
+  message: 'البحث عن: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: البحث في السكربتات...
 labelSettings:
   description: Label shown on the top of settings page
-  message: ''
+  message: الإعدادات
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: عرض مواضع ترتيب التنفيذ
 labelSync:
   description: Label for sync options.
-  message: ''
+  message: المزامنة
 labelSyncAnonymous:
   description: Label for using anonymous account.
-  message: ''
+  message: استخدام حساب مجهول
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: ''
+  message: تفويض
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: ''
+  message: جارٍ التفويض
 labelSyncDisabled:
   description: Label for option to disable sync service.
-  message: ''
+  message: بدون
 labelSyncPassword:
   description: Label for input to hold password.
-  message: ''
+  message: 'كلمة المرور: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
   message: ''
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
-  message: ''
+  message: إلغاء التفويض
 labelSyncScriptStatus:
   description: Label for option to sync script status.
-  message: ''
+  message: مزامنة حالة السكربت
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: ''
+  message: 'عنوان الخادم: '
 labelSyncService:
   description: Label for sync service select.
-  message: ''
+  message: المزامنة مع
 labelSyncUsername:
   description: Label for input to hold username.
-  message: ''
+  message: 'اسم المستخدم: '
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: 'الوسوم (مفصولة بمسافات):'
 labelTheme:
   description: Label for the visual theme option.
-  message: ''
+  message: 'السمة: '
 labelTranslator:
   description: Label of translator.
   message: ''
   touched: false
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
-  message: ''
+  message: 'عنوان التحديث:'
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
     column.
-  message: ''
+  message: عمود واحد
 labelViewTable:
   description: Label for option in dashboard script list to show the scripts as a table.
-  message: ''
+  message: عرض جدولي
 labelWidth:
   description: Width.
-  message: ''
+  message: 'العرض:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: وضع $1 متزامن
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: ''
+  message: >-
+    فعّله فقط إذا كان لديك سكربت يحتاج للتشغيل قبل بدء تحميل الصفحة، وهو حاليًا
+    يُنفَّذ متأخرًا جدًّا. مثل وضع الحقن الفوري في Tampermonkey، يستخدم هذا
+    الخيار XHR المتزامن المُهمَل، لذا ستظهر تحذيرات في وحدة تحكم أدوات المطور في
+    Chrome/Chromium، لكن يمكنك تجاهلها بأمان لأن تأثيراتها السلبية ضئيلة في هذه
+    الحالة. يمكنك إخفاء التحذيرات نهائيًا بالنقر بزر الماوس الأيمن على أحدها.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: >-
+    (باستثناء وضع التصفح المتخفي والمواقع التي تم تعطيل ملفات تعريف الارتباط
+    فيها)
 lastSync:
   description: Label for last sync timestamp.
-  message: ''
+  message: آخر مزامنة في $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
-  message: ''
+  message: معرفة المزيد عن أنماط قائمة الحظر.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
-  message: ''
+  message: معرفة المزيد عن أنماط الحقن.
 menuCommands:
   description: Menu item to list script commands.
   message: ''
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: فتح لوحة التحكم
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: ''
+  message: استبعاد...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: ''
+  message: >-
+    ستُعاد تلقائيًا تحميل علامة التبويب الحالية إذا كنت قد فعّلت هذا الخيار في
+    الإعدادات العامة.
+
+    لتطبيق التغييرات على باقي العلامات، يُرجى إعادة تحميلها يدويًا.
+
+    استخدم علامة التبويب "الإعدادات" في المحرر لمزيد من المرونة.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
     short word in translation to keep the menu narrow.
-  message: ''
+  message: ملاحظات
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: ''
+  message: البحث عن سكربتات لهذا الموقع
 menuInjectionFailed:
   description: Injection error.
-  message: ''
+  message: تعذّر حقن بعض السكربتات.
 menuInjectionFailedFix:
   description: Injection error fix, shown in case the default mode is "page".
-  message: ''
+  message: إعادة المحاولة في الوضع "التلقائي"
 menuMatchedDisabledScripts:
   description: >-
     Label for menu listing matched disabled scripts when the option to group
     disabled scripts is selected.
-  message: ''
+  message: السكربتات المطابقة والمعطّلة
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: ''
+  message: سكربتات الإطارات الفرعية فقط
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
-  message: ''
+  message: السكربتات المطابقة
 menuNewScript:
   description: Menu item to create a new script.
-  message: ''
+  message: إنشاء سكربت جديد
 menuScriptDisabled:
   description: Menu item showing the status of Violentmonkey, when disabled.
-  message: ''
+  message: السكربتات معطّلة
 menuScriptEnabled:
   description: Menu item showing the status of Violentmonkey, when enabled.
-  message: ''
+  message: السكربتات مفعّلة
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
-  message: ''
+  message: جارٍ التحقق من وجود تحديثات...
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
-  message: ''
+  message: >-
+    انقر لفتح وثائق MomentJS. الرموز المسموحة: $1. استخدم [الأقواس المربعة]
+    لحماية النص الحرفي.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
     the script.
-  message: ''
+  message: خطأ في جلب المورد!
 msgErrorFetchingScript:
   description: Message shown when Violentmonkey fails fetching a new version of the script.
-  message: ''
+  message: خطأ في جلب السكربت!
 msgErrorFetchingUpdateInfo:
   description: Message shown when Violentmonkey fails fetching version data of the script.
-  message: ''
+  message: فشل في جلب معلومات التحديث.
 msgErrorLoadingData:
   description: >-
     Message shown on confirm page when the script to be installed cannot be
     loaded.
-  message: ''
+  message: خطأ في تحميل بيانات السكربت.
 msgErrorLoadingDependency:
   description: Message shown when not all requirements are loaded successfully.
-  message: ''
+  message: خطأ في تحميل التبعيات.
 msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: ''
+  message: $1 عنصر/عناصر تم استيرادها.
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: ''
+  message: >-
+    التعديلات التي تقوم بها في وضع التصفح المتخفي تنطبق أيضًا على ملف التعريف
+    الرئيسي.
 msgInstalled:
   description: Message shown when a script is installed.
-  message: ''
+  message: تم تثبيت السكربت.
 msgInvalidScript:
   description: Message shown when script is invalid.
-  message: ''
+  message: سكربت غير صالح!
 msgLoadedData:
   description: >-
     Message shown in the confirm page when a javascript file to be installed is
@@ -693,44 +758,48 @@ msgLoading:
   touched: false
 msgLoadingData:
   description: Message shown on confirm page when the script to be installed is loading.
-  message: ''
+  message: جارٍ تحميل بيانات السكربت...
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: ''
+  message: جارٍ تحميل التبعيات... ($1/$2)
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: الموارد المطلوبة مفقودة.
 msgNamespaceConflict:
   description: >-
     Message shown when namespace of the new script conflicts with an existent
     one.
-  message: ''
+  message: >-
+    سكربت مشابه مثبّت بالفعل.
+
+    يرجى استخدام @name و@namespace مختلفين هنا، أو تعديل ذلك السكربت بدلًا من
+    ذلك.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: سكربت بنفس @name و@namespace مثبّت بالفعل.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
     @downloadURL is provided.
-  message: ''
+  message: تم العثور على إصدار جديد.
 msgNoUpdate:
   description: Message shown when there is no new version of a script.
-  message: ''
+  message: لم يتم العثور على تحديث.
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
-  message: ''
+  message: خطأ في تحديث السكربتات. انقر لفتحها.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: ''
+  message: 'يرجى إعادة الحفظ أو إعادة تثبيت هذه السكربتات:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
-  message: ''
+  message: ' (الكود نفسه)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
   message: ''
@@ -749,67 +818,72 @@ msgSavedScriptTemplate:
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
-  message: ''
+  message: تم تحديث السكربت [$1]!
 msgShowHide:
   description: Tooltip or text shown on a toggle that shows/hides stuff
-  message: ''
+  message: عرض/إخفاء
 msgSyncError:
   description: Message shown when sync failed.
-  message: ''
+  message: خطأ في المزامنة!
 msgSyncInit:
   description: Message shown when sync service is initializing.
-  message: ''
+  message: جارٍ التهيئة...
 msgSyncInitError:
   description: Message shown when sync fails in initialization.
-  message: ''
+  message: خطأ في التهيئة!
 msgSyncNoAuthYet:
   description: Message shown when the selected sync provider hasn't been authorized yet.
-  message: ''
+  message: لم يتم التفويض بعد.
 msgSyncReady:
   description: Message shown when sync will start soon.
-  message: ''
+  message: ستبدأ المزامنة قريبًا...
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: ''
+  message: المزامنة قيد التنفيذ...
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
-  message: ''
+  message: هل هناك خطأ نحوي؟
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    السكربت لم يكن موجودًا أو لم يتطابق مع عنوان URL عند تحميل الصفحة، وهو ما
+    يحدث في مواقع تطبيقات الصفحات الواحدة (SPA) مثل Facebook أو Instagram التي
+    تستخدم التنقّل الوهمي. يمكنك إعادة تحميل علامة التبويب لتشغيل السكربت.
+    ولإصلاح المشكلة، استخدم @match للموقع بأكمله ثم اكتشف التغييرات باستخدام
+    MutationObserver أو واجهة برمجة window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
-  message: ''
+  message: تم تحديث السكربت.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: ''
+  message: جارٍ التحديث...
 noValues:
   description: Label shown when there is no value for current script.
-  message: ''
+  message: لم يتم تخزين أي قيمة
 optionEditorWindow:
   description: Label for the option in settings
-  message: ''
+  message: فتح المحرر من النافذة المنبثقة في نافذة جديدة
 optionEditorWindowHint:
   description: >-
     Tooltip for optionEditorWindow in case the browser doesn't support
     onBoundsChanged
-  message: ''
+  message: سيتم حفظ موضع نافذة المحرر فقط عند تغيير حجمها أو حفظها
 optionEditorWindowSimple:
   description: Label for the editor window type
-  message: ''
+  message: إخفاء شريط العناوين
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: ''
+  message: القائمة المنبثقة والأيقونة
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
-  message: ''
+  message: المفعّلة أولًا
 optionPopupGroupDisabled:
   description: Option to group disabled scripts in popup.
   message: ''
   touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: تجميع حسب مرحلة @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: ''
@@ -820,51 +894,55 @@ optionPopupShowDisabled:
   touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: ''
+  message: عرض السكربتات المفعّلة أولًا
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: ''
+  message: 'سمة واجهة المستخدم: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: تلقائي
 optionUiThemeDark:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: داكن
 optionUiThemeLight:
   description: Name of a theme selector value in settings.
-  message: ''
+  message: فاتح
 optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: ''
+  message: تحديث
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: إعدادات النافذة المنبثقة
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'النقر بزر الماوس الأيمن: إعدادات النافذة المنبثقة'
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: للقراءة فقط
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    السكربت الذي يتم تحديثه تلقائيًا للقراءة فقط ما لم تعطّل التحديثات أو تسمح
+    بالتعديل.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: السماح بالتعديل
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (سيتم استبدال التعديلات في التحديث القادم)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: إعادة التثبيت
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: إعادة تحميل علامة التبويب
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    إذا تم تفعيله، فسيتم إعادة تحميل علامة التبويب النشطة عند اكتشاف تغييرات
+    وتطابق هذا السكربت مع عنوان URL الخاص بها.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -875,37 +953,39 @@ removeAllScriptsConfirm:
   touched: false
 searchCaseSensitive:
   description: Option to perform a case-sensitive search
-  message: ''
+  message: حساس لحالة الأحرف
 searchUseRegex:
   description: Option to perform a regular expression search
-  message: ''
+  message: استخدام التعبيرات النمطية (Regex)
 sideMenuAbout:
   description: 'Side menu: About'
-  message: ''
+  message: حول
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
-  message: ''
+  message: السكربتات المثبّتة
 sideMenuSettings:
   description: 'Side menu: Settings'
-  message: ''
+  message: الإعدادات
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: إعادة تحميل الصفحة بدون سكربتات المستخدم
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    لقد عطّلت سكربتات المستخدم لهذه الصفحة. لتشغيلها، أعد تحميل الصفحة أو انتقل
+    إلى علامة تبويب أخرى.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'ترتيب الفرز:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: إيقاف التتبع
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: ''
+  message: لون الشارة العادي
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: ''
+  message: لون الشارة عندما يكون الموقع غير قابل للحقن (في قائمة الحظر أو غير مدعوم)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''
@@ -914,39 +994,57 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * مفتاح <kbd>Enter</kbd> يضيف النص إلى سجل الإكمال التلقائي
+
+    * جميع الشروط غير حساسة لحالة الأحرف
+
+    * يمكن دمج الشروط المفصولة بمسافات
+
+    * البحث حسب البيانات الوصفية: <code>"Awesome Script" "Description"</code>
+
+    * البحث حسب الوسوم: <code>#tag1 #tag2</code>
+
+    * البحث حسب اسم السكربت: <code>name:"awesome name"</code>
+
+    * البحث حسب كود السكربت: <code>code:"awesome code"</code>
+
+    * البحث السلبي: <code>!#tag2 !name:"unwanted"</code>
+
+    * التعبيرات النمطية: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: تبديل حقن سكربتات المستخدم
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: تتبع التعديلات الخارجية
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: ابقَ هذه الصفحة مفتوحة لتتبع تعديلاتك على الملف المحلي
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: تحديث السكربتات ($1)
 updateScript:
   description: Button to update one script.
-  message: ''
+  message: تحديث
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: تحديث جميع السكربتات
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: تحديث سكربتات علامة التبويب الحالية
 valueLabelKey:
   description: Label for key of a script value.
-  message: ''
+  message: المفتاح (نص)
 valueLabelValue:
   description: Label for value of a script value.
-  message: ''
+  message: القيمة (مُسلسلة بصيغة JSON)
 valueLabelValueAll:
   description: Label for input of entire script value storage.
-  message: ''
+  message: جميع القيم (مُسلسلة بصيغة JSON)
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ''
