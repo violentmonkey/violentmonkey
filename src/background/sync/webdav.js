@@ -1,4 +1,5 @@
 import { tryUrl } from '@/common';
+import { ANONYMOUS, PASSWORD, SERVER_URL, USER_CONFIG, USERNAME } from '@/common/consts-sync';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
 } from './base';
@@ -88,43 +89,40 @@ class XNode {
 }
 
 const DEFAULT_CONFIG = {
-  serverUrl: '',
-  anonymous: false,
-  username: '',
-  password: '',
+  [SERVER_URL]: '',
+  [ANONYMOUS]: false,
+  [USERNAME]: '',
+  [PASSWORD]: '',
 };
 
 const WebDAV = BaseService.extend({
   name: 'webdav',
   displayName: 'WebDAV',
   properties: {
-    authType: 'password',
-    serverUrl: null,
+    authType: PASSWORD,
+    [SERVER_URL]: null,
   },
   getUserConfig() {
-    if (!this.userConfig) {
-      this.userConfig = {
-        ...DEFAULT_CONFIG,
-        ...this.config.get('userConfig'),
-      };
-    }
-    return this.userConfig;
+    return this[USER_CONFIG] ||= {
+      ...DEFAULT_CONFIG,
+      ...this.config.get(USER_CONFIG),
+    };
   },
   setUserConfig(config) {
-    Object.assign(this.userConfig, config);
-    this.config.set('userConfig', this.userConfig);
+    Object.assign(this[USER_CONFIG], config);
+    this.config.set(USER_CONFIG, this[USER_CONFIG]);
   },
   initToken() {
     this.prepareHeaders();
     const config = this.getUserConfig();
-    let url = config.serverUrl?.trim() || '';
+    let url = config[SERVER_URL]?.trim() || '';
     if (!url.includes('://')) url = `http://${url}`;
     if (!url.endsWith('/')) url += '/';
     if (!tryUrl(url)) {
-      this.properties.serverUrl = null;
+      this.properties[SERVER_URL] = null;
       return false;
     }
-    this.properties.serverUrl = `${url}${VIOLENTMONKEY}/`;
+    this.properties[SERVER_URL] = `${url}${VIOLENTMONKEY}/`;
     const { anonymous, username, password } = config;
     if (anonymous) return true;
     if (!username || !password) return false;

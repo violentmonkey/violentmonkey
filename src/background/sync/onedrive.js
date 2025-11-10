@@ -1,6 +1,7 @@
 // Reference: https://dev.onedrive.com/README.htm
 import { dumpQuery, noop } from '@/common';
 import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
+import { AUTHORIZING, ERROR, UNAUTHORIZED } from '@/common/consts-sync';
 import { objectGet } from '@/common/object';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
@@ -40,11 +41,11 @@ const OneDrive = BaseService.extend({
     .catch((res) => {
       if (res.status === 400 && objectGet(res, 'data.error') === 'invalid_grant') {
         return Promise.reject({
-          type: 'unauthorized',
+          type: UNAUTHORIZED,
         });
       }
       return Promise.reject({
-        type: 'error',
+        type: ERROR,
         data: res,
       });
     });
@@ -112,7 +113,7 @@ const OneDrive = BaseService.extend({
   checkAuth(url) {
     const redirectUri = `${config.redirect_uri}?code=`;
     if (url.startsWith(redirectUri)) {
-      this.authState.set('authorizing');
+      this.authState.set(AUTHORIZING);
       this.checkSync(this.authorized({
         code: url.slice(redirectUri.length),
       }));

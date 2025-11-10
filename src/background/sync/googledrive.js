@@ -3,6 +3,7 @@
 // - https://developers.google.com/drive/v3/reference/files
 import { dumpQuery, getUniqId, loadQuery, noop } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
+import { AUTHORIZING, ERROR, UNAUTHORIZED } from '@/common/consts-sync';
 import { objectGet } from '@/common/object';
 import {
   getURI, getItemFilename, BaseService, register, isScriptFile,
@@ -21,7 +22,6 @@ const config = {
   // redirect_uri: VM_HOME + 'auth_googledrive.html',
   scope: 'https://www.googleapis.com/auth/drive.appdata',
 };
-const UNAUTHORIZED = { status: 'UNAUTHORIZED' };
 
 const GoogleDrive = BaseService.extend({
   name: 'googledrive',
@@ -29,33 +29,36 @@ const GoogleDrive = BaseService.extend({
   urlPrefix: 'https://www.googleapis.com/drive/v3',
   refreshToken() {
     const refreshToken = this.config.get('refresh_token');
-    if (!refreshToken) return Promise.reject({ type: 'unauthorized' });
+    if (!refreshToken) return Promise.reject({ type: UNAUTHORIZED });
     return this.authorized({
       refresh_token: refreshToken,
       grant_type: 'refresh_token',
     })
     .then(() => this.prepare());
   },
-  user() {
+  async user() {
     const requestUser = () => this.loadData({
       url: `https://www.googleapis.com/oauth2/v3/tokeninfo?${dumpQuery({
         access_token: this.config.get('token'),
       })}`,
       responseType: 'json',
     });
-    return requestUser()
-    .then((info) => {
-      if (info.scope !== config.scope) return Promise.reject(UNAUTHORIZED);
-    })
-    .catch((res) => {
-      if (res === UNAUTHORIZED || res.status === 400 && objectGet(res, 'data.error_description') === 'Invalid Value') {
-        return this.refreshToken().then(requestUser);
-      }
-      return Promise.reject({
-        type: 'error',
-        data: res,
-      });
-    });
+    let res;
+    try {
+      res = await requestUser();
+      if (res.scope === config.scope) return res;
+      res = false;
+    } catch (e) {
+      res = e;
+    }
+    if (!res || res.status === 400 && objectGet(res, 'data.error_description') === 'Invalid Value') {
+      await this.refreshToken();
+      return requestUser();
+    }
+    throw {
+      type: ERROR,
+      data: res,
+    };
   },
   getSyncData() {
     const params = {
@@ -121,7 +124,7 @@ const GoogleDrive = BaseService.extend({
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    this.authState.set('authorizing');
+    this.authState.set(AUTHORIZING);
     this.checkSync(this.authorized({
       code: query.code,
       code_verifier: codeVerifier,

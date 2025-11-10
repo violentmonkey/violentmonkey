@@ -362,6 +362,9 @@ li {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.pre {
+  white-space: pre;
+}
 .text-center {
   text-align: center;
 }

@@ -357,7 +357,8 @@ export async function request(url, options = {}) {
         accept && { accept })
       : headers,
   });
-  let result = { url, status: -1 };
+  let status = -1;
+  let result = { url };
   try {
     const urlNoAuth = auth ? scheme + hostname + urlTail : url;
     const resp = await fetch(urlNoAuth, init);
@@ -367,14 +368,15 @@ export async function request(url, options = {}) {
       json: 'json',
     }[responseType] || 'text';
     // status for `file:` protocol will always be `0`
-    result.status = resp.status || 200;
+    status = resp.status || 200;
     result.headers = resp.headers;
     result.data = await resp[loadMethod]();
   } catch (err) {
     result = Object.assign(err, result);
-    result.message += '\n' + url;
+    result.message += (status > 0 ? ` (HTTP ${status})` : ' (could not connect)') + '\n' + url;
   }
-  if (result.status < 0 || result.status > 300) throw result;
+  result.status = status;
+  if (status < 0 || status > 300) throw result;
   return result;
 }
 

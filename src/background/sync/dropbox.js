@@ -1,5 +1,6 @@
 import { dumpQuery, getUniqId, loadQuery } from '@/common';
 import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
+import { AUTHORIZING, ERROR, UNAUTHORIZED } from '@/common/consts-sync';
 import {
   getURI, getItemFilename, BaseService, isScriptFile, register,
   openAuthPage,
@@ -46,11 +47,11 @@ const Dropbox = BaseService.extend({
     .catch((err) => {
       if (err.status === 401) {
         return Promise.reject({
-          type: 'unauthorized',
+          type: UNAUTHORIZED,
         });
       }
       return Promise.reject({
-        type: 'error',
+        type: ERROR,
         data: err,
       });
     });
@@ -130,7 +131,7 @@ const Dropbox = BaseService.extend({
   },
   async authorized(params) {
     delete this.headers.Authorization;
-    this.authState.set('authorizing');
+    this.authState.set(AUTHORIZING);
     const data = await this.loadData({
       method: 'POST',
       url: 'https://api.dropbox.com/oauth2/token',

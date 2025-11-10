@@ -375,12 +375,17 @@ declare namespace VMReq {
     /** truthy = multi script update, 'auto' = autoUpdate, falsy = single */
     multi?: boolean | 'auto';
   }
-  interface Response {
+  type Response = {
     url: string;
     status: number;
+  } & (ResponseOK | ResponseError);
+  type ResponseOK = {
     headers: Headers;
     data: string | ArrayBuffer | Blob | PlainJSONValue;
-  }
+  };
+  type ResponseError = {
+    message: string;
+  };
 }
 
 declare type VMSearchOptions = {

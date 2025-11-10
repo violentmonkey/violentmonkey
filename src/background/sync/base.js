@@ -6,6 +6,10 @@ import {
   TIMEOUT_HOUR, NO_CACHE,
 } from '@/common/consts';
 import {
+  AUTHORIZED, AUTHORIZING, ERROR, IDLE, INITIALIZING, NO_AUTH, READY, SYNCING, UNAUTHORIZED,
+  USER_CONFIG,
+} from '@/common/consts-sync';
+import {
   forEachEntry, objectSet, objectPick,
 } from '@/common/object';
 import {
@@ -116,15 +120,17 @@ function serviceState(validStates, initialState, onChange) {
 export function getStates() {
   return serviceNames.map((name) => {
     const service = services[name];
+    const { error } = service;
     return {
       name: service.name,
       displayName: service.displayName,
+      error: isObject(error) ? error.message || JSON.stringify(error) : error,
       authState: service.authState.get(),
       syncState: service.syncState.get(),
       lastSync: service.config.get('meta', {}).lastSync,
       progress: service.progress,
       properties: service.properties,
-      userConfig: service.getUserConfig(),
+      [USER_CONFIG]: service.getUserConfig(),
     };
   });
 }
@@ -225,19 +231,19 @@ export const BaseService = serviceFactory({
     };
     this.config = serviceConfig(this.name);
     this.authState = serviceState([
-      'idle',
-      'no-auth',
-      'initializing',
-      'authorizing', // in case some services require asynchronous requests to get access_tokens
-      'authorized',
-      'unauthorized',
-      'error',
+      IDLE,
+      NO_AUTH,
+      INITIALIZING,
+      AUTHORIZING, // in case some services require asynchronous requests to get access_tokens
+      AUTHORIZED,
+      UNAUTHORIZED,
+      ERROR,
     ], null, onStateChange);
     this.syncState = serviceState([
-      'idle',
-      'ready',
-      'syncing',
-      'error',
+      IDLE,
+      READY,
+      SYNCING,
+      ERROR,
     ], null, onStateChange);
     this.lastFetch = Promise.resolve();
     this.startSync = this.syncFactory();
@@ -250,23 +256,27 @@ export const BaseService = serviceFactory({
   log(...args) {
     console.log(...args); // eslint-disable-line no-console
   },
+  logError(err) {
+    console.warn(err);
+    this.error = err;
+  },
   syncFactory() {
     let promise;
     let debouncedResolve;
-    const shouldSync = () => this.authState.is('authorized') && getCurrent() === this.name;
+    const shouldSync = () => this.authState.is(AUTHORIZED) && getCurrent() === this.name;
     const getReady = () => {
       if (!shouldSync()) return Promise.resolve();
       this.log('Ready to sync:', this.displayName);
-      this.syncState.set('ready');
+      this.syncState.set(READY);
       working = working.then(() => new Promise((resolve) => {
         debouncedResolve = debounce(resolve, 10 * 1000);
         debouncedResolve();
       }))
       .then(() => {
         if (shouldSync()) return this.sync();
-        this.syncState.set('idle');
+        this.syncState.set(IDLE);
       })
-      .catch((err) => { console.error(err); })
+      .catch(err => this.logError(err))
       .then(() => {
         promise = null;
         debouncedResolve = null;
@@ -284,21 +294,21 @@ export const BaseService = serviceFactory({
     this.headers = {};
   },
   prepare(promise) {
-    this.authState.set('initializing');
+    this.authState.set(INITIALIZING);
     return Promise.resolve(promise)
     .then(() => this.initToken() ? this.user() : Promise.reject({
-      type: 'no-auth',
+      type: NO_AUTH,
     }))
     .then(() => {
-      this.authState.set('authorized');
+      this.authState.set(AUTHORIZED);
     }, (err) => {
-      if (['no-auth', 'unauthorized'].includes(err?.type)) {
+      if ([NO_AUTH, UNAUTHORIZED].includes(err?.type)) {
         this.authState.set(err.type);
       } else {
-        console.error(err);
-        this.authState.set('error');
+        this.logError(err);
+        this.authState.set(ERROR);
       }
-      this.syncState.set('idle');
+      this.syncState.set(IDLE);
       throw err;
     });
   },
@@ -346,7 +356,7 @@ export const BaseService = serviceFactory({
       if (url.startsWith('/')) url = (options.prefix ?? this.urlPrefix) + url;
       return request(url, options);
     })
-    .then(({ data }) => ({ data }), error => ({ error }))
+    .catch(error => ({ error }))
     .then(({ data, error }) => {
       progress.finished += 1;
       onStateChange();
@@ -370,7 +380,7 @@ export const BaseService = serviceFactory({
       finished: 0,
       total: 0,
     };
-    this.syncState.set('syncing');
+    this.syncState.set(SYNCING);
     // Avoid simultaneous requests
     return this.prepare()
     .then(() => this.getSyncData())
@@ -528,12 +538,12 @@ export const BaseService = serviceFactory({
       .then((errors) => { if (errors.length) throw errors; });
     })
     .then(() => {
-      this.syncState.set('idle');
+      this.syncState.set(IDLE);
       this.log('Sync finished:', this.displayName);
     }, (err) => {
-      this.syncState.set('error');
+      this.syncState.set(ERROR);
       this.log('Failed syncing:', this.displayName);
-      this.log(err);
+      this.logError(err);
     })
     .then(() => Promise.resolve(this.releaseLock()).catch(noop));
   },
@@ -562,9 +572,9 @@ export function initialize() {
 }
 
 function syncOne(service) {
-  if (service.syncState.is(['ready', 'syncing'])) return;
-  if (service.authState.is(['idle', 'error'])) return service.checkSync();
-  if (service.authState.is('authorized')) return service.startSync();
+  if (service.syncState.is([READY, SYNCING])) return;
+  if (service.authState.is([IDLE, ERROR])) return service.checkSync();
+  if (service.authState.is(AUTHORIZED)) return service.startSync();
 }
 
 export function sync() {
