@@ -28,7 +28,7 @@ function cacheOrFetch(handlers = {}) {
     const promise = requests[url] || (requests[url] = this::doFetch(...args));
     return promise;
   };
-  /** @this StorageArea */
+  /** @this {VMStorageArea} */
   async function doFetch(...args) {
     const [url, options] = args;
     try {

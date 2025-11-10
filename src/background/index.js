@@ -64,8 +64,8 @@ async function handleCommandMessageAsync(func, data, src) {
   }
 }
 
-global.handleCommandMessage = handleCommandMessage;
-global.deepCopy = deepCopy;
+global['handle' + 'CommandMessage' /* hiding the global from IDE */] = handleCommandMessage;
+global['deep' + 'Copy' /* hiding the global from IDE */] = deepCopy;
 browser.runtime.onMessage.addListener(handleCommandMessage);
 browser.commands?.onCommand.addListener(async cmd => {
   handleHotkeyOrMenu(cmd, await getActiveTab());
