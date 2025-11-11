@@ -8,7 +8,9 @@ import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */
 const openers = {};
-let chain;
+let chain = Promise.resolve();
+let toCommit = {};
+let toCommitPending;
 let toSend = {};
 
 addOwnCommands({
@@ -21,21 +23,20 @@ addOwnCommands({
    * @param {Object} data - key can be an id or a uri
    */
   SetValueStores(data) {
-    const toWrite = {};
+    toCommit = {};
     data::forEachEntry(([id, store = {}]) => {
       id = getScript({ id: +id, uri: id })?.props.id;
       if (id) {
-        toWrite[S_VALUE_PRE + id] = store;
+        toCommit[S_VALUE_PRE + id] = store;
         toSend[id] = store;
       }
     });
-    commit(toWrite, cachedStorageApi);
+    commit(true);
   },
 });
 
 addPublicCommands({
   UpdateValue(what, src) {
-    const res = {};
     for (const id in what) {
       const values = objectGet(openers, [id, src.tab.id, getFrameDocIdFromSrc(src)]);
       // preventing the weird case of message arriving after the page navigated
@@ -47,9 +48,9 @@ addPublicCommands({
         if (raw) values[key] = raw; else delete values[key];
         hub[key] = raw || null;
       }
-      res[id] = values;
+      toCommit[id] = values;
     }
-    commit(res);
+    toCommitPending ??= setTimeout(commit);
   },
 });
 
@@ -101,10 +102,12 @@ export function reifyValueOpener(ids, documentId) {
   }
 }
 
-function commit(data, api) {
-  (api || storage[S_VALUE]).set(data, !!api);
-  chain = chain?.catch(console.warn).then(broadcast)
-    || broadcast();
+function commit(cached) {
+  if (cached) cachedStorageApi.set(toCommit, true);
+  else storage[S_VALUE].set(toCommit);
+  chain = chain.catch(console.warn).then(broadcast);
+  toCommit = {};
+  toCommitPending = null;
 }
 
 async function broadcast() {
@@ -121,7 +124,6 @@ async function broadcast() {
       }
     }
   }
-  chain = null;
 }
 
 /** @this {Object} accumulator */

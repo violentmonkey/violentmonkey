@@ -11,9 +11,6 @@ const dataDecoders = {
   n: val => +val,
   b: val => val === 'true',
 };
-let uploadAsync;
-let uploadBuf = createNullObj();
-let uploadThrottle;
 
 addHandlers({
   UpdatedValues(updates) {
@@ -50,13 +47,12 @@ export function dumpValue(context, add, what) {
     if (add) values[key] = raw;
     else delete values[key];
     if (raw !== oldRaw) {
-      (res || (res = uploadBuf[id] || (uploadBuf[id] = createNullObj())))[key] = raw;
+      (res ??= createNullObj())[key] = raw;
       if ((tmp = keyHooks?.[key])) notifyChange(tmp, key, val, raw, oldRaw);
     }
   }
   if (res) {
-    res = uploadThrottle || (uploadThrottle = promiseResolve()::then(upload));
-    if (async) uploadAsync = true;
+    res = (async ? bridge.promise : bridge.post)('UpdateValue', { [id]: res });
   }
   if (async) {
     return res || promiseResolve();
@@ -106,11 +102,4 @@ function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
       log('error', ['GM_addValueChangeListener', 'callback'], e);
     }
   });
-}
-
-function upload() {
-  const res = (uploadAsync ? bridge.promise : bridge.post)('UpdateValue', uploadBuf);
-  uploadBuf = createNullObj();
-  uploadThrottle = uploadAsync = false;
-  return res;
 }
