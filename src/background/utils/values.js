@@ -48,7 +48,7 @@ addPublicCommands({
         if (raw) values[key] = raw; else delete values[key];
         hub[key] = raw || null;
       }
-      toCommit[id] = values;
+      toCommit[S_VALUE_PRE + id] = values;
     }
     toCommitPending ??= setTimeout(commit);
   },
@@ -102,9 +102,8 @@ export function reifyValueOpener(ids, documentId) {
   }
 }
 
-function commit(cached) {
-  if (cached) cachedStorageApi.set(toCommit, true);
-  else storage[S_VALUE].set(toCommit);
+function commit(flushNow) {
+  cachedStorageApi.set(toCommit, flushNow);
   chain = chain.catch(console.warn).then(broadcast);
   toCommit = {};
   toCommitPending = null;
