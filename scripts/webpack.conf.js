@@ -12,6 +12,8 @@ const VAULT_ID = 'VAULT_ID';
 const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
 const VM_VER = getVersion();
 
+global.localStorage = {}; // workaround for node 25 and HtmlWebpackPlugin's `...global`
+
 configLoader
   // Default values
   .add({
