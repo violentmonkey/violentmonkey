@@ -110,11 +110,13 @@ function initMain() {
       }
       const i1 = store.scripts.findIndex(item => item.props.id === where.id);
       const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
-      const script = store.scripts[i1] || store.removedScripts[i2]
+      // JS engines like V8 deoptimize when accessing an array element out of bounds
+      const oldScript = i1 >= 0 ? store.scripts[i1] : i2 >= 0 ? store.removedScripts[i2] : null;
+      const script = oldScript
         || update.meta && store.canRenderScripts && {}; // a new script was just saved or installed
       if (!script) return; // We're in editor that doesn't have data for all scripts
       const removed = update.config?.removed;
-      const oldTags = script.custom.tags;
+      const oldTags = oldScript?.custom.tags;
       const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
       const { search } = store;
       Object.assign(script, update);
