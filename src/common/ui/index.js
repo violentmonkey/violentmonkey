@@ -8,7 +8,7 @@ import { VM_HOME } from '@/common/consts';
 /** Showing unexpected errors in UI so that the users can notify us */
 addEventListener('error', e => showUnhandledError(e.error));
 addEventListener('unhandledrejection', e => showUnhandledError(e.reason));
-function showUnhandledError(err) {
+export function showUnhandledError(err) {
   if (!err) return;
   const id = 'unhandledError';
   const fontSize = 10;
