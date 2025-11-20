@@ -274,8 +274,8 @@ onMounted(() => {
   $codeComp = $code.value;
   CM = $codeComp.cm;
   toggleUnloadSentry = getUnloadSentry(null, () => CM.focus());
-  if (options.get('editorWindow') && global.history.length === 1) {
-    browser.windows?.getCurrent({ populate: true }).then(setupSavePosition);
+  if (browserWindows && options.get('editorWindow') && global.history.length === 1) {
+    browserWindows.getCurrent({ populate: true }).then(setupSavePosition);
   }
   // hotkeys
   const navLabels = Object.values(navItems.value);
@@ -415,18 +415,17 @@ function onScript(scr) {
 /** @param {chrome.windows.Window} [wnd] */
 async function savePosition(wnd) {
   if (options.get('editorWindow')) {
-    if (!wnd) wnd = await browserWindows?.getCurrent() || {};
+    wnd ??= await browserWindows.getCurrent();
     /* chrome.windows API can't set both the state and coords, so we have to choose:
      * either we save the min/max state and lose the coords on restore,
      * or we lose the min/max state and save the normal coords.
      * Let's assume those who use a window prefer it at a certain position most of the time,
      * and occasionally minimize/maximize it, but wouldn't want to save the state. */
-    if (wnd.state === 'normal') {
+    if (wnd.type !== 'normal' || wnd.state === 'normal') {
       options.set('editorWindowPos', objectPick(wnd, ['left', 'top', 'width', 'height']));
     }
   }
 }
-
 /** @param {chrome.windows.Window} _ */
 function setupSavePosition({ id: curWndId, tabs }) {
   if (tabs.length === 1) {
@@ -438,7 +437,7 @@ function setupSavePosition({ id: curWndId, tabs }) {
       });
     } else {
       // triggered on resizing only
-      addEventListener('resize', debounce(savePosition, 100));
+      addEventListener('resize', debounce(savePosition.bind(null, null), 100));
       shouldSavePositionOnSave = true;
     }
   }
