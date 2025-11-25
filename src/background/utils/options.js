@@ -88,8 +88,8 @@ export function getOption(key) {
   if (res != null) return res;
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
-  const value = options[mainKey] ?? deepCopy(defaults[mainKey]);
-  return keys.length > 1 ? objectGet(value, keys.slice(1)) : value;
+  const value = options[mainKey] ?? defaults[mainKey];
+  return deepCopy(keys.length > 1 ? objectGet(value, keys.slice(1)) : value);
 }
 
 export function setOption(key, value, silent) {
