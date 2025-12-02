@@ -136,7 +136,7 @@
           :showVisit="filters.showVisit || filters.sort.startsWith('visit')"
           :script
           :draggable
-          :visible="index < state.batchRender.limit"
+          :visible="renderAll || index < state.batchRender.limit"
           :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
           :activeTags
@@ -279,6 +279,7 @@ const $menuNew = ref();
 const isEmpty = ref();
 const refSearch = ref();
 const refList = ref();
+const renderAll = ref(false);
 const scroller = ref();
 const kScrollTop = 'scrollTop';
 
@@ -366,7 +367,6 @@ const batchActions = computed(() => {
 });
 
 const debouncedSearch = debounce(scheduleSearch, 100);
-const debouncedRender = debounce(renderScripts);
 
 function resetList() {
   if (!showRecycle.value && store.needRefresh) {
@@ -391,12 +391,11 @@ function sortScripts(scripts) {
 function onUpdate() {
   const scripts = [...getCurrentList()];
   const rules = state.search.rules;
-  const numFound = rules.length ? performSearch(scripts, rules) : scripts.length;
+  if (rules.length) performSearch(scripts, rules);
   sortScripts(scripts);
   state.filteredScripts = rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
   selectScript(state.focusedIndex);
-  if (!step || numFound < step) renderScripts();
-  else debouncedRender();
+  renderScripts();
 }
 async function handleInstallFromURL() {
   try {
@@ -473,7 +472,7 @@ async function onHashChange() {
   }
 }
 async function renderScripts() {
-  if (!store.canRenderScripts) return;
+  if (!store.canRenderScripts || renderAll.value) return;
   const { length } = state.sortedScripts;
   let limit = 9;
   const batchRender = reactive({ limit });
@@ -496,6 +495,8 @@ async function renderScripts() {
     }
     if (step && limit < length) await makePause();
   }
+  // Completed the potentially slow initial creation, subsequent redraws will be fast
+  if (limit === length) renderAll.value = true;
 }
 function scheduleSearch() {
   try {
@@ -757,7 +758,7 @@ watch(showRecycle, resetList);
 watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
   dr => toggleDragging(refList.value, moveScript, dr));
 watch(() => state.search.value, debouncedSearch);
-watch(() => [filters.sort, filters.showEnabledFirst], debouncedSearch);
+watch(() => [filters.sort, filters.showEnabledFirst], scheduleSearch);
 if (screen.availWidth > 767) {
   watch(() => filters.viewSingleColumn, adjustScriptWidth);
   watch(() => filters.viewTable, adjustNarrowWidth);
