@@ -5,7 +5,7 @@ const scopeSym = SafeSymbol.unscopables;
 const globalDesc = createNullObj();
 /** Original ~50 global functions such as setTimeout that some sites override.
  * Not saving all globals because it would waste a lot of time on each page and frame. */
-const globalFunctionDesc = createNullObj();
+const globalFunctionDesc = assign(createNullObj(), builtinFuncs);
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
@@ -17,6 +17,8 @@ const globalKeys = (function makeGlobalKeys() {
   let desc;
   let v;
   for (const key of names) {
+    if (key in builtinFuncs)
+      continue;
     if (+key >= 0 && key < numFrames
       || isContentMode && (
         key === process.env.INIT_FUNC_NAME || key === 'browser' || key === 'chrome'

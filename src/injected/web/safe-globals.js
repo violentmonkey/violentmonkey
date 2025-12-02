@@ -54,6 +54,7 @@ export let
   slice,
   // various values
   builtinGlobals,
+  builtinFuncs,
   // various methods
   URLToString,
   arrayIsArray,
@@ -183,6 +184,13 @@ export const VAULT = (() => {
       getOwnPropertyNames(srcWindow),
       src !== srcWindow && getOwnPropertyNames(src),
     ],
+    builtinFuncs = res[i += 1] || (funcs => {
+      // extracting commonly hijacked functions that still work when bound to a real `window`
+      for (const key of ['setInterval', 'setTimeout']) {
+        funcs[key] = setPrototypeOf(describeProperty(src, key), null);
+      }
+      return funcs;
+    })(createNullObj()),
   ];
   // Well-known Symbols are unforgeable
   toStringTagSym = SafeSymbol.toStringTag;
