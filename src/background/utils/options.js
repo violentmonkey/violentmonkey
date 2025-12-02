@@ -1,4 +1,4 @@
-import { debounce, initHooks, normalizeKeys, sendCmd } from '@/common';
+import { compareVersion, debounce, initHooks, normalizeKeys, sendCmd } from '@/common';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
 import defaults, { kScriptTemplate } from '@/common/options-defaults';
 import { addOwnCommands, init } from './init';
@@ -40,7 +40,7 @@ const optProxy = new Proxy(defaults, { get: (_, key) => getOption(key) });
 export const hookOptions = hooks.hook;
 hookOptions(data => sendCmd('UpdateOptions', data));
 
-export function initOptions(data) {
+export function initOptions(data, lastVersion, versionChanged) {
   data = data[kOptions] || {};
   Object.assign(options, data);
   if (process.env.DEBUG) console.info('options:', options);
@@ -53,6 +53,17 @@ export function initOptions(data) {
   if (Object.keys(options).map(omitDefaultValue).some(Boolean)) {
     delete options[`${kScriptTemplate}Edited`]; // TODO: remove this in 2023
     writeOptionsLater();
+  }
+  if (versionChanged) {
+    let key, val;
+    if (IS_FIREFOX && options[key = 'defaultInjectInto'] === PAGE
+    && compareVersion(lastVersion, '2.12.7') <= 0) {
+      options[key] = AUTO;
+    }
+    if ((val = options.filters) && val[key = 'sort'] === 'exec'
+    && compareVersion(lastVersion, '2.31.2') <= 0) {
+      val[key] += '-'; // Until reverse sort was implemented, 'size' was reversed by design
+    }
   }
 }
 

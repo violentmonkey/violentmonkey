@@ -64,7 +64,7 @@ export default {
     searchScope: 'name',
     /** @type {boolean} */
     showOrder: false,
-    /** @type {'exec' | 'alpha' | 'update'} */
+    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'update'|'update-'} */
     sort: 'exec',
     /** @type {boolean} */
     viewSingleColumn: false,

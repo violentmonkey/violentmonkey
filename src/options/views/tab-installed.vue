@@ -56,7 +56,7 @@
         <span class="ml-1">{{ i18n('sortOrder') }}
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
-              v-for="(option, name) in filterOptions.sort"
+              v-for="(option, name) in sortModes"
               v-text="option.title"
               :key="name"
               :value="name">
@@ -198,31 +198,26 @@ const RESTORE = 'restore';
 const TOGGLE = 'toggle';
 const UNDO = 'undo';
 const UPDATE = 'update';
-const filterOptions = {
-  sort: {
-    exec: {
-      title: i18n('filterExecutionOrder'),
-    },
-    alpha: {
-      title: i18n('filterAlphabeticalOrder'),
-      compare: (
-        { $cache: { lowerName: a } },
-        { $cache: { lowerName: b } },
-      ) => (a < b ? -1 : a > b),
-    },
-    [UPDATE]: {
-      title: i18n('filterLastUpdateOrder'),
-      compare: (
-        { props: { lastUpdated: a } },
-        { props: { lastUpdated: b } },
-      ) => (+b || 0) - (+a || 0),
-    },
-    size: {
-      title: i18n('filterSize'),
-      compare: (a, b) => b.$cache.sizeNum - a.$cache.sizeNum,
-    },
-  },
-};
+/** @type {{ [key:string]: SortMode }} */
+const sortModes = [
+  ['exec', i18n('filterExecutionOrder')],
+  ['alpha', i18n('filterAlphabeticalOrder'),
+    ({ $cache: { lowerName: a } }, { $cache: { lowerName: b } }) => (a < b ? -1 : a > b)],
+  [UPDATE, i18n('filterLastUpdateOrder'),
+    (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
+  ['size', i18n('filterSize'),
+    (a, b) => a.$cache.sizeNum - b.$cache.sizeNum],
+].reduce((res, [key, title, compare]) => (
+  (res[key] = {title, compare}),
+  (res[key + '-'] = /**@namespace SortMode*/{
+    title: title + ' ⯆',
+    compare: compare ? (a, b) => compare(b, a) :
+      /** @param {VMScript} a
+       * @param {VMScript} b */
+      (a, b) => b.props.position - a.props.position,
+  }),
+  res
+), {});
 const filters = reactive({
   searchScope: null,
   showEnabledFirst: null,
@@ -239,7 +234,7 @@ const combinedCompare = cmpFunc => (
 filters::forEachKey(key => {
   hookSetting(`filters.${key}`, (val) => {
     filters[key] = val;
-    if (key === 'sort' && !filterOptions.sort[val]) filters[key] = Object.keys(filterOptions.sort)[0];
+    if (key === 'sort' && !sortModes[val]) filters[key] = Object.keys(sortModes)[0];
   });
 });
 
@@ -300,9 +295,9 @@ const state = reactive({
 });
 
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
-const draggableRaw = computed(() => !showRecycle.value && filters.sort === 'exec');
+const draggableRaw = computed(() => !showRecycle.value && /^exec/.test(filters.sort));
 const draggable = computed(() => isTouch && draggableRaw.value);
-const currentSortCompare = computed(() => filterOptions.sort[filters.sort]?.compare);
+const currentSortCompare = computed(() => sortModes[filters.sort]?.compare);
 const selectedScript = computed(() => state.filteredScripts[state.focusedIndex]);
 const message = computed(() => {
   if (!store.loaded) {

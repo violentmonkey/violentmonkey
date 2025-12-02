@@ -1,5 +1,5 @@
 import {
-  compareVersion, dataUri2text, i18n, getScriptHome, isDataUri,
+  dataUri2text, i18n, getScriptHome, isDataUri,
   getScriptName, getScriptsTags, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
   ignoreChromeErrors,
@@ -12,7 +12,7 @@ import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
-import { getOption, initOptions, kOptions, kVersion, setOption } from './options';
+import { initOptions, kOptions, kVersion, setOption } from './options';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
@@ -129,8 +129,9 @@ addOwnCommands({
   const lastVersion = (!getStorageKeys || dbKeys.has(kVersion))
     && await storage.base.getOne(kVersion);
   const version = process.env.VM_VER;
+  const versionChanged = version !== lastVersion;
   if (!lastVersion) await patchDB();
-  if (version !== lastVersion) storage.base.set({ [kVersion]: version });
+  if (versionChanged) storage.base.set({ [kVersion]: version });
   const data = await storage.base.getMulti(keys);
   const uriMap = {};
   const defaultCustom = getDefaultCustom();
@@ -173,14 +174,7 @@ addOwnCommands({
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
     }
   });
-  initOptions(data);
-  // Switch defaultInjectInto from `page` to `auto` when upgrading VM2.12.7 or older
-  if (version !== lastVersion
-  && IS_FIREFOX
-  && getOption('defaultInjectInto') === PAGE
-  && compareVersion(lastVersion, '2.12.7') <= 0) {
-    setOption('defaultInjectInto', AUTO);
-  }
+  initOptions(data, lastVersion, versionChanged);
   if (process.env.DEBUG) {
     console.info('store:', {
       aliveScripts, removedScripts, maxScriptId, maxScriptPosition, scriptMap, scriptSizes,
