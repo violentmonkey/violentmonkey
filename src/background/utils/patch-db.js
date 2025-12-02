@@ -27,7 +27,7 @@ export default () => new Promise((resolve, reject) => {
     let processing = 3;
     const done = () => {
       processing -= 1;
-      if (!processing) resolve(storage.base.set(updates));
+      if (!processing) resolve(storage.api.set(updates));
     };
     const getAll = (storeName, callback) => {
       const req = tx.objectStore(storeName).getAll();

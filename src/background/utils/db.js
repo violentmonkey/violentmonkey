@@ -130,8 +130,8 @@ addOwnCommands({
   const version = process.env.VM_VER;
   const versionChanged = version !== lastVersion;
   if (!lastVersion) await patchDB();
-  if (versionChanged) storage.base.set({ [kVersion]: version });
-  const data = await storage.base.getMulti(keys);
+  if (versionChanged) storage.api.set({ [kVersion]: version });
+  const data = await storage.api.get(keys);
   const uriMap = {};
   const defaultCustom = getDefaultCustom();
   data::forEachEntry(([key, script]) => {
@@ -183,7 +183,7 @@ addOwnCommands({
   setTimeout(async () => {
     if (allKeys?.length) {
       const set = new Set(keys); // much faster lookup
-      const data2 = await storage.base.getMulti(allKeys.filter(k => !set.has(k)));
+      const data2 = await storage.api.get(allKeys.filter(k => !set.has(k)));
       Object.assign(data, data2);
     }
     vacuum(data);
@@ -389,7 +389,7 @@ async function readEnvironmentData(env) {
       keys.push(storage[area].toKey(id));
     }
   }
-  const data = await storage.base.getMulti(keys);
+  const data = await storage.api.get(keys);
   const badScripts = new Set();
   for (const [area, listName] of STORAGE_ROUTES_ENTRIES) {
     for (const id of env[listName]) {
@@ -539,7 +539,7 @@ export async function removeScripts(ids) {
   }, -1);
   if (removedScripts.length !== newLen) {
     removedScripts.length = newLen; // live scripts were moved to the beginning
-    await storage.base.remove(idsToRemove);
+    await storage.api.remove(idsToRemove);
     return sendCmd('RemoveScripts', ids);
   }
 }
@@ -568,12 +568,13 @@ const getUUID = crypto.randomUUID ? crypto.randomUUID.bind(crypto) : () => {
 /** @return {Promise<void>} */
 export async function updateScriptInfo(id, data) {
   const script = scriptMap[id];
-  if (!script) throw null;
-  script.props = { ...script.props, ...data.props };
-  script.config = { ...script.config, ...data.config };
-  script.custom = { ...script.custom, ...data.custom };
-  await storage[S_SCRIPT].setOne(id, script);
-  return sendCmd('UpdateScript', { where: { id }, update: script });
+  for (const key in data) { // shallow merge
+    if (script[key]) Object.assign(script[key], data[key]);
+  }
+  await Promise.all([
+    storage.api.set({ [S_SCRIPT_PRE + id]: script }),
+    sendCmd('UpdateScript', { where: { id }, update: script }),
+  ]);
 }
 
 /**
@@ -677,7 +678,7 @@ export async function parseScript(src) {
   if (codeChanged && src.bumpDate) props.lastUpdated = now;
   // Installer has all the deps, so we'll put them in storage first
   if (src.cache) await depsPromise;
-  await storage.base.set({
+  await storage.api.set({
     [S_SCRIPT_PRE + id]: script,
     ...codeChanged && { [S_CODE_PRE + id]: code },
   });
@@ -849,7 +850,7 @@ export async function vacuum(data) {
       status[key] = 2 + scriptId;
     }
   };
-  if (!data) data = await storage.base.getMulti();
+  if (!data) data = await storage.api.get();
   data::forEachKey((key) => {
     if (prefixRe.test(key)) {
       status[key] = -1;
@@ -895,7 +896,7 @@ export async function vacuum(data) {
     }
   });
   if (keysToRemove.length) {
-    await storage.base.remove(keysToRemove); // Removing `mod` before fetching
+    await storage.api.remove(keysToRemove); // Removing `mod` before fetching
     result.errors = (await Promise.all(toFetch)).filter(Boolean);
   }
   if (noFetch && noFetch.length) {
