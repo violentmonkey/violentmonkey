@@ -56,8 +56,9 @@
         <span class="ml-1">{{ i18n('sortOrder') }}
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
-              v-for="(option, name) in sortModes"
-              v-text="option.title"
+              v-for="({text, title}, name) in sortModes"
+              v-text="text"
+              :title
               :key="name"
               :value="name">
             </option>
@@ -76,6 +77,9 @@
             </div>
             <div>
               <SettingCheck name="filters.showOrder" :label="i18n('labelShowOrder')" />
+            </div>
+            <div>
+              <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
             </div>
             <div class="mr-2c">
               <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
@@ -129,6 +133,7 @@
           :key="script.props.id"
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
+          :showVisit="filters.showVisit || filters.sort.startsWith('visit')"
           :script
           :draggable
           :visible="index < state.batchRender.limit"
@@ -162,6 +167,8 @@
 <script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
 import { i18n, sendCmdDirectly, debounce, ensureArray, makePause, trueJoin } from '@/common';
+import { INFERRED } from '@/common/consts';
+import handlers from '@/common/handlers';
 import options from '@/common/options';
 import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
@@ -201,16 +208,19 @@ const UPDATE = 'update';
 /** @type {{ [key:string]: SortMode }} */
 const sortModes = [
   ['exec', i18n('filterExecutionOrder')],
-  ['alpha', i18n('filterAlphabeticalOrder'),
+  ['alpha', i18n('filterAlphabeticalOrder'), '',
     ({ $cache: { lowerName: a } }, { $cache: { lowerName: b } }) => (a < b ? -1 : a > b)],
-  [UPDATE, i18n('filterLastUpdateOrder'),
+  [UPDATE, i18n('filterLastUpdateOrder'), '',
     (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
-  ['size', i18n('filterSize'),
+  ['visit', i18n('filterLastVisitOrder'), i18n('filterLastVisitOrderTooltip'),
+    (a, b) => (b[INFERRED].visit || 0) - (a[INFERRED].visit || 0)],
+  ['size', i18n('filterSize'), '',
     (a, b) => a.$cache.sizeNum - b.$cache.sizeNum],
-].reduce((res, [key, title, compare]) => (
-  (res[key] = {title, compare}),
+].reduce((res, [key, text, title, compare]) => (
+  (res[key] = {text, title, compare}),
   (res[key + '-'] = /**@namespace SortMode*/{
-    title: title + ' ⯆',
+    text: text + ' ⯆',
+    title: title,
     compare: compare ? (a, b) => compare(b, a) :
       /** @param {VMScript} a
        * @param {VMScript} b */
@@ -219,12 +229,12 @@ const sortModes = [
   res
 ), {});
 const filters = reactive({
-  searchScope: null,
-  showEnabledFirst: null,
-  showOrder: null,
-  viewSingleColumn: null,
-  viewTable: null,
-  sort: null,
+  /** @type {Boolean} */ showEnabledFirst: null,
+  /** @type {Boolean} */ showOrder: null,
+  /** @type {Boolean} */ showVisit: null,
+  /** @type {Boolean} */ viewSingleColumn: null,
+  /** @type {Boolean} */ viewTable: null,
+  sort: '',
 });
 const combinedCompare = cmpFunc => (
   filters.showEnabledFirst
@@ -233,8 +243,9 @@ const combinedCompare = cmpFunc => (
 );
 filters::forEachKey(key => {
   hookSetting(`filters.${key}`, (val) => {
-    filters[key] = val;
-    if (key === 'sort' && !sortModes[val]) filters[key] = Object.keys(sortModes)[0];
+    filters[key] = key === 'sort' && !sortModes[val]
+      ? Object.keys(sortModes)[0]
+      : val;
   });
 });
 
@@ -295,7 +306,7 @@ const state = reactive({
 });
 
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
-const draggableRaw = computed(() => !showRecycle.value && /^exec/.test(filters.sort));
+const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith('exec'));
 const draggable = computed(() => isTouch && draggableRaw.value);
 const currentSortCompare = computed(() => sortModes[filters.sort]?.compare);
 const selectedScript = computed(() => state.filteredScripts[state.focusedIndex]);
@@ -372,13 +383,16 @@ async function refreshUI() {
   onUpdate();
   onHashChange();
 }
+function sortScripts(scripts) {
+  const cmp = currentSortCompare.value;
+  if (cmp) scripts.sort(combinedCompare(cmp));
+  state.sortedScripts = scripts;
+}
 function onUpdate() {
   const scripts = [...getCurrentList()];
   const rules = state.search.rules;
   const numFound = rules.length ? performSearch(scripts, rules) : scripts.length;
-  const cmp = currentSortCompare.value;
-  if (cmp) scripts.sort(combinedCompare(cmp));
-  state.sortedScripts = scripts;
+  sortScripts(scripts);
   state.filteredScripts = rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
   selectScript(state.focusedIndex);
   if (!step || numFound < step) renderScripts();
@@ -764,6 +778,21 @@ watch(() => state.showHotkeys, value => {
 });
 
 const disposables = [];
+
+Object.assign(handlers, {
+  Visited(data) {
+    let dirty;
+    for (const list of [store.scripts, store.removedScripts]) {
+      for (const /** @type {VMScript} */ scr of list) {
+        const val = data[scr.props.id];
+        if (val) dirty = scr[INFERRED].visit = val;
+      }
+    }
+    if (dirty && filters.sort.startsWith('visit')) {
+      sortScripts([...getCurrentList()]);
+    }
+  },
+});
 
 onMounted(() => {
   // Ensure the correct UI is shown when mounted:

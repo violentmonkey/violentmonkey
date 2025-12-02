@@ -7,31 +7,30 @@ import {
 import { FETCH_OPTS, INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
-import { getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta } from './script';
+import {
+  aliveScripts, getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta,
+  removedScripts, scriptMap,
+} from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
-import { initOptions, kOptions, kVersion, setOption } from './options';
+import { initOptions, kVersion, setOption } from './options';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
   getStorageKeys,
 } from './storage';
-import { dbKeys, storageCacheHas } from './storage-cache';
+import { storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
 import { vetUrl } from './url';
 
 let maxScriptId = 0;
 let maxScriptPosition = 0;
+/** @type {Map<string,number>} */
+export let dbKeys = new Map(); // 1: exists, 0: known to be absent
 /** @type {{ [url:string]: number }} */
 export let scriptSizes = {};
-/** @type {{ [id: string]: VMScript }} */
-const scriptMap = {};
-/** @type {VMScript[]} */
-const aliveScripts = [];
-/** @type {VMScript[]} */
-const removedScripts = [];
 /** Ensuring slow icons don't prevent installation/update */
 const ICON_TIMEOUT = 1000;
 export const kTryVacuuming = 'Try vacuuming database in options.';
@@ -121,11 +120,10 @@ addOwnCommands({
   let allKeys, keys;
   if (getStorageKeys) {
     allKeys = await getStorageKeys();
-    keys = allKeys.filter(key => {
-      dbKeys.set(key, 1);
-      return key.startsWith(S_SCRIPT_PRE);
-    });
-    keys.push(kOptions);
+    // Filtering and creating Map in atomic native code operations instead of js loop
+    keys = allKeys.join('\n').replace(/^(?:(options|version|(?:scr|mod):\d+)|\S+)$/gm, '$1').trim();
+    dbKeys = new Map(JSON.parse(`[${keys.replace(/\S+/g, '["$&",1],').slice(0, -1)}]`));
+    keys = keys.split(/\n+/);
   }
   const lastVersion = (!getStorageKeys || dbKeys.has(kVersion))
     && await storage.base.getOne(kVersion);
@@ -208,22 +206,6 @@ function getPropsId(script) {
 /** @return {void} */
 function updateLastModified() {
   setOption('lastModified', Date.now());
-}
-
-export function updateScriptMap(key, val) {
-  const id = +storage[S_SCRIPT].toId(key);
-  if (!id) return;
-  if (val) {
-    const oldScript = scriptMap[id];
-    const i1 = aliveScripts.indexOf(oldScript);
-    const i2 = removedScripts.indexOf(oldScript);
-    if (i1 >= 0) aliveScripts[i1] = val;
-    if (i2 >= 0) removedScripts[i2] = val;
-    scriptMap[id] = val;
-  } else {
-    delete scriptMap[id];
-  }
-  return true;
 }
 
 /** @return {Promise<boolean>} */
@@ -885,6 +867,7 @@ export async function vacuum(data) {
       downloadUrls[id] = updUrls[0];
     }
     touch(S_CODE_PRE, id, id);
+    touch(S_MOD_PRE, id, id);
     touch(S_VALUE_PRE, id, id);
     meta.require.forEach(url => touch(S_REQUIRE_PRE, url, id, pathMap));
     meta.resources::forEachValue(url => touch(S_CACHE_PRE, url, id, pathMap));

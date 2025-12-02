@@ -268,6 +268,12 @@ filterExecutionOrder:
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: last update time
+filterLastVisitOrder:
+  description: Label for option to sort scripts by the last time the user visited any site targeted by this script.
+  message: last visit time
+filterLastVisitOrderTooltip:
+  description: Tooltip for option to sort scripts.
+  message: The last time you visited any site targeted by this script.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: All
@@ -553,6 +559,9 @@ labelSettings:
 labelShowOrder:
   description: Label for option in dashboard -> script list
   message: Show execution order positions
+labelShowVisited:
+  description: Label for option in dashboard -> script list
+  message: Show last visit time
 labelSync:
   description: Label for sync options.
   message: Sync

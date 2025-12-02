@@ -1,5 +1,5 @@
 import {
-  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, i18n, noop,
+  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, i18n, noop, sendCmd,
 } from '@/common';
 import {
   __CODE, HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, TL_AWAIT, UNWRAP,
@@ -9,6 +9,7 @@ import { mapEntry } from '@/common/object';
 import defaults, { kScriptTemplate } from '@/common/options-defaults';
 import { addOwnCommands, commands } from './init';
 import { getOption, hookOptionsInit } from './options';
+import storage, { S_MOD_PRE, S_SCRIPT_PRE } from './storage';
 import { injectableRe } from './tabs';
 
 addOwnCommands({
@@ -33,6 +34,14 @@ hookOptionsInit((changes, firstRun) => {
   }
 });
 
+/** @type {{ [id: string]: VMScript }} */
+export const scriptMap = {};
+/** @type {{ [id: string]: number }} */
+export const scriptSiteVisited = {};
+/** @type {VMScript[]} */
+export const aliveScripts = [];
+/** @type {VMScript[]} */
+export const removedScripts = [];
 /** @return {boolean|?RegExpExecArray} */
 export const matchUserScript = text => !/^\s*</.test(text) /*HTML*/ && METABLOCK_RE.exec(text);
 
@@ -86,7 +95,7 @@ export const ERR_META_SPACE_INSIDE = 'Expected a single space after "//" in ';
  * @param {Array} [opts.errors] - to collect errors
  * @param {boolean} [opts.retDefault] - returns the default empty meta if no meta is found
  * @param {boolean} [opts.retMetaStr] - adds the matched part as [__CODE] prop in result
- * @return {VMScript.Meta | false}
+ * @return {VMScript['meta'] | false}
  */
 export function parseMeta(code, { errors, retDefault, retMetaStr } = {}) {
   // initialize meta
@@ -231,17 +240,46 @@ function inferScriptSupportUrl(script, home = getScriptHome(script)) {
   }
 }
 
+/** @param {VMScript} script */
 export function inferScriptProps(script) {
-  if (!script || hasOwnProperty(script, INFERRED)) {
-    return;
+  const data = script[INFERRED] ??= {};
+  const home = data[HOMEPAGE_URL] ??= getScriptHome(script) || inferScriptHome(script);
+  data[SUPPORT_URL] ??= !getScriptSupportUrl(script) && inferScriptSupportUrl(script, home);
+  data.visit = scriptSiteVisited[script.props.id];
+}
+
+/**
+ * @param {VMInjection.Script[] | number[]} arr
+ * @param {boolean} [isIds]
+ */
+export function updateVisitedTime(arr, isIds) {
+  const now = Date.now();
+  const toBroadcast = {};
+  const toWrite = {};
+  for (let v of arr) {
+    if (!isIds) v = v.id;
+    scriptSiteVisited[v] = toBroadcast[v] = toWrite[S_MOD_PRE + v] = now;
   }
-  let url, res;
-  if (!(url = getScriptHome(script)) && (url = inferScriptHome(script))) {
-    (res || (res = {}))[HOMEPAGE_URL] = url;
+  sendCmd('Visited', toBroadcast);
+  storage.api.set(toWrite);
+}
+
+/** `key` must be already verified to start with S_SCRIPT_PRE */
+export function updateScriptMap(key, val) {
+  if ((key = +key.slice(S_SCRIPT_PRE.length))) {
+    if (val) {
+      const oldScript = scriptMap[key];
+      if (oldScript) {
+        const i1 = aliveScripts.indexOf(oldScript);
+        const i2 = removedScripts.indexOf(oldScript);
+        if (i1 >= 0) aliveScripts[i1] = val;
+        if (i2 >= 0) removedScripts[i2] = val;
+        val[INFERRED] ??= oldScript[INFERRED];
+      }
+      scriptMap[key] = val;
+    } else {
+      delete scriptMap[key];
+    }
+    return true;
   }
-  if (!getScriptSupportUrl(script) && (url = inferScriptSupportUrl(script, url))) {
-    (res || (res = {}))[SUPPORT_URL] = url;
-  }
-  script[INFERRED] = res;
-  // Setting the key when failed to `undefined` makes it detectable via hasOwnProperty above
 }

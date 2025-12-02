@@ -7,6 +7,10 @@ declare type NumBoolNull = 0 | 1 | null
 declare type StringMap = { [key: string]: string }
 declare type PlainJSONValue = browser.extensionTypes.PlainJSONValue;
 
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
 //#endregion Generic
 //#region GM-specific
 
@@ -153,26 +157,14 @@ declare type VMBadgeData = {
  * Internal script representation
  */
 declare interface VMScript {
-  config: VMScript.Config;
-  custom: VMScript.Custom;
-  meta: VMScript.Meta;
-  props: VMScript.Props;
-  /** Automatically inferred from other props in getData, in-memory only and not in storage */
-  inferred?: {
-    homepageURL?: string;
-    supportURL?: string;
-  },
-}
-
-declare namespace VMScript {
-  type Config = {
+  config: {
     enabled: NumBool;
     removed: NumBool;
     /** 2 = allow updates and local edits */
     shouldUpdate: NumBool | 2;
     notifyUpdates?: NumBoolNull;
-  }
-  type Custom = {
+  };
+  custom: {
     name?: string;
     /** Installation web page that will be used for inferring a missing @homepageURL */
     from?: string;
@@ -194,8 +186,8 @@ declare namespace VMScript {
     pathMap?: StringMap;
     runAt?: VMScriptRunAt;
     tags?: string;
-  }
-  type Meta = {
+  };
+  meta: {
     description?: string;
     downloadURL?: string;
     exclude: string[];
@@ -216,23 +208,25 @@ declare namespace VMScript {
     topLevelAwait?: boolean;
     unwrap?: boolean;
     version?: string;
-  }
-  type Props = {
+  };
+  props: {
     id: number;
     lastModified: number;
     lastUpdated: number;
     position: number;
     uri: string;
     uuid: string;
-  }
+  };
+  /** Automatically inferred from other props in getData, in-memory only and not in storage */
+  inferred?: {
+    homepageURL?: string;
+    supportURL?: string;
+    visit: number;
+  },
 }
 
-declare interface VMScriptSourceOptions {
+declare interface VMScriptSourceOptions extends DeepPartial<Omit<VMScript, 'inferred'>> {
   code?: string;
-  config?: VMScript.Config;
-  custom?: VMScript.Custom;
-  meta?: VMScript.Meta;
-  props?: VMScript.Props;
 
   id?: number;
   isNew?: boolean;
@@ -344,7 +338,7 @@ declare namespace VMInjection {
     injectInto: VMScriptInjectInto;
     key: { data: string, win: string };
     /** `resources` is still an object, converted later in makeGmApiWrapper */
-    meta: VMScript.Meta | VMScriptGMInfoScriptMeta;
+    meta: VMScript['meta'] | VMScriptGMInfoScriptMeta;
     metaStr: (string|number)[];
     pathMap: StringMap;
     runAt?: RunAt;

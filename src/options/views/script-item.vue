@@ -64,6 +64,10 @@
           <span class="ellipsis" v-else v-text="author.name" />
         </tooltip>
         <span class="version ellipsis" v-text="script.meta.version"/>
+        <tooltip class="visit hidden-sm ml-1c" :content="visit.title" align="end"
+                 v-if="showVisit">
+          {{ visit.show }}
+        </tooltip>
         <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end" v-if="!isRemoved">
           {{ script.$cache.size }}
         </tooltip>
@@ -146,12 +150,17 @@
 
 <script>
 import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
+import { INFERRED } from '@/common/consts';
 import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
 const itemMargin = 8;
+const visitedRecently = new Set();
+const refreshVisited = () => { store.now = Date.now(); };
+const scheduleRefreshVisited = () => setInterval(refreshVisited, 60e3);
 const setScriptFocus = val => keyboardService.setContext('scriptFocus', val);
+let visitedRecentlyInterval;
 </script>
 
 <script setup>
@@ -167,6 +176,7 @@ const props = defineProps([
   'focused',
   'hotkeys',
   'showHotkeys',
+  'showVisit',
   'activeTags',
 ]);
 const emit = defineEmits([
@@ -209,10 +219,18 @@ const updatedAt = computed(() => {
   const lastModified = !isRemoved.value && scrProps.lastUpdated || scrProps.lastModified;
   const dateStr = lastModified && new Date(lastModified).toLocaleString();
   return lastModified ? {
-    show: formatTime(Date.now() - lastModified),
+    show: formatDynamicTime(scrProps, lastModified),
     title: isRemoved.value
       ? i18n('labelRemovedAt', dateStr)
       : i18n('labelLastUpdatedAt', dateStr)
+  } : {};
+});
+const visit = computed(() => {
+  const { script } = props;
+  const time = script[INFERRED].visit;
+  return time && props.showVisit ? {
+    show: formatDynamicTime(script.props, time),
+    title: new Date(time).toLocaleString() + '. ' + i18n('filterLastVisitOrderTooltip'),
   } : {};
 });
 const url = computed(() => `#${
@@ -234,6 +252,24 @@ const onUpdate = async () => {
     emitScript('update');
   }
 };
+/**
+ * @param {VMScript['props']} scriptProps
+ * @param {number} time
+ * @return {string}
+ */
+function formatDynamicTime({ id }, time) {
+  time = store.now - time;
+  if (time < 24 * 3600e3) {
+    visitedRecently.add(id);
+    visitedRecentlyInterval ??= scheduleRefreshVisited();
+  } else {
+    visitedRecently.delete(id);
+    if (visitedRecentlyInterval && !visitedRecently.size) {
+      visitedRecentlyInterval = clearInterval(refreshVisited);
+    }
+  }
+  return formatTime(time);
+}
 
 watch(() => props.visible, visible => {
   // Leave it if the element is already rendered
@@ -456,6 +492,9 @@ $removedItemHeight: calc(
   &-message {
     white-space: nowrap;
   }
+  .visit {
+    color: var(--fill-8);
+  }
 }
 
 .hotkeys [data-hotkey] {
@@ -569,11 +608,11 @@ $removedItemHeight: calc(
           width: 3em;
           text-align: right;
         }
-        .updated, .version {
+        .updated, .version, .visit {
           text-align: right;
           color: var(--fill-8);
         }
-        .updated {
+        .updated, .visit {
           width: 3em;
         }
         .version:not(:empty)::before {

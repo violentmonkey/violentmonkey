@@ -2,8 +2,9 @@ import { ensureArray, ignoreChromeErrors, initHooks, isEmpty, sendCmd } from '@/
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
-import { scriptSizes, sizesPrefixRe, updateScriptMap } from './db';
-import storage, { S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
+import { dbKeys, scriptSizes, sizesPrefixRe } from './db';
+import { scriptSiteVisited, updateScriptMap } from './script';
+import storage, { S_MOD_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
 import { clearValueOpener } from './values';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
@@ -23,7 +24,6 @@ const TTL_MAIN = 3600e3;
 /** Keeping tiny info for extended period of time as it's inexpensive. */
 const TTL_TINY = 24 * 3600e3;
 const cache = initCache({ lifetime: TTL_MAIN });
-export const dbKeys = new Map(); // 1: exists, 0: known to be absent
 const api = /** @type {browser.storage.StorageArea} */ storage.api;
 /** Using a simple delay with setTimeout to avoid infinite debouncing due to periodic activity */
 const FLUSH_DELAY = 100;
@@ -54,13 +54,17 @@ export const cachedStorageApi = storage.api = {
       return !ok && dbKeys.get(key) !== 0;
     });
     if (!keys || keys.length) {
-      let lifetime;
+      let lifetime, id;
       if (!keys) lifetime = TTL_SKIM; // DANGER! Must be `undefined` otherwise.
       (await api.get(keys))::forEachEntry(([key, val]) => {
         res[key] = val;
         dbKeys.set(key, 1);
         cache.put(key, deepCopy(val), lifetime);
-        updateScriptMap(key, val);
+        if (key.startsWith(S_SCRIPT_PRE)) {
+          updateScriptMap(key, val);
+        } else if (key.startsWith(S_MOD_PRE) && (id = +key.slice(S_MOD_PRE.length))) {
+          scriptSiteVisited[id] = val;
+        }
       });
       keys?.forEach(key => dbKeys.set(key, +hasOwnProperty(res, key)));
     }
@@ -86,7 +90,7 @@ export const cachedStorageApi = storage.api = {
           valuesToFlush[key] = copy;
         } else {
           toWrite[key] = val;
-          if (updateScriptMap(key, val) && val[INFERRED]) {
+          if (key.startsWith(S_SCRIPT_PRE) && updateScriptMap(key, val) && val[INFERRED]) {
             delete (toWrite[key] = { ...val })[INFERRED];
           }
           updateScriptSizeContributor(key, val);
@@ -111,7 +115,7 @@ export const cachedStorageApi = storage.api = {
           valuesToFlush[key] = null;
           ok = false;
         } else {
-          updateScriptMap(key);
+          if (key.startsWith(S_SCRIPT_PRE)) updateScriptMap(key);
           updateScriptSizeContributor(key);
         }
       }

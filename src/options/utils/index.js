@@ -15,6 +15,7 @@ export const store = reactive({
   loaded: false,
   /** Whether removed scripts need to be filtered from `store.scripts`. */
   needRefresh: false,
+  now: Date.now(),
   sync: [],
   title: null,
 });

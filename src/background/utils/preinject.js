@@ -1,5 +1,5 @@
 import {
-  getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd
+  getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd,
 } from '@/common';
 import {
   __CODE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
@@ -17,6 +17,7 @@ import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
 import { kSetCookie } from './requests-core';
+import { updateVisitedTime } from './script';
 import {
   S_CACHE, S_CACHE_PRE, S_CODE, S_CODE_PRE, S_REQUIRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE,
   S_VALUE_PRE,
@@ -173,6 +174,9 @@ addPublicCommands({
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
       addValueOpener(scripts, tabId, frameDoc);
+      if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
+        updateVisitedTime(scripts);
+      }
     }
     if (popupTabs[tabId]) {
       sendPopupShown(tabId, frameDoc);
@@ -201,6 +205,9 @@ addPublicCommands({
     const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);
     addValueOpener(scripts, tabId, getFrameDocId(isTop, src[kDocumentId], frameId));
+    if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
+      updateVisitedTime(scripts);
+    }
     return {
       [SCRIPTS]: scripts,
       [S_CACHE]: envCache,
@@ -216,6 +223,7 @@ addPublicCommands({
     setBadge(ids, reset, src);
     if (isTop === 3) {
       if (hasIds) reifyValueOpener(ids, docId);
+      if (ids.length) updateVisitedTime(ids, true);
       reifyRequests(tabId, docId);
       clearNotifications(tabId);
     }
@@ -576,7 +584,7 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   let code;
   let wantsPage;
   const toContent = [];
-  for (const scr of scripts) {
+  for (const /**@type{VMInjection.Script}*/ scr of scripts) {
     const metaStr = scr[META_STR];
     if (isContentRealm(scr[INJECT_INTO], forceContent)) {
       if (!metaStr[0]) {

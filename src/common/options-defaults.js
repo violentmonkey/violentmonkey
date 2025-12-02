@@ -60,11 +60,11 @@ export default {
   ffInject: true,
   xhrInject: false,
   filters: {
-    /** @type {'name' | 'code' | 'all'} */
-    searchScope: 'name',
     /** @type {boolean} */
     showOrder: false,
-    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'update'|'update-'} */
+    /** @type {boolean} */
+    showVisit: false,
+    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'update'|'update-' | 'visit'|'visit-'} */
     sort: 'exec',
     /** @type {boolean} */
     viewSingleColumn: false,
