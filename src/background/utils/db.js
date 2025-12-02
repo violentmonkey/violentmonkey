@@ -34,6 +34,7 @@ const aliveScripts = [];
 const removedScripts = [];
 /** Ensuring slow icons don't prevent installation/update */
 const ICON_TIMEOUT = 1000;
+export const kTryVacuuming = 'Try vacuuming database in options.';
 /** Same order as in SIZE_TITLES and getSizes */
 export const sizesPrefixRe = RegExp(
   `^(${S_CODE_PRE}|${S_SCRIPT_PRE}|${S_VALUE_PRE}|${S_REQUIRE_PRE}|${S_CACHE_PRE}${S_MOD_PRE})`);
@@ -915,7 +916,7 @@ export async function vacuum(data) {
     result.errors = (await Promise.all(toFetch)).filter(Boolean);
   }
   if (noFetch && noFetch.length) {
-    console.warn('Missing required resources. Try vacuuming database in options.', noFetch);
+    console.warn('Missing required resources. ' + kTryVacuuming, noFetch);
   }
   _vacuuming = null;
   result.fixes = toFetch.length + keysToRemove.length;

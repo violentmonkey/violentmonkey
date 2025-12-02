@@ -9,7 +9,7 @@ import initCache from '@/common/cache';
 import {
   deepCopy, forEachEntry, forEachValue, mapEntry, objectPick, objectSet,
 } from '@/common/object';
-import { CACHE_KEYS, getScriptsByURL, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
+import { CACHE_KEYS, getScriptsByURL, kTryVacuuming, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { setBadge } from './icon';
 import { addOwnCommands, addPublicCommands } from './init';
 import { clearNotifications } from './notifications';
@@ -524,7 +524,9 @@ function prepareScript(script, env) {
   }
   tmp = false;
   for (const url of meta[S_REQUIRE]) {
-    const req = require[pathMap[url] || url];
+    const req = require[pathMap[url] || url] || `/* ${VIOLENTMONKEY} is missing @require ${
+      url.replace(/\*\//g, '%2A/')
+    }\n${kTryVacuuming} */`;
     if (/\S/.test(req)) {
       injectedCode.push(...[
         tmp && isUnsafeConcat(req) && ';',
