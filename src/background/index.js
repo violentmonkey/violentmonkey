@@ -64,6 +64,7 @@ async function handleCommandMessageAsync(func, data, src) {
   }
 }
 
+window._bg = 1;
 global['handle' + 'CommandMessage' /* hiding the global from IDE */] = handleCommandMessage;
 global['deep' + 'Copy' /* hiding the global from IDE */] = deepCopy;
 browser.runtime.onMessage.addListener(handleCommandMessage);

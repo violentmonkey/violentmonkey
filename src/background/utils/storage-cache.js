@@ -66,7 +66,7 @@ export const cachedStorageApi = storage.api = {
           scriptSiteVisited[id] = val;
         }
       });
-      keys?.forEach(key => dbKeys.set(key, +hasOwnProperty(res, key)));
+      keys?.forEach(key => !hasOwnProperty(res, key) && dbKeys.set(key, 0));
     }
     cache.batch(false);
     return res;
