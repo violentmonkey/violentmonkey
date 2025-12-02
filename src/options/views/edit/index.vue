@@ -140,7 +140,7 @@ const toEnum = val => val || null; // `null` removes the prop from script object
 const K_PREV_PANEL = 'Alt-PageUp';
 const K_NEXT_PANEL = 'Alt-PageDown';
 const compareString = (a, b) => (a < b ? -1 : a > b);
-/** @param {VMScript.Config} config */
+/** @param {VMScript['config']} config */
 const collectShouldUpdate = ({ shouldUpdate, _editable }) => (
   +shouldUpdate && (shouldUpdate + _editable)
 );

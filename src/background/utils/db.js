@@ -565,7 +565,10 @@ const getUUID = crypto.randomUUID ? crypto.randomUUID.bind(crypto) : () => {
   return '01-2-3-4-567'.replace(/\d/g, i => (rnd[i] + 0x1_0000).toString(16).slice(-4));
 };
 
-/** @return {Promise<void>} */
+/**
+ * @param {number} id
+ * @param {DeepPartial<VMScript>} data
+ */
 export async function updateScriptInfo(id, data) {
   const script = scriptMap[id];
   for (const key in data) { // shallow merge
@@ -578,8 +581,8 @@ export async function updateScriptInfo(id, data) {
 }
 
 /**
- * @param {string | {code:string, custom:VMScript.Custom}} src
- * @return {{ meta: VMScript.Meta, errors: string[] }}
+ * @param {string | {code:string, custom:VMScript['custom']}} src
+ * @return {{ meta: VMScript['meta'], errors: string[] }}
  */
 function parseMetaWithErrors(src) {
   const isObj = isObject(src);
