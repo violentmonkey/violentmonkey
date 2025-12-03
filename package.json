@@ -36,7 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
     "@violentmonkey/types": "^0.3.1",
-    "@vue/compiler-sfc": "^3.4.38",
+    "@vue/compiler-sfc": "^3.5.25",
     "@vue/eslint-config-typescript": "^13.0.0",
     "amo-upload": "^0.5.5",
     "autoprefixer": "^10.4.15",
@@ -98,11 +98,11 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
-    "@violentmonkey/shortcut": "^1.2.6",
+    "@violentmonkey/shortcut": "^1.4.4",
     "@zip.js/zip.js": "2.4.4",
-    "codemirror": "^5.65.10",
-    "tldts": "^6.0.14",
-    "vue": "^3.4.38",
+    "codemirror": "^5.65.20",
+    "tldts": "^7.0.19",
+    "vue": "^3.5.25",
     "vueleton": "^2.0.2"
   },
   "engines": {
