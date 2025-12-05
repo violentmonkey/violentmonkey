@@ -48,6 +48,7 @@ export default {
   autoReload: false,
   features: null,
   syncScriptStatus: true,
+  syncAutomatically: true,
   sync: null,
   customCSS: '',
   importScriptData: true,

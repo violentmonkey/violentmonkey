@@ -1,27 +1,27 @@
-import {
-  initialize,
-  sync,
-  getStates,
-  authorize,
-  revoke,
-  setConfig,
-} from './base';
-import './dropbox';
-import './onedrive';
-import './googledrive';
-import './webdav';
+import { SYNC_MERGE } from '@/common/consts-sync';
 import { addOwnCommands, hookOptionsInit } from '../utils';
 import { S_CODE_PRE, S_SCRIPT_PRE } from '../utils/storage';
 import { onStorageChanged } from '../utils/storage-cache';
+import {
+  authorize,
+  autoSync,
+  getStates,
+  initialize,
+  revoke,
+  setConfig,
+  setSyncOnceMode,
+  sync,
+} from './base';
+import './dropbox';
+import './googledrive';
+import './onedrive';
+import './webdav';
 
-const keysToSyncRe = new RegExp(`^(?:${[
-  S_SCRIPT_PRE,
-  S_CODE_PRE,
-].join('|')})`);
+const keysToSyncRe = new RegExp(`^(?:${[S_SCRIPT_PRE, S_CODE_PRE].join('|')})`);
 let unwatch;
 
 hookOptionsInit((changes, firstRun) => {
-  if ('sync.current' in changes || firstRun) reconfigure();
+  if (firstRun || 'sync.current' in changes) reconfigure();
 });
 
 addOwnCommands({
@@ -29,7 +29,10 @@ addOwnCommands({
   SyncGetStates: getStates,
   SyncRevoke: revoke,
   SyncSetConfig: setConfig,
-  SyncStart: sync,
+  SyncStart(mode) {
+    setSyncOnceMode(mode || SYNC_MERGE);
+    sync();
+  },
 });
 
 function reconfigure() {
@@ -48,7 +51,7 @@ function reconfigure() {
 function dbSentry({ keys }) {
   for (const k of keys) {
     if (keysToSyncRe.test(k)) {
-      sync();
+      autoSync();
       break;
     }
   }

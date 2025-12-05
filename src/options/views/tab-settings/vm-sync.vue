@@ -1,6 +1,6 @@
 <template>
   <section class="mb-1c">
-    <h3 v-text="i18n('labelSync')" :class="{bright: store.isEmpty === 1}"/>
+    <h3 v-text="i18n('labelSync')" :class="{ bright: store.isEmpty === 1 }" />
     <div class="flex flex-wrap center-items">
       <span v-text="i18n('labelSyncService')"></span>
       <select class="mx-1" :value="rCurrentName" @change="onSyncChange">
@@ -12,16 +12,28 @@
         />
       </select>
       <template v-if="rService">
-        <button v-text="rLabel" v-if="rAuthType === 'oauth'"
-                :disabled="!rCanAuthorize" @click="onAuthorize"/>
+        <button
+          v-text="rLabel"
+          v-if="rAuthType === 'oauth'"
+          :disabled="!rCanAuthorize"
+          @click="onAuthorize"
+        />
         <tooltip :content="i18n('labelSync')" class="stretch-self flex mr-1">
-          <button :disabled="!rCanSync" @click="onSync" class="flex center-items">
-            <icon name="refresh"/>
+          <button
+            :disabled="!rCanSync"
+            @click="onSync(SYNC_MERGE)"
+            class="flex center-items"
+          >
+            <icon name="refresh" />
           </button>
         </tooltip>
         <p v-if="rMessage">
-          <span v-text="rMessage" :class="{'text-red': rError}" class="mr-1"/>
-          <span v-text="rError"/>
+          <span
+            v-text="rMessage"
+            :class="{ 'text-red': rError }"
+            class="mr-1"
+          />
+          <span v-text="rError" />
         </p>
       </template>
     </div>
@@ -70,19 +82,51 @@
       </div>
     </fieldset>
     <div v-if="rService">
-      <setting-check name="syncScriptStatus" :label="i18n('labelSyncScriptStatus')" />
+      <setting-check
+        class="mr-1"
+        name="syncAutomatically"
+        :label="i18n('labelSyncAutomatically')"
+      />
+      <button v-text="i18n('buttonSyncPushOnce')" @click="onSync(SYNC_PUSH)" />
+      <button v-text="i18n('buttonSyncPullOnce')" @click="onSync(SYNC_PULL)" />
+    </div>
+    <div v-if="rService">
+      <setting-check
+        name="syncScriptStatus"
+        :label="i18n('labelSyncScriptStatus')"
+      />
     </div>
   </section>
 </template>
 
-<script>
+<script setup>
 import { i18n, sendCmdDirectly } from '@/common';
 import {
-  ANONYMOUS, AUTHORIZED, AUTHORIZING, ERROR, IDLE, INITIALIZING, NO_AUTH, PASSWORD, READY,
-  SERVER_URL, SYNCING, UNAUTHORIZED, USER_CONFIG, USERNAME,
+  ANONYMOUS,
+  AUTHORIZED,
+  AUTHORIZING,
+  ERROR,
+  IDLE,
+  INITIALIZING,
+  NO_AUTH,
+  PASSWORD,
+  READY,
+  SERVER_URL,
+  SYNC_MERGE,
+  SYNC_PULL,
+  SYNC_PUSH,
+  SYNCING,
+  UNAUTHORIZED,
+  USER_CONFIG,
+  USERNAME,
 } from '@/common/consts-sync';
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
+import { ref, watchEffect } from 'vue';
+import Tooltip from 'vueleton/lib/tooltip';
+import SettingCheck from '@/common/ui/setting-check';
+import Icon from '@/common/ui/icon';
+import { store } from '../../utils';
 
 const LABEL_MAP = {
   [AUTHORIZING]: i18n('labelSyncAuthorizing'),
@@ -94,14 +138,6 @@ const SYNC_NONE = {
   name: '',
   properties: {},
 };
-</script>
-
-<script setup>
-import { ref, watchEffect } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
-import SettingCheck from '@/common/ui/setting-check';
-import Icon from '@/common/ui/icon';
-import { store } from '../../utils';
 
 //#region refs
 const rAuthType = ref();
@@ -121,7 +157,7 @@ hookSetting(SYNC_CURRENT, (value) => {
 watchEffect(() => {
   const services = store.sync || [];
   const curName = rCurrentName.value || '';
-  const srv = curName && services.find(item => item.name === curName);
+  const srv = curName && services.find((item) => item.name === curName);
   if (srv) setRefs(srv);
   else if (curName) console.warn('Invalid current service:', curName);
   rService.value = srv;
@@ -145,13 +181,14 @@ function onAuthorize() {
     sendCmdDirectly('SyncAuthorize');
   }
 }
-function onSync() {
-  sendCmdDirectly('SyncStart');
+function onSync(mode) {
+  sendCmdDirectly('SyncStart', mode);
 }
 function setRefs(srv) {
   const { authState, syncState } = srv;
-  const canAuth = rCanAuthorize.value = [IDLE, ERROR].includes(syncState)
-    && [NO_AUTH, UNAUTHORIZED, ERROR, AUTHORIZED].includes(authState);
+  const canAuth = (rCanAuthorize.value =
+    [IDLE, ERROR].includes(syncState) &&
+    [NO_AUTH, UNAUTHORIZED, ERROR, AUTHORIZED].includes(authState));
   rAuthType.value = srv.properties.authType;
   rCanSync.value = canAuth && authState === AUTHORIZED;
   rLabel.value = LABEL_MAP[authState] || i18n('labelSyncAuthorize');
@@ -166,11 +203,13 @@ function setRefs(srv) {
   else if (syncState === READY) res = i18n('msgSyncReady');
   else if (syncState === SYNCING) {
     res = srv.progress;
-    res = i18n('msgSyncing') + (res?.total ? ` (${res.finished}/${res.total})` : '');
+    res =
+      i18n('msgSyncing') +
+      (res?.total ? ` (${res.finished}/${res.total})` : '');
   } else if ((res = srv.lastSync)) {
     res = i18n('lastSync', new Date(res).toLocaleString());
   }
   rMessage.value = res || err || '';
-  rError.value = err && srv.error || '';
+  rError.value = (err && srv.error) || '';
 }
 </script>
