@@ -136,7 +136,7 @@
           :showVisit="filters.showVisit || filters.sort.startsWith('visit')"
           :script
           :draggable
-          :visible="renderAll || index < state.batchRender.limit"
+          :visible="index < state.batchRender.limit"
           :viewTable="filters.viewTable"
           :hotkeys="scriptHotkeys"
           :activeTags
@@ -166,7 +166,7 @@
 
 <script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
-import { i18n, sendCmdDirectly, debounce, ensureArray, makePause, trueJoin } from '@/common';
+import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin } from '@/common';
 import { INFERRED } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
@@ -279,7 +279,6 @@ const $menuNew = ref();
 const isEmpty = ref();
 const refSearch = ref();
 const refList = ref();
-const renderAll = ref(false);
 const scroller = ref();
 const kScrollTop = 'scrollTop';
 
@@ -472,7 +471,7 @@ async function onHashChange() {
   }
 }
 async function renderScripts() {
-  if (!store.canRenderScripts || renderAll.value) return;
+  if (!store.canRenderScripts || isNaN(state.batchRender.limit)) return;
   const { length } = state.sortedScripts;
   let limit = 9;
   const batchRender = reactive({ limit });
@@ -489,14 +488,14 @@ async function renderScripts() {
       limit += step || 1;
     }
     batchRender.limit = limit;
-    await new Promise(resolve => nextTick(resolve));
-    if (!step && performance.now() - startTime >= MAX_BATCH_DURATION) {
+    // Let the browser calculate the layout so we know the real duration of the batch
+    const now = await new Promise(requestAnimationFrame);
+    if (!step && now - startTime >= MAX_BATCH_DURATION) {
       step = limit * 2; // the first batch is slow to render because it has more work to do
     }
-    if (step && limit < length) await makePause();
   }
   // Completed the potentially slow initial creation, subsequent redraws will be fast
-  if (limit === length) renderAll.value = true;
+  if (length && limit >= length) batchRender.limit = NaN;
 }
 function scheduleSearch() {
   try {
