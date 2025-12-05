@@ -38,12 +38,9 @@ const defsObj = {
   ...pickEnvs([
     'DEBUG',
     'VM_VER',
-    'SYNC_GOOGLE_CLIENT_ID',
-    'SYNC_GOOGLE_CLIENT_SECRET',
     'SYNC_GOOGLE_DESKTOP_ID',
     'SYNC_GOOGLE_DESKTOP_SECRET',
     'SYNC_ONEDRIVE_CLIENT_ID',
-    'SYNC_ONEDRIVE_CLIENT_SECRET',
     'SYNC_DROPBOX_CLIENT_ID',
   ]),
   'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
