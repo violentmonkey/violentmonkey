@@ -102,6 +102,12 @@ buttonShowEditorState:
 buttonSupport:
   description: Button to open support page.
   message: Βοήθεια
+buttonSyncPullOnce:
+  description: Button to sync scripts from remote to local for once
+  message: ''
+buttonSyncPushOnce:
+  description: Button to sync scripts from local to remote for once
+  message: ''
 buttonUndo:
   description: Button to undo removement of a script.
   message: Αναίρεση
@@ -615,6 +621,9 @@ labelSyncAuthorize:
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
   message: Εξουσιοδότηση...
+labelSyncAutomatically:
+  description: Label for option to sync automatically.
+  message: ''
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Να μη γίνεται συγχρονισμός
@@ -892,6 +901,7 @@ msgSyncNoAuthYet:
 msgSyncReady:
   description: Message shown when sync will start soon.
   message: Ο συγχρονισμός θα ξεκινήσει σύντομα...
+  touched: false
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Ο συγχρονισμός βρίσκεται σε εξέλιξη...
