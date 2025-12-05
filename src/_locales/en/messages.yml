@@ -269,7 +269,9 @@ filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: last update time
 filterLastVisitOrder:
-  description: Label for option to sort scripts by the last time the user visited any site targeted by this script.
+  description: >-
+    Label for option to sort scripts by the last time the user visited any site
+    targeted by this script.
   message: last visit time
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
