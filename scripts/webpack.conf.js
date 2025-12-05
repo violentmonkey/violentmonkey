@@ -82,6 +82,10 @@ module.exports = [
     config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
+    (config.ignoreWarnings ??= []).push({
+      // suppressing a false warning (the HTML spec allows it) as we don't need SSR
+      message: /<tr> cannot be child of <table>/,
+    });
   }),
 
   buildConfig('injected', './src/injected', (config) => {
