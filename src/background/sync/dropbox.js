@@ -1,11 +1,16 @@
 import { dumpQuery, getUniqId, loadQuery } from '@/common';
 import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
-import { AUTHORIZING, ERROR, UNAUTHORIZED } from '@/common/consts-sync';
 import {
-  getURI, getItemFilename, BaseService, isScriptFile, register,
-  openAuthPage,
-  getCodeVerifier,
+  BaseService,
   getCodeChallenge,
+  getCodeVerifier,
+  getItemFilename,
+  getURI,
+  INIT_ERROR,
+  INIT_RETRY,
+  isScriptFile,
+  openAuthPage,
+  register,
 } from './base';
 
 const config = {
@@ -14,7 +19,8 @@ const config = {
 };
 
 const escRE = /[\u007f-\uffff]/g; // eslint-disable-line no-control-regex
-const escFunc = m => `\\u${(m.charCodeAt(0) + 0x10000).toString(16).slice(1)}`;
+const escFunc = (m) =>
+  `\\u${(m.charCodeAt(0) + 0x10000).toString(16).slice(1)}`;
 
 function jsonStringifySafe(obj) {
   const string = JSON.stringify(obj);
@@ -24,53 +30,35 @@ function jsonStringifySafe(obj) {
 const Dropbox = BaseService.extend({
   name: 'dropbox',
   displayName: 'Dropbox',
-  refreshToken() {
-    const refreshToken = this.config.get('refresh_token');
-    return this.authorized({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    })
-    .then(() => this.prepare());
-  },
-  user() {
-    const requestUser = () => this.loadData({
-      method: 'POST',
-      url: 'https://api.dropboxapi.com/2/users/get_current_account',
-    });
-    return requestUser()
-    .catch((res) => {
-      if (res.status === 401) {
-        return this.refreshToken().then(requestUser);
-      }
-      throw res;
-    })
-    .catch((err) => {
-      if (err.status === 401) {
-        return Promise.reject({
-          type: UNAUTHORIZED,
-        });
-      }
-      return Promise.reject({
-        type: ERROR,
-        data: err,
+  async requestAuth() {
+    try {
+      await this.loadData({
+        method: 'POST',
+        url: 'https://api.dropboxapi.com/2/users/get_current_account',
       });
-    });
+    } catch (err) {
+      let code = INIT_ERROR;
+      if (err.status === 401) {
+        code = INIT_RETRY;
+      }
+      return { code, error: err };
+    }
   },
-  handleMetaError(res) {
+  metaError(res) {
     if (res.status !== 409) throw res;
   },
-  list() {
-    return this.loadData({
+  async list() {
+    const data = await this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/list_folder',
       body: {
         path: '',
       },
       responseType: 'json',
-    })
-    .then(data => (
-      data.entries.filter(item => item['.tag'] === 'file' && isScriptFile(item.name)).map(normalize)
-    ));
+    });
+    return data.entries
+      .filter((item) => item['.tag'] === 'file' && isScriptFile(item.name))
+      .map(normalize);
   },
   get(item) {
     const name = getItemFilename(item);
@@ -98,8 +86,7 @@ const Dropbox = BaseService.extend({
       },
       body: data,
       responseType: 'json',
-    })
-    .then(normalize);
+    }).then(normalize);
   },
   remove(item) {
     const name = getItemFilename(item);
@@ -110,8 +97,7 @@ const Dropbox = BaseService.extend({
         path: `/${name}`,
       },
       responseType: 'json',
-    })
-    .then(normalize);
+    }).then(normalize);
   },
   async authorize() {
     this.session = {
@@ -124,14 +110,12 @@ const Dropbox = BaseService.extend({
       client_id: config.client_id,
       redirect_uri: config.redirect_uri,
       state: this.session.state,
-      ...await getCodeChallenge(this.session.codeVerifier),
+      ...(await getCodeChallenge(this.session.codeVerifier)),
     };
     const url = `https://www.dropbox.com/oauth2/authorize?${dumpQuery(params)}`;
     openAuthPage(url, config.redirect_uri);
   },
   async authorized(params) {
-    delete this.headers.Authorization;
-    this.authState.set(AUTHORIZING);
     const data = await this.loadData({
       method: 'POST',
       url: 'https://api.dropbox.com/oauth2/token',
@@ -151,19 +135,19 @@ const Dropbox = BaseService.extend({
       refresh_token: data.refresh_token || params.refresh_token,
     });
   },
-  checkAuth(url) {
+  async finishAuth(url) {
     const redirectUri = `${config.redirect_uri}?`;
     if (!url.startsWith(redirectUri)) return;
     const query = loadQuery(url.slice(redirectUri.length));
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    this.checkSync(this.authorized({
+    await this.authorized({
       code: query.code,
       code_verifier: codeVerifier,
       grant_type: 'authorization_code',
       redirect_uri: config.redirect_uri,
-    }));
+    });
     return true;
   },
   revoke() {

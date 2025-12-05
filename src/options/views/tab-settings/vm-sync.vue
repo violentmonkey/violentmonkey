@@ -3,7 +3,12 @@
     <h3 v-text="i18n('labelSync')" :class="{ bright: store.isEmpty === 1 }" />
     <div class="flex flex-wrap center-items">
       <span v-text="i18n('labelSyncService')"></span>
-      <select class="mx-1" :value="rCurrentName" @change="onSyncChange">
+      <select
+        class="mx-1"
+        :value="rCurrentName"
+        @change="onSyncChange"
+        :disabled="!rCanUpdateConfig"
+      >
         <option
           v-for="service in [SYNC_NONE, ...rSyncServices]"
           :key="service.name"
@@ -13,10 +18,16 @@
       </select>
       <template v-if="rService">
         <button
-          v-text="rLabel"
+          v-text="rLabelAuthorize"
           v-if="rAuthType === 'oauth'"
           :disabled="!rCanAuthorize"
           @click="onAuthorize"
+        />
+        <button
+          v-text="i18n('labelSyncRevoke')"
+          v-if="rAuthType === 'oauth'"
+          :disabled="!rCanRevoke"
+          @click="onRevoke"
         />
         <tooltip :content="i18n('labelSync')" class="stretch-self flex mr-1">
           <button
@@ -44,16 +55,16 @@
           type="url"
           class="flex-1"
           v-model="rUserConfig[SERVER_URL]"
-          :disabled="!rCanAuthorize"
+          :disabled="!rCanUpdateConfig"
         />
       </label>
       <div class="mr-2c">
-        <label>
+        <label class="inline-block">
           <span v-text="i18n('labelSyncUsername')"></span>
           <input
             type="text"
             v-model="rUserConfig[USERNAME]"
-            :disabled="!rCanAuthorize || rUserConfig[ANONYMOUS]"
+            :disabled="!rCanUpdateConfig || rUserConfig[ANONYMOUS]"
           />
         </label>
         <label class="inline-block">
@@ -61,14 +72,14 @@
           <input
             type="password"
             v-model="rUserConfig[PASSWORD]"
-            :disabled="!rCanAuthorize || rUserConfig[ANONYMOUS]"
+            :disabled="!rCanUpdateConfig || rUserConfig[ANONYMOUS]"
           />
         </label>
-        <label>
+        <label class="inline-block">
           <input
             type="checkbox"
             v-model="rUserConfig[ANONYMOUS]"
-            :disabled="!rCanAuthorize"
+            :disabled="!rCanUpdateConfig"
           />
           <span v-text="i18n('labelSyncAnonymous')"></span>
         </label>
@@ -77,20 +88,28 @@
         <button
           v-text="i18n('buttonSave')"
           @click.prevent="onSaveUserConfig"
-          :disabled="!rCanAuthorize"
+          :disabled="!rCanUpdateConfig"
         />
       </div>
     </fieldset>
-    <div v-if="rService">
+    <div>
       <setting-check
         class="mr-1"
         name="syncAutomatically"
         :label="i18n('labelSyncAutomatically')"
       />
-      <button v-text="i18n('buttonSyncPushOnce')" @click="onSync(SYNC_PUSH)" />
-      <button v-text="i18n('buttonSyncPullOnce')" @click="onSync(SYNC_PULL)" />
+      <button
+        v-text="i18n('buttonSyncPushOnce')"
+        @click="onSync(SYNC_PUSH)"
+        :disabled="!rCanSync"
+      />
+      <button
+        v-text="i18n('buttonSyncPullOnce')"
+        @click="onSync(SYNC_PULL)"
+        :disabled="!rCanSync"
+      />
     </div>
-    <div v-if="rService">
+    <div>
       <setting-check
         name="syncScriptStatus"
         :label="i18n('labelSyncScriptStatus')"
@@ -103,20 +122,11 @@
 import { i18n, sendCmdDirectly } from '@/common';
 import {
   ANONYMOUS,
-  AUTHORIZED,
-  AUTHORIZING,
-  ERROR,
-  IDLE,
-  INITIALIZING,
-  NO_AUTH,
   PASSWORD,
-  READY,
   SERVER_URL,
   SYNC_MERGE,
   SYNC_PULL,
   SYNC_PUSH,
-  SYNCING,
-  UNAUTHORIZED,
   USER_CONFIG,
   USERNAME,
 } from '@/common/consts-sync';
@@ -127,11 +137,17 @@ import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import { store } from '../../utils';
+import {
+  SYNC_AUTHORIZED,
+  SYNC_AUTHORIZING,
+  SYNC_ERROR,
+  SYNC_ERROR_AUTH,
+  SYNC_ERROR_INIT,
+  SYNC_IN_PROGRESS,
+  SYNC_INITIALIZING,
+  SYNC_UNAUTHORIZED,
+} from '@/background/sync/state-machine';
 
-const LABEL_MAP = {
-  [AUTHORIZING]: i18n('labelSyncAuthorizing'),
-  [AUTHORIZED]: i18n('labelSyncRevoke'),
-};
 const SYNC_CURRENT = 'sync.current';
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
@@ -142,10 +158,12 @@ const SYNC_NONE = {
 //#region refs
 const rAuthType = ref();
 const rCanAuthorize = ref();
+const rCanRevoke = ref();
 const rCanSync = ref();
+const rCanUpdateConfig = ref();
 const rCurrentName = ref('');
 const rError = ref();
-const rLabel = ref();
+const rLabelAuthorize = ref();
 const rMessage = ref();
 const rService = ref();
 const rSyncServices = ref();
@@ -158,8 +176,8 @@ watchEffect(() => {
   const services = store.sync || [];
   const curName = rCurrentName.value || '';
   const srv = curName && services.find((item) => item.name === curName);
-  if (srv) setRefs(srv);
-  else if (curName) console.warn('Invalid current service:', curName);
+  // Also update refs for None
+  setRefs(srv);
   rService.value = srv;
   rSyncServices.value = services;
 });
@@ -172,44 +190,55 @@ function onSyncChange(e) {
   options.set(SYNC_CURRENT, value);
 }
 function onAuthorize() {
-  const { authState } = rService.value;
-  if ([AUTHORIZED].includes(authState)) {
-    // revoke
-    sendCmdDirectly('SyncRevoke');
-  } else if ([NO_AUTH, UNAUTHORIZED, ERROR].includes(authState)) {
-    // authorize
-    sendCmdDirectly('SyncAuthorize');
-  }
+  sendCmdDirectly('SyncAuthorize');
+}
+function onRevoke() {
+  sendCmdDirectly('SyncRevoke');
 }
 function onSync(mode) {
   sendCmdDirectly('SyncStart', mode);
 }
 function setRefs(srv) {
-  const { authState, syncState } = srv;
-  const canAuth = (rCanAuthorize.value =
-    [IDLE, ERROR].includes(syncState) &&
-    [NO_AUTH, UNAUTHORIZED, ERROR, AUTHORIZED].includes(authState));
-  rAuthType.value = srv.properties.authType;
-  rCanSync.value = canAuth && authState === AUTHORIZED;
-  rLabel.value = LABEL_MAP[authState] || i18n('labelSyncAuthorize');
-  rUserConfig.value = srv[USER_CONFIG] || {};
+  const status = srv?.state?.status;
+  const hasAuth = srv?.hasAuth;
+  rCanAuthorize.value = [
+    SYNC_UNAUTHORIZED,
+    SYNC_ERROR,
+    SYNC_ERROR_INIT,
+  ].includes(status);
+  rCanRevoke.value =
+    hasAuth &&
+    [SYNC_AUTHORIZED, SYNC_ERROR, SYNC_ERROR_INIT, SYNC_ERROR_AUTH].includes(
+      status,
+    );
+  rCanSync.value = [SYNC_AUTHORIZED, SYNC_ERROR, SYNC_ERROR_INIT].includes(
+    status,
+  );
+  rCanUpdateConfig.value = status !== SYNC_IN_PROGRESS;
+  rAuthType.value = srv?.properties?.authType;
+  rLabelAuthorize.value =
+    status === SYNC_AUTHORIZING
+      ? i18n('labelSyncAuthorizing')
+      : i18n('labelSyncAuthorize');
+  rUserConfig.value = srv?.[USER_CONFIG] || {};
   // set message and error
   let res, err;
-  if (authState === INITIALIZING) res = i18n('msgSyncInit');
-  else if (authState === NO_AUTH) res = i18n('msgSyncNoAuthYet');
-  else if (authState === ERROR) err = i18n('msgSyncInitError');
-  else if (authState === UNAUTHORIZED) err = i18n('msgSyncInitError');
-  else if (syncState === ERROR) err = i18n('msgSyncError');
-  else if (syncState === READY) res = i18n('msgSyncReady');
-  else if (syncState === SYNCING) {
-    res = srv.progress;
-    res =
-      i18n('msgSyncing') +
-      (res?.total ? ` (${res.finished}/${res.total})` : '');
-  } else if ((res = srv.lastSync)) {
-    res = i18n('lastSync', new Date(res).toLocaleString());
+  if (srv) {
+    if (status === SYNC_INITIALIZING) res = i18n('msgSyncInit');
+    else if (status === SYNC_UNAUTHORIZED) res = i18n('msgSyncNoAuthYet');
+    else if (status === SYNC_ERROR_INIT) err = i18n('msgSyncInitError');
+    else if (status === SYNC_ERROR_AUTH) err = i18n('msgSyncInitError');
+    else if (status === SYNC_ERROR) err = i18n('msgSyncError');
+    else if (status === SYNC_IN_PROGRESS) {
+      res = srv.progress;
+      res =
+        i18n('msgSyncing') +
+        (res?.total ? ` (${res.finished}/${res.total})` : '');
+    } else if ((res = srv.lastSync)) {
+      res = i18n('lastSync', new Date(res).toLocaleString());
+    }
   }
   rMessage.value = res || err || '';
-  rError.value = (err && srv.error) || '';
+  rError.value = (err && srv?.error) || '';
 }
 </script>

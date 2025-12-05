@@ -1,15 +1,21 @@
 // Reference:
 // - https://developers.google.com/identity/protocols/oauth2/native-app
 // - https://developers.google.com/drive/v3/reference/files
-import { dumpQuery, getUniqId, loadQuery, noop } from '@/common';
+import { dumpQuery, getUniqId, loadQuery } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
-import { AUTHORIZING, ERROR, UNAUTHORIZED } from '@/common/consts-sync';
 import { objectGet } from '@/common/object';
 import {
-  getURI, getItemFilename, BaseService, register, isScriptFile,
-  openAuthPage,
-  getCodeVerifier,
+  BaseService,
   getCodeChallenge,
+  getCodeVerifier,
+  getItemFilename,
+  getURI,
+  INIT_ERROR,
+  INIT_RETRY,
+  INIT_SUCCESS,
+  isScriptFile,
+  openAuthPage,
+  register,
 } from './base';
 
 const config = {
@@ -27,51 +33,41 @@ const GoogleDrive = BaseService.extend({
   name: 'googledrive',
   displayName: 'Google Drive',
   urlPrefix: 'https://www.googleapis.com/drive/v3',
-  refreshToken() {
-    const refreshToken = this.config.get('refresh_token');
-    if (!refreshToken) return Promise.reject({ type: UNAUTHORIZED });
-    return this.authorized({
-      refresh_token: refreshToken,
-      grant_type: 'refresh_token',
-    })
-    .then(() => this.prepare());
-  },
-  async user() {
-    const requestUser = () => this.loadData({
-      url: `https://www.googleapis.com/oauth2/v3/tokeninfo?${dumpQuery({
-        access_token: this.config.get('token'),
-      })}`,
-      responseType: 'json',
-    });
-    let res;
+  async requestAuth() {
+    let code = INIT_SUCCESS;
+    let error;
     try {
-      res = await requestUser();
-      if (res.scope === config.scope) return res;
-      res = false;
-    } catch (e) {
-      res = e;
+      const res = await this.loadData({
+        url: `https://www.googleapis.com/oauth2/v3/tokeninfo?${dumpQuery({
+          access_token: this.config.get('token'),
+        })}`,
+        responseType: 'json',
+      });
+      if (res.scope !== config.scope) code = INIT_RETRY;
+    } catch (err) {
+      error = err;
+      code = INIT_ERROR;
+      if (
+        err.status === 400 &&
+        objectGet(err, 'data.error_description') === 'Invalid Value'
+      ) {
+        code = INIT_RETRY;
+      }
     }
-    if (!res || res.status === 400 && objectGet(res, 'data.error_description') === 'Invalid Value') {
-      await this.refreshToken();
-      return requestUser();
-    }
-    throw {
-      type: ERROR,
-      data: res,
-    };
+    return { code, error };
   },
-  getSyncData() {
+  async getSyncData() {
     const params = {
       spaces: 'appDataFolder',
       fields: 'files(id,name,size)',
     };
-    return this.loadData({
+    const { files } = await this.loadData({
       url: `/files?${dumpQuery(params)}`,
       responseType: 'json',
-    })
-    .then(({ files }) => {
-      let metaFile;
-      const remoteData = files.filter((item) => {
+    });
+    let metaFile;
+    const remoteData = files
+      .filter((item) => {
         if (isScriptFile(item.name)) return true;
         if (!metaFile && item.name === this.metaFile) {
           metaFile = item;
@@ -88,17 +84,18 @@ const GoogleDrive = BaseService.extend({
         }
         return true;
       });
-      const metaItem = metaFile ? normalize(metaFile) : {};
-      const gotMeta = this.get(metaItem)
-      .then(data => JSON.parse(data))
-      .catch(err => this.handleMetaError(err))
-      .then(data => Object.assign({}, metaItem, {
-        name: this.metaFile,
-        uri: null,
-        data,
-      }));
-      return Promise.all([gotMeta, remoteData, this.getLocalData()]);
-    });
+    const metaItem = metaFile ? normalize(metaFile) : {};
+    const gotMeta = this.get(metaItem)
+      .then((data) => JSON.parse(data))
+      .catch((err) => this.metaError(err))
+      .then((data) =>
+        Object.assign({}, metaItem, {
+          name: this.metaFile,
+          uri: null,
+          data,
+        }),
+      );
+    return Promise.all([gotMeta, remoteData, this.getLocalData()]);
   },
   async authorize() {
     this.session = {
@@ -111,26 +108,27 @@ const GoogleDrive = BaseService.extend({
       redirect_uri: config.redirect_uri,
       scope: config.scope,
       state: this.session.state,
-      ...await getCodeChallenge(this.session.codeVerifier),
+      ...(await getCodeChallenge(this.session.codeVerifier)),
     };
     if (!this.config.get('refresh_token')) params.prompt = 'consent';
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?${dumpQuery(params)}`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?${dumpQuery(
+      params,
+    )}`;
     openAuthPage(url, config.redirect_uri);
   },
-  checkAuth(url) {
+  async finishAuth(url) {
     const redirectUri = `${config.redirect_uri}?`;
     if (!url.startsWith(redirectUri)) return;
     const query = loadQuery(url.slice(redirectUri.length));
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    this.authState.set(AUTHORIZING);
-    this.checkSync(this.authorized({
+    await this.authorized({
       code: query.code,
       code_verifier: codeVerifier,
       grant_type: 'authorization_code',
       redirect_uri: config.redirect_uri,
-    }));
+    });
     return true;
   },
   revoke() {
@@ -140,40 +138,43 @@ const GoogleDrive = BaseService.extend({
     });
     return this.prepare();
   },
-  authorized(params) {
-    return this.loadData({
+  async authorized(params) {
+    const data = await this.loadData({
       method: 'POST',
       url: 'https://www.googleapis.com/oauth2/v4/token',
       prefix: '',
       headers: {
         'Content-Type': FORM_URLENCODED,
       },
-      body: dumpQuery(Object.assign({}, {
-        client_id: config.client_id,
-        client_secret: config.client_secret,
-      }, params)),
+      body: dumpQuery(
+        Object.assign(
+          {},
+          {
+            client_id: config.client_id,
+            client_secret: config.client_secret,
+          },
+          params,
+        ),
+      ),
       responseType: 'json',
-    })
-    .then((data) => {
-      if (data.access_token) {
-        const update = {
-          token: data.access_token,
-        };
-        if (data.refresh_token) {
-          update.refresh_token = data.refresh_token;
-        }
-        this.config.set(update);
-      } else {
-        throw data;
-      }
     });
+    if (data.access_token) {
+      const update = {
+        token: data.access_token,
+      };
+      if (data.refresh_token) {
+        update.refresh_token = data.refresh_token;
+      }
+      this.config.set(update);
+    } else {
+      throw data;
+    }
   },
-  handleMetaError: noop,
   list() {
     throw new Error('Not supported');
   },
   get({ id }) {
-    if (!id) return Promise.reject();
+    if (!id) throw new Error('Invalid file ID');
     return this.loadData({
       url: `/files/${id}?alt=media`,
     });
@@ -185,12 +186,14 @@ const GoogleDrive = BaseService.extend({
     const headers = {
       'Content-Type': `multipart/related; boundary=${boundary}`,
     };
-    const metadata = id ? {
-      name,
-    } : {
-      name,
-      parents: ['appDataFolder'],
-    };
+    const metadata = id
+      ? {
+          name,
+        }
+      : {
+          name,
+          parents: ['appDataFolder'],
+        };
     const body = [
       `--${boundary}`,
       'Content-Type: application/json; ' + CHARSET_UTF8,

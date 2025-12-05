@@ -2,7 +2,6 @@
 // - https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow
 import { dumpQuery, getUniqId, loadQuery, noop } from '@/common';
 import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
-import { AUTHORIZING, ERROR, UNAUTHORIZED } from '@/common/consts-sync';
 import { objectGet } from '@/common/object';
 import {
   BaseService,
@@ -10,6 +9,9 @@ import {
   getCodeVerifier,
   getItemFilename,
   getURI,
+  INIT_ERROR,
+  INIT_RETRY,
+  INIT_UNAUTHORIZED,
   isScriptFile,
   openAuthPage,
   register,
@@ -24,62 +26,33 @@ const OneDrive = BaseService.extend({
   name: 'onedrive',
   displayName: 'OneDrive',
   urlPrefix: 'https://graph.microsoft.com/v1.0',
-  refreshToken() {
-    const refreshToken = this.config.get('refresh_token');
-    return this.authorized({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    }).then(() => this.prepare());
-  },
-  user() {
-    const requestUser = () =>
-      this.loadData({
+  async requestAuth() {
+    try {
+      await this.loadData({
         url: '/drive/special/approot',
         responseType: 'json',
       });
-    let unauthorized = false;
-    return requestUser()
-      .catch((res) => {
-        if (!unauthorized && res.status === 401) {
-          unauthorized = true;
-          return this.refreshToken().then(requestUser);
-        }
-        throw res;
-      })
-      .catch((res) => {
-        if (
-          res.status === 400 &&
-          objectGet(res, 'data.error') === 'invalid_grant'
-        ) {
-          return Promise.reject({
-            type: UNAUTHORIZED,
-          });
-        }
-        return Promise.reject({
-          type: ERROR,
-          data: res,
-        });
-      });
-  },
-  handleMetaError(res) {
-    if (res.status === 404) {
-      const header = res.headers.get('WWW-Authenticate')?.[0] || '';
-      if (/^Bearer realm="OneDriveAPI"/.test(header)) {
-        return this.refreshToken().then(() => this.getMeta());
+    } catch (err) {
+      let code = INIT_ERROR;
+      if (err.status === 401) {
+        code = INIT_RETRY;
+      } else if (
+        err.status === 400 &&
+        objectGet(err, 'data.error') === 'invalid_grant'
+      ) {
+        code = INIT_UNAUTHORIZED;
       }
-      return;
+      return { code, error: err };
     }
-    throw res;
   },
-  list() {
-    return this.loadData({
+  async list() {
+    const data = await this.loadData({
       url: '/drive/special/approot/children',
       responseType: 'json',
-    }).then((data) =>
-      data.value
-        .filter((item) => item.file && isScriptFile(item.name))
-        .map(normalize),
-    );
+    });
+    return data.value
+      .filter((item) => item.file && isScriptFile(item.name))
+      .map(normalize);
   },
   get(item) {
     const name = getItemFilename(item);
@@ -125,7 +98,7 @@ const OneDrive = BaseService.extend({
     )}`;
     openAuthPage(url, config.redirect_uri);
   },
-  checkAuth(url) {
+  async finishAuth(url) {
     const redirectUri = `${config.redirect_uri}?`;
     if (!url.startsWith(redirectUri)) return;
     const query = loadQuery(url.slice(redirectUri.length));
@@ -133,15 +106,12 @@ const OneDrive = BaseService.extend({
     this.session = null;
     if (query.state !== state || !query.code) return;
     if (url.startsWith(redirectUri)) {
-      this.authState.set(AUTHORIZING);
-      this.checkSync(
-        this.authorized({
-          code: query.code,
-          code_verifier: codeVerifier,
-          grant_type: 'authorization_code',
-          redirect_uri: config.redirect_uri,
-        }),
-      );
+      await this.authorized({
+        code: query.code,
+        code_verifier: codeVerifier,
+        grant_type: 'authorization_code',
+        redirect_uri: config.redirect_uri,
+      });
       return true;
     }
   },
@@ -153,8 +123,8 @@ const OneDrive = BaseService.extend({
     });
     return this.prepare();
   },
-  authorized(params) {
-    return this.loadData({
+  async authorized(params) {
+    const data = await this.loadData({
       method: 'POST',
       url: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
       prefix: '',
@@ -170,17 +140,16 @@ const OneDrive = BaseService.extend({
         ),
       ),
       responseType: 'json',
-    }).then((data) => {
-      if (data.access_token) {
-        this.config.set({
-          uid: data.user_id,
-          token: data.access_token,
-          refresh_token: data.refresh_token,
-        });
-      } else {
-        throw data;
-      }
     });
+    if (data.access_token) {
+      this.config.set({
+        uid: data.user_id,
+        token: data.access_token,
+        refresh_token: data.refresh_token,
+      });
+    } else {
+      throw data;
+    }
   },
 });
 if (config.client_id) register(OneDrive);

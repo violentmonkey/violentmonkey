@@ -1,7 +1,17 @@
 import { tryUrl } from '@/common';
-import { ANONYMOUS, PASSWORD, SERVER_URL, USER_CONFIG, USERNAME } from '@/common/consts-sync';
 import {
-  getURI, getItemFilename, BaseService, isScriptFile, register,
+  ANONYMOUS,
+  PASSWORD,
+  SERVER_URL,
+  USER_CONFIG,
+  USERNAME,
+} from '@/common/consts-sync';
+import {
+  BaseService,
+  getItemFilename,
+  getURI,
+  isScriptFile,
+  register,
 } from './base';
 
 const KEY_CHILDREN = Symbol('children');
@@ -58,8 +68,9 @@ class XNode {
   children() {
     if (!this[KEY_CHILDREN]) {
       const { node, nsMap } = this;
-      this[KEY_CHILDREN] = [...node.children]
-      .map(child => new XNode(child, nsMap));
+      this[KEY_CHILDREN] = [...node.children].map(
+        (child) => new XNode(child, nsMap),
+      );
     }
     return this[KEY_CHILDREN];
   }
@@ -70,7 +81,10 @@ class XNode {
 
   getCallback(callback) {
     if (typeof callback === 'string') {
-      return (tagName => node => node.name === tagName)(callback);
+      return (
+        (tagName) => (node) =>
+          node.name === tagName
+      )(callback);
     }
     return callback;
   }
@@ -103,17 +117,16 @@ const WebDAV = BaseService.extend({
     [SERVER_URL]: null,
   },
   getUserConfig() {
-    return this[USER_CONFIG] ||= {
+    return (this[USER_CONFIG] ||= {
       ...DEFAULT_CONFIG,
       ...this.config.get(USER_CONFIG),
-    };
+    });
   },
   setUserConfig(config) {
     Object.assign(this[USER_CONFIG], config);
     this.config.set(USER_CONFIG, this[USER_CONFIG]);
   },
   initToken() {
-    this.prepareHeaders();
     const config = this.getUserConfig();
     let url = config[SERVER_URL]?.trim() || '';
     if (!url.includes('://')) url = `http://${url}`;
@@ -127,143 +140,79 @@ const WebDAV = BaseService.extend({
     if (anonymous) return true;
     if (!username || !password) return false;
     const auth = window.btoa(`${username}:${password}`);
-    this.headers.Authorization = `Basic ${auth}`;
+    this.headers = { Authorization: `Basic ${auth}` };
     return true;
+  },
+  async requestAuth() {
+    await this.list();
   },
   loadData(options) {
     // Bypassing login CSRF protection in Nextcloud / Owncloud by not sending cookies.
     // We are not using web UI and cookie authentication, so we don't have to worry about that.
     // See https://github.com/violentmonkey/violentmonkey/issues/976
-    return BaseService.prototype.loadData.call(this, Object.assign({
-      credentials: 'omit',
-    }, options));
-  },
-  handleMetaError(res) {
-    if (![
-      404, // File not exists
-      409, // Directory not exists
-    ].includes(res.status)) throw res;
-  },
-  // Some WebDAV servers do not allow LOCK / UNLOCK
-  /*
-  acquireLock() {
-    const { serverUrl } = this.properties;
-    const createLock = () => {
-      this.log('Acquire lock...');
-      return this.loadData({
-        method: 'LOCK',
-        url: serverUrl,
-        headers: {
-          Timeout: `Second-${30 * 60}`,
+    return BaseService.prototype.loadData.call(
+      this,
+      Object.assign(
+        {
+          credentials: 'omit',
         },
-        body: `\
-<?xml version="1.0" encoding="utf-8" ?>
-<D:lockinfo xmlns:D='DAV:'>
-  <D:lockscope><D:exclusive/></D:lockscope>
-  <D:locktype><D:write/></D:locktype>
-</D:lockinfo>`,
-      })
-      .then(xml => {
-        const doc = XNode.fromXML(xml);
-        const lock = doc.find('DAV:prop')
-        .find('DAV:lockdiscovery')
-        .find('DAV:activelock')
-        .find('DAV:locktoken')
-        .find('DAV:href')
-        .text();
-        this.log('Acquired lock:', lock);
-        this.config.set({
-          lock,
-        });
-      });
-    };
-    const lock = this.config.get('lock');
-    if (lock) {
-      this.log('Refresh lock:', lock);
-      return this.loadData({
-        method: 'LOCK',
-        url: serverUrl,
-        headers: {
-          If: `(<${lock}>)`,
-        },
-      })
-      .then(() => {
-        this.log('Refreshed lock:', lock);
-      }, err => {
-        if (err.status === 412) {
-          this.log('Refresh lock error');
-          this.config.set({ lock: null });
-          // Precondition Failed
-          return createLock();
-        }
-        throw err;
-      });
-    }
-    return createLock();
+        options,
+      ),
+    );
   },
-  releaseLock() {
-    const lock = this.config.get('lock');
-    if (lock) {
-      const { serverUrl } = this.properties;
-      this.log('Release lock:', lock);
-      return this.loadData({
-        method: 'UNLOCK',
-        url: serverUrl,
-        headers: {
-          'Lock-Token': `<${lock}>`,
-        },
-      })
-      .then(() => {
-        this.log('Released lock');
-      }, () => {
-        this.log('Release lock error');
-      })
-      .then(() => {
-        this.config.set({ lock: null });
-      });
-    }
+  metaError(res) {
+    if (
+      ![
+        404, // File not exists
+        409, // Directory not exists
+      ].includes(res.status)
+    )
+      throw res;
   },
-  */
   list() {
     const { serverUrl } = this.properties;
-    const mkdir = () => this.loadData({
-      method: 'MKCOL',
-      url: serverUrl,
-    });
-    const readdir = () => this.loadData({
-      method: 'PROPFIND',
-      url: serverUrl,
-      headers: {
-        depth: '1',
-      },
-    })
-    .then((xml) => {
-      const doc = XNode.fromXML(xml);
-      const items = doc.children()[0]
-      .map((node) => {
-        const prop = node.find('DAV:propstat').find('DAV:prop');
-        const type = prop.find('DAV:resourcetype').find('DAV:collection') ? 'directory' : 'file';
-        if (type === 'file') {
-          const displayNameNode = prop.find('DAV:displayname');
-          const displayName = decodeURIComponent(
-            displayNameNode ? displayNameNode.text() // some servers also encode DAV:displayname
-              : node.find('DAV:href').text().split('/').pop(), // extracting file name
-          );
-          if (isScriptFile(displayName)) {
-            const size = prop.find('DAV:getcontentlength');
-            return normalize({
-              name: displayName,
-              size: size ? +size.text() : 0,
-            });
-          }
-        }
-        return null;
-      })
-      .filter(Boolean);
-      return items;
-    });
-    return readdir()
-    .catch((err) => {
+    const mkdir = () =>
+      this.loadData({
+        method: 'MKCOL',
+        url: serverUrl,
+      });
+    const readdir = () =>
+      this.loadData({
+        method: 'PROPFIND',
+        url: serverUrl,
+        headers: {
+          depth: '1',
+        },
+      }).then((xml) => {
+        const doc = XNode.fromXML(xml);
+        const items = doc
+          .children()[0]
+          .map((node) => {
+            const prop = node.find('DAV:propstat').find('DAV:prop');
+            const type = prop.find('DAV:resourcetype').find('DAV:collection')
+              ? 'directory'
+              : 'file';
+            if (type === 'file') {
+              const displayNameNode = prop.find('DAV:displayname');
+              const displayName = decodeURIComponent(
+                displayNameNode
+                  ? displayNameNode.text() // some servers also encode DAV:displayname
+                  : node.find('DAV:href').text().split('/').pop(), // extracting file name
+              );
+              if (isScriptFile(displayName)) {
+                const size = prop.find('DAV:getcontentlength');
+                return normalize({
+                  name: displayName,
+                  size: size ? +size.text() : 0,
+                });
+              }
+            }
+            return null;
+          })
+          .filter(Boolean);
+        return items;
+      });
+    return readdir().catch((err) => {
       if (err.status === 404) {
         return mkdir().then(readdir);
       }
