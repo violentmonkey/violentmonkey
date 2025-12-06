@@ -4,6 +4,10 @@ $tabPadY: 3rem;
 $tabPadTopY: 1.5rem;
 $sectionBorder: 1px solid var(--fill-2);
 
+button {
+  height: 1.5rem;
+}
+
 aside {
   position: fixed;
   top: 0;

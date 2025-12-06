@@ -222,6 +222,7 @@ const getBaseConfig = () => ({
     ...styleOptions.extract ? [new MiniCssExtractPlugin({
       filename: '[name].css',
     })] : [],
+    require('unplugin-icons/webpack')(),
   ],
 });
 

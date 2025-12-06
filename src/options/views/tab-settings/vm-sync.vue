@@ -1,22 +1,23 @@
 <template>
   <section class="mb-1c">
     <h3 v-text="i18n('labelSync')" :class="{ bright: store.isEmpty === 1 }" />
-    <div class="flex flex-wrap center-items">
-      <span v-text="i18n('labelSyncService')"></span>
-      <select
-        class="mx-1"
-        :value="rCurrentName"
-        @change="onSyncChange"
-        :disabled="!rCanUpdateConfig"
-      >
-        <option
-          v-for="service in [SYNC_NONE, ...rSyncServices]"
-          :key="service.name"
-          v-text="service.displayName"
-          :value="service.name"
-        />
-      </select>
-      <template v-if="rService">
+    <div class="flex flex-wrap center-items mr-2c">
+      <div class="flex center-items">
+        <span class="mr-1" v-text="i18n('labelSyncService')"></span>
+        <select
+          :value="rCurrentName"
+          @change="onSyncChange"
+          :disabled="!rCanUpdateConfig"
+        >
+          <option
+            v-for="service in [SYNC_NONE, ...rSyncServices]"
+            :key="service.name"
+            v-text="service.displayName"
+            :value="service.name"
+          />
+        </select>
+      </div>
+      <div v-if="rService" class="flex">
         <button
           v-text="rLabelAuthorize"
           v-if="rAuthType === 'oauth'"
@@ -29,25 +30,39 @@
           :disabled="!rCanRevoke"
           @click="onRevoke"
         />
-        <tooltip :content="i18n('labelSync')" class="stretch-self flex mr-1">
+      </div>
+      <div v-if="rService" class="flex">
+        <tooltip :content="i18n('labelSync')" class="stretch-self flex">
           <button
             :disabled="!rCanSync"
             @click="onSync(SYNC_MERGE)"
             class="flex center-items"
           >
-            <icon name="refresh" />
+            <IconSync />
           </button>
         </tooltip>
-        <p v-if="rMessage">
-          <span
-            v-text="rMessage"
-            :class="{ 'text-red': rError }"
-            class="mr-1"
-          />
-          <span v-text="rError" />
-        </p>
-      </template>
+        <tooltip
+          :content="i18n('buttonSyncPushOnce')"
+          class="stretch-self flex"
+        >
+          <button @click="onSync(SYNC_PUSH)" :disabled="!rCanSync">
+            <IconCloudUpload />
+          </button>
+        </tooltip>
+        <tooltip
+          :content="i18n('buttonSyncPullOnce')"
+          class="stretch-self flex"
+        >
+          <button @click="onSync(SYNC_PULL)" :disabled="!rCanSync">
+            <IconCloudDownload />
+          </button>
+        </tooltip>
+      </div>
     </div>
+    <p v-if="rMessage">
+      <span v-text="rMessage" :class="{ 'text-red': rError }" class="mr-1" />
+      <span v-text="rError" />
+    </p>
     <fieldset v-if="rService && rAuthType === PASSWORD" class="mt-1c">
       <label class="sync-server-url flex pre">
         <span v-text="i18n('labelSyncServerUrl')"></span>
@@ -92,24 +107,11 @@
         />
       </div>
     </fieldset>
-    <div>
+    <div class="flex mr-2c">
       <setting-check
-        class="mr-1"
         name="syncAutomatically"
         :label="i18n('labelSyncAutomatically')"
       />
-      <button
-        v-text="i18n('buttonSyncPushOnce')"
-        @click="onSync(SYNC_PUSH)"
-        :disabled="!rCanSync"
-      />
-      <button
-        v-text="i18n('buttonSyncPullOnce')"
-        @click="onSync(SYNC_PULL)"
-        :disabled="!rCanSync"
-      />
-    </div>
-    <div>
       <setting-check
         name="syncScriptStatus"
         :label="i18n('labelSyncScriptStatus')"
@@ -119,6 +121,9 @@
 </template>
 
 <script setup>
+import IconCloudUpload from '~icons/mdi/cloud-upload';
+import IconCloudDownload from '~icons/mdi/cloud-download';
+import IconSync from '~icons/mdi/sync';
 import { i18n, sendCmdDirectly } from '@/common';
 import {
   ANONYMOUS,
@@ -135,7 +140,6 @@ import options from '@/common/options';
 import { ref, watchEffect } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
-import Icon from '@/common/ui/icon';
 import { store } from '../../utils';
 import {
   SYNC_AUTHORIZED,
