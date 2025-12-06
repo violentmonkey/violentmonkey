@@ -15,10 +15,9 @@ addOwnCommands({
       ? requestLimited
       : request;
     const res = await fn(vettedUrl, opts);
-    if (opts[kResponseType] === 'blob') {
-      res.data = await makeRaw(res);
-    }
-    return res;
+    return opts[kResponseType] === 'blob'
+      ? makeRaw(res)
+      : res.data; // TODO: if we ever need headers, send it as [...headers] to make it transferable
   },
 });
 
