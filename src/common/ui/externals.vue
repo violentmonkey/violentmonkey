@@ -125,6 +125,7 @@ async function update() {
       raw = url;
     } else if (install) {
       raw = install.deps[depsUrl];
+      if (!isReq) raw = makeDataUri(raw);
     } else {
       const key = props.value.custom.pathMap?.[url] || url;
       raw = await sendCmdDirectly('Storage', [isReq ? 'require' : 'cache', 'getOne', key]);
