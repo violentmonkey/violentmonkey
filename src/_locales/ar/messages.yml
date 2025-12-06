@@ -138,11 +138,11 @@ confirmUndoImport:
   message: >-
     هل تريد التراجع عن جميع التغييرات التي أجريتها على قاعدة البيانات
     (الاستيراد، التحديث، التعديل، التخصيص)؟
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: قائمة الحظر للحقن (لن يتم تشغيل السكربتات في المواقع المطابقة)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     قائمة الحظر الشبكية (لن تتصل السكربتات بالمواقع المطابقة ولا بملفات تعريف
     الارتباط الخاصة بها)
@@ -239,13 +239,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: موجود في قائمة الحظر في إعدادات Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     لا يمكن لـ Violentmonkey تشغيل سكربتات المستخدم في هذه الصفحة
 
@@ -397,8 +397,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: عدد السكربتات الفريدة قيد التشغيل
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: قائمة الحظر
 labelContributors:
   description: Label for link to contributors.
@@ -651,8 +651,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: آخر مزامنة في $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: معرفة المزيد عن أنماط قائمة الحظر.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -811,8 +811,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (الكود نفسه)'
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: ''
   touched: false
 msgSavedCustomCSS:

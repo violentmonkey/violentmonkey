@@ -97,7 +97,7 @@
         <setting-text :name="kScriptTemplate" has-reset/>
       </section>
 
-      <vm-blacklist />
+      <vm-blocklist />
 
       <section>
         <h3 v-text="i18n('labelCustomCSS')"/>
@@ -143,7 +143,7 @@ import VmExport from './vm-export';
 import VmMaintenance from './vm-maintenance';
 import VmSync from './vm-sync';
 import VmEditor from './vm-editor';
-import VmBlacklist from './vm-blacklist';
+import VmBlocklist from './vm-blocklist';
 import VmDateInfo from './vm-date-info';
 
 const $el = ref();

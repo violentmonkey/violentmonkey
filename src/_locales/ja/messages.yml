@@ -134,11 +134,11 @@ confirmUndoImport:
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
   message: データベースへのすべての変更を元に戻します (インポート、更新、編集、カスタマイズ)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: 挿入のブラックリスト (一致するサイトでスクリプトを実行しない)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: ネットワークのブラックリスト (スクリプトは一致するサイトとそのクッキーに接続しない)
 descCustomCSS:
   description: Description of custom CSS section.
@@ -225,13 +225,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: ブロックリストに登録済み
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: |-
     このページでユーザースクリプトを実行できません
     (一般例: ブラウザーのUI、拡張機能、ポリシーにてブロック済み、Operaの検索サイト)
@@ -375,8 +375,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: 個々の実行中のスクリプト数
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: ブロックリスト
 labelContributors:
   description: Label for link to contributors.
@@ -622,8 +622,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: $1 に同期
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: 記法の詳細
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -773,8 +773,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (変更なし)
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: ブロックリストを更新しました。
   touched: false
 msgSavedCustomCSS:

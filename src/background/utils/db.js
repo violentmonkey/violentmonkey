@@ -11,7 +11,7 @@ import {
   aliveScripts, getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta,
   removedScripts, scriptMap,
 } from './script';
-import { testBlacklist, testerBatch, testScript } from './tester';
+import { testBlocklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import patchDB from './patch-db';
@@ -290,7 +290,7 @@ const notifiedBadScripts = new Set();
  * @return {VMInjection.EnvStart | VMInjection.EnvDelayed | Object | void }
  */
 export function getScriptsByURL(url, isTop, errors, prevIds) {
-  if (testBlacklist(url)) return;
+  if (testBlocklist(url)) return;
   const allIds = {};
   const isDelayed = !errors;
   /** @type {VMInjection.EnvStart} */

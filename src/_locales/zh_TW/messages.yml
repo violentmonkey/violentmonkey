@@ -134,11 +134,11 @@ confirmUndoImport:
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
   message: 還原所有資料庫的變更（包含匯入、更新、編輯和自訂設定）。
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: 腳本插入黑名單（腳本不會在符合的網站上執行）
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: 網路黑名單（腳本無法連線至符合的網站及其 Cookie）
 descCustomCSS:
   description: Description of custom CSS section.
@@ -225,13 +225,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: 在 Violentmonkey 的設定中被列入黑名單
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: |-
     Violentmonkey 無法在此頁面執行使用者腳本
 
@@ -377,8 +377,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: 正在執行的不重複腳本數量
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: 黑名單
 labelContributors:
   description: Label for link to contributors.
@@ -627,8 +627,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步時間為 $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: 了解更多黑名單規則。
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -781,8 +781,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: （程式碼未變更）
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: 黑名單已更新。
   touched: false
 msgSavedCustomCSS:

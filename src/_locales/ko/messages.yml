@@ -134,11 +134,11 @@ confirmUndoImport:
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
   message: 데이터베이스의 모든 변경 사항 되돌리기 (가져오기, 업데이트, 수정, 사용자 지정)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: 이 목록과 일치하는 URL에는 스크립트가 삽입되지 않습니다.
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: ''
 descCustomCSS:
   description: Description of custom CSS section.
@@ -226,13 +226,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Violentmonkey 블랙리스트 목록에 추가되어 있습니다
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: |-
     Violentmonkey가 이 페이지의 유저스크립트를 실행하지 못했습니다
     (대표적인 원인 예시: 브라우저 UI, 확장 기능, 정책, Opera 내 검색엔진 사이트)
@@ -376,8 +376,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: 실행 중인 스크립트의 고유 수
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: 블랙리스트
 labelContributors:
   description: Label for link to contributors.
@@ -626,8 +626,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: $1에 마지막으로 동기화됨
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: 블랙리스트 패턴에 대해 자세히 알아보기
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -775,8 +775,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (변경 없음)'
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: 블랙리스트 업데이트됨.
   touched: false
 msgSavedCustomCSS:

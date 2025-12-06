@@ -396,7 +396,7 @@ async function getFile(url, opts) {
   }
   const { data } = await sendCmdDirectly('Request', {
     url,
-    vet: !!opts, // TODO: add a blacklist for installation URLs?
+    vet: !!opts, // TODO: add a blocklist for installation URLs?
     [kResponseType]: isBlob ? 'blob' : null,
   });
   if (useCache) cache.put(cacheKey, data);

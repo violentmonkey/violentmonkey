@@ -50,7 +50,7 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
 }
 
 const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
-const whitelistRe = re`/^https:\/\/(
+const allowlistRe = re`/^https:\/\/(
   (greas|sleaz)yfork\.(org|cc)\/scripts\/[^/]*\/code|
   update\.(greas|sleaz)yfork\.(org|cc)\/scripts|
   openuserjs\.org\/install\/[^/]*|
@@ -64,7 +64,7 @@ const whitelistRe = re`/^https:\/\/(
   raw\.githubusercontent\.com(\/[^/]*){3}|
   gist\.github\.com\/.*?
 )\/[^/]*?\.user\.js  ([?#]|$)  /ix`;
-const blacklistRe = re`/^https?:\/\/(
+const blocklistRe = re`/^https?:\/\/(
   (gist\.)?github\.com|
   ((greas|sleaz)yfork|openuserjs)\.(org|cc)
 )\//ix`;
@@ -81,11 +81,11 @@ const maybeRedirectVirtualUrlFF = virtualUrlRe && ((tabId, src) => {
   }
 });
 
-async function maybeInstallUserJs(tabId, url, isWhitelisted) {
+async function maybeInstallUserJs(tabId, url, isAllowlisted) {
   // Getting the tab now before it navigated
   const tab = tabId >= 0 && await browser.tabs.get(tabId) || {};
-  const { data: code } = !isWhitelisted && await request(url).catch(noop) || {};
-  if (isWhitelisted || code && parseMeta(code).name) {
+  const { data: code } = !isAllowlisted && await request(url).catch(noop) || {};
+  if (isAllowlisted || code && parseMeta(code).name) {
     confirmInstall({ code, url, from: tab.url, parsed: true }, { tab });
   } else {
     cache.put(`bypass:${url}`, true, 10e3);
@@ -138,10 +138,10 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   if (url.startsWith(extensionRoot)) {
     return { redirectUrl: resolveVirtualUrl(url) };
   }
-  let isWhitelisted;
+  let isAllowlisted;
   if (!cache.has(`bypass:${url}`)
-  && ((isWhitelisted = whitelistRe.test(url)) || !blacklistRe.test(url))) {
-    maybeInstallUserJs(tabId, url, isWhitelisted);
+  && ((isAllowlisted = allowlistRe.test(url)) || !blocklistRe.test(url))) {
+    maybeInstallUserJs(tabId, url, isAllowlisted);
     return IS_FIREFOX
       ? { cancel: true } // for sites with strict CSP in FF
       : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url

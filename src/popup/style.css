@@ -312,7 +312,7 @@ footer {
   }
 }
 
-.page-popup:not(.noninjectable):not(.blacklisted) {
+.page-popup:not(.noninjectable):not(.blocklisted) {
   .failure-reason {
     // Making the warning noticeable
     background: hsla(30, 100%, 50%, .2);

@@ -138,13 +138,13 @@ confirmUndoImport:
   message: >-
     Annuler toutes les modifications apportées à la base de données
     (importation, mise à jour, édition, personnalisation)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: >-
     Liste noire d'injection (les scripts ne seront pas exécutés dans les sites
     correspondants)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Liste noire du réseau (les scripts ne se connecteront pas aux sites
     correspondants et à leurs cookies)
@@ -250,13 +250,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Sur la liste noire des paramètres de Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: "Violentmonkey ne peut pas lancer de scripts utilisateur\nsur cette page (exemples courants\_: page du navigateur\nou d’une extension)"
 failureReasonRestarted:
   description: Shown in the popup.
@@ -416,8 +416,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: Le nombre de scripts uniques en cours d’exécution
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Liste noire
 labelContributors:
   description: Label for link to contributors.
@@ -675,8 +675,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Dernière synchronisation le $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: En apprendre plus sur les motifs de la liste noire.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -832,8 +832,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (le code est identique)
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Liste noire mise à jour.
   touched: false
 msgSavedCustomCSS:
@@ -1022,7 +1022,7 @@ titleBadgeColor:
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: >-
-    Couleur du badge lorsque le site est non-injectable (blacklisté ou non pris
+    Couleur du badge lorsque le site est non-injectable (blocklisté ou non pris
     en charge)
 titleSearchHint:
   description: Hover title for search icon in dashboard.

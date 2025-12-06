@@ -3,7 +3,7 @@ import {
 } from '@/common';
 import {
   __CODE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
-  BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
+  BLOCKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import {
@@ -122,7 +122,7 @@ export const reloadAndSkipScripts = async tab => {
 };
 
 const OPT_HANDLERS = {
-  [BLACKLIST]: cache.destroy,
+  [BLOCKLIST]: cache.destroy,
   defaultInjectInto(value) {
     value = normalizeRealm(value);
     cache.destroy();
@@ -200,7 +200,7 @@ addPublicCommands({
     if (!url) url = src.url || tab.url;
     const env = cache.get(moreKey)
       || cache.put(moreKey, getScriptsByURL(url, isTop))
-      || { [SCRIPTS]: [] }; // scripts got removed or the url got blacklisted after GetInjected
+      || { [SCRIPTS]: [] }; // scripts got removed or the url got blocklisted after GetInjected
     const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
     const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);

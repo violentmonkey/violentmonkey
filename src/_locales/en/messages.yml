@@ -136,13 +136,13 @@ confirmUndoImport:
   message: >-
     Revert all changes made to the database (importing, updating, editing,
     customizing)
-descBlacklist:
-  description: Description for the global injection blacklist.
-  message: Injection blacklist (scripts won't run in the matching sites)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
+  message: Injection blocklist (scripts won't run in the matching sites)
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
-    Network blacklist (scripts won't connect to the matching sites and their
+    Network blocklist (scripts won't connect to the matching sites and their
     cookies)
 descCustomCSS:
   description: Description of custom CSS section.
@@ -235,13 +235,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Blacklisted in Violentmonkey's settings
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
+  message: Blocklisted in Violentmonkey's settings
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     Violentmonkey cannot run userscripts in this page
 
@@ -391,9 +391,9 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: number of unique running scripts
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
-  message: Blacklist
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
+  message: Blocklist
 labelContributors:
   description: Label for link to contributors.
   message: Contributors
@@ -645,9 +645,9 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Last sync at $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
-  message: Learn more about blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
+  message: Learn more about blocklist patterns.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: Learn more about injection modes.
@@ -803,9 +803,9 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (code is the same)'
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
-  message: Blacklist updated.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
+  message: Blocklist updated.
   touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
@@ -992,7 +992,7 @@ titleBadgeColor:
   message: Normal badge color
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: Badge color when the site is non-injectable (blacklisted or unsupported)
+  message: Badge color when the site is non-injectable (blocklisted or unsupported)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-

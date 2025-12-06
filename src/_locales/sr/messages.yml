@@ -138,13 +138,13 @@ confirmUndoImport:
   message: >-
     Вратите све промене направљене у бази података (увоз, ажурирање, уређивање,
     прилагођавање)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: >-
     Црна листа за убризгавање (скрипте се неће покретати на одговарајућим
     сајтовима)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Мрежна црна листа (скрипте се неће повезати са одговарајућим сајтовима и
     њиховим колачићима)
@@ -235,13 +235,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Стављено на црну листу у подешавањима Violentmonkey-а.
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     Violentmonkey не може да покрене корисничке скрипте на овој страници (чести
     примери: кориснички интерфејс претраживача, додатак, блокирано политиком,
@@ -390,8 +390,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: број јединствених покренутих скрипти
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Црна листа
 labelContributors:
   description: Label for link to contributors.
@@ -634,8 +634,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: 'Последња синхронизација: $1'
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Сазнајте више о обрасцима за црну листу
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -782,8 +782,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (код је иста)
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Црна листа је ажурирана
   touched: false
 msgSavedCustomCSS:
@@ -968,7 +968,7 @@ titleBadgeColor:
   message: Нормална боја значке
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
-  message: Badge color when the site is non-injectable (blacklisted or unsupported)
+  message: Badge color when the site is non-injectable (blocklisted or unsupported)
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: ''

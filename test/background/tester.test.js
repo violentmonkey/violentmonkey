@@ -1,4 +1,4 @@
-import { MatchTest, resetBlacklist, testScript, testBlacklist } from '@/background/utils/tester';
+import { MatchTest, resetBlocklist, testScript, testBlocklist } from '@/background/utils/tester';
 import cache from '@/background/utils/cache';
 
 afterEach(cache.destroy);
@@ -453,9 +453,9 @@ describe('custom', () => {
   });
 });
 
-describe('blacklist', () => {
+describe('blocklist', () => {
   test('should exclude match rules', () => {
-    resetBlacklist(`\
+    resetBlocklist(`\
 # match rules
 *://www.google.com/*
 `);
@@ -463,13 +463,13 @@ describe('blacklist', () => {
       'http://www.google.com/',
       'https://www.google.com/',
     ].forEach(url => {
-      expect(testBlacklist(url)).toBeTruthy();
+      expect(testBlocklist(url)).toBeTruthy();
     });
-    expect(testBlacklist('https://twitter.com/')).toBeFalsy();
+    expect(testBlocklist('https://twitter.com/')).toBeFalsy();
   });
 
   test('should exclude domains', () => {
-    resetBlacklist(`\
+    resetBlocklist(`\
 # domains
 www.google.com
 `);
@@ -477,13 +477,13 @@ www.google.com
       'http://www.google.com/',
       'https://www.google.com/',
     ].forEach(url => {
-      expect(testBlacklist(url)).toBeTruthy();
+      expect(testBlocklist(url)).toBeTruthy();
     });
-    expect(testBlacklist('https://twitter.com/')).toBeFalsy();
+    expect(testBlocklist('https://twitter.com/')).toBeFalsy();
   });
 
   test('should support @exclude rules', () => {
-    resetBlacklist(`\
+    resetBlocklist(`\
 # @exclude rules
 @exclude https://www.google.com/*
 `);
@@ -491,8 +491,8 @@ www.google.com
       'https://www.google.com/',
       'https://www.google.com/whatever',
     ].forEach(url => {
-      expect(testBlacklist(url)).toBeTruthy();
+      expect(testBlocklist(url)).toBeTruthy();
     });
-    expect(testBlacklist('http://www.google.com/')).toBeFalsy();
+    expect(testBlocklist('http://www.google.com/')).toBeFalsy();
   });
 });

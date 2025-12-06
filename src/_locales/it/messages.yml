@@ -138,13 +138,13 @@ confirmUndoImport:
   message: >-
     Annulla tutte le modifiche eseguite al database (importazioni,
     aggiornamenti, modifiche e personalizzazioni)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: >-
     Lista nera iniezione (gli script non verranno eseguiti nei siti
     corrispondenti)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Lista nera reti (gli script non si connetteranno ai siti corrispondenti e ai
     loro cookie)
@@ -246,13 +246,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Aggiunto alla lista nera nelle impostazioni di Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     Violentmonkey non può eseguire script utente in questa pagina
 
@@ -413,8 +413,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: numero di script unici in esecuzione
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Lista nera
 labelContributors:
   description: Label for link to contributors.
@@ -668,8 +668,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Ultima sincronizzazione alle $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Scopri di più sugli schemi della lista nera.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -828,8 +828,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (il codice è lo stesso)
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Lista nera aggiornata.
   touched: false
 msgSavedCustomCSS:

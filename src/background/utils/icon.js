@@ -1,12 +1,12 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
-import { BLACKLIST } from '@/common/consts';
+import { BLOCKLIST } from '@/common/consts';
 import { nest, objectPick } from '@/common/object';
 import { addOwnCommands, commands, init } from './init';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
-import { testBlacklist } from './tester';
+import { testBlocklist } from './tester';
 import { FIREFOX, ua } from './ua';
 
 /** 1x + HiDPI 1.5x, 2x */
@@ -49,7 +49,7 @@ export const badges = {};
 const KEY_SHOW_BADGE = 'showBadge';
 const KEY_BADGE_COLOR = 'badgeColor';
 const KEY_BADGE_COLOR_BLOCKED = 'badgeColorBlocked';
-const titleBlacklisted = i18n('failureReasonBlacklisted');
+const titleBlocklisted = i18n('failureReasonBlocklisted');
 const titleDefault = extensionManifest[BROWSER_ACTION].default_title;
 const iconDefault = extensionManifest[BROWSER_ACTION].default_icon[16].match(/\d+(\w*)\./)[1];
 const titleDisabled = i18n('menuScriptDisabled');
@@ -82,7 +82,7 @@ hookOptions((changes) => {
   || (v = changes[KEY_BADGE_COLOR_BLOCKED]) && (badgeColorBlocked = v)) {
     jobs.push(updateBadgeColor);
   }
-  if (BLACKLIST in changes) {
+  if (BLOCKLIST in changes) {
     jobs.push(updateState);
   }
   if (jobs.length) {
@@ -232,7 +232,7 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
 /** Omitting `data` = check whether injection is allowed for `url` */
 export function getFailureReason(url, data, def = titleDefault) {
   return !injectableRe.test(url) ? [titleNoninjectable, INJECT_INTO]
-    : ((url = testBlacklist(url))) ? [titleBlacklisted, 'blacklisted', url]
+    : ((url = testBlocklist(url))) ? [titleBlocklisted, 'blocklisted', url]
       : !isApplied || data?.[INJECT] === 'off' ? [titleDisabled, IS_APPLIED]
         : !data ? []
           : data[INJECT] === SKIP_SCRIPTS

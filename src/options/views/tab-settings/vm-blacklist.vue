@@ -1,20 +1,20 @@
 <template>
   <section>
-    <h3 v-text="i18n('labelBlacklist')"/>
+    <h3 v-text="i18n('labelBlocklist')"/>
     <p>
-      <a :href="VM_HOME + 'posts/smart-rules-for-blacklist/#blacklist-patterns'"
-         v-text="i18n('learnBlacklist')" v-bind="EXTERNAL_LINK_PROPS"/>
+      <a :href="VM_HOME + 'posts/smart-rules-for-blocklist/#blocklist-patterns'"
+         v-text="i18n('learnBlocklist')" v-bind="EXTERNAL_LINK_PROPS"/>
     </p>
-    <VmBlacklistBody :name="BLACKLIST" :desc="i18n('descBlacklist')"/>
-    <VmBlacklistBody :name="BLACKLIST_NET" :desc="i18n('descBlacklistNet')"/>
+    <VmBlocklistBody :name="BLOCKLIST" :desc="i18n('descBlocklist')"/>
+    <VmBlocklistBody :name="BLOCKLIST_NET" :desc="i18n('descBlocklistNet')"/>
   </section>
 </template>
 
 <script>
-import { BLACKLIST, BLACKLIST_NET, VM_HOME } from '@/common/consts';
+import { BLOCKLIST, BLOCKLIST_NET, VM_HOME } from '@/common/consts';
 import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 </script>
 
 <script setup>
-import VmBlacklistBody from './vm-blacklist-body';
+import VmBlocklistBody from './vm-blocklist-body';
 </script>

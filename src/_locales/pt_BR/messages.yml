@@ -138,11 +138,11 @@ confirmUndoImport:
   message: >-
     Reverter todas as alterações feitas no banco de dados (importação,
     atualização, edição, personalização)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: URL nesta lista não será injetado por scripts.
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: ''
 descCustomCSS:
   description: Description of custom CSS section.
@@ -233,13 +233,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Configurações de Lista negra do Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     Violentmonkey não pode executar scripts de usuários nesta página
 
@@ -392,8 +392,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: Número de scripts únicos em execução
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Lista negra
 labelContributors:
   description: Label for link to contributors.
@@ -647,8 +647,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Última sincronização em $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Saiba mais sobre padrões de lista negra.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -805,8 +805,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (o código é o mesmo)'
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Lista negra atualizada.
   touched: false
 msgSavedCustomCSS:

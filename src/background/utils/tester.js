@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
-import { ERR_BAD_PATTERN, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
+import { ERR_BAD_PATTERN, BLOCKLIST, BLOCKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from '@/common/tld';
 import { hookOptionsInit } from './options';
@@ -44,15 +44,15 @@ const RE_URL_PARTS = /^([^:]*):\/\/([^/]*)\/(.*)/;
 const RE_STR_ANY = '(?:|[^:/]*?\\.)';
 const RE_STR_TLD = '(|(?:\\.[-\\w]+)+)';
 const MAX_BL_CACHE_LENGTH = 100e3;
-const blacklist = {
-  [BLACKLIST]: CreateBlacklist(),
-  [BLACKLIST_NET]: CreateBlacklist(),
+const blocklist = {
+  [BLOCKLIST]: CreateBlocklist(),
+  [BLOCKLIST_NET]: CreateBlocklist(),
 };
 export const {
-  reset: resetBlacklist,
-  test: testBlacklist,
-} = blacklist[BLACKLIST];
-export const testBlacklistNet = blacklist[BLACKLIST_NET].test;
+  reset: resetBlocklist,
+  test: testBlocklist,
+} = blocklist[BLOCKLIST];
+export const testBlocklistNet = blocklist[BLOCKLIST_NET].test;
 // Context start
 let batchErrors;
 let curUrl;
@@ -64,9 +64,9 @@ let urlResultsInc;
 // Context end
 
 hookOptionsInit((changes) => {
-  for (const key in blacklist) {
+  for (const key in blocklist) {
     if (key in changes) {
-      const errors = blacklist[key].reset(changes[key] || []);
+      const errors = blocklist[key].reset(changes[key] || []);
       const res = errors.length ? errors : null;
       storage.base.setOne(key + ERRORS, res);
       if (res) throw res; // will be passed to the UI
@@ -300,7 +300,7 @@ function pathMatcher(tail) {
     || RegExp(`^${str2RE(tail)}${hasHash ? '$' : `($|${iQuery >= 0 ? '#' : '[?#]'})`}`);
 }
 
-function CreateBlacklist() {
+function CreateBlocklist() {
   let cache = {};
   let cacheSize = 0;
   let rules = [];
@@ -312,7 +312,7 @@ function CreateBlacklist() {
     const errors = [];
     testerBatch(true);
     if (process.env.DEBUG) {
-      console.info('Reset blacklist:', value);
+      console.info('Reset blocklist:', value);
     }
     // XXX compatible with {Array} list in v2.6.1-
     rules = [];
@@ -326,7 +326,7 @@ function CreateBlacklist() {
         const m = (isInc || mode === '@exclude') && emplace(cacheInc, rule, autoReg)
           || !mode && !rule.includes('/') && emplace(cacheMat, `*://${rule}/*`, MatchTest.try) // domain
           || emplace(cacheMat, rule, MatchTest.try); // @match and @exclude-match
-        m.reject = !(mode === '@match' || isInc); // @include and @match = whitelist
+        m.reject = !(mode === '@match' || isInc); // @include and @match = allowlist
         m.text = text;
         rules.push(m);
       } catch (err) {
@@ -349,8 +349,8 @@ function CreateBlacklist() {
     return res;
   }
   /**
-   Simple FIFO queue for the results of testBlacklist, cached separately from the main |cache|
-   because the blacklist is updated only once in a while so its entries would be crowding
+   Simple FIFO queue for the results of testBlocklist, cached separately from the main |cache|
+   because the blocklist is updated only once in a while so its entries would be crowding
    the main cache and reducing its performance (objects with lots of keys are slow to access).
    We also don't need to auto-expire the entries after a timeout.
    The only limit we're concerned with is the overall memory used.

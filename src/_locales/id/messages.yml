@@ -136,11 +136,11 @@ confirmUndoImport:
   message: >-
     Mengembalikan semua perubahan yang dibuat pada basis data (mengimpor,
     memperbarui, mengedit, menyesuaikan)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: Daftar hitam injeksi (skrip tidak akan berjalan di situs yang cocok)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Daftar hitam jaringan (skrip tidak akan terhubung ke situs yang cocok dan
     cookie mereka)
@@ -236,13 +236,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Dalam daftar hitam di pengaturan Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: |-
     Violentmonkey tidak bisa menjalankan userscript di halaman ini
     (contoh: UI peramban atau ekstensi)
@@ -388,8 +388,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: jumlah skrip unik yang aktif
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Daftar hitam
 labelContributors:
   description: Label for link to contributors.
@@ -643,8 +643,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Sinkron terakhir pada $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Pelajari lebih lanjut tentang pola daftar hitam.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -803,8 +803,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kode sama)
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Daftar hitam diperbarui.
   touched: false
 msgSavedCustomCSS:

@@ -2,7 +2,7 @@ import { isCdnUrlRe, isDataUri, isRemote, makeRaw, request, tryUrl } from '@/com
 import { VM_HOME } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import { addOwnCommands } from './init';
-import { testBlacklistNet } from './tester';
+import { testBlocklistNet } from './tester';
 
 export const requestLimited = limitConcurrency(request, 4, 100, 1000,
   url => url.split('/')[2] // simple extraction of the `host` part
@@ -35,7 +35,7 @@ export function vetUrl(url, base = VM_HOME, throwOnFailure) {
   } else {
     res = tryUrl(url, base);
     err = !res ? 'Invalid'
-      : (res.startsWith(extensionRoot) || testBlacklistNet(res)) && 'Blacklisted';
+      : (res.startsWith(extensionRoot) || testBlocklistNet(res)) && 'Blocklisted';
     if (err) {
       err = `${err} URL ${res || url}`;
       if (throwOnFailure) throw err;

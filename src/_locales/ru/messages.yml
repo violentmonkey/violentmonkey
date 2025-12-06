@@ -136,11 +136,11 @@ confirmUndoImport:
   message: >-
     Отменить все изменения, внесённые в базу данных (импорт, обновление,
     редактирование, настройка)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: Чёрный список инъекций (скрипты не будут запускаться на указанных сайтах)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Чёрный список сети (скрипты не будут подключаться к указанным сайтам и их
     куки)
@@ -241,13 +241,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Чёрный список Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     Violentmonkey не может запускать скрипты на этой странице
 
@@ -400,8 +400,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: уникальные запущенные скрипты
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Чёрный список
 labelContributors:
   description: Label for link to contributors.
@@ -655,8 +655,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Последняя синхронизация в $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Подробнее о шаблонах чёрного списка.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -810,8 +810,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (код такой же)'
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Чёрный список сохранен.
   touched: false
 msgSavedCustomCSS:

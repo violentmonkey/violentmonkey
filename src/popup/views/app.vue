@@ -58,7 +58,7 @@
     </div>
     <div class="failure-reason" v-if="store.failureText">
       <span v-text="store.failureText"/>
-      <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
+      <code v-text="store.blocklisted" v-if="store.blocklisted" class="ellipsis inline-block"/>
     </div>
     <div v-if="showSettings" class="mb-1c menu settings">
       <settings-popup/>

@@ -134,11 +134,11 @@ confirmUndoImport:
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
   message: 撤销所有数据变更（导入、更新、编辑、自定义）
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: 注入黑名单（脚本不会在匹配的网站上运行）
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: 网络黑名单（脚本不会连接到匹配的网站及其 Cookie）
 descCustomCSS:
   description: Description of custom CSS section.
@@ -226,13 +226,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: 暴力猴
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: 暴力猴黑名单设置阻止运行
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: |-
     暴力猴无法在当前页面执行用户脚本
     （常见原因：浏览器/扩展内置页面、被策略屏蔽、Opera 下的搜索页面需要特殊设置）
@@ -375,8 +375,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: 执行脚本个数
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: 黑名单
 labelContributors:
   description: Label for link to contributors.
@@ -624,8 +624,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: 最近同步时间为 $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: 了解更多黑名单规则。
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -773,8 +773,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: （代码一致）
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: 黑名单已更新！
   touched: false
 msgSavedCustomCSS:

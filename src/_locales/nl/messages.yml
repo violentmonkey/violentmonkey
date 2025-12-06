@@ -136,11 +136,11 @@ confirmUndoImport:
   message: >-
     Herstel alle wijzigingen aan de databank (importeren, bijwerken, bewerken en
     aanpassen)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: Zwarte injectielijst (scripts worden niet op deze sites uitgevoerd)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Zwarte netwerklijst (scripts maken geen verbinding met deze sites en hun
     cookies)
@@ -240,13 +240,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Staat op Violentmonkey's zwarte lijst
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: >-
     Violentmonkey kan geen gebruikersscripts uitvoeren op deze pagina
 
@@ -399,8 +399,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: aantal unieke actieve scripts
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Zwarte lijst
 labelContributors:
   description: Label for link to contributors.
@@ -653,8 +653,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Gesynchroniseerd op $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Meer informatie over zwartelijstpatronen.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -809,8 +809,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (code is hetzelfde)
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: De zwarte lijst is bijgewerkt.
   touched: false
 msgSavedCustomCSS:

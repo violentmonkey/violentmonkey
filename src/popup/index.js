@@ -121,7 +121,7 @@ async function initialize() {
     reason = 'scripts-skipped';
   } else if (reason === IS_APPLIED) {
     reason = 'scripts-disabled';
-  } else { // blacklisted
+  } else { // blocklisted
     data[reason] = reason2;
   }
   Object.assign(store, data, {

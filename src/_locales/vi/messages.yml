@@ -136,11 +136,11 @@ confirmUndoImport:
   message: >-
     Hoàn nguyên tất cả các thay đổi được thực hiện cho cơ sở dữ liệu (nhập, cập
     nhật, chỉnh sửa, tùy chỉnh)
-descBlacklist:
-  description: Description for the global injection blacklist.
+descBlocklist:
+  description: Description for the global injection blocklist.
   message: Danh sách đen chặn tiêm mã (script sẽ không chạy trong các trang web khớp)
-descBlacklistNet:
-  description: Description for the global network blacklist.
+descBlocklistNet:
+  description: Description for the global network blocklist.
   message: >-
     Danh sách đen mạng (các script sẽ không kết nối đến các trang web khớp và
     cookie của chúng).
@@ -237,13 +237,13 @@ extDescription:
 extName:
   description: Name of this extension.
   message: Violentmonkey
-failureReasonBlacklisted:
-  description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
+failureReasonBlocklisted:
+  description: Shown for blocklisted URLs (in the extension icon tooltip, in the popup)
   message: Đã ở trong danh sách đen của Violentmonkey
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
-    failureBlacklistedUrl)
+    failureBlocklistedUrl)
   message: Violentmonkey không hoạt động ở đây.
 failureReasonRestarted:
   description: Shown in the popup.
@@ -391,8 +391,8 @@ labelBadgeTotal:
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
   message: Số script không trùng lặp đang chạy
-labelBlacklist:
-  description: Label for global blacklist settings in security section.
+labelBlocklist:
+  description: Label for global blocklist settings in security section.
   message: Danh sách đen
 labelContributors:
   description: Label for link to contributors.
@@ -650,8 +650,8 @@ labelXhrInjectNote:
 lastSync:
   description: Label for last sync timestamp.
   message: Đồng bộ cuối lúc $1
-learnBlacklist:
-  description: Refers to a link to introduce blacklist patterns.
+learnBlocklist:
+  description: Refers to a link to introduce blocklist patterns.
   message: Tìm hiểu thêm về quy tắc danh sách đen.
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
@@ -807,8 +807,8 @@ msgReinstallScripts:
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (mã nguồn không đổi)'
-msgSavedBlacklist:
-  description: Message shown when blacklist are saved.
+msgSavedBlocklist:
+  description: Message shown when blocklist are saved.
   message: Danh sách đen đã cập nhật.
   touched: false
 msgSavedCustomCSS:
