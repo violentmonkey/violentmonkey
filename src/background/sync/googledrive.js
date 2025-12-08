@@ -1,6 +1,10 @@
 // Reference:
 // - https://developers.google.com/identity/protocols/oauth2/native-app
 // - https://developers.google.com/drive/v3/reference/files
+//
+// Note:
+// - Use a native app approach for longer authorization periods,
+// - Web app refresh tokens have short expiration and require frequent user reauthorization.
 import { dumpQuery, getUniqId, loadQuery } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED } from '@/common/consts';
 import { objectGet } from '@/common/object';
@@ -21,7 +25,6 @@ import {
 const config = {
   client_id: process.env.SYNC_GOOGLE_DESKTOP_ID,
   client_secret: process.env.SYNC_GOOGLE_DESKTOP_SECRET,
-  // We use native app approach with code challenge for better security.
   // Google OAuth for native app only allows loopback IP address for callback URL.
   // The URL will be intercepted and blocked so the port doesn't matter.
   redirect_uri: 'http://127.0.0.1:45678/',
@@ -116,20 +119,25 @@ const GoogleDrive = BaseService.extend({
     )}`;
     openAuthPage(url, config.redirect_uri);
   },
-  async finishAuth(url) {
+  matchAuth(url) {
     const redirectUri = `${config.redirect_uri}?`;
     if (!url.startsWith(redirectUri)) return;
     const query = loadQuery(url.slice(redirectUri.length));
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    await this.authorized({
+    return {
       code: query.code,
       code_verifier: codeVerifier,
+    };
+  },
+  async finishAuth(payload) {
+    await this.authorized({
+      code: payload.code,
+      code_verifier: payload.code_verifier,
       grant_type: 'authorization_code',
       redirect_uri: config.redirect_uri,
     });
-    return true;
   },
   revoke() {
     this.config.set({

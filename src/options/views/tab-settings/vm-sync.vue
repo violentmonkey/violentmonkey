@@ -209,6 +209,7 @@ function setRefs(srv) {
     SYNC_UNAUTHORIZED,
     SYNC_ERROR,
     SYNC_ERROR_INIT,
+    SYNC_ERROR_AUTH,
   ].includes(status);
   rCanRevoke.value =
     hasAuth &&

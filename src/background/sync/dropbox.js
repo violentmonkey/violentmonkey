@@ -135,20 +135,25 @@ const Dropbox = BaseService.extend({
       refresh_token: data.refresh_token || params.refresh_token,
     });
   },
-  async finishAuth(url) {
+  matchAuth(url) {
     const redirectUri = `${config.redirect_uri}?`;
     if (!url.startsWith(redirectUri)) return;
     const query = loadQuery(url.slice(redirectUri.length));
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    await this.authorized({
+    return {
       code: query.code,
       code_verifier: codeVerifier,
+    };
+  },
+  async finishAuth(payload) {
+    await this.authorized({
+      code: payload.code,
+      code_verifier: payload.code_verifier,
       grant_type: 'authorization_code',
       redirect_uri: config.redirect_uri,
     });
-    return true;
   },
   revoke() {
     this.config.set({

@@ -1,5 +1,9 @@
 // References
 // - https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow
+//
+// Note:
+// - SPA refresh tokens expire after 24h.
+// - Microsoft does not allow browser extensions to use the native app flow.
 import { dumpQuery, getUniqId, loadQuery, noop } from '@/common';
 import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
 import { objectGet } from '@/common/object';
@@ -98,22 +102,25 @@ const OneDrive = BaseService.extend({
     )}`;
     openAuthPage(url, config.redirect_uri);
   },
-  async finishAuth(url) {
+  matchAuth(url) {
     const redirectUri = `${config.redirect_uri}?`;
     if (!url.startsWith(redirectUri)) return;
     const query = loadQuery(url.slice(redirectUri.length));
     const { state, codeVerifier } = this.session || {};
     this.session = null;
     if (query.state !== state || !query.code) return;
-    if (url.startsWith(redirectUri)) {
-      await this.authorized({
-        code: query.code,
-        code_verifier: codeVerifier,
-        grant_type: 'authorization_code',
-        redirect_uri: config.redirect_uri,
-      });
-      return true;
-    }
+    return {
+      code: query.code,
+      code_verifier: codeVerifier,
+    };
+  },
+  async finishAuth(payload) {
+    await this.authorized({
+      code: payload.code,
+      code_verifier: payload.code_verifier,
+      grant_type: 'authorization_code',
+      redirect_uri: config.redirect_uri,
+    });
   },
   revoke() {
     this.config.set({

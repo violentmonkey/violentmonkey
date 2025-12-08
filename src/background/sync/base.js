@@ -252,9 +252,10 @@ export const BaseService = serviceFactory({
   setUserConfig: noop,
   requestAuth: noop,
   authorize: noop,
-  finishAuth: noop,
   revoke: noop,
   authorized: noop,
+  matchAuth: noop,
+  finishAuth: noop,
   metaError: noop,
   hasAuth() {
     const token = this.config.get('token');
@@ -324,17 +325,23 @@ export const BaseService = serviceFactory({
       status: SYNC_UNAUTHORIZED,
     });
   },
-  async checkAuth(url) {
+  async handleAuth(payload) {
     setSyncState({ status: SYNC_AUTHORIZING });
-    let result;
     try {
-      result = await this.finishAuth(url);
+      await this.finishAuth(payload);
     } catch (err) {
       setSyncState({ status: SYNC_ERROR_AUTH });
       throw err;
     }
-    setSyncState({ status: result ? SYNC_AUTHORIZED : SYNC_UNAUTHORIZED });
-    return result;
+    setSyncState({ status: SYNC_AUTHORIZED });
+    autoSync();
+  },
+  checkAuth(url) {
+    const payload = this.matchAuth(url);
+    if (payload) {
+      this.handleAuth(payload);
+      return true;
+    }
   },
   getMeta() {
     return this.get({ name: this.metaFile })
@@ -675,7 +682,6 @@ export async function openAuthPage(url, redirectUri) {
       browser.tabs.remove(tabId);
       // If we unregister without setTimeout, API will ignore { cancel: true }
       setTimeout(unregister, 0);
-      autoSync();
       return { cancel: true };
     }
   };
