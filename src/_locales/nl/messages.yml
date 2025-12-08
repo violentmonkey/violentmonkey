@@ -102,10 +102,10 @@ buttonSupport:
   message: Ondersteuningspagina
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Eenmalig lokaal ophalen
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Eenmalig versturen naar externe bron
 buttonUndo:
   description: Button to undo removement of a script.
   message: Ongedaan maken
@@ -286,10 +286,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: recentst bezoek
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: De recentste keer dat je een site waarop het script werkt bezocht hebt.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Alle
@@ -577,7 +577,7 @@ labelShowOrder:
   message: Uitvoervolgorde tonen
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Recentste bezoektijd tonen
 labelSync:
   description: Label for sync options.
   message: Synchroniseren
@@ -592,7 +592,7 @@ labelSyncAuthorizing:
   message: Bezig met goedkeuren
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Automatisch synchroniseren
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Niets

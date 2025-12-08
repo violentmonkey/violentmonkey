@@ -102,10 +102,10 @@ buttonSupport:
   message: Страница поддержки
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Забрать к локальному единожды
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Отправить на внешнее единожды
 buttonUndo:
   description: Button to undo removement of a script.
   message: Откатить
@@ -153,8 +153,8 @@ descBlacklistNet:
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Пользовательский CSS для страниц настроек и установки скриптов. Если вы не
-    знаете, зачем это нужно, пожалуйста, не редактируйте.
+    Пользовательский стиль CSS для страниц настроек и установки скриптов. Если
+    вы не знаете, зачем это нужно, пожалуйста, не редактируйте его.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
@@ -287,10 +287,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: времени последнего посещения
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: Последний раз, когда вы посещали любой сайт, на который нацелен этот скрипт.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Все
@@ -578,7 +578,7 @@ labelShowOrder:
   message: Показать номера порядка выполнения
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Показать время последнего посещения
 labelSync:
   description: Label for sync options.
   message: Синхронизация
@@ -593,7 +593,7 @@ labelSyncAuthorizing:
   message: Авторизация...
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Синхронизировать автоматически
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Нет

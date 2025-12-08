@@ -104,10 +104,10 @@ buttonSupport:
   message: Stránka podpory
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Stiahnuť zmeny z repozitára
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Odoslať zmeny do repozitára
 buttonUndo:
   description: Button to undo removement of a script.
   message: Späť
@@ -288,10 +288,12 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: čas poslednej návštevy
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: >-
+    Čas, kedy ste naposledy navštívili akúkoľvek stránku, ktorú ovplyvňuje tento
+    skript.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Všetko
@@ -581,7 +583,7 @@ labelShowOrder:
   message: Zobraziť poradie vykonania príkazu
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Zobraziť čas poslednej návštevy
 labelSync:
   description: Label for sync options.
   message: Synchronizácia
@@ -596,7 +598,7 @@ labelSyncAuthorizing:
   message: Autorizácia
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Automaticky synchronizovať
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Zakázané

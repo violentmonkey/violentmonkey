@@ -102,10 +102,10 @@ buttonSupport:
   message: 支持页面
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: 拉取一次到本地
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: 推送一次到远端
 buttonUndo:
   description: Button to undo removement of a script.
   message: 撤销
@@ -264,10 +264,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: 最近访问时间
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: 最近访问任何用到这个脚本的网站的时间。
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: 全部
@@ -551,7 +551,7 @@ labelShowOrder:
   message: 显示执行序号
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: 显示最近访问时间
 labelSync:
   description: Label for sync options.
   message: 同步
@@ -566,7 +566,7 @@ labelSyncAuthorizing:
   message: 授权中
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: 自动同步
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: 无
