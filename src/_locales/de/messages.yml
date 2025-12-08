@@ -289,10 +289,12 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: Letzter Besuchszeitpunkt
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: >-
+    Der letzte Zeitpunkt, an dem eine besuchte Seite von diesem Skript erfasst
+    wurde.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Alles
@@ -587,7 +589,7 @@ labelShowOrder:
   message: Positionen in der Ausführungsreihenfolge anzeigen
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Letzten Besuchszeitpunkt anzeigen
 labelSync:
   description: Label for sync options.
   message: Sync
@@ -972,7 +974,7 @@ readonlyOptWarn:
   message: (nächstes Update wird sie überschreiben)
 reinstall:
   description: Button to reinstall a script
-  message: Reinstallieren
+  message: Re-installieren
 reloadTab:
   description: Label of action to reload the tab
   message: Tab neu laden

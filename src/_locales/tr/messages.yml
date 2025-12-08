@@ -292,10 +292,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: son ziyaret
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: Bu betiğin hedeflediği herhangi bir siteyi ziyaret ettiğiniz son tarih.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Tümü
@@ -586,7 +586,7 @@ labelShowOrder:
   message: Çalıştırma sıralarını göster
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Son ziyaret tarihini göster
 labelSync:
   description: Label for sync options.
   message: Eşitleme
@@ -601,7 +601,7 @@ labelSyncAuthorizing:
   message: Yetkilendiriliyor
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Otomatik olarak eşitle
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Hiçbiri
