@@ -539,7 +539,8 @@ export const BaseService = serviceFactory({
     });
     remoteItemMap::forEachEntry(([uri, item]) => {
       const info = remoteMetaData.info[uri];
-      if (outdated) {
+      const result = compareItems(null, item, info);
+      if (result < 0) {
         putLocal.push({ remote: item, info });
       } else {
         delRemote.push({ remote: item });
