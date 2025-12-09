@@ -240,7 +240,6 @@ events.on('change', (state) => {
 export const BaseService = serviceFactory({
   name: 'base',
   displayName: 'BaseService',
-  delayTime: 1000,
   urlPrefix: '',
   metaFile: VIOLENTMONKEY,
   properties: {
@@ -352,33 +351,62 @@ export const BaseService = serviceFactory({
         data,
       }));
   },
-  loadData(options) {
-    const { progress } = this;
-    const { delay = this.delayTime } = options;
-    let lastFetch = Promise.resolve();
-    if (delay) {
-      lastFetch = this.lastFetch
-        .then((ts) => makePause(delay - (Date.now() - ts)))
-        .then(() => Date.now());
-      this.lastFetch = lastFetch;
+  _requestDelay: 0,
+  async _request(options) {
+    options = Object.assign({}, NO_CACHE, options);
+    options.headers = Object.assign({}, this.headers, options.headers);
+    let { url } = options;
+    if (url.startsWith('/')) url = (options.prefix ?? this.urlPrefix) + url;
+    let delay = this._requestDelay;
+    let attempts = 5;
+    while (attempts > 0) {
+      attempts -= 1;
+      if (delay >= 200) await makePause(delay);
+      try {
+        const res = await request(url, options);
+        this._requestDelay >>= 1;
+        return res.data;
+      } catch (err) {
+        if (err?.status !== 429 || attempts <= 0) throw err;
+        const retryAfter = err.headers?.get('retry-after');
+        const serverDelay =
+          retryAfter &&
+          (isNaN(+retryAfter)
+            ? new Date(retryAfter).getTime() - Date.now()
+            : +retryAfter * 1000);
+        if (serverDelay) {
+          delay = serverDelay;
+        } else {
+          delay = Math.max(1000, delay * 2);
+          this._requestDelay = delay;
+        }
+      }
     }
-    progress.total += 1;
+  },
+  _requestProcessing: false,
+  async _handleRequests() {
+    if (this._requestProcessing) return;
+    this._requestProcessing = true;
+    while (this._requestQueue.length) {
+      const task = this._requestQueue.shift();
+      task.resolve(this._request(task.options));
+      await task.promise.catch(noop);
+      this.progress.finished += 1;
+      onStateChange();
+    }
+    this._requestProcessing = false;
+  },
+  loadData(options) {
+    const task = { options };
+    task.promise = new Promise((resolve, reject) => {
+      task.resolve = resolve;
+      task.reject = reject;
+    });
+    (this._requestQueue ||= []).push(task);
+    this.progress.total += 1;
     onStateChange();
-    return lastFetch
-      .then(() => {
-        options = Object.assign({}, NO_CACHE, options);
-        options.headers = Object.assign({}, this.headers, options.headers);
-        let { url } = options;
-        if (url.startsWith('/')) url = (options.prefix ?? this.urlPrefix) + url;
-        return request(url, options);
-      })
-      .catch((error) => ({ error }))
-      .then(({ data, error }) => {
-        progress.finished += 1;
-        onStateChange();
-        if (error) return Promise.reject(error);
-        return data;
-      });
+    this._handleRequests();
+    return task.promise;
   },
   getLocalData() {
     return pluginScript.list();

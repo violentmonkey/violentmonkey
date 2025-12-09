@@ -130,7 +130,6 @@ const Dropbox = BaseService.extend({
     });
     if (!data.access_token) throw data;
     this.config.set({
-      uid: data.account_id,
       token: data.access_token,
       refresh_token: data.refresh_token || params.refresh_token,
     });

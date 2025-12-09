@@ -2,8 +2,8 @@
 // - https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow
 //
 // Note:
-// - SPA refresh tokens expire after 24h.
-// - Microsoft does not allow browser extensions to use the native app flow.
+// - SPA refresh tokens expire after 24h, but each refresh operation returns a new refresh_token, extending the expiration.
+// - Browser extensions cannot use the native app authorization flow due to Microsoft's restrictions.
 import { dumpQuery, getUniqId, loadQuery, noop } from '@/common';
 import { FORM_URLENCODED, VM_HOME } from '@/common/consts';
 import { objectGet } from '@/common/object';
@@ -148,15 +148,11 @@ const OneDrive = BaseService.extend({
       ),
       responseType: 'json',
     });
-    if (data.access_token) {
-      this.config.set({
-        uid: data.user_id,
-        token: data.access_token,
-        refresh_token: data.refresh_token,
-      });
-    } else {
-      throw data;
-    }
+    if (!data.access_token) throw data;
+    this.config.set({
+      token: data.access_token,
+      refresh_token: data.refresh_token || params.refresh_token,
+    });
   },
 });
 if (config.client_id) register(OneDrive);

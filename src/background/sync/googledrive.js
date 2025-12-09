@@ -166,17 +166,11 @@ const GoogleDrive = BaseService.extend({
       ),
       responseType: 'json',
     });
-    if (data.access_token) {
-      const update = {
-        token: data.access_token,
-      };
-      if (data.refresh_token) {
-        update.refresh_token = data.refresh_token;
-      }
-      this.config.set(update);
-    } else {
-      throw data;
-    }
+    if (!data.access_token) throw data;
+    this.config.set({
+      token: data.access_token,
+      refresh_token: data.refresh_token || params.refresh_token,
+    });
   },
   list() {
     throw new Error('Not supported');
