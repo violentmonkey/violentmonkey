@@ -728,7 +728,7 @@ export async function openAuthPage(url, redirectUri) {
       urls: [`${redirectUri}*`],
       types: ['main_frame', 'xmlhttprequest'], // fetch request in service worker
     },
-    ['blocking'],
+    [],
   );
 }
 

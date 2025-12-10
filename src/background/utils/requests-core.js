@@ -60,10 +60,10 @@ const SAME_SITE_MAP = {
 const kRequestHeaders = 'requestHeaders';
 const API_EVENTS = {
   onBeforeSendHeaders: [
-    onBeforeSendHeaders, kRequestHeaders, 'blocking', ...EXTRA_HEADERS,
+    onBeforeSendHeaders, kRequestHeaders, ...EXTRA_HEADERS,
   ],
   onHeadersReceived: [
-    onHeadersReceived, kResponseHeaders, 'blocking', ...EXTRA_HEADERS,
+    onHeadersReceived, kResponseHeaders, ...EXTRA_HEADERS,
   ],
 };
 

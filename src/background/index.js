@@ -13,6 +13,8 @@ import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
 
+const root = globalThis;
+
 addPublicCommands({
   /**
    * Timers in content scripts are shared with the web page so it can clear them.
@@ -64,9 +66,9 @@ async function handleCommandMessageAsync(func, data, src) {
   }
 }
 
-window._bg = 1;
-global['handle' + 'CommandMessage' /* hiding the global from IDE */] = handleCommandMessage;
-global['deep' + 'Copy' /* hiding the global from IDE */] = deepCopy;
+root._bg = 1;
+root['handle' + 'CommandMessage' /* hiding the global from IDE */] = handleCommandMessage;
+root['deep' + 'Copy' /* hiding the global from IDE */] = deepCopy;
 browser.runtime.onMessage.addListener(handleCommandMessage);
 browser.commands?.onCommand.addListener(async cmd => {
   handleHotkeyOrMenu(cmd, await getActiveTab());

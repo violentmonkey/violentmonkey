@@ -7,6 +7,7 @@ export { normalizeKeys } from './object';
 export * from './script';
 export * from './string';
 export * from './util';
+export { extensionManifest, extensionRoot, IS_MANIFEST_V3 } from './safe-globals';
 
 if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
   const get = () => {

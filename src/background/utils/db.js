@@ -556,7 +556,7 @@ export function checkRemove({ force } = {}) {
 /** @return {string} */
 const getUUID = crypto.randomUUID ? crypto.randomUUID.bind(crypto) : () => {
   const rnd = new Uint16Array(8);
-  window.crypto.getRandomValues(rnd);
+  globalThis.crypto.getRandomValues(rnd);
   // xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
   // We're using UUIDv4 variant 1 so N=4 and M=8
   // See format_uuid_v3or5 in https://tools.ietf.org/rfc/rfc4122.txt
