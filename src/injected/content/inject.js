@@ -1,4 +1,5 @@
 import bridge, { addHandlers } from './bridge';
+import { extensionManifest, extensionRoot } from '@/common';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
@@ -18,12 +19,71 @@ let invokeContent;
 let nonce;
 let getAttribute;
 let querySelector;
+const USER_SCRIPTS_IMMEDIATE = {
+  start: true,
+  body: true,
+  end: false,
+  idle: false,
+};
+const CHROME_PATCH = (() => {
+  const root = JSON.stringify(extensionRoot || '');
+  const manifest = JSON.stringify(extensionManifest ?? {});
+  const optionsPage = JSON.stringify(extensionManifest?.options_ui?.page || 'options/index.html');
+  return `(() => {
+    try {
+      const chromeObj = window.chrome ?? (window.chrome = {});
+      const runtime = chromeObj.runtime ?? (chromeObj.runtime = {});
+      const root = ${root};
+      const manifest = ${manifest};
+      runtime.getURL = path => root + (path || '').replace(/^\\//, '');
+      runtime.getManifest = () => {
+        const copy = JSON.parse(JSON.stringify(manifest));
+        if (!copy.options_ui) copy.options_ui = {};
+        if (!copy.options_ui.page) {
+          copy.options_ui.page = ${optionsPage};
+        }
+        return copy;
+      };
+      window.browser ??= chromeObj;
+      console.info('VM chrome patch applied', manifest && manifest.version);
+    } catch (e) {
+      console.warn('VM chrome patch failed', e);
+    }
+  })();`;
+})();
 
+let resolveVmInit;
+const vmInitReady = new Promise(resolve => {
+  resolveVmInit = resolve;
+});
+let resolveBridgeReady;
+const bridgeReady = new Promise(resolve => {
+  resolveBridgeReady = resolve;
+});
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
-/** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
- * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
-setOwnProp(window, INIT_FUNC_NAME, 1, false);
+const existingVmInit = window[INIT_FUNC_NAME];
+if (typeof existingVmInit === 'function') {
+  VMInitInjection = existingVmInit;
+  setOwnProp(window, INIT_FUNC_NAME, 1, false);
+  logging.info('VMInitInjection captured immediately');
+  resolveVmInit();
+} else {
+  defineProperty(window, INIT_FUNC_NAME, {
+    configurable: true,
+    get() {
+      return VMInitInjection;
+    },
+    set(value) {
+      if (typeof value === 'function') {
+        VMInitInjection = value;
+        setOwnProp(window, INIT_FUNC_NAME, 1, false);
+        logging.info('VMInitInjection captured via setter');
+        resolveVmInit();
+      }
+    },
+  });
+}
 
 addHandlers({
   /**
@@ -33,6 +93,7 @@ addHandlers({
 });
 
 export function injectPageSandbox(data) {
+  if (!VMInitInjection) return false;
   pageInjectable = false;
   const VAULT_WRITER = data[kSessionId] + 'VW';
   const VAULT_WRITER_ACK = VAULT_WRITER + '*';
@@ -110,18 +171,26 @@ export function injectPageSandbox(data) {
     /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
      * otherwise a same-origin parent page could use it to spoof the handshake. */
     window::on(handshakeId, handshaker, { capture: true, once: true });
-    inject({
-      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
+    const chromePatch = bridge.userScripts ? CHROME_PATCH : '';
+    const cleanup = () => window::off(handshakeId, handshaker, true);
+    const res = inject({
+      code: `${chromePatch}(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
         + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
     });
     // Clean up in case CSP prevented the script from running
-    window::off(handshakeId, handshaker, true);
+    if (res && res.then) res.then(cleanup, cleanup);
+    else cleanup();
   }
   function handshaker(evt) {
     pageInjectable = true;
+    logging.info('VM handshaker triggered');
     evt::stopImmediatePropagation();
     bindEvents(contentId, webId, bridge);
     fireBridgeEvent(`${handshakeId}*`, [webId, contentId]);
+    if (resolveBridgeReady) {
+      resolveBridgeReady();
+      resolveBridgeReady = null;
+    }
   }
 }
 
@@ -149,6 +218,17 @@ export async function injectScripts(data, info, isXml) {
   } else if (data[PAGE] && pageInjectable == null) {
     injectPageSandbox(data);
   }
+  const hasPageScripts = data[PAGE] || data[SCRIPTS]?.some(scr => (
+    scr[INJECT_INTO] !== CONTENT
+  ));
+  if (bridge.userScripts && !data[FORCE_CONTENT] && hasPageScripts) {
+    pageInjectable = true;
+  }
+  if (data[PAGE] && pageInjectable == null) {
+    await vmInitReady;
+    logging.info('VMInit ready, starting page sandbox');
+    injectPageSandbox(data);
+  }
   const toContent = data[SCRIPTS]
     .filter(scr => triageScript(scr) === CONTENT)
     .map(scr => [scr.id, scr.key.data]);
@@ -163,6 +243,10 @@ export async function injectScripts(data, info, isXml) {
   }
   tardyQueue = createNullObj();
   // Using a callback to avoid a microtask tick when the root element exists or appears.
+  const needsPageBridge = bridge.userScripts && !data[FORCE_CONTENT] && pageLists;
+  if (needsPageBridge && resolveBridgeReady) {
+    await bridgeReady;
+  }
   await onElement('*', injectAll, 'start');
   if (pageBodyScripts || contLists?.[BODY]) {
     await onElement(BODY, !wasInjectableFF || !pageBodyScripts ? injectAll : arg => {
@@ -177,7 +261,7 @@ export async function injectScripts(data, info, isXml) {
         }
         sendFeedback(toContent);
       }
-      injectAll(arg);
+      return injectAll(arg);
     }, BODY);
   }
   if (more && (data = await moreData)) {
@@ -200,10 +284,13 @@ export async function injectScripts(data, info, isXml) {
     await injectAll('idle');
   }
   // release for GC
-  bridgeInfo = contLists = pageLists = VMInitInjection = null;
+  bridgeInfo = contLists = pageLists = null;
 }
 
 function didPageLoseInjectability(toContent, scripts) {
+  if (bridge.userScripts) {
+    return;
+  }
   let res;
   if (!toContent) { // self-invoked
     pageInjectable = false;
@@ -269,6 +356,33 @@ function triageScript(script) {
 function inject(item, iframeCb) {
   const { code } = item;
   const isCodeArray = isObject(code);
+  if (bridge.userScripts && code) {
+    const payload = isCodeArray ? code.join('') : code;
+    if (payload) {
+      logging.info('VM userScripts inject start', {
+        id: item.id,
+        runAt: item[RUN_AT],
+        iframeCb: !!iframeCb,
+      });
+      return sendCmd('ExecuteUserScript', {
+        code: payload,
+        injectImmediately: USER_SCRIPTS_IMMEDIATE[item[RUN_AT]] ?? true,
+      }).then(() => {
+        logging.info('VM userScripts inject success', {
+          id: item.id,
+          runAt: item[RUN_AT],
+        });
+        if (iframeCb) iframeCb();
+      }).catch((err) => {
+        logging.warn('VM userScripts inject failed, skipping inline fallback', err, {
+          id: item.id,
+          runAt: item[RUN_AT],
+        });
+      });
+    }
+    logging.info('VM userScripts skipped empty payload', { id: item.id });
+    return;
+  }
   const script = makeElem('script', !isCodeArray && code);
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   const onError = IS_FIREFOX && !iframeCb && (e => {
@@ -331,27 +445,47 @@ function inject(item, iframeCb) {
   div::remove();
 }
 
-function injectAll(runAt) {
+async function injectAll(runAt) {
   if (contLists && !invokeContent) {
     setupContentInvoker();
   }
-  let res;
   for (let inPage = 1; inPage >= 0; inPage--) {
     const realm = inPage ? PAGE : CONTENT;
     const lists = inPage ? pageLists : contLists;
     const items = lists?.[runAt];
     if (items) {
-      bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
+      let post = bridge.post;
+      if (!post && inPage && resolveBridgeReady) {
+        await bridgeReady;
+        post = bridge.post;
+      }
+      if (!post) {
+        if (inPage) {
+          logging.warn('VM bridge post unavailable', { runAt, realm });
+          continue;
+        }
+        break;
+      }
+      post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
       for (const { id } of items) tardyQueue[id] = 1;
-      if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
-      else if (!IS_FIREFOX) res = injectPageList(runAt);
+      if (!inPage) {
+        nextTask()::then(() => tardyQueueCheck(items));
+      } else if (!IS_FIREFOX) {
+        await injectPageList(runAt);
+      }
     }
   }
-  return res;
 }
 
 async function injectPageList(runAt) {
+  if (!bridge.userScripts) {
+    logging.warn('VM userScripts unavailable, skipping page scripts', { runAt });
+    return;
+  }
+  if (bridge.userScripts && resolveBridgeReady) {
+    await bridgeReady;
+  }
   const scripts = pageLists[runAt];
   for (const scr of scripts) {
     if (scr.code) {
@@ -359,8 +493,18 @@ async function injectPageList(runAt) {
       if (runAt === 'end') await 0;
       tardyQueueCheck([scr]);
       // Exposing window.vmXXX setter just before running the script to avoid interception
-      if (!scr.meta.unwrap) bridge.post('Plant', scr.key);
-      inject(scr);
+      if (!scr.meta.unwrap) {
+        const post = bridge.post;
+        if (!post) {
+          logging.warn('VM bridge post unavailable for Plant', scr.key);
+          continue;
+        }
+        post('Plant', {
+          ...scr.key,
+          userScripts: bridge.userScripts,
+        });
+      }
+      await inject(scr);
       scr.code = '';
       if (scr.meta.unwrap) Run(scr.id);
     }
@@ -374,7 +518,7 @@ function setupContentInvoker() {
     const fn = realm === CONTENT
       ? invokeContent
       : postViaBridge;
-    fn(cmd, params, undefined, node);
+    if (fn) fn(cmd, params, undefined, node);
   };
 }
 

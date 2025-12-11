@@ -1,6 +1,6 @@
 name: __MSG_extName__
 version: __VERSION__
-manifest_version: 2
+manifest_version: 3
 description: __MSG_extDescription__
 author: Gerald
 homepage_url: 'https://violentmonkey.github.io/'
@@ -9,8 +9,7 @@ icons:
   '48': public/images/icon48.png
   '128': public/images/icon128.png
 default_locale: en
-browser_action:
-  browser_style: true
+action:
   default_icon:
     '16': public/images/icon16b.png
     '32': public/images/icon32b.png
@@ -20,7 +19,7 @@ browser_action:
   default_title: __MSG_extName__
   default_popup: popup/index.html
 background:
-  scripts: []
+  service_worker: background/index.js
 options_ui:
   page: options/index.html#settings
   open_in_tab: true
@@ -34,17 +33,19 @@ content_scripts:
     all_frames: true
 permissions:
   - tabs
-  - <all_urls>
   - webRequest
-  - webRequestBlocking
   - notifications
   - storage
   - unlimitedStorage
   - clipboardWrite
   - contextMenus
   - cookies
+  - scripting
+  - userScripts
+host_permissions:
+  - <all_urls>
 commands:
-  _execute_browser_action: {}
+  _execute_action: {}
   toggleInjection:
     description: __MSG_toggleInjection__
   dashboard:
@@ -60,11 +61,8 @@ commands:
   updateScriptsInTab:
     description: __MSG_updateScriptsInTab__
 
-minimum_chrome_version: '61.0'
-# 61: URLSearchParams(obj)
-# 61: scrollIntoView({ behavior: 'smooth' })
-# 60: {...spreadOrRest}
-# 60: CSS :focus-within
+minimum_chrome_version: '88.0'
+# 88: required for Manifest V3 service worker
 
 browser_specific_settings:
   gecko:

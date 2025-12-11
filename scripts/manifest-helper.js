@@ -18,7 +18,7 @@ async function buildManifest(base) {
     // Do not support i18n in beta version
     const name = 'Violentmonkey BETA';
     data.name = name;
-    data.browser_action.default_title = name;
+    data.action.default_title = name;
   }
   return data;
 }
@@ -53,12 +53,11 @@ class ListBackgroundScriptsPlugin {
       const bgId = 'background/index';
       const bgEntry = compilation.entrypoints.get(bgId);
       const scripts = bgEntry.chunks.flatMap(c => [...c.files]);
-      if (`${manifest.background.scripts}` !== `${scripts}`) {
-        manifest.background.scripts = scripts;
-        await fs.writeFile(path,
-          JSON.stringify(manifest, null, this.minify ? 0 : 2),
-          { encoding: 'utf8' });
-      }
+      const [serviceWorker] = scripts;
+      manifest.background.service_worker = serviceWorker;
+      await fs.writeFile(path,
+        JSON.stringify(manifest, null, this.minify ? 0 : 2),
+        { encoding: 'utf8' });
     });
   }
 }

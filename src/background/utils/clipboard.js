@@ -1,23 +1,24 @@
 import { addPublicCommands } from './init';
 
-const textarea = document.createElement('textarea');
-let clipboardData;
+async function writeClipboard({ data, type }) {
+  const mime = type || 'text/plain';
+  const blob = new Blob([data], { type: mime });
+  // Prefer write() to preserve MIME type when available.
+  if (navigator.clipboard?.write && globalThis.ClipboardItem) {
+    await navigator.clipboard.write([new ClipboardItem({ [mime]: blob })]);
+    return;
+  }
+  await navigator.clipboard?.writeText(data);
+}
 
 addPublicCommands({
-  SetClipboard(data) {
-    clipboardData = data;
-    textarea.focus();
-    const ret = document.execCommand('copy', false, null);
-    if (!ret && process.env.DEBUG) {
-      console.warn('Copy failed!');
+  async SetClipboard(data) {
+    try {
+      await writeClipboard(data);
+    } catch (err) {
+      if (process.env.DEBUG) {
+        console.warn('Copy failed!', err);
+      }
     }
   },
-});
-
-document.body.appendChild(textarea);
-
-addEventListener('copy', e => {
-  e.preventDefault();
-  const { type, data } = clipboardData;
-  e.clipboardData.setData(type || 'text/plain', data);
 });

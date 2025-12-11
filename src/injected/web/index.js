@@ -67,13 +67,20 @@ addHandlers({
     delete callbacks[id];
     if (fn) this::fn(data);
   },
-  async Plant({ data: dataKey, win: winKey }) {
+  async Plant({ data: dataKey, win: winKey, userScripts }) {
     setOwnProp(window, winKey, onCodeSet, true, 'set');
     /* Cleaning up for a script that didn't compile at all due to a syntax error.
      * Note that winKey can be intercepted via MutationEvent in this case. */
-    await 0;
-    delete toRun[dataKey];
-    delete window[winKey];
+    if (!userScripts) {
+      await 0;
+      delete toRun[dataKey];
+      delete window[winKey];
+    } else {
+      setTimeout(() => {
+        delete toRun[dataKey];
+        delete window[winKey];
+      }, 60e3);
+    }
   },
   /**
    * @param {VMInjection.Info} info

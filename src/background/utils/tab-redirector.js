@@ -4,7 +4,7 @@ import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { parseMeta, matchUserScript } from './script';
-import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
+import { executeScript, fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
 
 addPublicCommands({
@@ -95,7 +95,7 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
-      browser.tabs.executeScript(tabId, {
+      executeScript(tabId, {
         code: `console.warn(${JSON.stringify(error)})`,
       });
       browser.tabs.update(tabId, { url });
@@ -158,4 +158,4 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     `${extensionRoot}*.user.js`,
   ],
   types: ['main_frame'],
-}, ['blocking']);
+}, []);

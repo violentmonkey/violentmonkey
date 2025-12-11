@@ -131,7 +131,7 @@ export const cachedStorageApi = storage.api = {
 setInterval(() => {
   dbKeys.forEach((val, key) => !val && dbKeys.delete(key));
 }, TTL_TINY);
-window[WATCH_STORAGE] = fn => {
+globalThis[WATCH_STORAGE] = fn => {
   const id = performance.now();
   watchers[id] = fn;
   return id;

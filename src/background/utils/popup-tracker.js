@@ -3,6 +3,7 @@ import cache from './cache';
 import { getData, getScriptsByURL } from './db';
 import { badges, getFailureReason } from './icon';
 import { addOwnCommands, addPublicCommands, commands } from './init';
+import { executeScript } from './tabs';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
 export const popupTabs = {};
@@ -72,7 +73,7 @@ async function isInjectable(tabId, badgeData) {
   return badgeData[INJECT]
     && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
     || (
-      await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
+      await executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
       .catch(() => [])
     )[0];
 }
