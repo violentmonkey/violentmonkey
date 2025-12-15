@@ -104,10 +104,10 @@ buttonSupport:
   message: Página de soporte
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Extraer una vez a local
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Enviar una vez a remoto
 buttonUndo:
   description: Button to undo removement of a script.
   message: Deshacer
@@ -291,10 +291,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: hora de la última visita
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: La última vez que visitaste algún sitio al que apunta este script.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Todo
@@ -324,7 +324,9 @@ genericUseGlobal:
   message: usar configuración global
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Los patrones con "#" funcionan únicamente al abrir el sitio por primera vez
+    o al recargar la pestaña: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Papelera de reciclaje
@@ -588,7 +590,7 @@ labelShowOrder:
   message: Mostrar las posiciones del orden de ejecución
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Mostrar hora de última visita
 labelSync:
   description: Label for sync options.
   message: Sincronizar
@@ -603,7 +605,7 @@ labelSyncAuthorizing:
   message: Autorizando
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Sincronizar automáticamente
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Nada
@@ -879,7 +881,12 @@ msgSyntaxError:
   message: ¿Error de sintaxis?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    El script no existía o no coincidía con la URL cuando la página se cargó, lo
+    cual ocurre en sitios de Single-Page Application como Facebook o Instagram
+    que utilizan navegación simulada. Puedes recargar la pestaña para ejecutar
+    el script. Para corregir el script usa @match para todo el sitio y luego
+    detecta los cambios utilizando MutationObserver o la API window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script actualizado.
