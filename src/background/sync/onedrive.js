@@ -50,13 +50,22 @@ const OneDrive = BaseService.extend({
     }
   },
   async list() {
-    const data = await this.loadData({
-      url: '/drive/special/approot/children',
-      responseType: 'json',
-    });
-    return data.value
-      .filter((item) => item.file && isScriptFile(item.name))
-      .map(normalize);
+    let files = [];
+    let url = '/drive/special/approot/children';
+    while (url) {
+      const data = await this.loadData({
+        url,
+        responseType: 'json',
+      });
+      url = data['@odata.nextLink'] || '';
+      files = [
+        ...files,
+        ...data.value
+          .filter((item) => item.file && isScriptFile(item.name))
+          .map(normalize),
+      ];
+    }
+    return files;
   },
   get(item) {
     const name = getItemFilename(item);

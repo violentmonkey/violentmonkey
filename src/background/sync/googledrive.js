@@ -62,12 +62,18 @@ const GoogleDrive = BaseService.extend({
   async getSyncData() {
     const params = {
       spaces: 'appDataFolder',
-      fields: 'files(id,name,size)',
+      fields: 'files(id,name,size),nextPageToken',
     };
-    const { files } = await this.loadData({
-      url: `/files?${dumpQuery(params)}`,
-      responseType: 'json',
-    });
+    let files = [];
+    while (true) {
+      const result = await this.loadData({
+        url: `/files?${dumpQuery(params)}`,
+        responseType: 'json',
+      });
+      files = [...files, ...result.files];
+      params.pageToken = result.nextPageToken;
+      if (!params.pageToken) break;
+    }
     let metaFile;
     const remoteData = files
       .filter((item) => {

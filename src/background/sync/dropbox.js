@@ -48,7 +48,8 @@ const Dropbox = BaseService.extend({
     if (res.status !== 409) throw res;
   },
   async list() {
-    const data = await this.loadData({
+    let files = [];
+    let data = await this.loadData({
       method: 'POST',
       url: 'https://api.dropboxapi.com/2/files/list_folder',
       body: {
@@ -56,9 +57,29 @@ const Dropbox = BaseService.extend({
       },
       responseType: 'json',
     });
-    return data.entries
-      .filter((item) => item['.tag'] === 'file' && isScriptFile(item.name))
-      .map(normalize);
+    files = [
+      ...files,
+      ...data.entries
+        .filter((item) => item['.tag'] === 'file' && isScriptFile(item.name))
+        .map(normalize),
+    ];
+    while (data.has_more) {
+      data = await this.loadData({
+        method: 'POST',
+        url: 'https://api.dropboxapi.com/2/files/list_folder/continue',
+        body: {
+          cursor: data.cursor,
+        },
+        responseType: 'json',
+      });
+      files = [
+        ...files,
+        ...data.entries
+          .filter((item) => item['.tag'] === 'file' && isScriptFile(item.name))
+          .map(normalize),
+      ];
+    }
+    return files;
   },
   get(item) {
     const name = getItemFilename(item);
