@@ -8,11 +8,13 @@ const { toLowerCase } = '';
 const { [IDS]: ids } = bridge;
 let setPopupThrottle;
 let isPopupShown;
+let grantless;
 
 addBackgroundHandlers({
   async PopupShown(state) {
     await bridge[REIFY];
     isPopupShown = state;
+    if (bridge.grantless) bridge.post('GetGrantless');
     sendSetPopup();
   },
 }, true);
@@ -43,6 +45,10 @@ addHandlers({
     return raw ? decodeResource(raw, isBlob) : true;
   },
 
+  SetGrantless(data) {
+    grantless = data;
+  },
+
   RegisterMenu({ id, key, val }) {
     (menus[id] || (menus[id] = createNullObj()))[key] = val;
     sendSetPopup(true);
@@ -66,6 +72,7 @@ export async function sendSetPopup(isDelayed) {
     await sendCmd('SetPopup', {
       [IDS]: ids,
       [INJECT_INTO]: bridge[INJECT_INTO],
+      grantless,
       menus,
     });
   }

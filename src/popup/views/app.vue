@@ -114,6 +114,11 @@
                  @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
                 <Icon name="info"/>
               </a>
+              <a v-if="item.data.grantless"
+                 class="tardy" tabindex="0" :title="item.data.grantless"
+                 @click.stop="note = note === item.data.grantless ? '' : item.data.grantless">
+                @
+              </a>
             </div>
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>

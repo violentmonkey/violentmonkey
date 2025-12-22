@@ -34,6 +34,7 @@ const bridge = {
   __proto__: null,
   [IDS]: createNullObj(),
   cache: createNullObj(),
+  grantless: 0,
   pathMaps: createNullObj(),
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {

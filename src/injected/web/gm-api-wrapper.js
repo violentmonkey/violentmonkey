@@ -27,54 +27,51 @@ export function makeGmApiWrapper(script) {
   const { meta } = script;
   const { grant } = meta;
   const resources = setPrototypeOf(meta[kResources], null);
-  /** @type {GMContext} */
-  const context = safePickInto({
-    [kResources]: resources,
-    resCache: createNullObj(),
-    async: false,
-  }, script, COPY_SCRIPT_PROPS);
   const gmInfo = script.gmi;
   const gm4 = createNullObj();
   const gm = {
     __proto__: null,
     GM: gm4,
-    unsafeWindow: global,
   };
   let contextAsync;
+  let grantless;
   let wrapper;
-  let numGrants = grant.length;
-  if (numGrants === 1 && grant[0] === 'none') {
-    numGrants = 0;
-  }
-  assign(gm, componentUtils);
   defineGmInfoProps(makeGmInfo, 'get');
-  for (let name of grant) {
-    let fn, fnGm4, gmName, gm4name;
-    if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
-    || (fn = GM_API_CTX[gmName = gm4name ? `GM_${gm4name}` : name])
-    || (fn = GM_API_CTX_GM4ASYNC[gmName]) && (!gm4name || (fnGm4 = fn))) {
-      fn = safeBind(fnGm4 || fn,
-        fnGm4
-          ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
-          : context);
-    } else if (!(fn = GM_API[gmName]) && (
-      fn = name === 'window.close' && sendTabClose
-        || name === 'window.focus' && sendTabFocus
-    )) {
-      name = name::slice(7); // 'window.'.length
+  // Sandbox is enabled unless explicitly disabled via `none`, #2404
+  if (grant::indexOf('none') < 0) {
+    /** @type {GMContext} */
+    const context = safePickInto({
+      [kResources]: resources,
+      resCache: createNullObj(),
+      async: false,
+    }, script, COPY_SCRIPT_PROPS);
+    assign(gm, componentUtils);
+    for (let name of grant) {
+      let fn, fnGm4, gmName, gm4name;
+      if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
+      || (fn = GM_API_CTX[gmName = gm4name ? `GM_${gm4name}` : name])
+      || (fn = GM_API_CTX_GM4ASYNC[gmName]) && (!gm4name || (fnGm4 = fn))) {
+        fn = safeBind(fnGm4 || fn,
+          fnGm4
+            ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
+            : context);
+      } else if (!(fn = GM_API[gmName]) && (
+        fn = name === 'window.close' && sendTabClose
+          || name === 'window.focus' && sendTabFocus
+      )) {
+        name = name::slice(7); // 'window.'.length
+      }
+      if (fn) {
+        if (gm4name) gm4[gm4name] = fn;
+        else gm[name] = fn;
+      }
     }
-    if (fn) {
-      if (gm4name) gm4[gm4name] = fn;
-      else gm[name] = fn;
-    }
-  }
-  if (numGrants) {
-    wrapper = makeGlobalWrapper(gm);
+    wrapper = makeGlobalWrapper(gm, grantless = !grant.length && createNullObj());
     /* Exposing the fast cache of resolved properties,
      * using a name that'll never be added to the web platform */
     gm.c = gm;
   }
-  return { gm, wrapper };
+  return { gm, wrapper, grantless };
 
   function defineGmInfoProps(value, getter) {
     setOwnProp(gm, 'GM_info', value, true, getter);

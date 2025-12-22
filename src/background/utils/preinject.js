@@ -68,7 +68,7 @@ const cache = initCache({
   },
 });
 // KEY_XXX for hooked options
-const GRANT_NONE_VARS = '{GM,GM_info,unsafeWindow,cloneInto,createObjectIn,exportFunction}';
+const GRANT_NONE_VARS = '{GM,GM_info}';
 const META_KEYS_TO_ENSURE = [
   'description',
   'name',
@@ -482,8 +482,7 @@ function prepareScript(script, env) {
   const wrapTryCatch = wrap && IS_FIREFOX; // FF doesn't show errors in content script's console
   const { grant, [TL_AWAIT]: topLevelAwait } = meta;
   const startIIFE = topLevelAwait ? 'await(async' : '(';
-  const numGrants = grant.length;
-  const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
+  const grantNone = grant.includes('none');
   const shouldUpdate = !!script.config.shouldUpdate;
   // Storing slices separately to reuse JS-internalized strings for code in our storage cache
   const injectedCode = [];

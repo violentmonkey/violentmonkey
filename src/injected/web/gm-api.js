@@ -192,6 +192,7 @@ export const GM_API = {
   },
   // using the native console.log so the output has a clickable link to the caller's source
   GM_log: logging.log,
+  unsafeWindow: global,
 };
 
 function webAddElement(parent, tag, attrs) {

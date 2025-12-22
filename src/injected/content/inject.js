@@ -7,8 +7,8 @@ const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
 let bridgeInfo;
-let contLists;
-let pageLists;
+/** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
+let contLists, pageLists;
 /** @type {?boolean} */
 let pageInjectable;
 let frameEventWnd;
@@ -331,6 +331,7 @@ function inject(item, iframeCb) {
   div::remove();
 }
 
+/** @param {VMScriptRunAt} runAt */
 function injectAll(runAt) {
   if (contLists && !invokeContent) {
     setupContentInvoker();
@@ -343,7 +344,10 @@ function injectAll(runAt) {
     if (items) {
       bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
-      for (const { id } of items) tardyQueue[id] = 1;
+      for (const { id, meta: { grant } } of items) {
+        tardyQueue[id] = 1;
+        bridge.grantless += !grant.length;
+      }
       if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
       else if (!IS_FIREFOX) res = injectPageList(runAt);
     }

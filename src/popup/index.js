@@ -1,5 +1,5 @@
 import '@/common/browser';
-import { sendCmdDirectly } from '@/common';
+import { i18n, sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadCommandIcon, loadScriptIcon } from '@/common/load-script-icon';
 import { mapEntry } from '@/common/object';
@@ -57,10 +57,12 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     // frameScripts may be appended multiple times if iframes have unique scripts
     const { frameScripts } = store;
     const scope = isTop ? store[SCRIPTS] : frameScripts;
+    const { grantless } = data;
     const metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id))
       || (Object.assign(data, await sendCmdDirectly('GetData', { ids })))[SCRIPTS];
     metas.forEach(script => {
       loadScriptIcon(script, data);
+      let v;
       const { id } = script.props;
       const state = idMap[id];
       const more = state === MORE;
@@ -77,6 +79,9 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       script.runs = state === CONTENT || state === PAGE;
       script.pageUrl = url; // each frame has its own URL
       script.failed = badRealm || state === ID_INJECTING || more;
+      if (grantless && (v = grantless[id]) && delete v.window && (v = Object.keys(v).join(', '))) {
+        script.grantless = i18n('hintGrantless', v.length > 50 ? v.slice(0, 50) + '...' : v);
+      }
       script[MORE] = more;
       script.syntax = state === ID_INJECTING;
       if (badRealm && !store.injectionFailure) {

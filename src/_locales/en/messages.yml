@@ -323,6 +323,14 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: for $1 matching scripts
+hintGrantless:
+  description: >-
+    1) This is a tooltip so preserve the line breaks to ensure it's not too
+    wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
+  message: |-
+    A sandboxed script cannot change these global properties: $1.
+    To fix the script either add `@grant none` to disable the sandbox,
+    or add `@grant unsafeWindow` and use `unsafeWindow` instead of `window`.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Input URL:'
