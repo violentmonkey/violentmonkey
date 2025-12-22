@@ -8,7 +8,7 @@ import { vetUrl } from './url';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
-  || !!(window.AbortSignal && browserWindows); // and FF57+ except mobile
+  || !!(globalThis.AbortSignal && browserWindows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
 export const NEWTAB_URL_RE = re`/
 ^(
@@ -43,6 +43,75 @@ export const tabsOnRemoved = browser.tabs.onRemoved;
 export let injectableRe = /^(https?|file|ftps?):/;
 export let fileSchemeRequestable;
 let cookieStorePrefix;
+let userScriptsApi;
+try {
+  userScriptsApi = (globalThis.chrome || globalThis.browser)?.userScripts;
+} catch {
+  userScriptsApi = null;
+}
+export const canUseUserScripts = !!userScriptsApi?.execute;
+
+export function executeScript(tabId, options = {}) {
+  const {
+    allFrames,
+    code,
+    file,
+    files,
+    frameId,
+    nonce,
+    runAt,
+    world,
+    ...rest
+  } = options;
+  // Running in isolated world by default keeps page CSP from blocking inline script tags
+  const targetWorld = world ?? 'ISOLATED';
+  const injectImmediately = runAt === 'document_start';
+  const target = {
+    tabId,
+    ...allFrames && { allFrames },
+    ...frameId != null && { frameIds: [frameId] },
+  };
+  const canExecDynamic = execUserScripts && code != null && !files && !file;
+  if (canExecDynamic) {
+    return execUserScripts({
+      target,
+      js: [{ code }],
+      world: targetWorld,
+      injectImmediately,
+    }).then(res => res?.map(r => r?.result));
+  }
+  if (browser.scripting?.executeScript && (files || file)) {
+    const base = {
+      target,
+      world: targetWorld,
+      ...injectImmediately && { injectImmediately: true },
+    };
+    return browser.scripting.executeScript({
+      ...base,
+      files: files || [file],
+    }).then(res => res?.map(r => r?.result));
+  }
+  if (browser.tabs.executeScript) {
+    return browser.tabs.executeScript(tabId, {
+      allFrames,
+      code,
+      file,
+      frameId,
+      runAt,
+      ...rest,
+    });
+  }
+  console.warn('Violentmonkey has not been granted "Allow User Scripts" permissions in settings!');
+  throw new SafeError('userScriptsUnavailable');
+}
+
+const execUserScripts = canUseUserScripts && ((details) => new Promise((resolve, reject) => {
+  userScriptsApi.execute(details, res => {
+    const err = chrome.runtime.lastError;
+    if (err) reject(err);
+    else resolve(res);
+  });
+}));
 
 try {
   // onUpdated is filterable only in desktop FF 61+
@@ -181,6 +250,59 @@ addPublicCommands({
   TabFocus(_, src) {
     browser.tabs.update(src.tab.id, { active: true }).catch(noop);
     browserWindows?.update(src.tab[kWindowId], { focused: true }).catch(noop);
+  },
+});
+
+addPublicCommands({
+  /**
+   * Executes code in the page (main) world via chrome.userScripts.
+   * @param {{ code: string, injectImmediately?: boolean }} data
+   * @param {VMMessageSender} src
+   */
+  async ExecuteUserScript({ code, injectImmediately = true } = {}, src = {}) {
+    const { tab } = src;
+    if (!tab?.id) {
+      throw new SafeError('noTabForUserScript');
+    }
+    const target = {
+      tabId: tab.id,
+    };
+    if (src[kDocumentId]) {
+      target.documentIds = [src[kDocumentId]];
+    } else if (src[kFrameId] != null) {
+      target.frameIds = [src[kFrameId]];
+    }
+    console.info('VM ExecuteUserScript start', {
+      tabId: target.tabId,
+      docIds: target.documentIds,
+      frameIds: target.frameIds,
+      injectImmediately,
+      codeLen: code.length,
+    });
+    let res;
+    try {
+      if (!canUseUserScripts || !execUserScripts || !code) {
+        console.warn('Violentmonkey has not been granted "Allow User Scripts" permissions in settings!');
+        throw new SafeError('userScriptsUnavailable');
+      }
+      res = await execUserScripts({
+        target,
+        js: [{ code }],
+        world: 'MAIN',
+        injectImmediately,
+      });
+    } catch (err) {
+      console.error('VM ExecuteUserScript failed', err, {
+        tabId: target.tabId,
+        docIds: target.documentIds,
+        frameIds: target.frameIds,
+      });
+      throw err;
+    }
+    console.info('VM ExecuteUserScript done', {
+      tabId: target.tabId,
+      resultCount: res?.length,
+    });
   },
 });
 

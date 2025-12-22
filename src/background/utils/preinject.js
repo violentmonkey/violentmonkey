@@ -1,5 +1,11 @@
 import {
-  getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd,
+  extensionRoot,
+  getActiveTab,
+  getScriptName,
+  getScriptPrettyUrl,
+  getUniqId,
+  IS_MANIFEST_V3,
+  sendTabCmd,
 } from '@/common';
 import {
   __CODE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
@@ -23,7 +29,13 @@ import {
   S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
-import { getFrameDocId, getFrameDocIdAsObj, tabsOnRemoved } from './tabs';
+import {
+  canUseUserScripts,
+  executeScript,
+  getFrameDocId,
+  getFrameDocIdAsObj,
+  tabsOnRemoved,
+} from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
 import { ua } from './ua';
 
@@ -40,7 +52,6 @@ const API_CONFIG = {
   types: ['main_frame', 'sub_frame'],
 };
 const API_EXTRA = [
-  'blocking', // used for xhrInject and to make Firefox fire the event before GetInjected
   kResponseHeaders,
   browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
 ].filter(Boolean);
@@ -54,6 +65,7 @@ const isUnsafeConcat = s => (s = s.charCodeAt(s.match(SKIP_COMMENTS_RE)[0].lengt
   || s === 91/*"["*/
   || s === 40/*"("*/;
 const UNSAFE_INLINE = "'unsafe-inline'";
+const UNSAFE_EVAL = "'unsafe-eval'";
 /** These bags are reused in cache to reduce memory usage,
  * CACHE_KEYS is for removeStaleCacheEntry */
 const BAG_NOOP = { [INJECT]: {}, [CACHE_KEYS]: [] };
@@ -157,6 +169,9 @@ addPublicCommands({
     const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
     if (!url) url = src.url || tab.url;
+    if (url?.startsWith(extensionRoot)) {
+      return { [INJECT_INTO]: 'off' };
+    }
     clearFrameData(tabId, frameDoc);
     let skip = skippedTabs[tabId];
     if (skip > 0) { // first time loading the tab after skipScripts was invoked
@@ -213,13 +228,13 @@ addPublicCommands({
       [S_CACHE]: envCache,
     };
   },
-  Run({ [IDS]: ids, reset }, src) {
+  Run({ [IDS]: ids = [], reset }, src) {
     const {
       [kDocumentId]: docId,
       [kTop]: isTop,
       tab: { id: tabId },
     } = src;
-    const hasIds = +ids?.[0];
+    const hasIds = +ids[0];
     setBadge(ids, reset, src);
     if (isTop === 3) {
       if (hasIds) reifyValueOpener(ids, docId);
@@ -324,7 +339,8 @@ function togglePreinject(enable) {
   const config = enable ? API_CONFIG : undefined;
   browser.webRequest.onSendHeaders[onOff](onSendHeaders, config);
   if (!isApplied /* remove the listener */
-  || IS_FIREFOX && !xhrInject && injectInto !== CONTENT /* add 'nonce' detector */) {
+  || IS_FIREFOX && !xhrInject && injectInto !== CONTENT /* add 'nonce' detector */
+  || IS_MANIFEST_V3 && injectInto !== CONTENT) {
     API_HEADERS_RECEIVED[onOff](onHeadersReceived, config, config && API_EXTRA);
   }
   tabsOnRemoved[onOff](onTabRemoved);
@@ -358,14 +374,25 @@ function onSendHeaders(info) {
 /** @param {chrome.webRequest.WebResponseHeadersDetails} info */
 function onHeadersReceived(info) {
   const key = getKey(info.url, isTopFrame(info));
-  const bag = cache.get(key);
-  // The INJECT data is normally already in cache if code and values aren't huge
-  if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS] && !skippedTabs[info.tabId]) {
-    const ffReg = IS_FIREFOX && info.url.startsWith('https:')
-      && detectStrictCsp(info, bag);
-    const res = xhrInject && prepareXhrBlob(info, bag);
-    return ffReg ? ffReg.then(res && (() => res)) : res;
+  const entry = cache.get(key);
+  if (!entry || skippedTabs[info.tabId]) return;
+  const needCspDetect = (IS_FIREFOX && info.url.startsWith('https:'))
+    || (IS_MANIFEST_V3 && injectInto !== CONTENT);
+  if (needCspDetect) {
+    if (entry[INJECT]) {
+      detectStrictCsp(info, entry);
+    } else if (entry[PROMISE]) {
+      const infoLite = {
+        url: info.url,
+        [kResponseHeaders]: info[kResponseHeaders],
+      };
+      entry[PROMISE].then(bag => bag && detectStrictCsp(infoLite, bag));
+    }
   }
+  if (!xhrInject || entry[FORCE_CONTENT] || !entry[INJECT]?.[SCRIPTS]) {
+    return;
+  }
+  return prepareXhrBlob(info, entry);
 }
 
 /**
@@ -411,8 +438,23 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   if (!isApplied) return; // the user disabled injection while we awaited
   cache.batch(true);
   const bag = { [INJECT]: inject };
+  if (canUseUserScripts) {
+    inject.userScripts = true;
+  } else {
+    setForceContent(bag);
+  }
   const { allIds, [MORE]: envDelayed } = env;
   const moreKey = envDelayed[IDS].length && getUniqId('more');
+  if (env[FORCE_CONTENT]) {
+    bag[FORCE_CONTENT] = true;
+    inject[FORCE_CONTENT] = true;
+  }
+  if (env.nonce && !inject.nonce) {
+    inject.nonce = env.nonce;
+  }
+  if (IS_MANIFEST_V3 && injectInto !== CONTENT && !canUseUserScripts) {
+    setForceContent(bag);
+  }
   Object.assign(inject, {
     [SCRIPTS]: prepareScripts(env),
     [INJECT_INTO]: injectInto,
@@ -480,7 +522,7 @@ function prepareScript(script, env) {
   const pathMap = custom.pathMap || {};
   const wrap = !meta[UNWRAP];
   const wrapTryCatch = wrap && IS_FIREFOX; // FF doesn't show errors in content script's console
-  const { grant, [TL_AWAIT]: topLevelAwait } = meta;
+  const { grant = [], [TL_AWAIT]: topLevelAwait } = meta;
   const startIIFE = topLevelAwait ? 'await(async' : '(';
   const numGrants = grant.length;
   const grantNone = !numGrants || numGrants === 1 && grant[0] === 'none';
@@ -606,7 +648,7 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   if (toContent[0]) {
     // Processing known feedback without waiting for InjectionFeedback message.
     // Running in a separate task as executeScript may take a long time to serialize code.
-    setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
+    setTimeout(injectContentRealm, 0, toContent, tabId, frameId, bag?.[INJECT]?.nonce);
   }
 }
 
@@ -614,13 +656,14 @@ function triagePageRealm(env, forceContent) {
   return env?.[SCRIPTS].some(isPageRealmScript, forceContent || null);
 }
 
-function injectContentRealm(toContent, tabId, frameId) {
+function injectContentRealm(toContent, tabId, frameId, nonce) {
   for (const [id, dataKey] of toContent) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
-    browser.tabs.executeScript(tabId, {
+    executeScript(tabId, {
       code: scr[__CODE].join(''),
       [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
+      nonce,
       [kFrameId]: frameId,
     }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
   }
@@ -649,6 +692,18 @@ function unregisterScriptFF(bag) {
   }
 }
 
+function setForceContent(target) {
+  if (target[FORCE_CONTENT]) return;
+  target[FORCE_CONTENT] = true;
+  if (target[INJECT]) target[INJECT][FORCE_CONTENT] = true;
+}
+
+function setNonce(target, value) {
+  if (!value) return;
+  if (target[INJECT]) target[INJECT].nonce = value;
+  else target.nonce = value;
+}
+
 /**
  * @param {chrome.webRequest.WebResponseHeadersDetails} info
  * @param {VMInjection.Bag} bag
@@ -664,13 +719,25 @@ function detectStrictCsp(info, bag) {
   if (!tmp) return;
   tmp = tmp.match(NONCE_RE);
   if (tmp) {
-    bag[INJECT].nonce = tmp[1];
+    setNonce(bag, tmp[1]);
   } else if (
     scriptSrc && !scriptSrc.includes(UNSAFE_INLINE) ||
     scriptElemSrc && !scriptElemSrc.includes(UNSAFE_INLINE) ||
     !scriptSrc && !scriptElemSrc && defaultSrc && !defaultSrc.includes(UNSAFE_INLINE)
   ) {
-    bag[FORCE_CONTENT] = bag[INJECT][FORCE_CONTENT] = true;
+    if (!canUseUserScripts) {
+      setForceContent(bag);
+    }
+  } else if (
+    !canUseUserScripts && (
+      scriptSrc && !scriptSrc.includes(UNSAFE_EVAL) ||
+      scriptElemSrc && !scriptElemSrc.includes(UNSAFE_EVAL) ||
+      !scriptSrc && !scriptElemSrc && defaultSrc && !defaultSrc.includes(UNSAFE_EVAL)
+    )
+  ) {
+    if (!canUseUserScripts) {
+      setForceContent(bag);
+    }
   } else {
     return;
   }

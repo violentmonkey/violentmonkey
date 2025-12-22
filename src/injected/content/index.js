@@ -33,6 +33,7 @@ async function init() {
   );
   const info = data.info;
   const injectInto = bridge[INJECT_INTO] = data[INJECT_INTO];
+  bridge.userScripts = !!data.userScripts;
   assign(ids, data[IDS]);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);

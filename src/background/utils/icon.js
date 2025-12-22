@@ -1,4 +1,4 @@
-import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
+import { blob2base64, i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import { nest, objectPick } from '@/common/object';
 import { addOwnCommands, commands, init } from './init';
@@ -24,7 +24,7 @@ export const getImageData = url => iconCache[url] || (iconCache[url] = loadIcon(
 // Firefox Android does not support such APIs, use noop
 const browserAction = (() => {
   // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
-  const api = chrome.browserAction;
+  const api = chrome.action || chrome.browserAction;
   // Some methods like setBadgeText added callbacks only in Chrome 67+.
   const makeMethod = fn => (...args) => {
     try {
@@ -98,6 +98,12 @@ init.then(async () => {
   forEachTab(updateState);
   if (!isApplied) setIcon(); // sets the dimmed icon as default
   if (contextMenus) {
+    await new Promise(resolve => {
+      contextMenus.removeAll(() => {
+        ignoreChromeErrors();
+        resolve();
+      });
+    });
     const addToIcon = (id, title, opts) => (
       new Promise(resolve => (
         contextMenus.create({
@@ -219,14 +225,12 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
     const url = `${ICON_PREFIX}${n}${mod}.png`;
     pathData[n] = url;
     iconData[n] = iconDataCache[url]
-      || await (iconCache[url] || (iconCache[url] = loadIcon(url))) && iconDataCache[url];
+      || await (iconCache[url] || (iconCache[url] = loadIcon(url, true))) && iconDataCache[url];
   }
   // imageData doesn't work in Firefox Android, so we also set path here
-  browserAction.setIcon({
-    tabId,
-    path: pathData,
-    imageData: iconData,
-  });
+  const options = { tabId, path: pathData };
+  if (iconData[16]) options.imageData = iconData;
+  browserAction.setIcon(options);
 }
 
 /** Omitting `data` = check whether injection is allowed for `url` */
@@ -261,45 +265,69 @@ export function handleHotkeyOrMenu(id, tab) {
   }
 }
 
-async function loadIcon(url) {
-  const img = new Image();
-  const isOwn = url.startsWith(ICON_PREFIX);
-  img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
-    : url.startsWith('data:') ? url
-      : makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url))
-        || url;
-  await new Promise((resolve) => {
-    img.onload = resolve;
-    img.onerror = resolve;
-  });
-  let res;
-  let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
-  let { width, height } = img;
-  if (!width || !height) { // FF reports 0 for SVG
+async function loadIcon(url, isOwn = false) {
+  isOwn ||= url.startsWith(ICON_PREFIX);
+  try {
+    const resolvedUrl = await resolveIconUrl(url, isOwn);
+    const rendered = await renderIcon(resolvedUrl, isOwn, url);
+    iconCache[url] = rendered;
+    return rendered;
+  } catch (err) {
     iconCache[url] = url;
     return url;
   }
-  if (maxSize && (width > maxSize || height > maxSize)) {
-    maxSize /= width > height ? width : height;
-    width = Math.round(width * maxSize);
-    height = Math.round(height * maxSize);
-  }
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = width;
-  canvas.height = height;
-  ctx.drawImage(img, 0, 0, width, height);
-  try {
-    res = canvas.toDataURL();
-    if (isOwn) iconDataCache[url] = ctx.getImageData(0, 0, width, height);
-  } catch (err) {
-    res = url;
-  }
-  iconCache[url] = res;
-  return res;
 }
 
 async function loadStorageCache(url) {
   return await storage[S_CACHE].getOne(url)
     ?? await storage[S_CACHE].fetch(url, 'res').catch(console.warn);
+}
+
+async function resolveIconUrl(url, isOwn) {
+  if (isOwn || url.startsWith('data:')) {
+    return url;
+  }
+  const cached = makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url), url);
+  return cached || url;
+}
+
+async function renderIcon(url, isOwn, cacheKey) {
+  const { blob, type } = await fetchIconBlob(url);
+  const canvasSupported = typeof OffscreenCanvas !== 'undefined' && typeof createImageBitmap === 'function';
+  if (!canvasSupported) {
+    return blobToDataUrl(blob, type);
+  }
+  const bitmap = await createImageBitmap(blob).catch(noop);
+  if (!bitmap) {
+    return blobToDataUrl(blob, type);
+  }
+  let { width, height } = bitmap;
+  let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
+  if (maxSize && (width > maxSize || height > maxSize)) {
+    const scale = maxSize / (width > height ? width : height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+  }
+  const canvas = new OffscreenCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  const dataUrl = await blobToDataUrl(await canvas.convertToBlob({ type: 'image/png' }), 'image/png');
+  if (isOwn) {
+    iconDataCache[cacheKey] = ctx.getImageData(0, 0, width, height);
+  }
+  return dataUrl;
+}
+
+async function fetchIconBlob(url) {
+  const res = await fetch(url);
+  return {
+    blob: await res.blob(),
+    type: res.headers.get('content-type')?.split(';', 1)[0],
+  };
+}
+
+async function blobToDataUrl(blob, fallbackType) {
+  const base64 = await blob2base64(blob);
+  const type = blob.type || fallbackType || 'image/png';
+  return `data:${type};base64,${base64}`;
 }

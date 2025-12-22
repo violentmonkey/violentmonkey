@@ -47,6 +47,9 @@ const defsObj = {
   'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
   'process.env.DEV': JSON.stringify(!isProd),
   'process.env.TEST': JSON.stringify(process.env.BABEL_ENV === 'test'),
+  '__VUE_OPTIONS_API__': JSON.stringify(true),
+  '__VUE_PROD_DEVTOOLS__': JSON.stringify(false),
+  '__VUE_PROD_HYDRATION_MISMATCH_DETAILS__': JSON.stringify(false),
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
