@@ -104,10 +104,10 @@ buttonSupport:
   message: صفحة الدعم
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: سحب مرة واحدة إلى المحلي
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: اضغط مرة واحدة للتحكم عن بعد
 buttonUndo:
   description: Button to undo removement of a script.
   message: تراجع
@@ -284,10 +284,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: آخر وقت للزيارة
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: آخر مرة قمت فيها بزيارة أي موقع مستهدف بواسطة هذا السكريبت.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: ''
@@ -574,7 +574,7 @@ labelShowOrder:
   message: عرض مواضع ترتيب التنفيذ
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: عرض وقت آخر زيارة
 labelSync:
   description: Label for sync options.
   message: المزامنة
@@ -589,7 +589,7 @@ labelSyncAuthorizing:
   message: جارٍ التفويض
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: المزامنة تلقائياً
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: بدون
