@@ -46,6 +46,7 @@ export function makeGmApiWrapper(script) {
       async: false,
     }, script, COPY_SCRIPT_PROPS);
     assign(gm, componentUtils);
+    gm.unsafeWindow = global;
     for (let name of grant) {
       let fn, fnGm4, gmName, gm4name;
       if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
