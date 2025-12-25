@@ -268,6 +268,7 @@ const registerHotkey = (callback, items) => items.map(([key, condition, caseSens
 ));
 
 const MAX_BATCH_DURATION = 100;
+const RENDER_ALL = 1e9;
 let step = 0;
 
 let columnsForTableMode = [];
@@ -471,7 +472,11 @@ async function onHashChange() {
   }
 }
 async function renderScripts() {
-  if (!store.canRenderScripts || isNaN(state.batchRender.limit)) return;
+  if (!store.canRenderScripts
+  || state.batchRender.limit === RENDER_ALL
+  /* Skip rendering as the editor is being closed right now and we only have 1 script,
+     we'll render in the next call after all scripts data is requested. */
+  || store.title) return;
   const { length } = state.sortedScripts;
   let limit = 9;
   const batchRender = reactive({ limit });
@@ -495,7 +500,7 @@ async function renderScripts() {
     }
   }
   // Completed the potentially slow initial creation, subsequent redraws will be fast
-  if (length && limit >= length) batchRender.limit = NaN;
+  if (length && limit >= length) batchRender.limit = RENDER_ALL;
 }
 function scheduleSearch() {
   try {
