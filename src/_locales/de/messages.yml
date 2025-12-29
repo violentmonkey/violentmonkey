@@ -102,10 +102,10 @@ buttonSupport:
   message: Support-Seite
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Einmalig auf lokale Ebene ziehen
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Einmalig auf Remote-Ebene schieben
 buttonUndo:
   description: Button to undo removement of a script.
   message: Rückgängig
@@ -336,6 +336,15 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: für $1 gematchte Skripte
+hintGrantless:
+  description: >-
+    1) This is a tooltip so preserve the line breaks to ensure it's not too
+    wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
+  message: >-
+    Ein gesandboxtes Skript kann diese globalen Eigenschaften nicht ändern:
+    $1.Um das Skript zu reparieren, fügen Sie entweder '@grant-none' hinzu um
+    die Sandbox zu deaktivieren,oder nutzen Sie 'unsafeWindow' anstatt von
+    'window'.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Input-URL:'
@@ -604,7 +613,7 @@ labelSyncAuthorizing:
   message: Autorisiere...
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Automatischer Sync
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: nichts
