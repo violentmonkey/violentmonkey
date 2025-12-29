@@ -329,6 +329,14 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: لـ $1 سكربتًا مطابقًا
+hintGrantless:
+  description: >-
+    1) This is a tooltip so preserve the line breaks to ensure it's not too
+    wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
+  message: |-
+    لا يمكن للنص البرمجي المعزول تغيير هذه الخصائص العامة: $1.
+    لإصلاح النص البرمجي إما أضف `@grant none` لتعطيل العزل،
+    أو استخدم `unsafeWindow` بدلاً من `window`.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'أدخل عنوان URL:'
