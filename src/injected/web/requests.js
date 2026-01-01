@@ -1,4 +1,5 @@
 import bridge, { addHandlers } from './bridge';
+import { UPLOAD } from '../util';
 
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
@@ -57,8 +58,9 @@ addHandlers({
       return;
     }
     const { type } = msg;
-    const cb = req.cb[type];
-    if (type === 'loadend') {
+    const upload = getOwnProp(msg, UPLOAD);
+    const cb = req.cb[upload][type];
+    if (!upload && type === 'loadend') {
       delete idMap[req.id];
     }
     if (!cb) {
@@ -191,11 +193,25 @@ export function onRequestCreate(opts, context, fileName) {
   }
   const scriptId = context.id;
   const id = safeGetUniqId('VMxhr');
-  const cb = createNullObj();
+  const cb = [createNullObj(), createNullObj()];
+  const events = [createNullObj(), createNullObj()];
   const req = safePickInto({ cb, id, scriptId }, opts, OPTS_TO_KEEP);
   // withCredentials is for GM4 compatibility and used only if `anonymous` is not set,
   // it's true by default per the standard/historical behavior of gmxhr
-  const { withCredentials = true, anonymous = !withCredentials } = opts;
+  const {
+    withCredentials = true,
+    anonymous = !withCredentials,
+    [UPLOAD]: upload,
+  } = opts;
+  for (let i = 0, obj, key, val, passes = upload && isObject(upload) ? 2 : 1; i < passes; i++) {
+    obj = i ? nullObjFrom(upload) : opts;
+    for (key of EVENTS_TO_NOTIFY) {
+      if ((val = obj[`on${key}`]) && isFunction(val)) {
+        cb[i][key] = val;
+        events[i][key] = true;
+      }
+    }
+  }
   // setting opts.onload and onerror before EVENTS_TO_NOTIFY
   if (context.async) res = new SafePromise((resolve, reject) => {
     const { [kOnload]: onload, [kOnerror]: onerror } = opts;
@@ -221,7 +237,7 @@ export function onRequestCreate(opts, context, fileName) {
     [kFileName]: fileName,
     [kResponseType]: type,
     [kXhrType]: req[kXhrType] = XHR_TYPES[type] ? type : '',
-    events: EVENTS_TO_NOTIFY::filter(key => isFunction(cb[key] = opts[`on${key}`])),
+    events,
   }, opts, OPTS_TO_PASS));
   if (!res) res = {};
   else if (IS_FIREFOX) setPrototypeOf(res, SafePromiseConstructor);

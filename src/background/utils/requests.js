@@ -1,5 +1,5 @@
 import { blob2base64, sendTabCmd, string2uint8array } from '@/common';
-import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS } from '@/common/consts';
+import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS, UPLOAD } from '@/common/consts';
 import { downloadBlob } from '@/common/download';
 import { deepEqual, forEachEntry, forEachValue, objectPick } from '@/common/object';
 import cache from './cache';
@@ -33,7 +33,7 @@ addPublicCommands({
       sendTabCmd(tabId, 'HttpRequested', res, req.frame)
     );
     return httpRequest(opts, events, src, cb)
-    .catch(events.includes('error') && (err => cb({
+    .catch(events[0].error && (err => cb({
       id,
       error: err.message || err,
       data: null,
@@ -94,7 +94,7 @@ function text2chunk(response, index, size) {
 
 /**
  * @param {GMReq.BG} req
- * @param {GMReq.EventType[]} events
+ * @param {GMReq.EventTypeMap} events[]
  * @param {boolean} blobbed
  * @param {boolean} chunked
  * @param {boolean} isJson
@@ -118,9 +118,10 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   const eventQueue = [];
   const sequentialize = async () => {
     const evt = eventQueue.shift();
+    const upload = evt.target === xhr ? 0 : 1;
     const { type } = evt;
-    const shouldNotify = events.includes(type);
-    const isEnd = type === 'loadend';
+    const shouldNotify = events[upload][type];
+    const isEnd = !upload && type === 'loadend';
     const readyState4 = xhr.readyState === 4 || (sentReadyState4 = false); // reset on redirection
     if (!shouldNotify && !isEnd) {
       return;
@@ -133,7 +134,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (!contentType) {
       contentType = xhr.getResponseHeader('Content-Type') || '';
     }
-    if (fullResponse !== xhr[kResponse]) {
+    if (!upload && fullResponse !== xhr[kResponse]) {
       fullResponse = response = xhr[kResponse];
       sent = false;
       if (response) {
@@ -156,7 +157,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (response && isEnd && req[kFileName]) {
       downloadBlob(response, req[kFileName]);
     }
-    const shouldSendResponse = shouldNotify && (!isJson || readyState4) && !sent;
+    const shouldSendResponse = !upload && shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
@@ -189,6 +190,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           ? (responseHeaders = tmp)
           : null,
       } : null,
+      [UPLOAD]: upload,
     });
     if (isEnd) {
       clearRequest(req);
@@ -202,7 +204,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
 
 /**
  * @param {GMReq.Message.Web} opts
- * @param {GMReq.EventType[]} events
+ * @param {GMReq.EventTypeMap[]} events
  * @param {VMMessageSender} src
  * @param {function} cb
  * @returns {Promise<void>}
@@ -276,7 +278,8 @@ async function httpRequest(opts, events, src, cb) {
   toggleHeaderInjector(id, vmHeaders);
   // Sending as params to avoid storing one-time init data in `requests`
   const callback = xhrCallbackWrapper(req, events, blobbed, chunked, opts[kResponseType] === 'json');
-  events.forEach(evt => { xhr[`on${evt}`] = callback; });
+  for (const evt in events[0]) xhr[`on${evt}`] = callback;
+  for (const evt in events[1]) xhr[UPLOAD][`on${evt}`] = callback;
   xhr.onloadend = callback; // always send it for the internal cleanup
   xhr.send(body);
 }

@@ -30,6 +30,7 @@ declare interface GMContext {
  */
 declare namespace GMReq {
   type EventType = keyof XMLHttpRequestEventMap;
+  type EventTypeMap = { [name: EventType]: boolean };
   type Response = string | Blob | ArrayBuffer;
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
   interface BG {
@@ -60,7 +61,7 @@ declare namespace GMReq {
   interface Web {
     id: string;
     scriptId: number;
-    cb: { [name: EventType]: typeof VMScriptGMXHRDetails.onload };
+    cb: { [name: EventType]: typeof VMScriptGMXHRDetails.onload }[];
     context?: any;
     raw?: Response;
     response?: Response;
@@ -78,6 +79,7 @@ declare namespace GMReq {
       data: VMScriptResponseObject;
       id: string;
       type: EventType;
+      upload: 0 | 1;
     }
     interface BGChunk {
       id: string;
@@ -99,7 +101,7 @@ declare namespace GMReq {
       anonymous: boolean;
       fileName: string;
       data: any[];
-      events: EventType[];
+      events: [EventTypeMap, EventTypeMap];
       headers?: StringMap;
       method?: string;
       overrideMimeType?: string;

@@ -1,6 +1,6 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import { sendCmd } from './util';
-import { U8_fromBase64, UA_PROPS } from '../util';
+import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
 
 const {
   fetch: safeFetch,
@@ -122,7 +122,7 @@ addBackgroundHandlers({
       }
       data[kResponse] = response;
     }
-    if (msg.type === LOADEND) {
+    if (msg.type === LOADEND && !msg[UPLOAD]) {
       delete requests[msg.id];
     }
     sendHttpRequested(msg, req.realm);
@@ -132,7 +132,7 @@ addBackgroundHandlers({
 async function requestVirtualUrl(msg, url, realm) {
   let data, eventLoad;
   const { events, [kFileName]: fileName } = msg;
-  const wantsData = (eventLoad = events::includes(LOAD)) || events::includes(LOADEND);
+  const wantsData = (eventLoad = events[0][LOAD]) || events[0][LOADEND];
   if (wantsData || fileName && IS_FIREFOX) {
     data = await importBlob(url, isBlobXhr(msg));
   }
