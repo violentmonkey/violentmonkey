@@ -99,7 +99,7 @@ function notifyChange(hooks, key, val, raw, oldRaw, remote = false) {
     try {
       fn(key, oldVal, newVal, remote);
     } catch (e) {
-      log('error', ['GM_addValueChangeListener', 'callback'], e);
+      log(ERROR, ['GM_addValueChangeListener', 'callback'], e);
     }
   });
 }

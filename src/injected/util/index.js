@@ -11,7 +11,7 @@ export {
 } from '@/common';
 export * from '@/common/consts';
 
-export const CONSOLE_METHODS = ['log', 'info', 'warn', 'error', 'debug'];
+export const CONSOLE_METHODS = ['log', 'info', 'warn', ERROR, 'debug'];
 
 export const fireBridgeEvent = (eventId, msg) => {
   const detail = cloneInto ? cloneInto(msg, document) : msg;

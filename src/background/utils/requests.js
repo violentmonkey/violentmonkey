@@ -94,7 +94,7 @@ function text2chunk(response, index, size) {
 
 /**
  * @param {GMReq.BG} req
- * @param {GMReq.EventTypeMap} events[]
+ * @param {GMReq.EventTypeMap[]} events
  * @param {boolean} blobbed
  * @param {boolean} chunked
  * @param {boolean} isJson

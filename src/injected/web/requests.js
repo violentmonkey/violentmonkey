@@ -8,11 +8,11 @@ const kResponse = 'response';
 const kResponseXML = 'responseXML';
 const kDocument = 'document';
 const kRaw = 'raw';
-const kOnerror = 'onerror';
+const kOnerror = 'on' + ERROR;
 const kOnload = 'onload';
 const EVENTS_TO_NOTIFY = [
   'abort',
-  'error',
+  ERROR,
   'load',
   'loadend',
   'loadstart',

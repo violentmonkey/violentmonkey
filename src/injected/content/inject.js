@@ -272,9 +272,9 @@ function inject(item, iframeCb) {
   const script = makeElem('script', !isCodeArray && code);
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
   const onError = IS_FIREFOX && !iframeCb && (e => {
-    const { stack } = e.error;
+    const { stack } = e[ERROR];
     if (!stack || `${stack}`.includes(VM_UUID)) {
-      log('error', [item.displayName], e.error);
+      log(ERROR, [item.displayName], e[ERROR]);
       e.preventDefault();
     }
   });
@@ -306,14 +306,14 @@ function inject(item, iframeCb) {
     divRoot::appendChild(script);
   }
   if (onError) {
-    window::on('error', onError);
+    window::on(ERROR, onError);
   }
   if (!injectedRoot) {
     // When using declarativeContent there's no documentElement so we'll append to `document`
     (elemByTag('*') || document)::appendChild(div);
   }
   if (onError) {
-    window::off('error', onError);
+    window::off(ERROR, onError);
   }
   if (iframeCb) {
     injectedRoot = divRoot;
