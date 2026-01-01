@@ -33,12 +33,12 @@ addPublicCommands({
       sendTabCmd(tabId, 'HttpRequested', res, req.frame)
     );
     return httpRequest(opts, events, src, cb)
-    .catch(events[0].error && (err => cb({
+    .catch(err => cb({
       id,
-      error: err.message || err,
+      [ERROR]: [err.message || `${err}`, err.name],
       data: null,
-      type: 'error',
-    })));
+      type: ERROR,
+    }));
   },
   /** @return {void} */
   AbortRequest(id) {
@@ -123,7 +123,7 @@ function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     const shouldNotify = events[upload][type];
     const isEnd = !upload && type === 'loadend';
     const readyState4 = xhr.readyState === 4 || (sentReadyState4 = false); // reset on redirection
-    if (!shouldNotify && !isEnd) {
+    if (!shouldNotify && !isEnd && type !== ERROR) {
       return;
     }
     // Firefox duplicates readystatechange for state=4 randomly, #1862
@@ -278,9 +278,11 @@ async function httpRequest(opts, events, src, cb) {
   toggleHeaderInjector(id, vmHeaders);
   // Sending as params to avoid storing one-time init data in `requests`
   const callback = xhrCallbackWrapper(req, events, blobbed, chunked, opts[kResponseType] === 'json');
+  const onerror = 'on' + ERROR;
   for (const evt in events[0]) xhr[`on${evt}`] = callback;
   for (const evt in events[1]) xhr[UPLOAD][`on${evt}`] = callback;
   xhr.onloadend = callback; // always send it for the internal cleanup
+  xhr[onerror] = xhr[UPLOAD][onerror] = callback; // show it in tab's console if there's no callback
   xhr.send(body);
 }
 

@@ -11,6 +11,7 @@ const { window } = global; // it's unforgeable so we extract it primarily to imp
 export const VIOLENTMONKEY = 'Violentmonkey';
 export const AUTO = 'auto';
 export const CONTENT = 'content';
+export const ERROR = 'error';
 export const EXPOSE = 'expose';
 export const FORCE_CONTENT = 'forceContent';
 export const IDS = 'ids';

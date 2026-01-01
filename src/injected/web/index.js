@@ -1,4 +1,4 @@
-import bridge, { addHandlers, callbacks } from './bridge';
+import bridge, { addHandlers, callbacks, displayNames } from './bridge';
 import { commands, storages } from './store';
 import { GM_API_CTX } from './gm-api';
 import { makeGmApiWrapper } from './gm-api-wrapper';
@@ -91,6 +91,7 @@ addHandlers({
     for (const script of items) {
       const { key } = script;
       toRun[key.data] = script;
+      displayNames[script.id] = script.displayName;
       storages[script.id] = setPrototypeOf(script[VALUES] || {}, null);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;

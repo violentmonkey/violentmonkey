@@ -1,4 +1,4 @@
-import bridge, { addHandlers } from './bridge';
+import bridge, { addHandlers, displayNames } from './bridge';
 import { UPLOAD } from '../util';
 
 /** @type {Object<string,GMReq.Web>} */
@@ -63,11 +63,12 @@ addHandlers({
     if (!upload && type === 'loadend') {
       delete idMap[req.id];
     }
-    if (!cb) {
+    if (!cb && type !== ERROR)
       return;
-    }
-    if (hasOwnProperty(msg, 'error')) {
-      cb(new SafeError((/** @type {BGError} */msg).error));
+    if (hasOwnProperty(msg, ERROR)) {
+      msg = msg[ERROR];
+      msg = new SafeDOMException(msg[0], msg[1]);
+      if (cb) cb(msg); else log(ERROR, displayNames[req.scriptId], msg);
       return;
     }
     const { data } = msg;

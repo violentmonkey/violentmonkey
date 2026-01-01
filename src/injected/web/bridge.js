@@ -1,6 +1,7 @@
 const handlers = createNullObj();
 export const addHandlers = obj => assign(handlers, obj);
 export const callbacks = createNullObj();
+export const displayNames = createNullObj();
 /**
  * @mixes VMInjection.Info
  * @property {VMBridgePostFunc} post - synchronous
