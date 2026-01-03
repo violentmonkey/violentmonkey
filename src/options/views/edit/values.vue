@@ -85,24 +85,34 @@
       </div>
       <template v-if="editorValueShown">
         <p class="my-1" v-html="i18n('descEditorOptions')"/>
-        <setting-text name="valueEditor" json @dblclick="toggleBoolean" :has-save="false"/>
+        <setting-text :name="kValueEditor" json @dblclick="toggleBoolean" :has-save="false"/>
       </template>
       <label v-show="!current.isAll">
         <span v-text="i18n('valueLabelKey')"/>
         <input type="text" v-model="current.key" :readOnly="!current.isNew || readOnly"
                ref="$key"
+               class="w-100"
                spellcheck="false"
                @keydown="onKeyDownInKeyInput"
                @keydown.esc.exact.stop="onCancel">
       </label>
-      <label>
-        <span v-text="current.isAll ? i18n('valueLabelValueAll') : i18n('valueLabelValue')"/>
+      <div>
+        <label v-if="current.isAll" v-text="i18n('valueLabelValueAll')" for="edit-value"/>
+        <label v-else-if="!current.isStr" v-text="i18n('valueLabelValue')" for="edit-value"/>
+        <locale-group v-else i18n-key="valueLabelValueOr" span @click="$value.cm.focus()">
+          <label :style="editAsString ? 'font-weight: bold' : null">
+            <locale-group i18n-key="valueLabelValueString">
+              <input type="checkbox" v-model="editAsString" style="margin: 0">
+            </locale-group>
+          </label>
+        </locale-group>
         <vm-code
           :value="current.value"
           :cm-options="cmOptions"
           ref="$value"
           class="h-100 mt-1"
-          mode="application/json"
+          id="edit-value"
+          :mode="current.isStr ? 'text/plain' : 'application/json'"
           :readOnly
           @code-dirty="onChange"
           @keydown.tab.shift.exact.capture.stop
@@ -110,7 +120,7 @@
           :active="isActive"
           focusme
         />
-      </label>
+      </div>
     </div>
   </div>
 </template>
@@ -120,12 +130,15 @@ import { computed, nextTick, onActivated, onDeactivated, ref, watch } from 'vue'
 import { dumpScriptValue, formatByteLength, getBgPage, isEmpty, sendCmdDirectly } from '@/common';
 import { handleTabNavigation, keyboardService } from '@/common/keyboard';
 import { deepCopy, deepEqual, forEachEntry, mapEntry } from '@/common/object';
+import options from '@/common/options';
+import { kEditAsString, kValueEditor } from '@/common/options-defaults';
 import { WATCH_STORAGE } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
 import CodeMirror from 'codemirror';
 import Dropdown from 'vueleton/lib/dropdown';
 import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
+import LocaleGroup from '@/common/ui/locale-group';
 import { getActiveElement, showMessage } from '@/common/ui';
 import SettingText from '@/common/ui/setting-text';
 import { K_SAVE, kStorageSize, toggleBoolean } from '../../utils';
@@ -139,6 +152,7 @@ const $el = ref();
 const $editAll = ref();
 const $key = ref();
 const $value = ref();
+const editAsString = ref();
 const editorValueShown = ref();
 const isActive = ref();
 const current = ref();
@@ -203,8 +217,9 @@ onActivated(() => {
     () => root::removeEventListener('focusin', onFocus),
     keyboardService.register('pageup', () => flipPage(-1), conditionNotEdit),
     keyboardService.register('pagedown', () => flipPage(1), conditionNotEdit),
-    hookSetting('valueEditor', val => {
+    hookSetting(kValueEditor, val => {
       cmOptions = val;
+      editAsString.value = !!val?.[kEditAsString];
       jsonIndent = ' '.repeat(val?.tabSize || 2);
       if (cm && val) {
         for (const key in val) {
@@ -249,7 +264,14 @@ watch(current, (val, oldVal) => {
     focusedElement?.focus();
   }
 });
-
+watch(editAsString, val => {
+  const cur = current.value;
+  if (cur?.key) {
+    const str = cur.jsonValue;
+    cur.value = val ? str : JSON.stringify(str);
+  }
+  options.set(kValueEditor + '.' + kEditAsString, val);
+});
 watch(page, () => {
   focusedElement = null;
   autofocus();
@@ -268,12 +290,15 @@ function getLength(key, raw) {
   const len = key.length + (values.value[key] || raw).length - 1;
   return len < 10_000 ? len : formatByteLength(len);
 }
-function getValue(key, sliced, raw) {
-  let value = values.value[key] || raw;
+function getValue(key, sliced, asString) {
+  let value = values.value[key];
   const type = value[0];
   value = value.slice(1);
-  if (type === 's') value = JSON.stringify(value);
-  else if (!sliced) value = reparseJson(value);
+  if (type === 's') {
+    if (!asString || (asString[0] = value, !editAsString.value)) {
+      value = JSON.stringify(value);
+    }
+  } else if (!sliced) value = reparseJson(value);
   return sliced ? cutLength(value) : value;
 }
 function getValueAll() {
@@ -375,9 +400,14 @@ function onRestore(trashKey) {
   updateValue(entry);
 }
 function onEdit(key) {
+  const isStr = [];
+  const value = getValue(key, false, isStr);
+  const jsonValue = isStr[0];
   current.value = {
     key,
-    value: getValue(key),
+    value,
+    jsonValue,
+    isStr: jsonValue != null,
     ...currentObservables,
   };
 }
@@ -435,7 +465,7 @@ function onChange(isChanged) {
   try {
     if (cur.isAll && str[0] !== '{') throw 'Expected { at position 0';
     if (cur.jsonPaused) return;
-    cur.jsonValue = JSON.parse(str);
+    cur.jsonValue = cur.isStr && editAsString.value ? str : JSON.parse(str);
   } catch (e) {
     const re = /(position\s+)(\d+)|$/;
     const pos = cm.posFromIndex(+`${e}`.match(re)[2] || 0);
@@ -458,7 +488,7 @@ function onStorageChanged(changes) {
     const valueGetter = cur && (cur.isAll ? getValueAll : getValue);
     setData(data instanceof Object ? data : deepCopy(data));
     if (cur) {
-      const newText = valueGetter(currentKey);
+      const newText = valueGetter(currentKey, false, []);
       const curText = cm.getValue();
       if (curText === newText) {
         cur.isNew = false;
@@ -579,10 +609,7 @@ $lightBorder: 1px solid var(--fill-2);
         width: 0;
       }
     }
-    input {
-      width: 100%;
-    }
-    label {
+    > :not(.control) {
       display: flex;
       flex-direction: column;
       &:last-child {

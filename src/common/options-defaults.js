@@ -1,13 +1,15 @@
 import { BLACKLIST, BLACKLIST_NET, FILE_GLOB_ALL } from '@/common/consts';
 
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
+export const kEditAsString = 'editAsString';
 export const kFiltersPopup = 'filtersPopup';
 export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
 export const kPopupWidth = 'popupWidth';
 export const kShowTrailingSpace = 'showTrailingSpace';
 export const kScriptTemplate = 'scriptTemplate';
 export const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
-const defaultsValueEditor = {
+export const kValueEditor = 'valueEditor';
+const defaultsEditorCommon = {
   [kAutocompleteOnTyping]: 100,
   lineWrapping: false,
   indentWithTabs: false,
@@ -18,7 +20,7 @@ const defaultsValueEditor = {
 export const defaultsEditor = {
   [kKillTrailingSpaceOnSave]: true,
   [kShowTrailingSpace]: true,
-  ...defaultsValueEditor,
+  ...defaultsEditorCommon,
 };
 
 export default {
@@ -98,7 +100,10 @@ export default {
 // ==/UserScript==
 `,
   showAdvanced: true,
-  valueEditor: defaultsValueEditor,
+  [kValueEditor]: {
+    ...defaultsEditorCommon,
+    [kEditAsString]: true,
+  },
   /** @type {'' | 'dark' | 'light'} */
   uiTheme: '',
 };
