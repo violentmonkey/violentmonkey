@@ -74,6 +74,7 @@ import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import CodeMirror from 'codemirror';
 import { debounce, getUniqId, i18n, sendCmdDirectly } from '@/common';
+import { GM_API_NAMES, GM4_ALIAS } from '@/common/consts';
 import { deepEqual, forEachEntry, objectPick } from '@/common/object';
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
@@ -94,14 +95,27 @@ const cmOrigCommands = Object.assign({}, cmCommands);
 const { insertTab, insertSoftTab } = cmCommands;
 /** Using space prefix to show the command at the top of Help list */
 const Esc = ' back / cancel / close / singleSelection';
-
+const GM4_API_NAMES = GM_API_NAMES.map(s => GM4_ALIAS[s = s.slice(3)] || s);
 Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
 CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
-  const result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
+  let result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
   // fallback to anyword if default returns nothing (or no default)
-  return result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
+  result = result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
+  if (result) {
+    const { from: { ch, line }, list } = result;
+    const prev = cm.getRange({ch: ch < 3 ? ch : ch - 3, line}, result.to);
+    const prefix = ch < 3 ? prev : prev.slice(3);
+    const v4 = ch >= 3 && prev.startsWith('GM.');
+    if (v4) list.length = 0;
+    for (const s of v4 ? GM4_API_NAMES : GM_API_NAMES) {
+      if (s.startsWith(prefix) && (v4 || !list.includes(s))) {
+        list.push(s);
+      }
+    }
+  }
+  return result;
 });
 </script>
 

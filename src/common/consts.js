@@ -58,3 +58,34 @@ export const XHR_COOKIE_RE = /:\W+([-\w]+)/; // extracts ://id in Chrome, ://{id
 /** @type {(str: string, opts?: {}) => Uint8Array} */
 export const U8_fromBase64 = process.env.IS_INJECTED !== 'injected-web' && Uint8Array.fromBase64;
 export const UPLOAD = 'upload';
+export const GM_API_NAMES = [
+  'GM',
+  'GM_addElement',
+  'GM_addStyle',
+  'GM_addValueChangeListener',
+  'GM_deleteValue',
+  'GM_deleteValues',
+  'GM_download',
+  'GM_getResourceText',
+  'GM_getResourceURL',
+  'GM_getValue',
+  'GM_getValues',
+  'GM_info',
+  'GM_listValues',
+  'GM_log',
+  'GM_notification',
+  'GM_openInTab',
+  'GM_registerMenuCommand',
+  'GM_removeValueChangeListener',
+  'GM_setClipboard',
+  'GM_setValue',
+  'GM_setValues',
+  'GM_unregisterMenuCommand',
+  'GM_xmlhttpRequest',
+  'unsafeWindow',
+];
+export const GM4_ALIAS = {
+  __proto__: null,
+  getResourceURL: 'getResourceUrl',
+  xmlhttpRequest: 'xmlHttpRequest',
+};
