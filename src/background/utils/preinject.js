@@ -222,8 +222,10 @@ addPublicCommands({
     const hasIds = +ids?.[0];
     setBadge(ids, reset, src);
     if (isTop === 3) {
-      if (hasIds) reifyValueOpener(ids, docId);
-      if (ids.length) updateVisitedTime(ids, true);
+      if (hasIds) {
+        reifyValueOpener(ids, docId);
+        updateVisitedTime(ids, true);
+      }
       reifyRequests(tabId, docId);
       clearNotifications(tabId);
     }
