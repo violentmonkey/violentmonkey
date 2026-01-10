@@ -1,0 +1,5 @@
+- Do not remove existing MV2 targets or Firefox support.
+- Add Chrome MV3 as a new target only.
+- Prefer additive changes over destructive refactors.
+- Preserve runtime behavior unless impossible under MV3.
+- When behavior must change, document it.
