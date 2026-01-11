@@ -69,12 +69,26 @@ async function augmentSetPopup(data, src, key) {
 }
 
 async function isInjectable(tabId, badgeData) {
-  return badgeData[INJECT]
-    && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
-    || (
-      await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
-      .catch(() => [])
-    )[0];
+  if (badgeData[INJECT]
+  && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })) {
+    return true;
+  }
+  const scripting = chrome?.scripting || browser?.scripting;
+  if (scripting?.executeScript) {
+    try {
+      const result = await scripting.executeScript({
+        target: { tabId },
+        func: () => 1,
+      });
+      return result?.[0]?.result;
+    } catch {
+      return false;
+    }
+  }
+  return (
+    await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
+    .catch(() => [])
+  )[0];
 }
 
 function onPopupOpened(port) {

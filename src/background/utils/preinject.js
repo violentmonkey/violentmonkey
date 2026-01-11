@@ -320,6 +320,14 @@ function toggleXhrInject(enable) {
 
 function togglePreinject(enable) {
   isApplied = enable;
+  if (IS_CHROME_MV3) {
+    if (!enable) {
+      cache.destroy();
+      clearFrameData();
+      clearStorageCache();
+    }
+    return;
+  }
   // Using onSendHeaders because onHeadersReceived in Firefox fires *after* content scripts.
   // And even in Chrome a site may be so fast that preinject on onHeadersReceived won't be useful.
   const onOff = `${enable ? 'add' : 'remove'}Listener`;
@@ -616,6 +624,7 @@ function triagePageRealm(env, forceContent) {
 }
 
 function injectContentRealm(toContent, tabId, frameId) {
+  if (IS_CHROME_MV3) return;
   for (const [id, dataKey] of toContent) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
@@ -655,6 +664,7 @@ function unregisterScriptFF(bag) {
  * @param {VMInjection.Bag} bag
  */
 function detectStrictCsp(info, bag) {
+  if (IS_CHROME_MV3) return;
   const h = info[kResponseHeaders].find(findCspHeader);
   if (!h) return;
   let tmp = '';

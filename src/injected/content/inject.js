@@ -18,6 +18,7 @@ let invokeContent;
 let nonce;
 let getAttribute;
 let querySelector;
+const IS_CHROME_MV3 = !IS_FIREFOX && chrome?.runtime?.getManifest?.().manifest_version === 3;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -40,7 +41,7 @@ export function injectPageSandbox(data) {
   const handshakeId = safeGetUniqId();
   const contentId = safeGetUniqId();
   const webId = safeGetUniqId();
-  nonce = data.nonce;
+  nonce = IS_CHROME_MV3 ? null : data.nonce;
   if (IS_FIREFOX) {
     // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
     window::on(VAULT_WRITER, evt => {

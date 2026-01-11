@@ -27,6 +27,7 @@ export const ROUTE_SCRIPTS = '#' + SCRIPTS;
 export const extensionRoot = chrome.runtime.getURL('/');
 export const extensionOrigin = extensionRoot.slice(0, -1);
 export const extensionManifest = chrome.runtime.getManifest();
+export const IS_CHROME_MV3 = !IS_FIREFOX && extensionManifest.manifest_version === 3;
 // Using getURL because in Firefox manifest contains resolved (full) URLs
 export const extensionOptionsPage = process.env.TEST ? ''
   : chrome.runtime.getURL(extensionManifest.options_ui.page).split('#', 1)[0];
