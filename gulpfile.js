@@ -10,7 +10,7 @@ const { getVersion, isBeta } = require('./scripts/version-helper');
 const { buildManifest } = require('./scripts/manifest-helper');
 const pkg = require('./package.json');
 
-const DIST = 'dist';
+const DIST = process.env.DIST_DIR || 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
   locales: [
