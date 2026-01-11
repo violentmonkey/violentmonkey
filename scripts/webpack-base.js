@@ -8,6 +8,8 @@ const deepmerge = require('deepmerge');
 const GroupAssetsPlugin = require('./webpack-group-assets-plugin');
 const { alias, extensions, isProd } = require('./common');
 
+const DIST_DIR = process.env.DIST_DIR || 'dist';
+
 const defaultHtmlOptions = {
   minify: isProd && {
     collapseWhitespace: true,
@@ -56,7 +58,11 @@ const pages = [
   'confirm',
   'options',
   'popup',
+  ...(process.env.TARGET === 'chromeMV3' ? ['offscreen'] : []),
 ];
+const backgroundEntry = process.env.TARGET === 'chromeMV3'
+  ? './src/background/sw'
+  : './src/background';
 const createHtmlPage = key => new HtmlWebpackPlugin({
   ...defaultHtmlOptions,
   filename: `${key}/index.html`,
@@ -65,6 +71,7 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
   scriptLoading: 'blocking', // we don't need `defer` and it breaks in some browsers, see #1632
   // For GroupAssetsPlugin, inject only `index.js` into `body` to avoid FOUC
   injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
+  ...(key === 'offscreen' ? { template: './src/offscreen/index.html' } : {}),
 });
 
 const splitVendor = prefix => ({
@@ -118,7 +125,7 @@ const getBaseConfig = () => ({
   target: 'web', // required by live reloading
   devtool: isProd ? false : 'inline-source-map',
   output: {
-    path: resolve('dist'),
+    path: resolve(DIST_DIR),
     publicPath: '/',
     filename: '[name].js',
     hashFunction: 'xxhash64',
@@ -228,7 +235,10 @@ const getBaseConfig = () => ({
 
 const getPageConfig = () => {
   const config = getBaseConfig();
-  config.entry = Object.fromEntries(pages.map(name => [`${name}/index`, `./src/${name}`]));
+  config.entry = Object.fromEntries(pages.map(name => ([
+    `${name}/index`,
+    name === 'background' ? backgroundEntry : `./src/${name}`,
+  ])));
   config.plugins = [
     ...config.plugins,
     ...pages.filter(key => key !== 'background').map(createHtmlPage),
