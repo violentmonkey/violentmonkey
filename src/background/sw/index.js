@@ -7,6 +7,7 @@ let requestIdCounter = 0;
 const offscreenUrl = chrome?.runtime?.getURL('offscreen/index.html');
 const SMOKE_SCRIPT_ID = 'vm3-smoke';
 const RPC_TYPE = 'VM3_RPC';
+const RPC_PORT_NAME = 'VM3_RPC';
 const SMOKE_RESULT_TYPE = 'VM3_SMOKE_RESULT';
 const STORAGE_PREFIX = 'vm3:';
 
@@ -175,6 +176,12 @@ async function gmXmlHttpRequest(params) {
   }
 }
 
+async function gmSetClipboard({ data, text }) {
+  const payload = text ?? data ?? '';
+  await callOffscreen('SetClipboard', { text: `${payload}` });
+  return true;
+}
+
 async function handleRpcMessage(message) {
   const { method, params, script } = message;
   switch (method) {
@@ -188,6 +195,8 @@ async function handleRpcMessage(message) {
       return gmListValues(params, script);
     case 'GM_xmlhttpRequest':
       return gmXmlHttpRequest(params);
+    case 'GM_setClipboard':
+      return gmSetClipboard(params);
     default:
       throw new Error(`Unknown RPC method: ${method}`);
   }
@@ -306,24 +315,62 @@ browser.runtime.onStartup.addListener(() => {
     .catch(error => console.warn('VM MV3 SW: smoke check failed', error));
 });
 
-const userScriptMessageHandler = (message, _sender, sendResponse) => {
-  logSmokeMessage(message);
-  if (message?.type !== RPC_TYPE) return undefined;
+function respondRpc(message, sendResponse) {
+  if (message?.type !== RPC_TYPE) return false;
+  const requestId = message.requestId || '';
   (async () => {
     try {
       const result = await handleRpcMessage(message);
-      sendResponse({ ok: true, result });
+      sendResponse({ requestId, ok: true, result });
     } catch (error) {
-      sendResponse({ ok: false, error: `${error}` });
+      sendResponse({ requestId, ok: false, error: `${error}` });
     }
   })();
+  return true;
+}
+
+const userScriptMessageHandler = (message, _sender, sendResponse) => {
+  logSmokeMessage(message);
+  if (!respondRpc(message, sendResponse)) return undefined;
   return true;
 };
 
 if (chrome?.runtime?.onUserScriptMessage?.addListener) {
   chrome.runtime.onUserScriptMessage.addListener(userScriptMessageHandler);
+} else if (chrome?.runtime?.onMessage?.addListener) {
+  // browser polyfills may not pass sendResponse, so prefer chrome.runtime.onMessage when available.
+  chrome.runtime.onMessage.addListener(userScriptMessageHandler);
+} else if (browser?.runtime?.onMessage?.addListener) {
+  browser.runtime.onMessage.addListener((message) => {
+    logSmokeMessage(message);
+    if (message?.type !== RPC_TYPE) return undefined;
+    const requestId = message.requestId || '';
+    return handleRpcMessage(message)
+      .then(result => ({ requestId, ok: true, result }))
+      .catch(error => ({ requestId, ok: false, error: `${error}` }));
+  });
+}
+
+const rpcPortHandler = (port) => {
+  if (port.name !== RPC_PORT_NAME) return;
+  port.onMessage.addListener((message) => {
+    if (message?.type !== RPC_TYPE) return;
+    const requestId = message.requestId || '';
+    (async () => {
+      try {
+        const result = await handleRpcMessage(message);
+        port.postMessage({ requestId, ok: true, result });
+      } catch (error) {
+        port.postMessage({ requestId, ok: false, error: `${error}` });
+      }
+    })();
+  });
+};
+
+if (chrome?.runtime?.onUserScriptConnect?.addListener) {
+  chrome.runtime.onUserScriptConnect.addListener(rpcPortHandler);
 } else {
-  browser.runtime.onMessage.addListener(userScriptMessageHandler);
+  chrome.runtime.onConnect.addListener(rpcPortHandler);
 }
 
 browser.runtime.onMessage.addListener((message, sender) => {
