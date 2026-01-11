@@ -15,6 +15,14 @@ const getScriptInfo = context => ({
   name: context?.displayName,
 });
 
+function makeNullProtoObjectFromPairs(keys, values) {
+  const res = createNullObj();
+  for (let i = 0; i < keys.length; i += 1) {
+    setOwnProp(res, keys[i], values[i]);
+  }
+  return res;
+}
+
 /** Name in Greasemonkey4 -> name in GM, all methods are context-bound */
 export const GM4_ALIAS = createNullObj();
 /** Context-bound + async when used as GM.xxx */
@@ -50,12 +58,12 @@ export const GM_API_CTX_GM4ASYNC = {
       if (arrayIsArray(what)) {
         return resolveOrReturn(this, SafePromise.all(
           what.map(key => vm3Rpc('GM_getValue', { key }, getScriptInfo(this)))
-        ).then(values => Object.fromEntries(what.map((key, i) => [key, values[i]]))));
+        ).then(values => makeNullProtoObjectFromPairs(what, values)));
       }
       const keys = objectKeys(what || {});
       return resolveOrReturn(this, SafePromise.all(
         keys.map(key => vm3Rpc('GM_getValue', { key, defaultValue: what[key] }, getScriptInfo(this)))
-      ).then(values => Object.fromEntries(keys.map((key, i) => [key, values[i]]))));
+      ).then(values => makeNullProtoObjectFromPairs(keys, values)));
     }
     const res = {};
     const isArr = arrayIsArray(what);

@@ -10,6 +10,11 @@ export function isMv3UserScript() {
   return !!chrome?.runtime?.onUserScriptMessage || !!chrome?.runtime?.onUserScriptConnect;
 }
 
+function rejectPromise(err) {
+  if (SafePromise?.reject) return SafePromise.reject(err);
+  return new SafePromise((_, reject) => reject(err));
+}
+
 function handlePortMessage(message) {
   const requestId = message?.requestId;
   if (!requestId || !inflight.has(requestId)) return;
@@ -47,7 +52,7 @@ function sendMessageRpc(message) {
 
 export function vm3Rpc(method, params, script) {
   if (!chrome?.runtime) {
-    return promiseReject(new Error('Runtime API unavailable'));
+    return rejectPromise(new Error('Runtime API unavailable'));
   }
   const requestId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const message = {
