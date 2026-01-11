@@ -1,5 +1,6 @@
 import bridge, { addHandlers, displayNames } from './bridge';
 import { UPLOAD } from '../util';
+import { isMv3UserScript, vm3Rpc } from './mv3-rpc';
 
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
@@ -168,6 +169,30 @@ function parseRaw(req, msg, propName) {
  */
 export function onRequestCreate(opts, context, fileName) {
   if (process.env.DEBUG) throwIfProtoPresent(opts);
+  if (isMv3UserScript()) {
+    const onload = opts.onload;
+    const onerror = opts.onerror;
+    const onloadend = opts.onloadend;
+    vm3Rpc('GM_xmlhttpRequest', opts, { id: context?.id, name: context?.displayName })
+      .then((result) => {
+        const response = {
+          status: result.status,
+          statusText: result.statusText,
+          finalUrl: result.finalUrl,
+          responseHeaders: result.responseHeaders,
+          response: result.response,
+          responseText: typeof result.response === 'string' ? result.response : '',
+          context: opts.context,
+        };
+        onload?.(response);
+        onloadend?.(response);
+      })
+      .catch((error) => {
+        onerror?.(error);
+        onloadend?.({ error });
+      });
+    return { abort() {} };
+  }
   let { data, url, [kResponseType]: type = '' } = opts;
   let err, res;
   // XHR spec requires `url` but allows ''/null/non-string

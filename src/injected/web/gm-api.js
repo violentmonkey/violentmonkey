@@ -5,10 +5,15 @@ import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
 import { changeHooks, decodeValue, dumpValue } from './gm-values';
+import { isMv3UserScript, vm3Rpc } from './mv3-rpc';
 
 const resolveOrReturn = (context, val) => (
   context.async ? promiseResolve(val) : val
 );
+const getScriptInfo = context => ({
+  id: context?.id,
+  name: context?.displayName,
+});
 
 /** Name in Greasemonkey4 -> name in GM, all methods are context-bound */
 export const GM4_ALIAS = createNullObj();
@@ -17,19 +22,41 @@ export const GM_API_CTX_GM4ASYNC = {
   __proto__: null,
   /** @this {GMContext} */
   GM_deleteValue(key) {
+    if (isMv3UserScript()) {
+      return resolveOrReturn(this, vm3Rpc('GM_deleteValue', { key }, getScriptInfo(this)));
+    }
     return dumpValue(this, false, [key]);
   },
   /** @this {GMContext} */
   GM_deleteValues(keys) {
+    if (isMv3UserScript()) {
+      return resolveOrReturn(this, SafePromise.all(
+        (keys || []).map(key => vm3Rpc('GM_deleteValue', { key }, getScriptInfo(this)))
+      ));
+    }
     return dumpValue(this, false, keys);
   },
   /** @this {GMContext} */
   GM_getValue(key, def) {
+    if (isMv3UserScript()) {
+      return resolveOrReturn(this, vm3Rpc('GM_getValue', { key, defaultValue: def }, getScriptInfo(this)));
+    }
     const raw = storages[this.id][key];
     return resolveOrReturn(this, raw ? decodeValue(raw) : def);
   },
   /** @this {GMContext} */
   GM_getValues(what) {
+    if (isMv3UserScript()) {
+      if (arrayIsArray(what)) {
+        return resolveOrReturn(this, SafePromise.all(
+          what.map(key => vm3Rpc('GM_getValue', { key }, getScriptInfo(this)))
+        ).then(values => Object.fromEntries(what.map((key, i) => [key, values[i]]))));
+      }
+      const keys = objectKeys(what || {});
+      return resolveOrReturn(this, SafePromise.all(
+        keys.map(key => vm3Rpc('GM_getValue', { key, defaultValue: what[key] }, getScriptInfo(this)))
+      ).then(values => Object.fromEntries(keys.map((key, i) => [key, values[i]]))));
+    }
     const res = {};
     const isArr = arrayIsArray(what);
     const values = storages[this.id];
@@ -42,14 +69,26 @@ export const GM_API_CTX_GM4ASYNC = {
   },
   /** @this {GMContext} */
   GM_listValues() {
+    if (isMv3UserScript()) {
+      return resolveOrReturn(this, vm3Rpc('GM_listValues', {}, getScriptInfo(this)));
+    }
     return resolveOrReturn(this, objectKeys(storages[this.id]));
   },
   /** @this {GMContext} */
   GM_setValue(key, val) {
+    if (isMv3UserScript()) {
+      return resolveOrReturn(this, vm3Rpc('GM_setValue', { key, value: val }, getScriptInfo(this)));
+    }
     return dumpValue(this, true, { [key]: val });
   },
   /** @this {GMContext} */
   GM_setValues(obj) {
+    if (isMv3UserScript()) {
+      const keys = objectKeys(obj || {});
+      return resolveOrReturn(this, SafePromise.all(
+        keys.map(key => vm3Rpc('GM_setValue', { key, value: obj[key] }, getScriptInfo(this)))
+      ));
+    }
     return dumpValue(this, true, obj);
   },
   /**
@@ -188,6 +227,10 @@ export const GM_API = {
     return onTabCreate(options);
   },
   GM_setClipboard(data, type) {
+    if (isMv3UserScript()) {
+      vm3Rpc('GM_setClipboard', { data, type }, { name: 'GM_setClipboard' });
+      return;
+    }
     bridge.post('SetClipboard', { data, type });
   },
   // using the native console.log so the output has a clickable link to the caller's source
