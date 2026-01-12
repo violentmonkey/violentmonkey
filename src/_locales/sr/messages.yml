@@ -1027,6 +1027,12 @@ valueLabelValue:
 valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Све вредности (сериализовано као JSON)
+valueLabelValueOr:
+  description: $1 is "[x] string"
+  message: ''
+valueLabelValueString:
+  description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
+  message: ''
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ''
