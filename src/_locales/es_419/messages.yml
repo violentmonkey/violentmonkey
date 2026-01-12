@@ -340,7 +340,10 @@ hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: |-
+    Un script en sandbox no puede cambiar estas propiedades globales: $1.
+    Para corregir el script, agrega `@grant none` para desactivar el sandbox,
+    o usa `unsafeWindow` en lugar de `window`.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Ingrese la URL:'
@@ -1092,6 +1095,12 @@ valueLabelValue:
 valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Todos los valores (serializados como JSON)
+valueLabelValueOr:
+  description: $1 is "[x] string"
+  message: Valor (serializado como JSON o $1)
+valueLabelValueString:
+  description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
+  message: $1 cadena
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visitar sitio web

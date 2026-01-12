@@ -1090,6 +1090,12 @@ valueLabelValue:
 valueLabelValueAll:
   description: Label for input of entire script value storage.
   message: Všetky hodnoty (serializované ako JSON)
+valueLabelValueOr:
+  description: $1 is "[x] string"
+  message: Hodnota (serializovaná ako JSON alebo $1)
+valueLabelValueString:
+  description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
+  message: reťazec $1
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Prejsť na stránku
