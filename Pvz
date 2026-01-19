@@ -1,0 +1,59 @@
+pip install pygame
+import pygame
+import sys
+
+pygame.init()
+
+# Màn hình
+WIDTH, HEIGHT = 800, 400
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("PVZ Mini")
+
+clock = pygame.time.Clock()
+
+# Màu
+WHITE = (255, 255, 255)
+GREEN = (0, 200, 0)
+RED = (200, 0, 0)
+
+# Cây
+plant = pygame.Rect(100, 200, 40, 40)
+
+# Zombie
+zombie = pygame.Rect(750, 200, 40, 40)
+zombie_speed = 1
+
+# Đạn
+bullets = []
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                bullet = pygame.Rect(plant.x + 40, plant.y + 15, 10, 10)
+                bullets.append(bullet)
+
+    # Zombie di chuyển
+    zombie.x -= zombie_speed
+
+    # Đạn bay
+    for bullet in bullets[:]:
+        bullet.x += 5
+        if bullet.colliderect(zombie):
+            bullets.remove(bullet)
+            zombie.x = 750  # Zombie xuất hiện lại
+
+    # Vẽ
+    screen.fill(WHITE)
+    pygame.draw.rect(screen, GREEN, plant)
+    pygame.draw.rect(screen, RED, zombie)
+
+    for bullet in bullets:
+        pygame.draw.rect(screen, (0, 0, 0), bullet)
+
+    pygame.display.update()
+    clock.tick(60)
