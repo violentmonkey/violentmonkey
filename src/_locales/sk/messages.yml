@@ -415,10 +415,10 @@ labelBadgeNone:
   message: žiadne
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
-  message: spustených skriptov
+  message: spustené skripty
 labelBadgeUnique:
   description: Option to display number of unique running scripts on badge.
-  message: spustených unikátnych skriptov
+  message: spustené unikátne skripty
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Čierna listina

@@ -1076,10 +1076,10 @@ valueLabelValueAll:
   message: جميع القيم (مُسلسلة بصيغة JSON)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: القيمة (مسلسلة كـ JSON أو $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: سلسلة نصية $1
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ''
