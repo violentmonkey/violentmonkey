@@ -59,16 +59,17 @@ addHandlers({
     }
     const { type } = msg;
     const upload = getOwnProp(msg, UPLOAD);
-    const cb = req.cb[upload][type];
+    const cb = req.cb[upload ? 1 : 0][type];
     if (!upload && type === 'loadend') {
       delete idMap[req.id];
     }
-    if (!cb && type !== ERROR)
-      return;
     if (hasOwnProperty(msg, ERROR)) {
       msg = msg[ERROR];
       msg = new SafeDOMException(msg[0], msg[1]);
       if (cb) cb(msg); else log(ERROR, displayNames[req.scriptId], msg);
+      return;
+    }
+    if (!cb) {
       return;
     }
     const { data } = msg;
