@@ -331,6 +331,9 @@ hintGrantless:
     A sandboxed script cannot change these global properties: $1.
     To fix the script either add `@grant none` to disable the sandbox,
     or use `unsafeWindow` instead of `window`.
+hintGrantNone:
+  description: Don't translate back-quoted terms.
+  message: '`@grant none` disables all other `@grant` keys.'
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Input URL:'

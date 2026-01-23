@@ -590,6 +590,9 @@ function parseMetaWithErrors(src) {
   const errors = [];
   const meta = parseMeta(isObj ? src.code : src, { errors });
   if (meta) {
+    if (meta.grant.includes('none') && new Set(meta.grant).size > 1) {
+      errors.push(i18n('hintGrantNone'));
+    }
     testerBatch(errors);
     testScript('', { meta, custom });
     testerBatch();
