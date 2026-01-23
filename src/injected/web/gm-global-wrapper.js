@@ -5,7 +5,7 @@ const scopeSym = SafeSymbol.unscopables;
 const globalDesc = createNullObj();
 /** Original ~50 global functions such as setTimeout that some sites override.
  * Not saving all globals because it would waste a lot of time on each page and frame. */
-const globalFunctionDesc = assign(createNullObj(), builtinFuncs);
+const globalFunctionDesc = createNullObj();
 const globalKeysSet = FastLookup();
 const globalKeys = (function makeGlobalKeys() {
   const kWrappedJSObject = 'wrappedJSObject';
@@ -17,8 +17,6 @@ const globalKeys = (function makeGlobalKeys() {
   let desc;
   let v;
   for (const key of names) {
-    if (key in builtinFuncs)
-      continue;
     if (+key >= 0 && key < numFrames
       || isContentMode && (
         key === process.env.INIT_FUNC_NAME || key === 'browser' || key === 'chrome'
@@ -30,7 +28,7 @@ const globalKeys = (function makeGlobalKeys() {
       /* Saving built-in global descriptors except constructors and onXXX events,
          checking length>=3 to prevent calling String.prototype index getters */
       if (key >= 'a' && key <= 'z' && (key.length < 3 || key[0] !== 'o' || key[1] !== 'n')
-      && (desc = describeProperty(window, key))) {
+      && (desc = builtinFuncs[key] || describeProperty(window, key))) {
         setPrototypeOf(desc, null); // to read desc.XXX without calling Object.prototype getters
         (desc.enumerable && isFunction(desc.value)
           ? globalFunctionDesc
