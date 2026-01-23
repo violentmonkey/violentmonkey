@@ -48,15 +48,17 @@ export function makeGmApiWrapper(script) {
     assign(gm, componentUtils);
     gm.unsafeWindow = global;
     for (let name of grant) {
-      let fn, fnGm4, gmName, gm4name;
-      if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3)) && (fnGm4 = GM4_ALIAS[gm4name])
-      || (fn = GM_API_CTX[gmName = gm4name ? `GM_${gm4name}` : name])
-      || (fn = GM_API_CTX_GM4ASYNC[gmName]) && (!gm4name || (fnGm4 = fn))) {
-        fn = safeBind(fnGm4 || fn,
-          fnGm4
+      let fn, fnAsync, gm4name;
+      if (name::slice(0, 3) === 'GM.' && (gm4name = name::slice(3))) {
+        name = 'GM_' + gm4name;
+        fn = fnAsync = GM4_ALIAS[gm4name];
+      }
+      if (fn || (fn = GM_API_CTX[name]) || (fn = fnAsync = GM_API_CTX_GM4ASYNC[name])) {
+        fn = safeBind(fn,
+          fnAsync && gm4name
             ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
             : context);
-      } else if (!(fn = GM_API[gmName]) && (
+      } else if (!(fn = GM_API[name]) && (
         fn = name === 'window.close' && sendTabClose
           || name === 'window.focus' && sendTabFocus
       )) {
