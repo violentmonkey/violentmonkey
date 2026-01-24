@@ -275,6 +275,7 @@ let columnsForTableMode = [];
 let columnsForCardsMode = [];
 /** @type {CSSMediaRule} */
 let narrowMediaRules;
+let scrollTop1, scrollTop2;
 
 const $menuNew = ref();
 const isEmpty = ref();
@@ -444,6 +445,11 @@ async function onHashChange() {
   const [tab, id, cacheId] = store.route.paths;
   const newData = id === '_new' && await sendCmdDirectly('NewScript', +cacheId);
   const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
+  const scrollElem1 = scroller.value;
+  const scrollElem2 = document.scrollingElement; // for compact layout
+  const shouldSaveScroll = script && !state.script; // going into editor
+  scrollTop1 = shouldSaveScroll && scrollElem1[kScrollTop];
+  scrollTop2 = shouldSaveScroll && scrollElem2[kScrollTop];
   if (script) {
     state.code = newData ? newData.code : await sendCmdDirectly('GetScriptCode', id);
     state.script = script;
@@ -459,15 +465,10 @@ async function onHashChange() {
   }
   renderScripts();
   state.script = null;
-  // Workaround for bug in Chrome, not suppressible via overflow-anchor:none
-  if (!IS_FIREFOX) {
-    const el = scroller.value;
-    const el2 = document.scrollingElement; // for compact layout
-    const pos = el[kScrollTop];
-    const pos2 = el2[kScrollTop];
-    nextTick(() => {
-      el[kScrollTop] = pos;
-      el2[kScrollTop] = pos2;
+  if (scrollTop1 || scrollTop2) {
+    nextTick(() => { // scroll position has to be restored explicitly in Chrome and Firefox Android
+      scrollElem1[kScrollTop] = scrollTop1;
+      scrollElem2[kScrollTop] = scrollTop2;
     });
   }
 }
