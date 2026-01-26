@@ -331,6 +331,9 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: voor $1 overeenkomende scripts
+hintGrantNone:
+  description: Don't translate back-quoted terms.
+  message: '`@grant none` schakelt alle andere `@grant`-sleutels uit.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -1085,10 +1088,10 @@ valueLabelValueAll:
   message: Alle waarden (in json-opmaak)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: Waarde (in json-opmaak of $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1 tekenreeks
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Violentmonkey-website
