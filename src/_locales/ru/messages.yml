@@ -332,6 +332,9 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: применить к этим ($1) скриптам
+hintGrantNone:
+  description: Don't translate back-quoted terms.
+  message: '`@grant none` отключает все остальные ключи `@grant`.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -472,7 +475,7 @@ labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
     Альтернативный способ внедрения для скриптов <document-start> с Firefox 59,
-    более быстрый, чем режим по умолчанию. Как и «Режим синхронизации page», он
+    более быстрый, чем режим по умолчанию. Как и «Синхронный режим страницы», он
     также увеличивает потребление памяти, поэтому вы можете отключить его, если
     ваши скрипты работают верно без этого параметра.
 labelFeedback:

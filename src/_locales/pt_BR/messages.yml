@@ -320,6 +320,9 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: para $1 scripts correspondentes
+hintGrantNone:
+  description: Don't translate back-quoted terms.
+  message: ''
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too

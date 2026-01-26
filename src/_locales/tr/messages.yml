@@ -104,10 +104,10 @@ buttonSupport:
   message: Destek sayfası
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Yerele bir kez "pull"
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Uzağa bir kez "push"
 buttonUndo:
   description: Button to undo removement of a script.
   message: Geri al
@@ -337,6 +337,9 @@ helpForLocalFile:
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: eşleşen $1 betik
+hintGrantNone:
+  description: Don't translate back-quoted terms.
+  message: '`@grant none` tüm diğer `@grant` anahtarlarını devre dışı bırakır.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -1090,7 +1093,7 @@ valueLabelValueAll:
   message: Tüm değerler (JSON biçiminde serileştirilmiş)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: Değer (JSON serisi veya $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: ''
