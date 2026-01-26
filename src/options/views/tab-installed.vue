@@ -465,12 +465,10 @@ async function onHashChange() {
   }
   renderScripts();
   state.script = null;
-  if (scrollTop1 || scrollTop2) {
-    nextTick(() => { // scroll position has to be restored explicitly in Chrome and Firefox Android
-      scrollElem1[kScrollTop] = scrollTop1;
-      scrollElem2[kScrollTop] = scrollTop2;
-    });
-  }
+  nextTick(() => { // scroll position has to be restored explicitly in Chrome and Firefox Android
+    scrollElem1[kScrollTop] = scrollTop1;
+    scrollElem2[kScrollTop] = scrollTop2;
+  });
 }
 async function renderScripts() {
   if (!store.canRenderScripts
