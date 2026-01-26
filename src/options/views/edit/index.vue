@@ -96,7 +96,7 @@ import {
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
-import { ERR_BAD_PATTERN, VM_DOCS_MATCHING, VM_HOME } from '@/common/consts';
+import { ERR_BAD_PATTERN, INFERRED, VM_DOCS_MATCHING, VM_HOME } from '@/common/consts';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
 import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
@@ -337,6 +337,7 @@ async function save() {
       isNew: !id,
       message: '',
       bumpDate: true,
+      [INFERRED]: true,
     });
     const newId = res?.where?.id;
     CM.markClean();

@@ -688,6 +688,7 @@ export async function parseScript(src) {
     [S_SCRIPT_PRE + id]: script,
     ...codeChanged && { [S_CODE_PRE + id]: code },
   });
+  if (src[INFERRED]) inferScriptProps(script);
   Object.assign(update, script, srcUpdate);
   result.where = { id };
   result[S_CODE] = src[S_CODE];

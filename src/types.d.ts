@@ -242,6 +242,7 @@ declare interface VMScriptSourceOptions extends DeepPartial<Omit<VMScript, 'infe
 
   bumpDate?: boolean;
   fetchOpts?: object;
+  inferred?: boolean;
   message?: string;
   portId?: string;
   reloadTab?: boolean;
