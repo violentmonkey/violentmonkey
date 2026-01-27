@@ -205,6 +205,12 @@ export function onRequestCreate(opts, context, fileName) {
     anonymous = !withCredentials,
     [UPLOAD]: upload,
   } = opts;
+  // setting opts.onload and onerror before EVENTS_TO_NOTIFY
+  if (context.async) res = new SafePromise((resolve, reject) => {
+    const { [kOnload]: onload, [kOnerror]: onerror } = opts;
+    opts[kOnload] = onload ? v => { resolve(v); onload(v); } : resolve;
+    opts[kOnerror] = onerror ? v => { reject(v); onerror(v); } : reject;
+  });
   for (let i = 0, obj, key, val, passes = upload && isObject(upload) ? 2 : 1; i < passes; i++) {
     obj = i ? nullObjFrom(upload) : opts;
     for (key of EVENTS_TO_NOTIFY) {
@@ -214,12 +220,6 @@ export function onRequestCreate(opts, context, fileName) {
       }
     }
   }
-  // setting opts.onload and onerror before EVENTS_TO_NOTIFY
-  if (context.async) res = new SafePromise((resolve, reject) => {
-    const { [kOnload]: onload, [kOnerror]: onerror } = opts;
-    opts[kOnload] = onload ? v => { resolve(v); onload(v); } : resolve;
-    opts[kOnerror] = onerror ? v => { reject(v); onerror(v); } : reject;
-  });
   idMap[id] = req;
   data = data == null && []
     // `binary` is for TM/GM-compatibility + non-objects = must use a string `data`
