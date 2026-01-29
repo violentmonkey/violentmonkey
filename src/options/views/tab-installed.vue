@@ -447,9 +447,10 @@ async function onHashChange() {
   const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
   const scrollElem1 = scroller.value;
   const scrollElem2 = document.scrollingElement; // for compact layout
-  const shouldSaveScroll = script && !state.script; // going into editor
-  scrollTop1 = shouldSaveScroll && scrollElem1[kScrollTop];
-  scrollTop2 = shouldSaveScroll && scrollElem2[kScrollTop];
+  if (script && !state.script) { // going into editor
+    scrollTop1 = scrollElem1[kScrollTop];
+    scrollTop2 = scrollElem2[kScrollTop];
+  }
   if (script) {
     state.code = newData ? newData.code : await sendCmdDirectly('GetScriptCode', id);
     state.script = script;
@@ -464,11 +465,13 @@ async function onHashChange() {
     loadData();
   }
   renderScripts();
-  state.script = null;
-  nextTick(() => { // scroll position has to be restored explicitly in Chrome and Firefox Android
-    scrollElem1[kScrollTop] = scrollTop1;
-    scrollElem2[kScrollTop] = scrollTop2;
-  });
+  if (state.script) {
+    state.script = null;
+    nextTick(() => { // scroll position has to be restored explicitly in Chrome and Firefox Android
+      scrollElem1[kScrollTop] = scrollTop1;
+      scrollElem2[kScrollTop] = scrollTop2;
+    });
+  }
 }
 async function renderScripts() {
   if (!store.canRenderScripts
