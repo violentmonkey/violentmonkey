@@ -118,13 +118,13 @@ buttonUpdateAll:
   touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: Сбросить кэш
+  message: Оптимизировать базу данных
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Кэш очищен
+  message: Данные оптимизированы
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Очистка и сжатие кэша...
+  message: Оптимизация данных…
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
@@ -258,7 +258,7 @@ failureReasonNoninjectable:
     Violentmonkey не может запускать скрипты на этой странице
 
     (частые случаи: интерфейс браузера, расширение, заблокировано политикой,
-    сайт поисковой системы в Opera)
+    сайт поисковика в Opera)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
@@ -354,7 +354,7 @@ hintUseDownloadURL:
   message: Использовать @downloadURL
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Сбросить избыточный кэш и попробовать подгрузить недостающие ресурсы.
+  message: Отбросить лишние данные и перезагрузить недостающие ресурсы в кеше.
 install:
   description: Label for button to install a script.
   message: Установить
@@ -580,7 +580,7 @@ labelSearch:
   message: 'Найти: '
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Поиск скриптов...
+  message: Поиск скриптов…
 labelSettings:
   description: Label shown on the top of settings page
   message: Настройки
@@ -598,10 +598,10 @@ labelSyncAnonymous:
   message: Анонимный аккаунт
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Авторизироваться
+  message: Авторизировать
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
-  message: Авторизация...
+  message: Авторизация…
 labelSyncAutomatically:
   description: Label for option to sync automatically.
   message: Синхронизировать автоматически
@@ -692,7 +692,7 @@ menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
     the label short.
-  message: Исключить...
+  message: Исключить…
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: |-
@@ -722,7 +722,7 @@ menuMatchedDisabledScripts:
   message: Подходящие отключённые скрипты
 menuMatchedFrameScripts:
   description: Label for menu listing matching scripts in sub-frames.
-  message: Скрипты только субфреймов
+  message: Скрипты только для подфреймов
 menuMatchedScripts:
   description: Label for menu listing matched scripts.
   message: Подходящие скрипты
@@ -771,7 +771,9 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: Изменения, в режиме инкогнито, применяются и к основному профилю.
+  message: >-
+    Изменения, сделанные в режиме инкогнито, также применяются к основному
+    профилю.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Скрипт установлен.
@@ -793,7 +795,7 @@ msgLoadingData:
   message: Загружаются данные скрипта…
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
-  message: Загрузка зависимостей... ($1/$2)
+  message: Загрузка зависимостей… ($1/$2)
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when
@@ -870,7 +872,7 @@ msgSyncReady:
   touched: false
 msgSyncing:
   description: Message shown when sync is in progress.
-  message: Выполняется синхронизация...
+  message: Выполняется синхронизация…
 msgSyntaxError:
   description: Shown in popup when a script didn't run and we don't know the exact reason.
   message: Ошибка синтаксиса?
@@ -879,7 +881,7 @@ msgTardyMatch:
   message: >-
     Скрипт не существовал или не совпал по URL-адресу при загрузке страницы, что
     случается на сайтах с одностраничным приложением, таких как Фейсбук или
-    IИнстаграм, которые используют фальшивую навигацию. Вы можете перезагрузить
+    Инстаграм, которые используют фальшивую навигацию. Вы можете перезагрузить
     вкладку, чтобы запустить скрипт. Чтобы исправить скрипт, используйте @match
     для всего сайта, а затем находите изменения с помощью MutationObserver или
     API window.navigation.
@@ -888,7 +890,7 @@ msgUpdated:
   message: Скрипт обновлён.
 msgUpdating:
   description: Message shown when a new version of script is being fetched.
-  message: Обновление...
+  message: Обновление…
 noValues:
   description: Label shown when there is no value for current script.
   message: Значения не сохраняются

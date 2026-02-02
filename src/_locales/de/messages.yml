@@ -338,7 +338,7 @@ hintForBatchAction:
   message: für $1 gematchte Skripte
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '''@grant none'' deaktiviert alle anderen ''grant''-Schlüssel.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too

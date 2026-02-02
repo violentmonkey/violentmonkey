@@ -102,10 +102,10 @@ buttonSupport:
   message: Hỗ trợ
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Kéo một lần về máy
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Đẩy một lần lên máy chủ
 buttonUndo:
   description: Button to undo removement of a script.
   message: Hoàn tác
@@ -173,10 +173,11 @@ descEditorOptionsGeneric:
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
   message: >-
-    Các tùy chọn không chuẩn: 1autocompleteOnTyping1 là độ trễ tính bằng mili
-    giây để hiển thị gợi ý tự động hoàn thành sau khi nhập (202 = tắt),
-    3killTrailingSpaceOnSave3 tự động xóa khoảng trắng ở cuối mỗi dòng khi lưu,
-    4showTrailingSpace4 hiển thị khoảng trắng ở cuối dòng dưới dạng dấu chấm.
+    Các tùy chọn không chuẩn: <code>autocompleteOnTyping</code> là độ trễ tính
+    bằng mili giây để hiển thị gợi ý tự động hoàn thành sau khi nhập
+    (<code>0</code> = tắt), <code>killTrailingSpaceOnSave</code> tự động xóa
+    khoảng trắng ở cuối mỗi dòng khi lưu, <code>showTrailingSpace</code> hiển
+    thị khoảng trắng ở cuối dòng dưới dạng dấu chấm.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -278,10 +279,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: thời gian truy cập cuối
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: Lần cuối bạn truy cập bất kỳ trang web nào được script này nhắm đến.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Hiện tất cả
@@ -325,12 +326,15 @@ hintForBatchAction:
   message: Đối với các tập lệnh khớp với $1
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` vô hiệu hóa tất cả các khóa `@grant` khác.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: |-
+    Một script được sandbox không thể thay đổi các thuộc tính toàn cục này: $1.
+    Để sửa script, hãy thêm `@grant none` để vô hiệu hóa sandbox,
+    hoặc sử dụng `unsafeWindow` thay vì `window`.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
@@ -581,7 +585,7 @@ labelShowOrder:
   message: Hiển thị thứ tự sắp xếp thực thi
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Hiển thị thời gian truy cập cuối
 labelSync:
   description: Label for sync options.
   message: Đồng bộ
@@ -596,7 +600,7 @@ labelSyncAuthorizing:
   message: Đang xác thực
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Đồng bộ tự động
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Không có
@@ -1024,16 +1028,35 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    Phím 1Enter1 thêm văn bản vào lịch sử tự động hoàn thànhTất cả các điều kiện
-    không phân biệt chữ hoa chữ thườngCác điều kiện phân tách bằng dấu cách có
-    thể được kết hợpTìm kiếm theo siêu dữ liệu: 2"Kịch bản tuyệt vời" "Mô
-    tả"2Tìm kiếm theo thẻ: 3#thẻ1 #thẻ23Tìm kiếm theo tên kịch bản: 4name:"tên
-    tuyệt vời"4Tìm kiếm theo mã kịch bản: 5code:"mã tuyệt vời"5Tìm kiếm phủ
-    định: 6!#thẻ2 !name:"không mong muốn"6Biểu thức chính quy: 7/\w+?/7,
-    8/\w+?/gi8, 9name:/\w+?/9, 10name+re:"\w+? có khoảng trắng"10
+    * Phím <kbd>Enter</kbd> thêm văn bản vào lịch sử tự động hoàn thành
+
+
+    * Tất cả các điều kiện không phân biệt chữ hoa chữ thường
+
+
+    * Các điều kiện phân tách bằng dấu cách có thể được kết hợp
+
+
+    * Tìm kiếm theo siêu dữ liệu: <code>"Kịch bản tuyệt vời" "Mô tả"</code>
+
+
+    * Tìm kiếm theo thẻ: <code>#thẻ1 #thẻ2</code>
+
+
+    * Tìm kiếm theo tên kịch bản: <code>name:"tên tuyệt vời"</code>
+
+
+    * Tìm kiếm theo mã kịch bản: <code>code:"mã tuyệt vời"</code>
+
+
+    * Tìm kiếm phủ định: <code>!#thẻ2 !name:"không mong muốn"</code>
+
+
+    * Biểu thức chính quy: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? có khoảng trắng"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Bật/tắt tiêm userscript
 trackEdits:
   description: Button in a script installation dialog.
   message: Theo dõi chỉnh sửa bên ngoài
@@ -1065,10 +1088,10 @@ valueLabelValueAll:
   message: Tất cả giá trị (đã đưa về dạng JSON)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: Giá trị (được tuần tự hóa dưới dạng JSON hoặc $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1 chuỗi
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Truy cập trang web
