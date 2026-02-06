@@ -93,6 +93,7 @@ export default {
 // @name        New script {{name}}
 // @namespace   ${VIOLENTMONKEY} Scripts
 // @match       {{url}}
+// @icon        {{icon}}
 // @grant       none
 // @version     1.0
 // @author      -

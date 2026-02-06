@@ -14,12 +14,14 @@ import { injectableRe } from './tabs';
 
 addOwnCommands({
   async NewScript(tabId) {
-    const tabUrl = (tabId >= 0 && await browser.tabs.get(tabId).catch(noop) || {}).url;
+    const tab = tabId >= 0 && await browser.tabs.get(tabId).catch(noop) || {};
+    const tabUrl = tab.url;
     const url = injectableRe.test(tabUrl) && `${tabUrl.split(/[#?]/)[0]}*`;
     const { host = 'example.org', domain } = url ? commands.GetTabDomain(url) : {};
     return newScript({
       url: url || `*://${host}/*`,
       name: domain || '',
+      icon: tab.favIconUrl || '',
     });
   },
 });
