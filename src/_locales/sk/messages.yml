@@ -183,8 +183,9 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Podporované premenné: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
-    formát kompatibilný s MomentJS, napríklad <{{date:YYYY-MM-DD}}>.
+    Podporované premenné: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
+    <{{date:format}}> formát kompatibilný s MomentJS, napríklad
+    <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: skupina

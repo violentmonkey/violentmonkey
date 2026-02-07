@@ -171,8 +171,8 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    支援的變數包括：<{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>，並且與 MomentJS
-    相容的格式，例如 <{{date:YYYY-MM-DD}}>。
+    支援的變數包括：<{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>, <{{date:format}}>，並且與
+    MomentJS 相容的格式，例如 <{{date:YYYY-MM-DD}}>。
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: 分組

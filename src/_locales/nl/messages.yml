@@ -182,7 +182,7 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Ondersteunde variabelen: <{{name}}>, <{{url}}>, <{{date}}>,
+    Ondersteunde variabelen: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> met een met MomentJS compatibel formaat, bijvoorbeeld
     <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:

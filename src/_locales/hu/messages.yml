@@ -176,7 +176,7 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Támogatott változók: <{{name}}>, <{{url}}>, <{{date}}> és
+    Támogatott változók: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}> és
     <{{date:formátum}}>, ami a MomentJS formátumaival kompatibilis, pl.
     <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:

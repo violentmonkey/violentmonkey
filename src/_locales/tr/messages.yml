@@ -185,8 +185,8 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Desteklenen değerler: <{{name}}>, <{{url}}>, <{{date}}>, MomentJS uyumlu
-    biçimde <{{date:format}}> (örn. <{{date:YYYY-AA-GG}}>).
+    Desteklenen değerler: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
+    MomentJS uyumlu biçimde <{{date:format}}> (örn. <{{date:YYYY-AA-GG}}>).
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: grupla

@@ -189,8 +189,9 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Variabili supportate: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
-    con un formato compatibile con MomentJS, ad esempio <{{date:YYYY-MM-DD}}>.
+    Variabili supportate: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
+    <{{date:format}}> con un formato compatibile con MomentJS, ad esempio
+    <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: gruppo

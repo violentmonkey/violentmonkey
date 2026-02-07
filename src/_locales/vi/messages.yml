@@ -181,8 +181,9 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Các biến được hỗ trợ: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
-    với định dạng tương thích MomentJS, ví dụ như <{{date:YYYY-MM-DD}}>.
+    Các biến được hỗ trợ: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
+    <{{date:format}}> với định dạng tương thích MomentJS, ví dụ như
+    <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: Nhóm

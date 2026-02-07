@@ -171,8 +171,8 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    使用可能な変数: <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}> はMomentJS互換、例
-    <{{date:YYYY-MM-DD}}>.
+    使用可能な変数: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>, <{{date:format}}>
+    はMomentJS互換、例 <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: グループ

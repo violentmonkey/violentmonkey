@@ -181,7 +181,7 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Поддерживаемые переменные: <{{name}}>, <{{url}}>, <{{date}}>,
+    Поддерживаемые переменные: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> с совместимым с MomentJS форматом, например,
     <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:

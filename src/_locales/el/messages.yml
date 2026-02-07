@@ -192,7 +192,7 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Υποστηριζόμενες μεταβλητές: <{{name}}>, <{{url}}>, <{{date}}>,
+    Υποστηριζόμενες μεταβλητές: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}>. Η μορφή πρέπει να είναι συμβατή με το πακέτο MomentJS,
     για παράδειγμα <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:

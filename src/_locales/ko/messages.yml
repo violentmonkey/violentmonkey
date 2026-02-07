@@ -172,8 +172,8 @@ descEditorOptionsVM:
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    지원하는 변수: MomentJS와 호환되는 <{{name}}>, <{{url}}>, <{{date}}>, <{{date:format}}>
-    형식. 예: <{{date:YYYY-MM-DD}}>.
+    지원하는 변수: MomentJS와 호환되는 <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
+    <{{date:format}}> 형식. 예: <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: ''
