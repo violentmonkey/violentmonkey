@@ -1096,7 +1096,7 @@ valueLabelValueOr:
   message: Değer (JSON serisi veya $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1 string
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Siteyi ziyaret et
