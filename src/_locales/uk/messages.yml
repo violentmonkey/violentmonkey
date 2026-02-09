@@ -83,7 +83,7 @@ buttonReset:
   message: Скинути
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Скинути налаштування
 buttonRestore:
   description: Button to restore a removed script.
   message: Відновити
@@ -95,7 +95,7 @@ buttonSaveClose:
   message: Зберегти й закрити
 buttonSaved:
   description: Button text after saving.
-  message: ''
+  message: Збережено
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
   message: Показати стан редактора
@@ -104,10 +104,10 @@ buttonSupport:
   message: Сторінка підтримки
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Потягніть раз до локального
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Відправити один раз на віддалений сервер
 buttonUndo:
   description: Button to undo removement of a script.
   message: Скасувати
@@ -129,7 +129,9 @@ buttonVacuuming:
   message: Очищення даних кешу...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Самооновлення для цього скрипта відключено!
+    Натисніть «OK», щоб все одно оновити його.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -139,7 +141,9 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Повернути всі зміни, виконані в базі даних (імпорт, оновлення, редагування,
+    налаштування)
 descBlacklist:
   description: Description for the global injection blacklist.
   message: >-
@@ -147,7 +151,9 @@ descBlacklist:
     цього списку.
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Чорний список мережі (скрипти не підключаться до відповідних сайтів та їхніх
+    cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -163,25 +169,35 @@ descEditorOptions:
     rel="noopener noreferrer">повний список</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Булеві опції можуть бути перемикані двома кліками на значення:
+    <code>true</code> = включено, <code>false</code> = виключено. Нумераційні
+    опції, що закінчуються на <code>Delay</code>, <code>Interval</code>,
+    <code>Rate</code>, <code>Time</code> виражені в мілісекундах.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Нестандартні опції: <code>autocompleteOnTyping</code> це затримка в
+    мілісекундах для відображення підказок автозавершення після надрукування
+    (<code>0</code> = вимкнути), <code>killTrailingSpaceOnSave</code>
+    автоматично видаляє пробіли в кінці кожного рядка, коли
+    зберігається,<code>showTrailingSpace</code> показує пробіли в кінці рядка як
+    крапки.
 descScriptTemplate:
   description: Description of script template section.
   message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: група
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: ховати
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: 'Відключені скрипти:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: показати
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: 'Документація по блоку метаданих скриптів та <code>GM</code> API:'
@@ -247,10 +263,19 @@ failureReasonNoninjectable:
     політики, пошуковий двигун в Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: ''
+  message: >-
+    Програма Violentmonkey була перезапущена. Будь ласка, перезавантажте
+    вкладку, щоб виконати юзерскрипти.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
-  message: ''
+  message: >-
+    Існує кілька методiв встановлення або слідкування за змінами у локальному
+    файлi: <1> Перетягнiть файл у вiдкриту сторiнку або спливаюче вiкно
+    Violentmonkey, наприклад, у цьому. <2> Встановіть локальний сервер HTTP для
+    цього файлу та вiдкрийте його через http://localhost. <3> Активуйте опцію
+    «Дозволити доступ до URL-адрес файлiв» у налаштуваннях Violentmonkey на
+    сторiнцi chrome://extensions. Це небезпечно, тому що будь-який юзерскрипт
+    може читати всі локальні файли.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавіту
@@ -264,10 +289,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: Час останнього відвідування
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: 'Останній візит на цільові сайти скрипту. '
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Всі
@@ -297,24 +322,29 @@ genericUseGlobal:
   message: використовувати глобальні налаштування
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Схеми "#" працюють тільки при першому відкритті сайту або перезавантаженні
+    вкладки: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Кошик
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Показати інструкцію для перетягування локальних скриптів
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: для $1 співпадаючого скрипту
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` відключає всі інші ключі `@grant`.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: >-
+    Скрипт у sandbox не може змінювати ці глобальні параметри: $1Щоб виправити
+    скрипт, додайте `@grant none`, щоб вимкнути sandbox, або використовуйте
+    `unsafeWindow` замість `window`.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Введіть URL:'
@@ -329,7 +359,7 @@ hintVacuum:
   message: Очистити зайвий кеш та спробувати довантажити відсутні ресурси.
 install:
   description: Label for button to install a script.
-  message: ''
+  message: Встановити
 installFrom:
   description: Label for button to install script from a userscript site.
   message: Встановити з $1
@@ -375,7 +405,7 @@ labelBackup:
   touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: ''
+  message: Бекап і техобслуговування
 labelBadge:
   description: Label for option to show number on badge.
   message: 'Показувати на значку: '
@@ -447,7 +477,11 @@ labelFastFirefoxInject:
   message: Альтернативний $1 режим у Firefox
 labelFastFirefoxInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    Альтернативний метод введення для<document-start> скриптів, починаючи з
+    Firefox 59, швидший за стандартний режим. Подібно до «Синхронного режиму
+    сторінки», він також збільшує споживання пам'яті, тому ви можете вимкнути
+    його, якщо ваші скрипти працюють коректно без цієї опції.
 labelFeedback:
   description: Label of link to feedback page.
   message: Зворотній зв'язок
@@ -465,7 +499,7 @@ labelHomepageURL:
   message: 'Дом.сторінка:'
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: 'URL іконки:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: Імпорт даних скриптів
@@ -479,7 +513,7 @@ labelInjectionMode:
   description: >-
     Label for option in advanced settings and in script settings. Don't forget
     the space after ":" if the translated language separates words with spaces.
-  message: ''
+  message: 'Метод ін''єкції: '
 labelInstall:
   description: Shown in the title of the confirm page while trying to install a script.
   message: Встановлення скрипта...
@@ -512,7 +546,7 @@ labelNotifyThisUpdated:
     A per-script option in editor to enable notification when this script is
     updated. The text follows "Allow update" checkbox option so it's like a
     continuation of the phrase.
-  message: ''
+  message: ', потім повідомити:'
 labelNotifyUpdates:
   description: Option to show notification when script is updated.
   message: Повідомляти про оновлення скриптів.
@@ -559,7 +593,7 @@ labelShowOrder:
   message: Показати позиції порядку виконання
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Показувати час останнього візиту
 labelSync:
   description: Label for sync options.
   message: Синхронізація з хмарним сховищем
@@ -574,7 +608,7 @@ labelSyncAuthorizing:
   message: Авторизація...
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Автоматична синхронізація
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: нічим
@@ -602,7 +636,7 @@ labelSyncUsername:
   message: 'Ім''я користувача:'
 labelTags:
   description: Label for custom tags.
-  message: ''
+  message: Теги (розділені пробілом)
 labelTheme:
   description: Label for the visual theme option.
   message: 'Тема:'
@@ -623,12 +657,12 @@ labelViewTable:
   message: Табличний вигляд
 labelWidth:
   description: Width.
-  message: ''
+  message: 'Ширина:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
     synchronous injection.
-  message: ''
+  message: Синхронний $1 метод
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
@@ -640,7 +674,7 @@ labelXhrInjectHint:
     незначні. Приховати попередження можна натиснувши ПКМ на одному з них
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: ''
+  message: (крім інкогніто та сайтів із деактивованими cookies)
 lastSync:
   description: Label for last sync timestamp.
   message: Остання синхронізація в $1.
@@ -780,7 +814,7 @@ msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
     conflicts with an existent one.
-  message: ''
+  message: Скрипт з таким самим @name та @namespace вже інстальовано.
 msgNewVersion:
   description: >-
     Message shown when a new version of script is found by @updateURL, but no
@@ -846,7 +880,13 @@ msgSyntaxError:
   message: Синтаксична помилка?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    Скрипт не існував або не відповідав адресу URL під час завантаження
+    сторінки, це трапляється на односторінкових сайтах, таких як Facebook або
+    Instagram, які використовують штучну навігацію. Ви можете перезавантажити
+    вкладку, щоб скрипт спрацював. Щоб виправити скрипт, використовуйте @match
+    для всього сайту, а потім виявляйте зміни за допомогою MutationObserver або
+    window.navigation API.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Скрипт оновлено.
@@ -881,7 +921,7 @@ optionPopupGroupDisabled:
   touched: false
 optionPopupGroupRunAt:
   description: Option to group scripts in popup shown only when sorting by execution order.
-  message: ''
+  message: Групувати за етапом @run-at
 optionPopupHideDisabled:
   description: Option to hide disabled scripts in popup.
   message: Сховати відключені скрипти
@@ -912,31 +952,35 @@ optionUpdate:
   message: Оновлення
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: Налаштування спливного вікна
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Права кнопка миші: налаштування спливного вікна'
 readonly:
   description: Text in the editor's header for non-editable scripts.
-  message: ''
+  message: Лише читання
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Самооновлюваний скрипт захищений від змін і відкритий тільки для читання,
+    доки ви не вимкнете оновлення або не дозволите редагування.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Дозволити редагування
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (наступне оновлення перезапише їх)
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Перевстановити
 reloadTab:
   description: Label of action to reload the tab
-  message: ''
+  message: Перезавантажити сторінку
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Якщо ввімкнено, активна вкладка буде перезавантажена, коли будуть виявлені
+    зміни і цей скрипт відповідатиме URL-адресі вкладки.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -962,16 +1006,18 @@ sideMenuSettings:
   message: Налаштування
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: ''
+  message: Перезавантажити сторінку без юзерскриптів
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Ви виключили юзерскриптів для цій сторінці. Щоб вони працювали,
+    перезавантажте сторінку або перейдіть на іншу вкладку.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Порядок сортування:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Припинити відстеження
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Колір звичайного значка
@@ -990,30 +1036,50 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * Клавіша<kbd>Enter</kbd> додає текст до історії автозаповнення
+
+    * Усі умови не чутливі до великої/малої літери
+
+    * Умови, розділені пробілами, можна комбінувати
+
+    * Пошук за метаданими: <code>«Awesome Script» «Description»</code>
+
+    * Пошук за тегами: <code>#tag1 #tag2</code>
+
+    * Пошук за назвою скрипта: <code>name:"awesome name"</code>
+
+    * Пошук за кодом скрипта: <code>code:"awesome code"</code>
+
+    * Негативний пошук: <code>!#tag2 !name:"unwanted"</code>
+
+    * Регулярні вирази: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Увімкнути/вимкнути ін'єкцію юзерскрипт
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Відстежувати редагування ззовні
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: >-
+    Залиште цю сторінку відкритою, щоб слідкувати за вашими змінами у локальному
+    файлі.
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
     parentheses.
-  message: ''
+  message: Оновити скрипти ($1)
 updateScript:
   description: Button to update one script.
   message: Оновлення
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: Оновити всі скрипти
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Оновити скрипти поточної вкладки
 valueLabelKey:
   description: Label for key of a script value.
   message: Ключ (рядок)
@@ -1025,10 +1091,10 @@ valueLabelValueAll:
   message: Усі значення (у форматі JSON)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: Значення (серіалізоване як JSON або $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: "$1\_рядок"
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Відвідати веб-сайт
