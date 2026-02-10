@@ -431,7 +431,6 @@ async function installScript(evt, parsedMeta) {
       require: requireCache,
       cache: resourceCache,
       reloadTab: reloadTab.value,
-      reuseDeps: !!confirmedTime,
       bumpDate: true,
       id: tracking.value && lastScriptId,
     });
