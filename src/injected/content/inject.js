@@ -274,7 +274,7 @@ function inject(item, iframeCb) {
   const onError = IS_FIREFOX && !iframeCb && (e => {
     const { stack } = e[ERROR];
     if (!stack || `${stack}`.includes(VM_UUID)) {
-      log(ERROR, [item.displayName], e[ERROR]);
+      log(ERROR, [item.displayName + ':' + e.lineno + ':' + e.colno], e[ERROR]);
       e.preventDefault();
     }
   });
