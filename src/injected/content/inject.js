@@ -1,4 +1,4 @@
-import bridge, { addHandlers } from './bridge';
+import bridge, { addHandlers, grantless } from './bridge';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
@@ -346,7 +346,7 @@ function injectAll(runAt) {
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
       for (const { id, meta: { grant } } of items) {
         tardyQueue[id] = 1;
-        bridge.grantless += !grant.length;
+        if (!grant.length) grantless[realm] = 1;
       }
       if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
       else if (!IS_FIREFOX) res = injectPageList(runAt);

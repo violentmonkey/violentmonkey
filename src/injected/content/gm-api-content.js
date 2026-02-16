@@ -1,4 +1,4 @@
-import bridge, { addBackgroundHandlers, addHandlers } from './bridge';
+import bridge, { addBackgroundHandlers, addHandlers, grantless } from './bridge';
 import { addNonceAttribute } from './inject';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
@@ -8,13 +8,15 @@ const { toLowerCase } = '';
 const { [IDS]: ids } = bridge;
 let setPopupThrottle;
 let isPopupShown;
-let grantless;
+let grantlessUsage;
 
 addBackgroundHandlers({
   async PopupShown(state) {
     await bridge[REIFY];
     isPopupShown = state;
-    if (bridge.grantless) bridge.post('GetGrantless');
+    for (const realm in grantless) {
+      bridge.post('GetGrantless', null, realm);
+    }
     sendSetPopup();
   },
 }, true);
@@ -46,7 +48,7 @@ addHandlers({
   },
 
   SetGrantless(data) {
-    grantless = data;
+    assign(grantlessUsage ??= createNullObj(), data);
   },
 
   RegisterMenu({ id, key, val }) {
@@ -72,7 +74,7 @@ export async function sendSetPopup(isDelayed) {
     await sendCmd('SetPopup', {
       [IDS]: ids,
       [INJECT_INTO]: bridge[INJECT_INTO],
-      grantless,
+      grantless: grantlessUsage,
       menus,
     });
   }

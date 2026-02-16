@@ -3,6 +3,7 @@ import { sendCmd } from './util';
 
 const handlers = createNullObj();
 const bgHandlers = createNullObj();
+export const grantless = createNullObj();
 /** @type {function(VMInjection)[]} */
 export const onScripts = [];
 const addHandlersImpl = (dest, src, force) => {
@@ -34,7 +35,6 @@ const bridge = {
   __proto__: null,
   [IDS]: createNullObj(),
   cache: createNullObj(),
-  grantless: 0,
   pathMaps: createNullObj(),
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {
