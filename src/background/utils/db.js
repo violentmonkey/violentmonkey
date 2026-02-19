@@ -540,6 +540,7 @@ export async function removeScripts(ids) {
   if (removedScripts.length !== newLen) {
     removedScripts.length = newLen; // live scripts were moved to the beginning
     await storage.api.remove(idsToRemove);
+    vacuum();
     return sendCmd('RemoveScripts', ids);
   }
 }
