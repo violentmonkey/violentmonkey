@@ -104,10 +104,10 @@ buttonSupport:
   message: Página de suporte
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: Sincronizar uma vez com o repositório local
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: Publicar uma vez no repositório remoto
 buttonUndo:
   description: Button to undo removement of a script.
   message: Desfazer
@@ -149,7 +149,9 @@ descBlacklist:
   message: URL nesta lista não será injetado por scripts.
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Lista negra de rede (os scripts não se conectarão aos sites correspondentes
+    e seus cookies)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
@@ -278,10 +280,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: horário da última visita
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: A última vez que você visitou algum site que foi alvo deste script.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Tudo
@@ -311,7 +313,9 @@ genericUseGlobal:
   message: Usar configuração global
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
-  message: ''
+  message: >-
+    Os padrões "#"  funcionam apenas ao abrir o site pela primeira vez ou ao
+    recarregar a aba: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Lixeira
@@ -323,7 +327,7 @@ hintForBatchAction:
   message: para $1 scripts correspondentes
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` desativa todas as outras chaves `@grant`.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -579,7 +583,7 @@ labelShowOrder:
   message: Mostrar posições de ordem de execução
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Mostrar horário da última visita
 labelSync:
   description: Label for sync options.
   message: Sincronizar
@@ -594,7 +598,7 @@ labelSyncAuthorizing:
   message: Autorizando
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: Sincronizar automaticamente
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Nenhum
@@ -938,7 +942,7 @@ popupSettings:
   message: Configurações de Popup
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Clique com o botão direito do mouse: configurações da janela pop-up'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: Somente leitura
@@ -952,7 +956,7 @@ readonlyOpt:
   message: Permitir edições
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
-  message: ''
+  message: (a próxima atualização irá sobrescrevê-los)
 reinstall:
   description: Button to reinstall a script
   message: Reinstale
@@ -961,7 +965,9 @@ reloadTab:
   message: Recarregue a aba
 reloadTabTrackHint:
   description: Tooltip for "Reload tab" checkbox when installer is tracking a local file.
-  message: ''
+  message: >-
+    Se ativada, a aba ativa será recarregada quando forem detectadas alterações
+    e este script corresponder ao URL da aba.
 removeAllScripts:
   description: Button to remove all scripts
   message: ''
@@ -990,13 +996,15 @@ skipScripts:
   message: Recarregue a pagina sem os scripts
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
-  message: ''
+  message: >-
+    Você desativou os scripts de usuário para esta página. Para executá-los,
+    recarregue a página ou navegue até a nova aba.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: 'Ordem de classificação:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
-  message: ''
+  message: Parar de rastrear
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Cor normal do emblema
@@ -1016,13 +1024,13 @@ titleSearchHintV2:
   message: ''
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: Alternar injeção de script de usuário
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: Acompanhar edições externas
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Mantenha esta página aberta para acompanhar suas edições no arquivo local.
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in
@@ -1036,7 +1044,7 @@ updateScriptsAll:
   message: Atualize todos os scripts
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: Atualizar scripts da aba atual
 valueLabelKey:
   description: Label for key of a script value.
   message: Chave (string)
@@ -1048,10 +1056,10 @@ valueLabelValueAll:
   message: Todos os valores (serializados como JSON)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: Valor (serializado como JSON ou $1)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1 string
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: Visite o site
