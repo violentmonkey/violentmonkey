@@ -526,9 +526,11 @@ async function getCodeFromStorage(ids) {
   onUpdate();
 }
 async function handleEmptyRecycleBin() {
-  if (await showConfirmation(i18n('buttonEmptyRecycleBin'))) {
+  const totalKB = (store.removedScripts.reduce((sum, s) => sum + (s.$cache.sizeNum || 0), 0) / 1024).toFixed(2);
+  if (await showConfirmation(`${i18n('buttonEmptyRecycleBin')}\nThis will free up ${totalKB} KB of scripts!`)) {
     sendCmdDirectly('CheckRemove', { force: true });
     store.removedScripts = [];
+    await showMessage({ text: `${totalKB} KB of scripts removed!` });
   }
 }
 function adjustNarrowWidth(val) {
