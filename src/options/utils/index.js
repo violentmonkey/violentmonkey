@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { getScriptsTags, sendCmdDirectly } from '@/common';
+import { getScriptsTags, i18n, sendCmdDirectly } from '@/common';
 import { route } from '@/common/router';
 
 export * from './search';
@@ -37,6 +37,15 @@ export const kStorageSize = 'storageSize';
 export const kUpdateURL = 'updateURL';
 export const TOGGLE_ON = 'toggle-on';
 export const TOGGLE_OFF = 'toggle-off';
+
+// Same order as getSizes and sizesPrefixRe
+export const SIZE_TITLES = [
+  i18n('editNavCode'),
+  i18n('editNavSettings'),
+  i18n('editNavValues'),
+  '@require',
+  '@resource',
+];
 
 export let K_SAVE; // deduced from the current CodeMirror keymap
 

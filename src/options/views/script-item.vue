@@ -68,7 +68,7 @@
                  v-if="showVisit">
           {{ visit.show }}
         </tooltip>
-        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end" v-if="!isRemoved">
+        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end">
           {{ script.$cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">

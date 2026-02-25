@@ -1,6 +1,6 @@
 import '@/common/browser';
 import {
-  formatByteLength, getLocaleString, getScriptUpdateUrl, i18n, makePause, sendCmdDirectly, trueJoin,
+  formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmdDirectly, trueJoin,
 } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
@@ -8,17 +8,11 @@ import options from '@/common/options';
 import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
-import { kDescription, kName, kStorageSize, performSearch, store, updateTags } from './utils';
+import {
+  kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store, updateTags,
+} from './utils';
 import App from './views/app';
 
-// Same order as getSizes and sizesPrefixRe
-const SIZE_TITLES = [
-  i18n('editNavCode'),
-  i18n('editNavSettings'),
-  i18n('editNavValues'),
-  '@require',
-  '@resource',
-];
 let updateThrottle;
 
 initMain();
@@ -56,6 +50,7 @@ function initScript(script, sizes, code) {
   $cache.size = formatByteLength(total, true).replace(' ', '');
   $cache.sizes = str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B');
   $cache.sizeNum = total;
+  $cache.sizesNum = sizes;
   $cache[kStorageSize] = sizes[2];
   if (code) $cache.code = code;
   script.$canUpdate = getScriptUpdateUrl(script)

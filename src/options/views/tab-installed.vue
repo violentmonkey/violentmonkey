@@ -43,7 +43,11 @@
               <sub v-text="num" v-if="num" />
               <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
             </a>
-            <div class="btn-hint subtle" v-text="i18n('hintForBatchAction', `${state.filteredScripts.length}`)"></div>
+            <Tooltip :content="state.sizes" placement="bottom">
+              <div class="btn-hint subtle"
+                   v-text="i18n('hintForBatchAction', `${state.filteredScripts.length}`)"
+                   :data-size="state.size"/>
+            </Tooltip>
             <Tooltip :content="i18n('buttonUndo')" placement="bottom" align="start">
               <a v-if="state.batchAction.undo" class="btn-ghost" tabindex="0" @click.prevent="state.batchAction.undo">
                 <Icon name="undo" />
@@ -51,7 +55,9 @@
             </Tooltip>
           </div>
         </template>
-        <div v-else class="ml-2" v-text="i18n('headerRecycleBin')" />
+        <Tooltip v-else :content="state.sizes" :disabled="!state.sizes" placement="bottom">
+          <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
+        </Tooltip>
         <div class="flex-auto"></div>
         <span class="ml-1">{{ i18n('sortOrder') }}
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
@@ -166,7 +172,7 @@
 
 <script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
-import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin } from '@/common';
+import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength } from '@/common';
 import { INFERRED } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
@@ -183,7 +189,8 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import {
-  createSearchRules, markRemove, performSearch, runInBatch, setLocationHash, store, TOGGLE_OFF, TOGGLE_ON,
+  createSearchRules, markRemove, performSearch, runInBatch, setLocationHash, SIZE_TITLES, store,
+  TOGGLE_OFF, TOGGLE_ON,
 } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
@@ -305,6 +312,8 @@ const state = reactive({
     action: null,
     [UNDO]: null,
   },
+  size: '',
+  sizes: '',
 });
 
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
@@ -783,6 +792,23 @@ watch(selectedScript, script => {
 watch(() => state.showHotkeys, value => {
   keyboardService.setContext('showHotkeys', value);
 });
+watch(() => state.filteredScripts, value => {
+  const totals = Array(SIZE_TITLES.length).fill(0);
+  for (const script of value) {
+    for (let i = 0; i < totals.length; i++) {
+      totals[i] += script.$cache.sizesNum[i];
+    }
+  }
+  let sum = 0;
+  let str = '';
+  totals.forEach((val, i) => {
+    sum += val;
+    if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
+  });
+  // `null` removes the attribute to disable the ::after CSS rule
+  state.size = sum ? formatByteLength(sum) : null;
+  state.sizes = str;
+});
 
 const disposables = [];
 
@@ -970,7 +996,9 @@ $iconSize: 2rem; // from .icon in ui/style.css
     border-top: 1px solid var(--fill-5);
   }
 }
-
+[data-size]::after {
+  content: ' (' attr(data-size) ')';
+}
 .rotate {
   animation: 4s linear infinite rotate;
 }
