@@ -189,8 +189,8 @@ import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import {
-  createSearchRules, markRemove, performSearch, runInBatch, setLocationHash, SIZE_TITLES, store,
-  TOGGLE_OFF, TOGGLE_ON,
+  createSearchRules, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
+  SIZE_TITLES, store, TOGGLE_OFF, TOGGLE_ON,
 } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
@@ -806,8 +806,8 @@ watch(() => state.filteredScripts, value => {
     if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
   });
   // `null` removes the attribute to disable the ::after CSS rule
-  state.size = sum ? formatByteLength(sum) : null;
-  state.sizes = str;
+  state.size = sum ? formatByteLength(sum).replace(' ', '') : null;
+  state.sizes = sum ? formatSizesStr(str) : '';
 });
 
 const disposables = [];

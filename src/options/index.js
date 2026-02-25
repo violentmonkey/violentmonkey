@@ -9,7 +9,7 @@ import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
 import {
-  kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store, updateTags,
+  formatSizesStr, kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store, updateTags,
 } from './utils';
 import App from './views/app';
 
@@ -48,7 +48,7 @@ function initScript(script, sizes, code) {
   $cache.lowerName = name.toLocaleLowerCase();
   $cache.tags = custom.tags || '';
   $cache.size = formatByteLength(total, true).replace(' ', '');
-  $cache.sizes = str.slice(0, -1).replace(/\x20/g, '\xA0').replace(/[^B]$/gm, '$&B');
+  $cache.sizes = formatSizesStr(str);
   $cache.sizeNum = total;
   $cache.sizesNum = sizes;
   $cache[kStorageSize] = sizes[2];

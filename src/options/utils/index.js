@@ -46,6 +46,10 @@ export const SIZE_TITLES = [
   '@require',
   '@resource',
 ];
+export const formatSizesStr = str => str
+  .slice(0, -1) // drop space
+  .replace(/\x20/g, '\xA0') // prevent wrapping for big space-separated numbers
+  .replace(/[^B]$/gm, '$&B'); // add B to units e.g.g M -> MB
 
 export let K_SAVE; // deduced from the current CodeMirror keymap
 
