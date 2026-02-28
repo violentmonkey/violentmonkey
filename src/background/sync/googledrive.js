@@ -181,7 +181,7 @@ const GoogleDrive = BaseService.extend({
   list() {
     throw new Error('Not supported');
   },
-  get({ id }) {
+  async get({ id }) {
     if (!id) throw new Error('Invalid file ID');
     return this.loadData({
       url: `/files/${id}?alt=media`,
