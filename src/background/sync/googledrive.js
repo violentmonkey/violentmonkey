@@ -75,11 +75,14 @@ const GoogleDrive = BaseService.extend({
       if (!params.pageToken) break;
     }
     let metaFile;
+    let optionsFile;
     const remoteData = files
       .filter((item) => {
         if (isScriptFile(item.name)) return true;
         if (!metaFile && item.name === this.metaFile) {
           metaFile = item;
+        } else if (!optionsFile && item.name === this.optionsFile) {
+          optionsFile = item;
         } else {
           this.remove(item);
         }
@@ -93,18 +96,22 @@ const GoogleDrive = BaseService.extend({
         }
         return true;
       });
-    const metaItem = metaFile ? normalize(metaFile) : {};
-    const gotMeta = this.get(metaItem)
-      .then((data) => JSON.parse(data))
-      .catch((err) => this.metaError(err))
-      .then((data) =>
-        Object.assign({}, metaItem, {
-          name: this.metaFile,
+    const getJsonFile = (file, name, onError) => {
+      const item = file ? normalize(file) : {};
+      return (file ? this.get(item) : Promise.resolve('{}'))
+        .then((data) => JSON.parse(data))
+        .catch((err) => onError ? onError(err) : {})
+        .then((data) => Object.assign({}, item, {
+          name,
           uri: null,
           data,
-        }),
-      );
-    return Promise.all([gotMeta, remoteData, this.getLocalData()]);
+        }));
+    };
+    const gotMeta = getJsonFile(metaFile, this.metaFile,
+      err => this.metaError(err));
+    const gotOptions = getJsonFile(optionsFile, this.optionsFile);
+    return Promise.all([gotMeta, remoteData, this.getLocalData(),
+      gotOptions]);
   },
   async authorize() {
     this.session = {
