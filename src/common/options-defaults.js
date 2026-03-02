@@ -51,6 +51,7 @@ export default {
   features: null,
   syncScriptStatus: true,
   syncAutomatically: true,
+  syncSettings: true,
   sync: null,
   customCSS: '',
   importScriptData: true,

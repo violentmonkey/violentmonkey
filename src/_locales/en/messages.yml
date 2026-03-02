@@ -619,6 +619,9 @@ labelSyncServerUrl:
 labelSyncService:
   description: Label for sync service select.
   message: Sync to
+labelSyncSettings:
+  description: Label for option to sync settings.
+  message: Sync settings
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Username: '
