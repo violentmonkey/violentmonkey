@@ -220,7 +220,7 @@ export async function injectScripts(data, info, isXml) {
   if (!shouldDeferFeedback && (more || toContent.length)) {
     moreData = sendFeedback(toContent, more);
   }
-  const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
+  const getReadyState = describeProperty(Document[PROTO], 'readyState').get;
   const wasInjectableFF = IS_FIREFOX && !nonce && pageInjectable;
   const pageBodyScripts = pageLists?.[BODY];
   if (wasInjectableFF) {
@@ -257,23 +257,27 @@ export async function injectScripts(data, info, isXml) {
   }
   if (more && (data = await moreData)) {
     assign(bridge[CACHE], data[CACHE]);
-    if (document::getReadyState() === 'loading') {
-      await new SafePromise(resolve => {
-        /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
-         * by listening on `window` which follows `document` when the event bubbles up. */
-        on('DOMContentLoaded', resolve, { once: true });
-      });
-      await 0; // let the site's listeners on `window` run first
-    }
     if (wasInjectableFF && didPageLoseInjectability(toContent, data[SCRIPTS])) {
       sendFeedback(toContent);
     }
     for (const scr of data[SCRIPTS]) {
       triageScript(scr);
     }
-    await injectAll('end');
-    await injectAll('idle');
   }
+  // Always dispatch 'end' and 'idle' scripts after DOMContentLoaded regardless of
+  // whether a second GetInjected response was needed (more=false). In MV3, all scripts
+  // may arrive in the first response, so their contLists['end'] entries must still be
+  // dispatched here to install the defineProperty setters before scripting.executeScript.
+  if (document::getReadyState() === 'loading') {
+    await new SafePromise(resolve => {
+      /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
+       * by listening on `window` which follows `document` when the event bubbles up. */
+      on('DOMContentLoaded', resolve, { once: true });
+    });
+    await 0; // let the site's listeners on `window` run first
+  }
+  await injectAll('end');
+  await injectAll('idle');
   // release for GC
   // Keep `scriptPhases` alive because delayed `tardyQueueCheck` callbacks may still run.
   // Keep `scriptDiagnostics` for the same reason.
