@@ -18,7 +18,7 @@ addBackgroundHandlers({
     for (const realm in grantless) {
       bridge.post('GetGrantless', null, realm);
     }
-    sendSetPopup();
+    void sendSetPopup().catch(logging.error);
   },
 }, true);
 
@@ -57,12 +57,12 @@ addHandlers({
 
   RegisterMenu({ id, key, val }) {
     (menus[id] || (menus[id] = createNullObj()))[key] = val;
-    sendSetPopup(true);
+    void sendSetPopup(true).catch(logging.error);
   },
 
   UnregisterMenu({ id, key }) {
     delete menus[id]?.[key];
-    sendSetPopup(true);
+    void sendSetPopup(true).catch(logging.error);
   },
 });
 

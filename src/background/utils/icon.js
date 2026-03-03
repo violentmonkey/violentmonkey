@@ -91,7 +91,15 @@ hookOptions((changes) => {
   if ((v = changes[IS_APPLIED]) != null) {
     isApplied = v;
     setIcon(); // change the default icon
-    jobs.push(setIcon); // change the current tabs' icons
+    jobs.push((tab) => {
+      const data = badges[tab.id];
+      // A tab loaded while disabled may keep a stale "off" marker until the next top-frame run.
+      // Clear it when re-enabling so popup/title state reflects the global toggle immediately.
+      if (v && data?.[INJECT] === 'off') {
+        data[INJECT] = null;
+      }
+      updateState(tab, data);
+    });
   }
   if ((v = changes[KEY_SHOW_BADGE]) != null) {
     showBadge = v;
@@ -308,9 +316,10 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
 
 /** Omitting `data` = check whether injection is allowed for `url` */
 export function getFailureReason(url, data, def = titleDefault) {
+  const applied = isApplied ?? getOption(IS_APPLIED);
   return !injectableRe.test(url) ? [titleNoninjectable, INJECT_INTO]
     : ((url = testBlacklist(url))) ? [titleBlacklisted, 'blacklisted', url]
-      : !isApplied || data?.[INJECT] === 'off' ? [titleDisabled, IS_APPLIED]
+      : !applied || data?.[INJECT] === 'off' ? [titleDisabled, IS_APPLIED]
         : !data ? []
           : data[INJECT] === SKIP_SCRIPTS
             ? [titleSkipped, SKIP_SCRIPTS]

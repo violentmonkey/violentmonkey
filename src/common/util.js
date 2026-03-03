@@ -401,5 +401,8 @@ export function normalizeTag(tag) {
 }
 
 export function escapeStringForRegExp(str) {
-  return str.replace(/[\\.?+[\]{}()|^$]/g, '\\$&');
+  const special = '\\.?+[]{}()|^$';
+  let out = '';
+  for (const ch of str) out += special.includes(ch) ? `\\${ch}` : ch;
+  return out;
 }

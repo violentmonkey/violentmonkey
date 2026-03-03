@@ -34,8 +34,10 @@ function onShown(evt) {
 }
 
 export function Run(id, realm) {
+  if (!runningIds) runningIds = [];
+  const ids = bridge[IDS] || (bridge[IDS] = createNullObj());
   safePush(runningIds, id);
-  bridge[IDS][id] = realm || PAGE;
+  ids[id] = realm || PAGE;
   if (!pending) pending = report(2);
 }
 

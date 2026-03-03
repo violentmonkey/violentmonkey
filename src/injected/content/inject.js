@@ -7,6 +7,7 @@ const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
 let scriptPhases;
+let scriptDiagnostics;
 let bridgeInfo;
 /** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
 let contLists, pageLists;
@@ -16,7 +17,10 @@ let frameEventWnd;
 /** @type {ShadowRoot} */
 let injectedRoot;
 let invokeContent;
+let contentInvokerUnavailable;
+let contentInvokerError;
 let nonce;
+let evalFallbackPending;
 let getAttribute = Element[PROTO].getAttribute;
 let querySelector = Document[PROTO].querySelector;
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
@@ -25,7 +29,10 @@ const UNSAFE_INLINE = "'unsafe-inline'";
 const IS_CHROMIUM_MV3 = chrome.runtime.getManifest().manifest_version === 3;
 const TARDY_INITIAL_DELAY_MS = IS_CHROMIUM_MV3 ? 500 : 0;
 const TARDY_RECHECK_DELAY_MS = IS_CHROMIUM_MV3 ? 750 : 0;
-const TARDY_MAX_WAIT_MS = IS_CHROMIUM_MV3 ? 2000 : 0;
+// MV3 content bootstrap can take noticeably longer on large scripts/pages before ScriptEntered fires.
+// Keep diagnostics useful but avoid classifying normal startup as a hard stall at ~2s.
+const TARDY_MAX_WAIT_MS = IS_CHROMIUM_MV3 ? 12e3 : 0;
+const TARDY_FALLBACK_GRACE_MS = IS_CHROMIUM_MV3 ? 10e3 : 0;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -38,6 +45,29 @@ addHandlers({
    * FF bug workaround to enable processing of sourceURL in injected page scripts
    */
   InjectList: IS_FIREFOX && injectPageList,
+  ContentEvalBlocked(data) {
+    const scriptId = +data?.scriptId;
+    const dataKey = data?.dataKey;
+    if (!IS_CHROMIUM_MV3 || !(scriptId > 0) || !dataKey) return;
+    if (!evalFallbackPending) evalFallbackPending = createNullObj();
+    evalFallbackPending[scriptId] = Date.now();
+    markScriptPhase(scriptId, 'fallback-dispatched', {
+      realm: CONTENT,
+      checkPhase: 'eval-fallback-dispatch',
+    });
+    sendCmd('InjectionFeedback', {
+      [CONTENT]: [[scriptId, dataKey]],
+      url: location.href,
+    }).catch((error) => {
+      if (process.env.DEBUG) {
+        logging.warn('[vm.bootstrap]', 'content-eval-fallback-failed', {
+          scriptId,
+          reason: `${error?.message || error || ''}`.slice(0, 400),
+          pageUrl: location.href,
+        });
+      }
+    });
+  },
 });
 
 export function injectPageSandbox(data) {
@@ -174,9 +204,17 @@ export async function injectScripts(data, info, isXml) {
   } else if (data[PAGE] && pageInjectable == null) {
     injectPageSandbox(data);
   }
-  const toContent = data[SCRIPTS]
-    .filter(scr => triageScript(scr) === CONTENT)
-    .map(scr => [scr.id, scr.key.data]);
+  let toContent;
+  if (IS_CHROMIUM_MV3) {
+    toContent = [];
+    for (const scr of data[SCRIPTS]) {
+      triageScript(scr);
+    }
+  } else {
+    toContent = data[SCRIPTS]
+      .filter(scr => triageScript(scr) === CONTENT)
+      .map(scr => [scr.id, scr.key.data]);
+  }
   const shouldDeferFeedback = IS_CHROMIUM_MV3;
   let moreData;
   if (!shouldDeferFeedback && (more || toContent.length)) {
@@ -191,6 +229,10 @@ export async function injectScripts(data, info, isXml) {
   }
   tardyQueue = createNullObj();
   scriptPhases = createNullObj();
+  scriptDiagnostics = createNullObj();
+  evalFallbackPending = createNullObj();
+  contentInvokerUnavailable = false;
+  contentInvokerError = '';
   // Using a callback to avoid a microtask tick when the root element exists or appears.
   await onElement('*', injectAll, 'start');
   if (!moreData && (more || toContent.length)) {
@@ -234,16 +276,26 @@ export async function injectScripts(data, info, isXml) {
   }
   // release for GC
   // Keep `scriptPhases` alive because delayed `tardyQueueCheck` callbacks may still run.
+  // Keep `scriptDiagnostics` for the same reason.
   // `markScriptPhase` resets it lazily for subsequent navigations.
   bridgeInfo = contLists = pageLists = VMInitInjection = null;
 }
 
 function markScriptPhase(id, phase, extra) {
-  const map = scriptPhases || (scriptPhases = createNullObj());
-  const state = map[id] || (map[id] = {
-    phase: '',
-    history: [],
-  });
+  let map = scriptPhases;
+  if (!isObject(map)) {
+    // Defend against unexpected runtime clobbering so bootstrap diagnostics don't crash injection.
+    map = scriptPhases = createNullObj() || {};
+  }
+  let state = map[id];
+  if (!isObject(state)) {
+    state = map[id] = {
+      phase: '',
+      history: [],
+    };
+  } else if (!isObject(state.history)) {
+    state.history = [];
+  }
   state.phase = phase;
   const point = {
     phase,
@@ -253,6 +305,27 @@ function markScriptPhase(id, phase, extra) {
   safePush(state.history, point);
   if (state.history.length > 8) state.history.splice(0, state.history.length - 8);
   return state;
+}
+
+function rememberScriptDiagnostics(item, realm, runAt) {
+  const bootstrap = bridge.bootstrap || createNullObj();
+  const pageBridgeReady = IS_CHROMIUM_MV3
+    ? bootstrap.mainBridgeState === 'ready'
+    : !!pageInjectable;
+  scriptDiagnostics[item.id] = {
+    injectInto: item[INJECT_INTO],
+    resolvedRealm: realm,
+    runAt,
+    bridgeReady: !!bridge.post,
+    pageBridgeReady,
+    navigationType: bootstrap.navigationType || '',
+    lastBgResponseMs: bootstrap.getInjectedRttMs || 0,
+    swPingState: bootstrap.swPingState || '',
+    swPingRttMs: bootstrap.swPingRttMs || 0,
+    mainBridgeState: bootstrap.mainBridgeState || '',
+    mainBridgeRttMs: bootstrap.mainBridgeRttMs || 0,
+    mainBridgeError: bootstrap.mainBridgeError || '',
+  };
 }
 
 function hasStrictMetaCsp() {
@@ -320,9 +393,11 @@ function sendFeedback(toContent, more) {
 
 function triageScript(script) {
   let realm = script[INJECT_INTO];
-  realm = (realm === AUTO && !pageInjectable) || realm === CONTENT
+  realm = IS_CHROMIUM_MV3
     ? CONTENT
-    : pageInjectable && PAGE;
+    : (realm === AUTO && !pageInjectable) || realm === CONTENT
+      ? CONTENT
+      : pageInjectable && PAGE;
   if (realm) {
     const lists = realm === CONTENT
       ? contLists || (contLists = createNullObj())
@@ -407,8 +482,12 @@ function inject(item, iframeCb) {
 
 /** @param {VMScriptRunAt} runAt */
 function injectAll(runAt) {
-  if (contLists && !invokeContent) {
+  if (contLists && !invokeContent && !contentInvokerUnavailable) {
     setupContentInvoker();
+  }
+  if (contLists && contentInvokerUnavailable) {
+    reportContentInvokerUnavailable(contLists[runAt], runAt);
+    return;
   }
   let res;
   for (let inPage = 1; inPage >= 0; inPage--) {
@@ -418,12 +497,22 @@ function injectAll(runAt) {
     if (items) {
       bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
-      for (const { id, meta: { grant } } of items) {
+      for (const item of items) {
+        const { id, meta: { grant } } = item;
         tardyQueue[id] = {
           queuedAt: Date.now(),
           nextCheckAt: 0,
         };
+        rememberScriptDiagnostics(item, realm, runAt);
         markScriptPhase(id, 'queued', { realm, runAt });
+        if (process.env.DEBUG) {
+          logging.info('[vm.bootstrap]', 'script-dispatched', {
+            scriptId: id,
+            injectInto: item[INJECT_INTO],
+            realm,
+            runAt,
+          });
+        }
         if (!grant.length) grantless[realm] = 1;
       }
       if (!inPage) scheduleTardyQueueCheck(items, CONTENT, 'post-dispatch', TARDY_INITIAL_DELAY_MS);
@@ -467,6 +556,18 @@ function scheduleTardyQueueCheck(scripts, realm, checkPhase, delay = 0) {
 }
 
 function setupContentInvoker() {
+  if (typeof VMInitInjection !== 'function') {
+    contentInvokerUnavailable = true;
+    contentInvokerError = 'VMInitInjection bootstrap helper is unavailable.';
+    if (process.env.DEBUG) {
+      logging.error('[vm.bootstrap]', 'content-invoker-missing', {
+        reason: contentInvokerError,
+        href: location.href,
+        navigationType: bridge.bootstrap?.navigationType || '',
+      });
+    }
+    return;
+  }
   invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
@@ -477,6 +578,51 @@ function setupContentInvoker() {
   };
 }
 
+function reportContentInvokerUnavailable(items, runAt) {
+  if (!items) return;
+  const bootstrap = bridge.bootstrap || createNullObj();
+  for (const item of items) {
+    const id = item.id;
+    const phase = markScriptPhase(id, 'content-invoker-missing', {
+      realm: CONTENT,
+      runAt,
+    });
+    void sendCmd('DiagnosticsLogScriptIssue', {
+      scriptId: id,
+      scriptName: item.displayName,
+      runAt,
+      realm: CONTENT,
+      state: ID_INJECTING,
+      phase: phase.phase,
+      checkPhase: 'content-invoker-missing',
+      phaseTrail: phase.history,
+      bridgeState: bridgeIds[id],
+      injectInto: item[INJECT_INTO] || '',
+      resolvedRealm: CONTENT,
+      bridgeReady: !!bridge.post,
+      pageBridgeReady: false,
+      navigationType: bootstrap.navigationType || '',
+      lastBgResponseMs: bootstrap.getInjectedRttMs || 0,
+      getInjectedAttempts: bootstrap.getInjectedAttempts || 0,
+      swPingState: bootstrap.swPingState || '',
+      swPingRttMs: bootstrap.swPingRttMs || 0,
+      swPingError: bootstrap.swPingError || '',
+      mainBridgeState: bootstrap.mainBridgeState || '',
+      mainBridgeRttMs: bootstrap.mainBridgeRttMs || 0,
+      mainBridgeError: bootstrap.mainBridgeError || '',
+      lastRuntimeError: bootstrap.lastRuntimeError || '',
+      expectedAck: 'ScriptEntered',
+      ackReceived: false,
+      reason: contentInvokerError || 'Content bootstrap helper is unavailable.',
+      pageUrl: location.href,
+      fingerprint: [id, 'content-invoker-missing', location.href].join('|'),
+      bootstrapError: {
+        message: contentInvokerError || '',
+      },
+    }).catch(() => {});
+  }
+}
+
 /**
  * Chrome doesn't fire a syntax error event, so we'll mark ids that didn't start yet
  * as "still starting", so the popup can show them accordingly.
@@ -484,6 +630,8 @@ function setupContentInvoker() {
 function tardyQueueCheck(scripts, realm = PAGE, checkPhase = 'checkpoint') {
   for (const { id, displayName, [RUN_AT]: runAt } of scripts) {
     if (tardyQueue[id]) {
+      const scriptDiag = scriptDiagnostics?.[id] || createNullObj();
+      const bootstrap = bridge.bootstrap || createNullObj();
       const pending = isObject(tardyQueue[id]) ? tardyQueue[id] : {
         queuedAt: Date.now(),
         nextCheckAt: 0,
@@ -495,23 +643,31 @@ function tardyQueueCheck(scripts, realm = PAGE, checkPhase = 'checkpoint') {
       if (bridgeState && bridgeState !== 1 && bridgeState !== ID_INJECTING && bridgeState !== ID_BAD_REALM) {
         markScriptPhase(id, 'started', { realm, runAt, state: bridgeState });
         delete tardyQueue[id];
+        if (evalFallbackPending) delete evalFallbackPending[id];
+        if (scriptDiagnostics) delete scriptDiagnostics[id];
         continue;
       }
       if (bridgeState === ID_BAD_REALM) {
         markScriptPhase(id, 'bad-realm', { realm, runAt, state: bridgeState });
         delete tardyQueue[id];
+        if (evalFallbackPending) delete evalFallbackPending[id];
+        if (scriptDiagnostics) delete scriptDiagnostics[id];
         continue;
       }
       if (bridgeState === 1) bridgeIds[id] = ID_INJECTING;
       const now = Date.now();
       const elapsedMs = now - (pending.queuedAt || now);
-      if (TARDY_MAX_WAIT_MS && elapsedMs < TARDY_MAX_WAIT_MS) {
+      const hasEvalFallbackPending = !!evalFallbackPending?.[id];
+      const maxWaitMs = TARDY_MAX_WAIT_MS + (hasEvalFallbackPending ? TARDY_FALLBACK_GRACE_MS : 0);
+      if (maxWaitMs && elapsedMs < maxWaitMs) {
         markScriptPhase(id, 'awaiting-start', {
           realm,
           runAt,
           checkPhase,
           state: bridgeIds[id],
           elapsedMs,
+          evalFallbackPending: hasEvalFallbackPending,
+          maxWaitMs,
         });
         if (!pending.nextCheckAt || pending.nextCheckAt <= now) {
           pending.nextCheckAt = now + TARDY_RECHECK_DELAY_MS;
@@ -536,12 +692,31 @@ function tardyQueueCheck(scripts, realm = PAGE, checkPhase = 'checkpoint') {
         checkPhase,
         phaseTrail: phase.history,
         bridgeState: bridgeIds[id],
+        evalFallbackPending: !!evalFallbackPending?.[id],
+        injectInto: scriptDiag.injectInto || '',
+        resolvedRealm: scriptDiag.resolvedRealm || realm,
+        bridgeReady: scriptDiag.bridgeReady,
+        pageBridgeReady: scriptDiag.pageBridgeReady,
+        navigationType: scriptDiag.navigationType || bootstrap.navigationType || '',
+        lastBgResponseMs: scriptDiag.lastBgResponseMs || bootstrap.getInjectedRttMs || 0,
+        getInjectedAttempts: bootstrap.getInjectedAttempts || 0,
+        swPingState: scriptDiag.swPingState || bootstrap.swPingState || '',
+        swPingRttMs: scriptDiag.swPingRttMs || bootstrap.swPingRttMs || 0,
+        swPingError: bootstrap.swPingError || '',
+        mainBridgeState: scriptDiag.mainBridgeState || bootstrap.mainBridgeState || '',
+        mainBridgeRttMs: scriptDiag.mainBridgeRttMs || bootstrap.mainBridgeRttMs || 0,
+        mainBridgeError: scriptDiag.mainBridgeError || bootstrap.mainBridgeError || '',
+        lastRuntimeError: bootstrap.lastRuntimeError || '',
+        expectedAck: 'ScriptEntered',
+        ackReceived: false,
         reason: 'Script did not begin execution after injection.',
         pageUrl: location.href,
         fingerprint: [id, location.href].filter(Boolean).join('|'),
         elapsedMs,
       }).catch(() => {});
       delete tardyQueue[id];
+      if (evalFallbackPending) delete evalFallbackPending[id];
+      if (scriptDiagnostics) delete scriptDiagnostics[id];
     }
   }
 }

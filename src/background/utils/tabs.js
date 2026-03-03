@@ -47,6 +47,21 @@ const USERSCRIPT_UNREGISTER_DELAY = 30e3;
 const USERSCRIPT_HEALTH_TTL = 60e3;
 const USERSCRIPT_ONE_SHOT_ID_PREFIX = 'vm-one-shot-';
 const USERSCRIPT_DISABLED_RE = /allow user scripts|user scripts? (?:is|are)? ?(?:disabled|not enabled|not allowed)|not been granted permission|access to user scripts|cannot access user scripts/i;
+const MAIN_WORLD_BRIDGE_SCRIPT_ID = 'vm-main-bridge';
+const MAIN_BRIDGE_INIT_FUNC_NAME = process.env.INIT_FUNC_NAME || '**VMInitInjection**';
+// Additive MAIN-world bridge for MV3. The existing isolated-world bootstrap remains active
+// so current content startup behavior stays backward-compatible while we migrate bridge usage.
+const MAIN_WORLD_BRIDGE_OPTIONS = {
+  id: MAIN_WORLD_BRIDGE_SCRIPT_ID,
+  matches: ['*://*/*', 'file:///*'],
+  js: ['injected-web.js'],
+  // Keep this additive bridge off document_start so it won't race/override
+  // the isolated-world bootstrap helper consumed during content startup.
+  runAt: 'document_end',
+  allFrames: true,
+  world: 'MAIN',
+  persistAcrossSessions: true,
+};
 let userScriptSeq = 0;
 const registeredUserScriptsByTab = new Map();
 let staleUserScriptsCleanupApi;
@@ -90,13 +105,14 @@ addOwnCommands({
       pathId || `_new/${src?.tab?.id || (await getActiveTab()).id}`
     }`, src);
   },
-  async OpenEditorAt({
-    id,
-    line,
-    column,
-    source,
-    requireUrl,
-  } = {}, src) {
+  async OpenEditorAt(payload, src) {
+    const {
+      id,
+      line,
+      column,
+      source,
+      requireUrl,
+    } = payload || {};
     const scriptId = +id;
     if (!Number.isInteger(scriptId) || scriptId <= 0) {
       return commands.OpenEditor(id, src);
@@ -119,13 +135,14 @@ addOwnCommands({
 
 addPublicCommands({
   /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
-  async TabOpen({
-    url,
-    active = true,
-    container,
-    insert = true,
-    pinned,
-  }, src = {}) {
+  async TabOpen(payload, src = {}) {
+    let {
+      url,
+      active = true,
+      container,
+      insert = true,
+      pinned,
+    } = payload || {};
     const isRemoved = src._removed;
     // src.tab may be absent when invoked from popup (e.g. edit/create buttons)
     const srcTab = !isRemoved && src.tab
@@ -215,13 +232,44 @@ addPublicCommands({
     return isInternal ? newTab : { id: newTab.id };
   },
   /** @return {void} */
-  TabClose({ id } = {}, src) {
+  TabClose(payload, src) {
+    const { id } = payload || {};
     const tabId = id || src?.tab?.id;
     if (tabId >= 0) browser.tabs.remove(tabId);
   },
   TabFocus(_, src) {
     browser.tabs.update(src.tab.id, { active: true }).catch(noop);
     browserWindows?.update(src.tab[kWindowId], { focused: true }).catch(noop);
+  },
+  async MainBridgePing(_, src) {
+    if (extensionManifest.manifest_version !== 3) {
+      return { state: 'unsupported' };
+    }
+    const tabId = src?.tab?.id;
+    if (!(tabId >= 0)) {
+      return { state: 'no-tab' };
+    }
+    const frameId = src?.[kFrameId];
+    try {
+      const [result = {}] = await executeScriptInTab(tabId, {
+        ...frameId >= 0 && { [kFrameId]: frameId },
+        world: 'MAIN',
+        func: key => ({
+          ready: typeof globalThis[key] === 'function',
+          url: location.href,
+        }),
+        args: [MAIN_BRIDGE_INIT_FUNC_NAME],
+      });
+      return {
+        state: result.ready ? 'ready' : 'missing',
+        url: result.url || '',
+      };
+    } catch (error) {
+      return {
+        state: 'error',
+        message: `${error?.message || error || ''}`.slice(0, 400),
+      };
+    }
   },
 });
 
@@ -273,6 +321,7 @@ export async function forEachTab(callback) {
 export async function executeScriptInTab(tabId, options) {
   if (options.tryUserScripts) {
     const userScriptsApi = getUserScriptsApi();
+    const canExecuteNow = !!userScriptsApi?.execute;
     if (!userScriptsApi?.execute && !userScriptsApi?.register && !warnedMissingUserScriptsApi) {
       warnedMissingUserScriptsApi = true;
       if (process.env.DEBUG) {
@@ -288,12 +337,15 @@ export async function executeScriptInTab(tabId, options) {
         console.warn('MV3: userScripts.execute is unavailable for a strict no-legacy-fallback path.');
       }
     }
-    const canTryRegister = options.allowRegisterFallback !== false && options[kFrameId] <= 0;
-    if (canTryRegister && options.preferRegister && await registerUserScriptOnce(tabId, options)) {
+    const canTryRegister = options.allowRegisterFallback !== false && (options[kFrameId] ?? 0) <= 0;
+    // `userScripts.register` is not guaranteed to run immediately on the current document.
+    // Prefer `userScripts.execute` for one-shot runtime injection, then fallback to register.
+    if (canTryRegister && options.preferRegister && !canExecuteNow
+    && await registerUserScriptOnce(tabId, options)) {
       return [true];
     }
     const executed = await executeUserScriptCode(tabId, options);
-    if (executed) return executed;
+    if (executed?.length) return executed;
     if (canTryRegister
     && await registerUserScriptOnce(tabId, options)) {
       return [true];
@@ -315,8 +367,12 @@ export async function executeScriptInTab(tabId, options) {
   if (options[kFrameId] != null) target.frameIds = [options[kFrameId]];
   if (options.allFrames) target.allFrames = true;
   const injectDetails = { target };
+  if (options.world) injectDetails.world = options.world;
   if (options[RUN_AT] === 'document_start') injectDetails.injectImmediately = true;
-  if (options.file) injectDetails.files = [options.file];
+  if (options.func) {
+    injectDetails.func = options.func;
+    injectDetails.args = options.args || [];
+  } else if (options.file) injectDetails.files = [options.file];
   else if (options.files) injectDetails.files = options.files;
   else {
     if (extensionManifest.manifest_version === 3) {
@@ -358,6 +414,56 @@ export async function executeScriptInTab(tabId, options) {
 
 function getUserScriptsApi() {
   return chrome.userScripts || browser.userScripts;
+}
+
+function getScriptingApi() {
+  return chrome.scripting || browser.scripting;
+}
+
+function isMainWorldBridgeCurrent(entry) {
+  return !!entry
+    && entry.id === MAIN_WORLD_BRIDGE_OPTIONS.id
+    && entry.runAt === MAIN_WORLD_BRIDGE_OPTIONS.runAt
+    && entry.allFrames === MAIN_WORLD_BRIDGE_OPTIONS.allFrames
+    && entry.world === MAIN_WORLD_BRIDGE_OPTIONS.world
+    && JSON.stringify(entry.matches || []) === JSON.stringify(MAIN_WORLD_BRIDGE_OPTIONS.matches)
+    && JSON.stringify(entry.js || []) === JSON.stringify(MAIN_WORLD_BRIDGE_OPTIONS.js);
+}
+
+export async function ensureMainWorldBridgeRegistration(force = false) {
+  if (extensionManifest.manifest_version !== 3) return false;
+  const scripting = getScriptingApi();
+  if (!scripting?.registerContentScripts) return false;
+  let existing;
+  try {
+    existing = scripting.getRegisteredContentScripts
+      ? await scripting.getRegisteredContentScripts({ ids: [MAIN_WORLD_BRIDGE_SCRIPT_ID] })
+      : [];
+  } catch (e) {
+    existing = [];
+  }
+  const current = existing?.[0];
+  if (!force && isMainWorldBridgeCurrent(current)) return true;
+  try {
+    if (current && scripting.unregisterContentScripts) {
+      await scripting.unregisterContentScripts({ ids: [MAIN_WORLD_BRIDGE_SCRIPT_ID] });
+    }
+    await scripting.registerContentScripts([MAIN_WORLD_BRIDGE_OPTIONS]);
+    return true;
+  } catch (e) {
+    const message = `${e?.message || e || ''}`;
+    if (/already exists|duplicate/i.test(message) && scripting.unregisterContentScripts) {
+      try {
+        await scripting.unregisterContentScripts({ ids: [MAIN_WORLD_BRIDGE_SCRIPT_ID] });
+        await scripting.registerContentScripts([MAIN_WORLD_BRIDGE_OPTIONS]);
+        return true;
+      } catch { /* NOP */ }
+    }
+    if (process.env.DEBUG) {
+      console.warn('MV3 main-world bridge registration failed', e);
+    }
+    return false;
+  }
 }
 
 function getUserScriptsEnableMessage() {
@@ -435,12 +541,14 @@ async function executeUserScriptCode(tabId, options) {
   const api = getUserScriptsApi();
   if (!api?.execute || !options?.code) return null;
   const target = { tabId };
+  const userScriptsWorld = normalizeWorldForUserScripts(options.world);
   if (options[kFrameId] != null) target.frameIds = [options[kFrameId]];
   if (options.allFrames) target.allFrames = true;
   try {
     const result = await api.execute({
       target,
       js: [{ code: options.code || '' }],
+      ...userScriptsWorld && { world: userScriptsWorld },
       ...options[RUN_AT] === 'document_start' && { injectImmediately: true },
     });
     if (!result?.map) return [];
@@ -542,6 +650,7 @@ function makeUserScriptMatch(url) {
 export async function registerUserScriptOnce(tabId, options) {
   const api = getUserScriptsApi();
   if (!api?.register || !options?.code || options[kFrameId] > 0) return false;
+  const userScriptsWorld = normalizeWorldForUserScripts(options.world);
   await cleanupStaleUserScriptsAtStartup();
   const tab = browser.tabs.get
     ? await browser.tabs.get(tabId).catch(noop)
@@ -556,6 +665,7 @@ export async function registerUserScriptOnce(tabId, options) {
       js: [{ code: options.code || '' }],
       runAt: options[RUN_AT] || 'document_start',
       allFrames: !!options.allFrames,
+      ...userScriptsWorld && { world: userScriptsWorld },
     }]);
     rememberRegisteredUserScript(tabId, id);
     const timer = setTimeout(() => {
@@ -569,6 +679,84 @@ export async function registerUserScriptOnce(tabId, options) {
     }
     return false;
   }
+}
+
+/**
+ * Registers a one-shot ISOLATED-world content script via scripting.registerContentScripts.
+ * Returns true on success.
+ */
+export async function registerIsolatedContentScriptOnce(tabId, options) {
+  const scripting = getScriptingApi();
+  if (!scripting?.registerContentScripts || !options?.code) return false;
+  const tab = browser.tabs.get
+    ? await browser.tabs.get(tabId).catch(noop)
+    : null;
+  const match = makeUserScriptMatch(getTabUrl(tab || {}));
+  if (!match) return false;
+  const id = `${USERSCRIPT_ONE_SHOT_ID_PREFIX}iso-${Date.now()}-${tabId}-${++userScriptSeq}`;
+  try {
+    await scripting.registerContentScripts([{
+      id,
+      matches: [match],
+      js: [{ code: options.code || '' }],
+      runAt: options[RUN_AT] || 'document_end',
+      allFrames: !!options.allFrames,
+      persistAcrossSessions: false,
+    }]);
+    rememberRegisteredUserScript(tabId, id);
+    const timer = setTimeout(() => {
+      cleanupRegisteredUserScripts(tabId, [id]);
+    }, USERSCRIPT_UNREGISTER_DELAY);
+    timer?.unref?.();
+    return true;
+  } catch (e) {
+    if (process.env.DEBUG) {
+      console.warn('registerContentScripts ISOLATED fallback failed', e);
+    }
+    return false;
+  }
+}
+
+/**
+ * Registers a one-shot MAIN-world content script via scripting.registerContentScripts.
+ * Useful for CSP eval fallbacks that must plant data on the real page window.
+ */
+export async function registerMainWorldContentScriptOnce(tabId, options) {
+  const scripting = getScriptingApi();
+  if (!scripting?.registerContentScripts || !options?.code) return false;
+  const tab = browser.tabs.get
+    ? await browser.tabs.get(tabId).catch(noop)
+    : null;
+  const match = makeUserScriptMatch(getTabUrl(tab || {}));
+  if (!match) return false;
+  const id = `${USERSCRIPT_ONE_SHOT_ID_PREFIX}main-${Date.now()}-${tabId}-${++userScriptSeq}`;
+  try {
+    await scripting.registerContentScripts([{
+      id,
+      matches: [match],
+      js: [{ code: options.code || '' }],
+      runAt: options[RUN_AT] || 'document_end',
+      allFrames: !!options.allFrames,
+      world: 'MAIN',
+      persistAcrossSessions: false,
+    }]);
+    rememberRegisteredUserScript(tabId, id);
+    const timer = setTimeout(() => {
+      cleanupRegisteredUserScripts(tabId, [id]);
+    }, USERSCRIPT_UNREGISTER_DELAY);
+    timer?.unref?.();
+    return true;
+  } catch (e) {
+    if (process.env.DEBUG) {
+      console.warn('registerContentScripts MAIN-world fallback failed', e);
+    }
+    return false;
+  }
+}
+
+function normalizeWorldForUserScripts(world) {
+  // userScripts APIs run in USER_SCRIPT by default; only MAIN needs explicit opt-in.
+  return world === 'MAIN' ? 'MAIN' : '';
 }
 
 /**
@@ -599,4 +787,11 @@ export async function reloadTabForScript(script) {
 if (extensionManifest.manifest_version === 3) {
   void cleanupStaleUserScriptsAtStartup();
   void getUserScriptsHealth(true);
+  void ensureMainWorldBridgeRegistration();
+  browser.runtime.onInstalled?.addListener(() => {
+    void ensureMainWorldBridgeRegistration(true);
+  });
+  browser.runtime.onStartup?.addListener(() => {
+    void ensureMainWorldBridgeRegistration();
+  });
 }

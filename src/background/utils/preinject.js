@@ -16,7 +16,7 @@ import { clearNotifications } from './notifications';
 import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
 import { analyzeCspForInject } from './preinject-csp';
-import { logBackgroundError } from './diagnostics';
+import { logBackgroundAction, logBackgroundError } from './diagnostics';
 import { clearRequestsByTabId, reifyRequests } from './requests';
 import { kSetCookie } from './requests-core';
 import { updateVisitedTime } from './script';
@@ -32,6 +32,8 @@ import {
   injectableRe,
   tabsOnUpdated,
   tabsOnRemoved,
+  registerIsolatedContentScriptOnce,
+  registerMainWorldContentScriptOnce,
 } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
 import { ua } from './ua';
@@ -109,6 +111,7 @@ const getKey = (url, isTop) => (
 const getBaseUrl = url => url?.split('#', 1)[0] || url;
 const getCspHintKey = (tabId, url) => `${tabId}\n${getBaseUrl(url)}`;
 const CSP_HINT_WAIT_MS = 75;
+const SCRIPT_ENTERED_HOOK = '__VM_SCRIPT_ENTERED__';
 const cspHints = Object.create(null);
 const cspHintWaiters = Object.create(null);
 const normalizeRealm = val => (
@@ -185,7 +188,12 @@ addOwnCommands({
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({ url, [FORCE_CONTENT]: forceContent, done }, src) {
+  async GetInjected(payload, src) {
+    let {
+      url,
+      [FORCE_CONTENT]: forceContent,
+      done,
+    } = payload || {};
     const { tab, [kFrameId]: frameId, [kTop]: isTop } = src;
     const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
@@ -205,13 +213,26 @@ addPublicCommands({
     const inject = bag[INJECT];
     if (IS_MV3 && tabId >= 0) {
       const cspHintKey = getCspHintKey(tabId, url);
-      let cspHint = cspHints[cspHintKey];
-      if (!cspHint && inject[PAGE] && !bag[FORCE_CONTENT]) {
-        // In MV3 this can race with onHeadersReceived on first load.
-        cspHint = await waitForCspHint(cspHintKey);
-      }
+      const cspHint = cspHints[cspHintKey];
       if (cspHint) {
         applyCspResultToBag(cspHint, bag, url);
+      } else if (inject[PAGE] && !bag[FORCE_CONTENT]) {
+        logBackgroundAction('preinject.cspHint.pending', {
+          tabId,
+          url: getBaseUrl(url),
+        }, 'debug');
+        // Block GetInjected for up to CSP_HINT_WAIT_MS so triageRealms sees
+        // the correct realm (forceContent / nonce) before scripts are dispatched.
+        const hint = await waitForCspHint(cspHintKey);
+        if (hint) {
+          applyCspResultToBag(hint, bag, url);
+          logBackgroundAction('preinject.cspHint.applied', {
+            tabId,
+            url: getBaseUrl(url),
+            forceContent: !!hint.forceContent,
+            nonce: !!hint.nonce,
+          }, 'debug');
+        }
       }
     }
     const scripts = inject[SCRIPTS];
@@ -229,12 +250,13 @@ addPublicCommands({
       ? !done && inject
       : { [INJECT_INTO]: 'off', ...inject };
   },
-  async InjectionFeedback({
-    [FORCE_CONTENT]: forceContent,
-    [CONTENT]: items,
-    [MORE]: moreKey,
-    url,
-  }, src) {
+  async InjectionFeedback(payload, src) {
+    let {
+      [FORCE_CONTENT]: forceContent,
+      [CONTENT]: items,
+      [MORE]: moreKey,
+      url,
+    } = payload || {};
     if (!isApplied) return; // the user disabled injection right after page started loading
     const { tab, [kFrameId]: frameId } = src;
     const isTop = src[kTop];
@@ -243,7 +265,7 @@ addPublicCommands({
       const hintedUrl = url || src.url || tab.url;
       if (hintedUrl) {
         const key = getCspHintKey(tabId, hintedUrl);
-        publishCspHint(key, { forceContent: true });
+        publishCspHint(key, { forceContent: true }, 'feedback');
         const bag = cache.get(getKey(hintedUrl, true));
         if (bag) applyCspResultToBag(cspHints[key], bag, hintedUrl);
       }
@@ -266,7 +288,8 @@ addPublicCommands({
       [S_CACHE]: envCache,
     };
   },
-  Run({ [IDS]: ids, reset }, src) {
+  Run(payload, src) {
+    const { [IDS]: ids, reset } = payload || {};
     const {
       [kDocumentId]: docId,
       [kTop]: isTop,
@@ -586,6 +609,7 @@ function prepareScript(script, env) {
   const startIIFE = topLevelAwait ? 'await(async' : '(';
   const grantNone = grant.includes('none');
   const shouldUpdate = !!script.config.shouldUpdate;
+  const enteredHookCall = `window.${SCRIPT_ENTERED_HOOK}&&window.${SCRIPT_ENTERED_HOOK}(${id});`;
   // Storing slices separately to reuse JS-internalized strings for code in our storage cache
   const injectedCode = [];
   const metaCopy = meta::mapEntry(null, pluralizeMeta);
@@ -626,6 +650,7 @@ function prepareScript(script, env) {
       // using a shadowed name to avoid scope pollution
       grantNone ? GRANT_NONE_VARS : 'GM',
       wrapTryCatch ? `,${dataKey}){try{` : '){',
+      enteredHookCall,
       grantNone ? '' : 'with(this)with(c)delete c,',
       !topLevelAwait ? '(' : wrapTryCatch ? startIIFE : '(async',
       // hiding module interface from @require'd scripts so they don't mistakenly use it
@@ -647,6 +672,10 @@ function prepareScript(script, env) {
   }
   if (tmp && isUnsafeConcat(code)) {
     injectedCode.push(';');
+  }
+  // @unwrap scripts bypass VM wrapper, so trigger startup ACK directly as the first statement.
+  if (!wrap) {
+    injectedCode.push(enteredHookCall);
   }
   codeIndex = injectedCode.length;
   injectedCode.push(code);
@@ -682,18 +711,27 @@ function prepareScript(script, env) {
 }
 
 function triageRealms(scripts, forceContent, tabId, frameId, bag) {
+  // Always allow background-side planting so CSP eval fallbacks can hand off payloads,
+  // including MV3 where local Function() may be blocked.
+  const shouldInjectViaBackground = true;
   let code;
   let wantsPage;
   const toContent = [];
   for (const /**@type{VMInjection.Script}*/ scr of scripts) {
     const metaStr = scr[META_STR];
-    if (isContentRealm(scr[INJECT_INTO], forceContent)) {
+    const runAsContent = IS_MV3 || isContentRealm(scr[INJECT_INTO], forceContent);
+    if (runAsContent) {
       if (!metaStr[0]) {
         const [, i, from, to] = metaStr;
         metaStr[0] = scr[__CODE][i].slice(from, to);
       }
-      code = '';
-      toContent.push([scr.id, scr.key.data]);
+      if (shouldInjectViaBackground) {
+        code = '';
+        toContent.push([scr.id, scr.key.data]);
+      } else {
+        // MV3: content script executes this wrapper locally via Function().
+        code = scr[__CODE].join('');
+      }
     } else {
       metaStr[0] = '';
       code = forceContent ? ID_BAD_REALM : scr[__CODE];
@@ -702,9 +740,11 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
     scr.code = code;
   }
   if (bag) {
-    bag[INJECT][PAGE] = wantsPage || triagePageRealm(bag[MORE]);
+    bag[INJECT][PAGE] = IS_MV3
+      ? false
+      : wantsPage || triagePageRealm(bag[MORE]);
   }
-  if (toContent[0]) {
+  if (shouldInjectViaBackground && toContent[0]) {
     // Processing known feedback without waiting for InjectionFeedback message.
     // Running in a separate task as executeScript may take a long time to serialize code.
     setTimeout(injectContentRealm, 0, toContent, tabId, frameId);
@@ -719,7 +759,7 @@ function injectContentRealm(toContent, tabId, frameId) {
   for (const [id, dataKey] of toContent) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
-    const options = {
+    const baseOptions = {
       code: scr[__CODE].join(''),
       [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
       ...frameId > 0 && { [kFrameId]: frameId },
@@ -727,8 +767,12 @@ function injectContentRealm(toContent, tabId, frameId) {
       preferRegister: IS_MV3 && frameId <= 0,
       allowLegacyCodeFallback: !IS_MV3,
     };
-    executeScriptInTab(tabId, options)
-      .then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })))
+    // Always notify content that the script ran so the tardy queue clears.
+    // Non-UNWRAP scripts run in MAIN/USER_SCRIPT world where window.__VM_SCRIPT_ENTERED__
+    // is invisible (world boundary), so ScriptEntered never fires from the wrapper.
+    // The background must send Run(id) explicitly for every successfully executed script.
+    executeContentRealmWithImmediateFallback(tabId, frameId, scr, baseOptions)
+      .then(result => result?.length && sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId }))
       .catch((error) => {
         logBackgroundError('userscript.content.execute.failed', error, {
           scriptId: id,
@@ -747,6 +791,160 @@ function injectContentRealm(toContent, tabId, frameId) {
         });
       });
   }
+}
+
+async function executeContentRealmWithImmediateFallback(tabId, frameId, scr, baseOptions) {
+  const immediateAttempts = IS_MV3
+    ? [{
+      label: 'userscript-main-execute',
+      options: {
+        ...baseOptions,
+        world: 'MAIN',
+        preferRegister: false,
+        allowRegisterFallback: true,
+        // keep legacy fallback disabled here; we rely on userScripts register/execute
+        allowLegacyCodeFallback: false,
+      },
+    }, {
+      label: 'userscript-world-execute',
+      options: {
+        ...baseOptions,
+        preferRegister: false,
+        allowRegisterFallback: true,
+        allowLegacyCodeFallback: false,
+      },
+    }]
+    : [{
+      label: 'legacy-execute',
+      options: baseOptions,
+    }];
+  let lastError = '';
+  for (const attempt of immediateAttempts) {
+    try {
+      const result = await executeScriptInTab(tabId, attempt.options);
+      if (result?.length) {
+        logBackgroundAction('userscript.content.execute.attempt', {
+          scriptId: scr.id,
+          scriptName: scr.displayName,
+          runAt: scr[RUN_AT],
+          realm: 'content',
+          phase: 'execute-script',
+          attempt: attempt.label,
+          resultCount: result.length,
+          sender: {
+            tabId,
+            frameId,
+          },
+        }, 'debug');
+        return result;
+      }
+      lastError = `No execution results returned by ${attempt.label}.`;
+      logBackgroundAction('userscript.content.execute.attempt', {
+        scriptId: scr.id,
+        scriptName: scr.displayName,
+        runAt: scr[RUN_AT],
+        realm: 'content',
+        phase: 'execute-script',
+        attempt: attempt.label,
+        resultCount: result?.length || 0,
+        lastError,
+        sender: { tabId, frameId },
+      }, 'debug');
+    } catch (error) {
+      lastError = `${error?.message || error || ''}`.slice(0, 400);
+      logBackgroundAction('userscript.content.execute.attempt.error', {
+        scriptId: scr.id,
+        scriptName: scr.displayName,
+        runAt: scr[RUN_AT],
+        realm: 'content',
+        phase: 'execute-script',
+        attempt: attempt.label,
+        error: lastError,
+        sender: { tabId, frameId },
+      }, 'debug');
+    }
+  }
+  // Fallback: use scripting.executeScript with a safe Function wrapper in isolated world.
+  try {
+    const result = await executeScriptInTab(tabId, {
+      func: (source) => {
+        try { (0, eval)(source); return true; } catch (e) { return `err:${e?.message || e}`; }
+      },
+      args: [baseOptions.code],
+      ...frameId > 0 && { [kFrameId]: frameId },
+      [RUN_AT]: baseOptions[RUN_AT],
+    });
+    if (result?.length && result[0] === true) {
+      logBackgroundAction('userscript.content.execute.fallback.func', {
+        scriptId: scr.id,
+        scriptName: scr.displayName,
+        runAt: scr[RUN_AT],
+        realm: 'content',
+        phase: 'execute-script',
+      }, 'debug');
+      return result;
+    }
+    logBackgroundAction('userscript.content.execute.fallback.func', {
+      scriptId: scr.id,
+      scriptName: scr.displayName,
+      runAt: scr[RUN_AT],
+      realm: 'content',
+      phase: 'execute-script',
+      result: result?.[0] || null,
+    }, 'debug');
+  } catch (e) {
+    lastError = `${e?.message || e || ''}`.slice(0, 400);
+    logBackgroundAction('userscript.content.execute.fallback.func.error', {
+      scriptId: scr.id,
+      scriptName: scr.displayName,
+      runAt: scr[RUN_AT],
+      realm: 'content',
+      phase: 'execute-script',
+      error: lastError,
+    }, 'debug');
+  }
+  if (IS_MV3) {
+    const registeredIso = await registerIsolatedContentScriptOnce(tabId, {
+      code: baseOptions.code,
+      [RUN_AT]: baseOptions[RUN_AT],
+      allFrames: baseOptions.allFrames,
+    });
+    logBackgroundAction('userscript.content.register.isolated', {
+      scriptId: scr.id,
+      success: registeredIso,
+      runAt: scr[RUN_AT],
+      tabId,
+      frameId,
+    }, 'debug');
+    if (registeredIso) return [true];
+  }
+  if (IS_MV3 && frameId <= 0) {
+    const registered = await registerMainWorldContentScriptOnce(tabId, {
+      code: baseOptions.code,
+      [RUN_AT]: baseOptions[RUN_AT],
+      allFrames: baseOptions.allFrames,
+    });
+    logBackgroundAction('userscript.content.register.main', {
+      scriptId: scr.id,
+      success: registered,
+      runAt: scr[RUN_AT],
+      tabId,
+      frameId,
+    }, 'debug');
+    if (registered) {
+      return [true];
+    }
+  }
+  if (IS_MV3 && frameId <= 0) {
+    // Best-effort registration keeps pre-135 runtimes working on a subsequent navigation.
+    await executeScriptInTab(tabId, {
+      ...baseOptions,
+      world: 'MAIN',
+      preferRegister: true,
+      allowRegisterFallback: true,
+    }).catch(() => {});
+  }
+  throw new SafeError(lastError || 'Immediate userscripts execution returned no results.');
 }
 
 // TODO: rework the whole thing to register scripts individually with real `matches`
@@ -782,7 +980,7 @@ function detectStrictCsp(info, bag) {
   const cspResult = analyzeCspForInject(h.value);
   if (!cspResult) return;
   if (IS_MV3 && info.tabId >= 0) {
-    publishCspHint(getCspHintKey(info.tabId, info.url), cspResult);
+    publishCspHint(getCspHintKey(info.tabId, info.url), cspResult, 'headers');
   }
   if (!bag) return;
   return applyCspResultToBag(cspResult, bag, info.url);
@@ -834,8 +1032,13 @@ function onTabRemoved(id /* , info */) {
   delete skippedTabs[id];
 }
 
-function publishCspHint(key, hint) {
+function publishCspHint(key, hint, source = 'unknown') {
   cspHints[key] = hint;
+  logCspHintLifecycle('preinject.cspHint.publish', key, {
+    source,
+    forceContent: !!hint?.forceContent,
+    nonce: !!hint?.nonce,
+  });
   const waiters = cspHintWaiters[key];
   if (!waiters) return;
   delete cspHintWaiters[key];
@@ -845,10 +1048,23 @@ function publishCspHint(key, hint) {
 }
 
 function waitForCspHint(key) {
-  if (cspHints[key]) return Promise.resolve(cspHints[key]);
+  if (cspHints[key]) {
+    logCspHintLifecycle('preinject.cspHint.wait.hit', key, {
+      forceContent: !!cspHints[key]?.forceContent,
+      nonce: !!cspHints[key]?.nonce,
+    });
+    return Promise.resolve(cspHints[key]);
+  }
+  logCspHintLifecycle('preinject.cspHint.wait.start', key, {
+    timeoutMs: CSP_HINT_WAIT_MS,
+  });
   return new Promise(resolve => {
     const waiter = hint => {
       clearTimeout(timeout);
+      logCspHintLifecycle('preinject.cspHint.wait.resolve', key, {
+        forceContent: !!hint?.forceContent,
+        nonce: !!hint?.nonce,
+      });
       resolve(hint);
     };
     const timeout = setTimeout(() => {
@@ -858,10 +1074,26 @@ function waitForCspHint(key) {
         if (i >= 0) waiters.splice(i, 1);
         if (!waiters.length) delete cspHintWaiters[key];
       }
+      logCspHintLifecycle('preinject.cspHint.wait.timeout', key, {
+        timeoutMs: CSP_HINT_WAIT_MS,
+        forceContent: !!cspHints[key]?.forceContent,
+        nonce: !!cspHints[key]?.nonce,
+      });
       resolve(cspHints[key]);
     }, CSP_HINT_WAIT_MS);
     (cspHintWaiters[key] || (cspHintWaiters[key] = [])).push(waiter);
   });
+}
+
+function logCspHintLifecycle(action, key, details) {
+  const splitAt = key.indexOf('\n');
+  const tabId = splitAt > 0 ? +key.slice(0, splitAt) : null;
+  const url = splitAt > 0 ? key.slice(splitAt + 1) : key;
+  logBackgroundAction(action, {
+    ...tabId >= 0 && { tabId },
+    ...url && { url: getBaseUrl(url) },
+    ...details,
+  }, 'debug');
 }
 
 function onTabReplaced(addedId, removedId) {

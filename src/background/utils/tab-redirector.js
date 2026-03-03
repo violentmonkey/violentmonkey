@@ -20,14 +20,15 @@ const CAN_BLOCK_INSTALL_INTERCEPT = IS_FIREFOX || !IS_MV3;
 const CAN_USE_DNR_INSTALL_INTERCEPT = IS_MV3 && !!browser.declarativeNetRequest?.updateSessionRules;
 const USERJS_URL_RE = /\.user\.js([?#]|$)/;
 const DNR_INSTALL_RULE_ID = 940001;
-const DNR_INSTALL_REGEX_FILTER = '^https:\\/\\/(?:'
-  + 'update\\.(?:greasy|sleazy)fork\\.(?:org|cc)\\/scripts'
-  + '|(?:greasy|sleazy)fork\\.(?:org|cc)\\/(?:[a-z]{2}(?:-[A-Z]{2})?\\/)?scripts\\/[^/]+\\/code'
-  + '|openuserjs\\.org\\/install\\/[^/]+'
-  + '|github\\.com\\/[^/]+\\/[^/]+\\/(?:raw\\/[^/]+|releases\\/(?:download\\/[^/]+|latest\\/download))'
-  + '|raw\\.githubusercontent\\.com(?:\\/[^/]+){3}'
-  + '|gist\\.github\\.com\\/.*'
-  + ')\\/[^/]*?\\.user\\.js(?:[?#].*)?$';
+const DNR_INSTALL_REGEX_FILTERS = [
+  '^https:\\/\\/update\\.(?:greasy|sleazy)fork\\.(?:org|cc)\\/scripts\\/[^?#]*\\.user\\.js(?:[?#].*)?$',
+  '^https:\\/\\/(?:greasy|sleazy)fork\\.(?:org|cc)\\/(?:[a-z]{2}(?:-[A-Z]{2})?\\/)?scripts\\/[^/]+\\/code\\/[^?#]*\\.user\\.js(?:[?#].*)?$',
+  '^https:\\/\\/openuserjs\\.org\\/install\\/[^?#]*\\.user\\.js(?:[?#].*)?$',
+  '^https:\\/\\/github\\.com\\/[^/]+\\/[^/]+\\/(?:raw\\/[^?#]*|releases\\/(?:download\\/[^/]+|latest\\/download)\\/[^?#]*)\\.user\\.js(?:[?#].*)?$',
+  '^https:\\/\\/raw\\.githubusercontent\\.com\\/[^?#]*\\.user\\.js(?:[?#].*)?$',
+  '^https:\\/\\/gist\\.github\\.com\\/[^?#]*\\.user\\.js(?:[?#].*)?$',
+];
+const DNR_INSTALL_RULE_IDS = DNR_INSTALL_REGEX_FILTERS.map((_, i) => DNR_INSTALL_RULE_ID + i);
 
 function logInstallAction(event, details, level = 'info') {
   try {
@@ -328,16 +329,16 @@ async function updateInstallDnrRules() {
   if (!CAN_USE_DNR_INSTALL_INTERCEPT) return;
   try {
     await browser.declarativeNetRequest.updateSessionRules({
-      removeRuleIds: [DNR_INSTALL_RULE_ID],
-      addRules: [{
-        id: DNR_INSTALL_RULE_ID,
+      removeRuleIds: DNR_INSTALL_RULE_IDS,
+      addRules: DNR_INSTALL_REGEX_FILTERS.map((regexFilter, i) => ({
+        id: DNR_INSTALL_RULE_IDS[i],
         priority: 1,
         action: { type: 'block' },
         condition: {
-          regexFilter: DNR_INSTALL_REGEX_FILTER,
+          regexFilter,
           resourceTypes: ['main_frame'],
         },
-      }],
+      })),
     });
   } catch (e) {
     if (process.env.DEBUG) {

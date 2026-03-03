@@ -40,8 +40,18 @@ function run() {
   );
   assertContains(
     tabs,
-    /if\s*\(\s*extensionManifest\.manifest_version\s*===\s*3\s*\)\s*\{\s*void\s+cleanupStaleUserScriptsAtStartup\(\);\s*void\s+getUserScriptsHealth\(true\);\s*\}/,
-    'sw-lifecycle: MV3 startup must proactively clean stale userscripts and refresh health state',
+    /if\s*\(\s*extensionManifest\.manifest_version\s*===\s*3\s*\)\s*\{[\s\S]*?void\s+cleanupStaleUserScriptsAtStartup\(\);[\s\S]*?void\s+getUserScriptsHealth\(true\);[\s\S]*?void\s+ensureMainWorldBridgeRegistration\(\);/,
+    'sw-lifecycle: MV3 startup must clean userscripts, refresh health, and ensure main-world bridge registration',
+  );
+  assertContains(
+    tabs,
+    /browser\.runtime\.onInstalled\?\.addListener\(\(\)\s*=>\s*\{\s*void\s+ensureMainWorldBridgeRegistration\(true\);\s*\}\);/,
+    'sw-lifecycle: MV3 must re-register main-world bridge on install/update',
+  );
+  assertContains(
+    tabs,
+    /browser\.runtime\.onStartup\?\.addListener\(\(\)\s*=>\s*\{\s*void\s+ensureMainWorldBridgeRegistration\(\);\s*\}\);/,
+    'sw-lifecycle: MV3 must ensure main-world bridge on startup',
   );
   assertContains(
     init,

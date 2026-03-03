@@ -53,11 +53,13 @@ export function getFullUrl(url, base) {
 
 export function encodeFilename(name) {
   // `escape` generated URI has % in it
-  return name.replace(/[-\\/:*?"<>|%\s]/g, (m) => {
-    let code = m.charCodeAt(0).toString(16);
+  const unsafeChars = '-\\/:*?"<>|%';
+  return [...name].map((char) => {
+    if (!/\s/.test(char) && !unsafeChars.includes(char)) return char;
+    let code = char.charCodeAt(0).toString(16);
     if (code.length < 2) code = `0${code}`;
     return `-${code}`;
-  });
+  }).join('');
 }
 
 export function decodeFilename(filename) {

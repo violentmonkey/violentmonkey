@@ -5,6 +5,7 @@ import { addOwnCommands, init } from './init';
 import storage from './storage';
 
 let changes;
+let pendingIsApplied;
 
 addOwnCommands({
   /** @return {Object} */
@@ -43,6 +44,10 @@ hookOptions(data => sendCmd('UpdateOptions', data));
 export function initOptions(data, lastVersion, versionChanged) {
   data = data[kOptions] || {};
   Object.assign(options, data);
+  if (pendingIsApplied != null) {
+    options[IS_APPLIED] = pendingIsApplied;
+    pendingIsApplied = null;
+  }
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[kVersion]) {
     setOption(kVersion, 1);
@@ -104,9 +109,14 @@ export function getOption(key) {
 }
 
 export function setOption(key, value, silent) {
-  if (init) return init.then(setOption.bind(null, ...arguments));
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
+  if (init && mainKey !== IS_APPLIED) {
+    return init.then(setOption.bind(null, ...arguments));
+  }
+  if (init && mainKey === IS_APPLIED) {
+    pendingIsApplied = value;
+  }
   key = keys.join('.'); // must be a string for addChange()
   if (!hasOwnProperty(defaults, mainKey)) {
     if (process.env.DEBUG) console.info('Unknown option:', key, value, options);

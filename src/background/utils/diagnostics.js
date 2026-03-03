@@ -28,6 +28,8 @@ const IGNORED_COMMANDS = new Set([
   'DiagnosticsExportLog',
   'DiagnosticsClearLog',
   'DiagnosticsLogScriptIssue',
+  'HealthPing',
+  'MainBridgePing',
 ]);
 const SYNTAX_PARSE_OPTS = {
   allowHashBang: true,
@@ -295,11 +297,12 @@ function probeSyntaxFromCode(code, { scriptId, source, requireUrl } = {}) {
   }
 }
 
-async function resolveScriptSyntaxIssue({
-  scriptId,
-  runAt,
-  realm,
-} = {}) {
+async function resolveScriptSyntaxIssue(payload) {
+  const {
+    scriptId,
+    runAt,
+    realm,
+  } = payload || {};
   const id = toPositiveInt(scriptId);
   if (!id) {
     return { ok: false, message: 'Missing script id.', source: 'unknown' };
@@ -534,13 +537,14 @@ function getEntryTags(entry) {
   return tags;
 }
 
-async function getFilteredEntries({
-  event,
-  level = 'debug',
-  limit,
-  since,
-  type,
-} = {}) {
+async function getFilteredEntries(payload) {
+  const {
+    event,
+    level = 'debug',
+    limit,
+    since,
+    type,
+  } = payload || {};
   await loadPromise;
   const minLevel = getLevelPriority(level);
   const sinceTs = since == null
@@ -563,7 +567,8 @@ function formatTimestampForFile(ts) {
   return new Date(ts).toISOString().replace(/[.:]/g, '-');
 }
 
-async function getMv3RuntimeHealth({ force } = {}) {
+async function getMv3RuntimeHealth(payload) {
+  const { force } = payload || {};
   const isMv3 = extensionManifest.manifest_version === 3;
   if (!isMv3) {
     return {
@@ -756,6 +761,16 @@ addPublicCommands({
     const source = isExtensionSender
       ? 'popup'
       : issue.realm === 'page' ? 'page' : 'content';
+    if (extensionManifest.manifest_version === 3
+    && source === 'popup'
+    && issue.checkPhase === 'popup-state'
+    && issue.state === ID_INJECTING) {
+      return {
+        logged: false,
+        deduped: false,
+        ignored: 'mv3-popup-injecting',
+      };
+    }
     const fingerprint = getScriptIssueFingerprint(issue, src);
     if (isDuplicateScriptIssue(fingerprint, source)) {
       return { logged: false, deduped: true };

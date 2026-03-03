@@ -1,14 +1,17 @@
 import {
   cleanupStaleUserScriptsAtStartup,
   cleanupRegisteredUserScripts,
+  ensureMainWorldBridgeRegistration,
   executeScriptInTab,
   getUserScriptsHealth,
   registerUserScriptOnce,
 } from '@/background/utils/tabs';
+import { commands } from '@/background/utils/init';
 import { browser as browserApi } from '@/common/consts';
 
 const { tabs } = browserApi;
 const browser = global.browser;
+const MAIN_BRIDGE_INIT_FUNC_NAME = process.env.INIT_FUNC_NAME || '**VMInitInjection**';
 
 let oldTabsExecuteScript;
 let oldTabsGet;
@@ -17,6 +20,8 @@ let oldChromeScripting;
 let oldChromeUserScripts;
 let oldBrowserUserScripts;
 let oldRuntimeLastError;
+let oldRuntimeOnInstalled;
+let oldRuntimeOnStartup;
 
 beforeEach(() => {
   oldTabsExecuteScript = tabs.executeScript;
@@ -26,6 +31,8 @@ beforeEach(() => {
   oldChromeUserScripts = chrome.userScripts;
   oldBrowserUserScripts = browser.userScripts;
   oldRuntimeLastError = chrome.runtime.lastError;
+  oldRuntimeOnInstalled = browser.runtime.onInstalled;
+  oldRuntimeOnStartup = browser.runtime.onStartup;
   chrome.runtime.lastError = null;
 });
 
@@ -38,6 +45,8 @@ afterEach(() => {
   chrome.userScripts = oldChromeUserScripts;
   browser.userScripts = oldBrowserUserScripts;
   chrome.runtime.lastError = oldRuntimeLastError;
+  browser.runtime.onInstalled = oldRuntimeOnInstalled;
+  browser.runtime.onStartup = oldRuntimeOnStartup;
 });
 
 test('executeScriptInTab uses tabs.executeScript when available', async () => {
@@ -190,6 +199,31 @@ test('executeScriptInTab keeps top-frame target by default in MV3', async () => 
   expect(res).toEqual(['top']);
 });
 
+test('executeScriptInTab forwards world/func args to scripting API', async () => {
+  tabs.executeScript = undefined;
+  browser.scripting = undefined;
+  let details;
+  chrome.scripting = {
+    executeScript: jest.fn((injectedDetails, cb) => {
+      details = injectedDetails;
+      cb([{ result: { ok: true } }]);
+    }),
+  };
+  const res = await executeScriptInTab(20, {
+    [kFrameId]: 3,
+    world: 'MAIN',
+    func: (a, b) => a + b,
+    args: [2, 3],
+  });
+  expect(details).toEqual(expect.objectContaining({
+    target: { tabId: 20, frameIds: [3] },
+    world: 'MAIN',
+    func: expect.any(Function),
+    args: [2, 3],
+  }));
+  expect(res).toEqual([{ ok: true }]);
+});
+
 test('executeScriptInTab does not force immediate injection for document_end and document_idle', async () => {
   tabs.executeScript = undefined;
   browser.scripting = undefined;
@@ -233,6 +267,21 @@ test('registerUserScriptOnce registers one-shot script and schedules cleanup', a
   await Promise.resolve();
   expect(unregister).toHaveBeenCalledWith({ ids: [id] });
   jest.useRealTimers();
+});
+
+test('registerUserScriptOnce omits world for non-MAIN userscripts execution', async () => {
+  tabs.get = jest.fn(async () => ({ url: 'https://example.com/path/index.html?x=1' }));
+  const register = jest.fn(async () => {});
+  chrome.userScripts = { register, unregister: jest.fn(async () => {}) };
+  browser.userScripts = chrome.userScripts;
+  const ok = await registerUserScriptOnce(22, {
+    code: 'window.__vm = 1;',
+    [kFrameId]: 0,
+    world: 'ISOLATED',
+  });
+  expect(ok).toBe(true);
+  expect(register).toHaveBeenCalledTimes(1);
+  expect(register.mock.calls[0][0][0].world).toBeUndefined();
 });
 
 test('registerUserScriptOnce returns false for unsupported URL', async () => {
@@ -336,7 +385,31 @@ test('executeScriptInTab uses userScripts.execute when available', async () => {
   expect(res).toEqual(['us-ok']);
 });
 
-test('executeScriptInTab can prefer register path over userScripts.execute in top frame', async () => {
+test('executeScriptInTab omits world for non-MAIN userscripts execution', async () => {
+  tabs.executeScript = undefined;
+  browser.scripting = undefined;
+  chrome.scripting = {
+    executeScript: jest.fn((details, cb) => cb([{ result: 'legacy' }])),
+  };
+  chrome.userScripts = {
+    execute: jest.fn(async () => [{ result: 'us-ok' }]),
+    register: jest.fn(async () => {}),
+    unregister: jest.fn(async () => {}),
+  };
+  browser.userScripts = chrome.userScripts;
+  const res = await executeScriptInTab(24, {
+    code: 'window.__vm = true;',
+    tryUserScripts: true,
+    [kFrameId]: 0,
+    world: 'ISOLATED',
+  });
+  const call = chrome.userScripts.execute.mock.calls[0][0];
+  expect(call.world).toBeUndefined();
+  expect(chrome.scripting.executeScript).not.toHaveBeenCalled();
+  expect(res).toEqual(['us-ok']);
+});
+
+test('executeScriptInTab prefers userScripts.execute over register for immediate top-frame injection', async () => {
   tabs.get = jest.fn(async () => ({ url: 'https://example.com/page' }));
   tabs.executeScript = undefined;
   browser.scripting = undefined;
@@ -355,10 +428,13 @@ test('executeScriptInTab can prefer register path over userScripts.execute in to
     preferRegister: true,
     [kFrameId]: 0,
   });
-  expect(chrome.userScripts.register).toHaveBeenCalledTimes(1);
-  expect(chrome.userScripts.execute).not.toHaveBeenCalled();
+  expect(chrome.userScripts.register).not.toHaveBeenCalled();
+  expect(chrome.userScripts.execute).toHaveBeenCalledWith(expect.objectContaining({
+    target: { tabId: 24, frameIds: [0] },
+    js: [{ code: 'window.__vm = true;' }],
+  }));
   expect(chrome.scripting.executeScript).not.toHaveBeenCalled();
-  expect(res).toEqual([true]);
+  expect(res).toEqual(['us-ok']);
 });
 
 test('executeScriptInTab ignores preferRegister in subframes and uses userScripts.execute', async () => {
@@ -482,6 +558,172 @@ test('getUserScriptsHealth reports ok when probe registration succeeds', async (
   const health = await getUserScriptsHealth(true);
   expect(health.state).toBe('ok');
   expect(health.message).toBe('');
+});
+
+test('ensureMainWorldBridgeRegistration registers MV3 MAIN-world bridge content script', async () => {
+  const oldManifestVersion = global.extensionManifest.manifest_version;
+  global.extensionManifest.manifest_version = 3;
+  try {
+    tabs.executeScript = undefined;
+    browser.scripting = undefined;
+    const registerContentScripts = jest.fn(async () => {});
+    chrome.scripting = {
+      registerContentScripts,
+      unregisterContentScripts: jest.fn(async () => {}),
+      getRegisteredContentScripts: jest.fn(async () => []),
+    };
+    const ok = await ensureMainWorldBridgeRegistration(true);
+    expect(ok).toBe(true);
+    expect(registerContentScripts).toHaveBeenCalledWith([expect.objectContaining({
+      id: 'vm-main-bridge',
+      js: ['injected-web.js'],
+      matches: ['*://*/*', 'file:///*'],
+      runAt: 'document_end',
+      allFrames: true,
+      world: 'MAIN',
+      persistAcrossSessions: true,
+    })]);
+  } finally {
+    global.extensionManifest.manifest_version = oldManifestVersion;
+  }
+});
+
+test('ensureMainWorldBridgeRegistration skips re-registration when current config matches', async () => {
+  const oldManifestVersion = global.extensionManifest.manifest_version;
+  global.extensionManifest.manifest_version = 3;
+  try {
+    tabs.executeScript = undefined;
+    browser.scripting = undefined;
+    chrome.scripting = {
+      registerContentScripts: jest.fn(async () => {}),
+      unregisterContentScripts: jest.fn(async () => {}),
+      getRegisteredContentScripts: jest.fn(async () => [{
+        id: 'vm-main-bridge',
+        js: ['injected-web.js'],
+        matches: ['*://*/*', 'file:///*'],
+        runAt: 'document_end',
+        allFrames: true,
+        world: 'MAIN',
+      }]),
+    };
+    const ok = await ensureMainWorldBridgeRegistration();
+    expect(ok).toBe(true);
+    expect(chrome.scripting.unregisterContentScripts).not.toHaveBeenCalled();
+    expect(chrome.scripting.registerContentScripts).not.toHaveBeenCalled();
+  } finally {
+    global.extensionManifest.manifest_version = oldManifestVersion;
+  }
+});
+
+test('ensureMainWorldBridgeRegistration updates stale registration when config drifts', async () => {
+  const oldManifestVersion = global.extensionManifest.manifest_version;
+  global.extensionManifest.manifest_version = 3;
+  try {
+    tabs.executeScript = undefined;
+    browser.scripting = undefined;
+    chrome.scripting = {
+      registerContentScripts: jest.fn(async () => {}),
+      unregisterContentScripts: jest.fn(async () => {}),
+      getRegisteredContentScripts: jest.fn(async () => [{
+        id: 'vm-main-bridge',
+        js: ['injected-web.js'],
+        matches: ['http://*/*', 'https://*/*'],
+        runAt: 'document_idle',
+        allFrames: true,
+        world: 'ISOLATED',
+      }]),
+    };
+    const ok = await ensureMainWorldBridgeRegistration();
+    expect(ok).toBe(true);
+    expect(chrome.scripting.unregisterContentScripts).toHaveBeenCalledWith({
+      ids: ['vm-main-bridge'],
+    });
+    expect(chrome.scripting.registerContentScripts).toHaveBeenCalledTimes(1);
+  } finally {
+    global.extensionManifest.manifest_version = oldManifestVersion;
+  }
+});
+
+test('ensureMainWorldBridgeRegistration recovers from duplicate registration errors', async () => {
+  const oldManifestVersion = global.extensionManifest.manifest_version;
+  global.extensionManifest.manifest_version = 3;
+  try {
+    tabs.executeScript = undefined;
+    browser.scripting = undefined;
+    const registerContentScripts = jest.fn()
+      .mockRejectedValueOnce(new Error('Script id already exists'))
+      .mockResolvedValueOnce();
+    const unregisterContentScripts = jest.fn(async () => {});
+    chrome.scripting = {
+      registerContentScripts,
+      unregisterContentScripts,
+      getRegisteredContentScripts: jest.fn(async () => []),
+    };
+    const ok = await ensureMainWorldBridgeRegistration();
+    expect(ok).toBe(true);
+    expect(unregisterContentScripts).toHaveBeenCalledWith({
+      ids: ['vm-main-bridge'],
+    });
+    expect(registerContentScripts).toHaveBeenCalledTimes(2);
+  } finally {
+    global.extensionManifest.manifest_version = oldManifestVersion;
+  }
+});
+
+test('MainBridgePing reports ready when MAIN-world init hook exists', async () => {
+  const oldManifestVersion = global.extensionManifest.manifest_version;
+  global.extensionManifest.manifest_version = 3;
+  try {
+    tabs.executeScript = undefined;
+    browser.scripting = undefined;
+    let details;
+    chrome.scripting = {
+      executeScript: jest.fn((injectedDetails, cb) => {
+        details = injectedDetails;
+        cb([{ result: { ready: true, url: 'https://www.torn.com/' } }]);
+      }),
+    };
+    const res = await commands.MainBridgePing(null, {
+      tab: { id: 77 },
+      [kFrameId]: 0,
+    });
+    expect(details).toEqual(expect.objectContaining({
+      target: { tabId: 77, frameIds: [0] },
+      world: 'MAIN',
+      func: expect.any(Function),
+      args: [MAIN_BRIDGE_INIT_FUNC_NAME],
+    }));
+    expect(res).toEqual({
+      state: 'ready',
+      url: 'https://www.torn.com/',
+    });
+  } finally {
+    global.extensionManifest.manifest_version = oldManifestVersion;
+  }
+});
+
+test('MainBridgePing reports execution errors', async () => {
+  const oldManifestVersion = global.extensionManifest.manifest_version;
+  global.extensionManifest.manifest_version = 3;
+  try {
+    tabs.executeScript = undefined;
+    browser.scripting = undefined;
+    chrome.scripting = {
+      executeScript: jest.fn((details, cb) => {
+        chrome.runtime.lastError = { message: 'main world blocked' };
+        cb();
+        chrome.runtime.lastError = null;
+      }),
+    };
+    const res = await commands.MainBridgePing(null, {
+      tab: { id: 78 },
+      [kFrameId]: 0,
+    });
+    expect(res.state).toBe('error');
+    expect(res.message).toMatch(/main world blocked/i);
+  } finally {
+    global.extensionManifest.manifest_version = oldManifestVersion;
+  }
 });
 
 test('getTabUrl prefers current tab.url over pendingUrl', () => {

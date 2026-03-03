@@ -11,6 +11,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
   const STACK = 'stack';
+  const NO_RECEIVER_RE = /Receiving end does not exist|message (?:port|channel) closed before a response was received|moved into back\/forward cache/i;
   const isSyncMethodName = key => key === kAddListener
     || key === kRemoveListener
     || key === 'hasListener'
@@ -80,6 +81,9 @@ if (!IS_FIREFOX && !browser?.runtime) {
           if (e[MESSAGE] === 'Extension context invalidated.') {
             /* global logging */// only used with process.env.IS_INJECTED=content
             logging.error(`Please reload the tab to restore ${VIOLENTMONKEY} API for userscripts.`);
+            stackInfo[MESSAGE] = e[MESSAGE];
+            stackInfo[STACK] = `${e[STACK] || ''}\n${stackInfo[STACK]}`;
+            reject(stackInfo);
           } else {
             throw e;
           }
@@ -88,7 +92,13 @@ if (!IS_FIREFOX && !browser?.runtime) {
         /* Not process.env.IS_INJECTED */// eslint-disable-next-line no-restricted-syntax
         thisArg::func(...args, cb);
       }
-      if (process.env.DEBUG) promise.catch(err => console.warn(args, err?.[MESSAGE] || err));
+      if (process.env.DEBUG) {
+        promise.catch((err) => {
+          const msg = err?.[MESSAGE] || err?.message || `${err || ''}`;
+          if (NO_RECEIVER_RE.test(msg)) return;
+          console.warn(args, msg);
+        });
+      }
       return promise;
     }
   );
@@ -146,6 +156,7 @@ if (!IS_FIREFOX && !browser?.runtime) {
   browser = global.browser = proxifyGroup(chrome, {
     extension: 0, // we don't use its async methods
     i18n: 0, // we don't use its async methods
+    storage: 0,
     runtime: {
       connect: 0,
       getManifest: 0,

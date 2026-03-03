@@ -11,16 +11,17 @@ const kZombieUrl = 'zombieUrl';
 
 addPublicCommands({
   /** @return {Promise<string>} */
-  async Notification({
-    image,
-    text,
-    tag,
-    title,
-    silent,
-    onclick,
-    [kZombieUrl]: zombieUrl,
-    [kZombieTimeout]: zombieTimeout,
-  }, src) {
+  async Notification(payload, src) {
+    const {
+      image,
+      text,
+      tag,
+      title,
+      silent,
+      onclick,
+      [kZombieUrl]: zombieUrl,
+      [kZombieTimeout]: zombieTimeout,
+    } = payload || {};
     if (tag) clearZombieTimer(openers[tag]);
     const notificationId = await browser.notifications.create(tag, {
       type: 'basic',

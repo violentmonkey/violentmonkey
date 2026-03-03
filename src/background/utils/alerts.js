@@ -121,13 +121,14 @@ export function getAlertsBadgeState() {
   };
 }
 
-export async function pushAlert({
-  code,
-  severity = 'error',
-  message,
-  details = {},
-  fingerprint,
-}) {
+export async function pushAlert(payload) {
+  const {
+    code,
+    severity = 'error',
+    message,
+    details = {},
+    fingerprint,
+  } = payload || {};
   await loadPromise;
   const now = Date.now();
   const normalized = normalizeAlert({
@@ -163,11 +164,12 @@ export async function pushAlert({
   return normalized;
 }
 
-export async function getAlertsSnapshot({
-  unreadOnly,
-  severity = 'info',
-  limit = 30,
-} = {}) {
+export async function getAlertsSnapshot(payload) {
+  const {
+    unreadOnly,
+    severity = 'info',
+    limit = 30,
+  } = payload || {};
   await loadPromise;
   const minLevel = ALERT_LEVELS[normalizeLevel(severity)];
   let items = state.items.filter(item => (
@@ -184,7 +186,8 @@ export async function getAlertsSnapshot({
   };
 }
 
-export async function markAlertsRead({ id, all } = {}) {
+export async function markAlertsRead(payload) {
+  const { id, all } = payload || {};
   await loadPromise;
   let updated = 0;
   state.items.forEach(item => {
@@ -201,7 +204,8 @@ export async function markAlertsRead({ id, all } = {}) {
   return { updated };
 }
 
-export async function clearAlerts({ all, readOnly } = {}) {
+export async function clearAlerts(payload) {
+  const { all, readOnly } = payload || {};
   await loadPromise;
   const before = state.items.length;
   state.items = state.items.filter(item => (

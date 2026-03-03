@@ -93,12 +93,17 @@ function run() {
   );
   assertContains(
     preinject,
-    /if\s*\(IS_MV3\s*&&\s*tabId\s*>=\s*0\)\s*\{[\s\S]*?let\s+cspHint\s*=\s*cspHints\[cspHintKey\];[\s\S]*?waitForCspHint\(cspHintKey\)/,
-    'preinject: MV3 GetInjected must wait for CSP hints before page injection in any frame',
+    /if\s*\(IS_MV3\s*&&\s*tabId\s*>=\s*0\)\s*\{[\s\S]*?const\s+cspHint\s*=\s*cspHints\[cspHintKey\];[\s\S]*?if\s*\(cspHint\)\s*\{[\s\S]*?applyCspResultToBag\([\s\S]*?\}[\s\S]*?waitForCspHint\(cspHintKey\)\.then\(/,
+    'preinject: MV3 GetInjected must apply available CSP hints immediately and handle late hints asynchronously',
+  );
+  assertNotContains(
+    preinject,
+    /await\s+waitForCspHint\(cspHintKey\)/,
+    'preinject: MV3 GetInjected must not block on CSP hints',
   );
   assertContains(
     preinject,
-    /function\s+publishCspHint\(key,\s*hint\)\s*\{/,
+    /function\s+publishCspHint\(key,\s*hint,\s*source\s*=\s*'unknown'\)\s*\{/,
     'preinject: CSP hint publisher must exist to resolve pending waiters',
   );
   assertContains(
@@ -108,8 +113,18 @@ function run() {
   );
   assertContains(
     preinject,
-    /publishCspHint\(getCspHintKey\(info\.tabId,\s*info\.url\),\s*cspResult\);/,
+    /publishCspHint\(getCspHintKey\(info\.tabId,\s*info\.url\),\s*cspResult,\s*'headers'\);/,
     'preinject: CSP header detector must publish hints through waiter-aware path',
+  );
+  assertContains(
+    preinject,
+    /publishCspHint\(key,\s*\{\s*forceContent:\s*true\s*\},\s*'feedback'\);/,
+    'preinject: InjectionFeedback must publish forceContent hints with source tagging',
+  );
+  assertContains(
+    preinject,
+    /preinject\.cspHint\.wait\.timeout/,
+    'preinject: CSP hint waiter timeout lifecycle logging is missing',
   );
   assertContains(
     preinject,

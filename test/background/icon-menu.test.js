@@ -121,6 +121,14 @@ describe('icon menu handlers', () => {
     expect(payload.color).toBeTruthy();
   });
 
+  test('getFailureReason honors option fallback before icon init settles', () => {
+    jest.resetModules();
+    setupBrowserApis();
+    const { getFailureReason } = require('@/background/utils/icon');
+    const [, reason] = getFailureReason('https://example.com/', { [INJECT]: null });
+    expect(reason).not.toBe(IS_APPLIED);
+  });
+
   test('badge color invocation errors do not retry without callback', () => {
     jest.resetModules();
     setupBrowserApis();

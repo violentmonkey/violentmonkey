@@ -10,6 +10,7 @@ import { emptyStore, store } from './utils';
 
 let mutex, mutexResolve, port;
 let hPrev;
+const IS_CHROMIUM_MV3 = chrome.runtime.getManifest().manifest_version === 3;
 const POPUP_SCRIPT_ISSUE_DEDUP_MS = 60e3;
 const popupScriptIssueCache = new Map();
 
@@ -80,12 +81,12 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       }
       script.runs = state === CONTENT || state === PAGE;
       script.pageUrl = url; // each frame has its own URL
-      script.failed = badRealm || state === ID_INJECTING || more;
+      script.failed = badRealm || (!IS_CHROMIUM_MV3 && state === ID_INJECTING) || more;
       if (grantless && (v = grantless[id]) && delete v.window && (v = Object.keys(v).join(', '))) {
         script.grantless = i18n('hintGrantless', v.length > 50 ? v.slice(0, 50) + '...' : v);
       }
       script[MORE] = more;
-      script.syntax = state === ID_INJECTING;
+      script.syntax = !IS_CHROMIUM_MV3 && state === ID_INJECTING;
       if (script.syntax) {
         reportPopupScriptIssue(script, {
           frameId,
@@ -120,6 +121,9 @@ function reportPopupScriptIssue(script, {
   isTop,
   state,
 }) {
+  // MV3 often reports transient ID_INJECTING while fallback/bootstrap settles.
+  // Content-side diagnostics already handle real stalls with better context.
+  if (IS_CHROMIUM_MV3 && state === ID_INJECTING) return;
   const id = +script?.props?.id || 0;
   if (!id) return;
   const scriptName = script?.props?.name || script?.meta?.name || '';

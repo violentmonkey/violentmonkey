@@ -141,7 +141,8 @@ function onReset() {
     }
   }
 }
-function bgError({ message: m } = {}) {
+function bgError(payload) {
+  let m = payload && payload.message;
   if (m) try { m = JSON.parse(m); } catch {/**/}
   error.value = m && (
     m.length <= 1 && Array.isArray(m)

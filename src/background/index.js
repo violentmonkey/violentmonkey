@@ -29,10 +29,27 @@ addPublicCommands({
   SetTimeout(ms) {
     return ms > 0 && makePause(ms);
   },
+  /**
+   * Lightweight ping for measuring content->SW message latency in MV3 diagnostics.
+   */
+  HealthPing() {
+    return Date.now();
+  },
 });
 
+function canBypassInit(message) {
+  if (!init || !message || typeof message !== 'object' || Array.isArray(message)) return false;
+  if (message.cmd !== 'SetOptions') return false;
+  const data = message.data;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+  const keys = Object.keys(data);
+  return keys.length === 1
+    && keys[0] === IS_APPLIED
+    && typeof data[IS_APPLIED] === 'boolean';
+}
+
 function handleCommandMessage(message, src) {
-  if (init) {
+  if (init && !canBypassInit(message)) {
     return init.then(handleCommandMessage.bind(this, ...arguments));
   }
   const payload = message && typeof message === 'object' && !Array.isArray(message)
@@ -134,6 +151,12 @@ globalThis._bg = 1;
 global['handle' + 'CommandMessage' /* hiding the global from IDE */] = handleCommandMessage;
 global['deep' + 'Copy' /* hiding the global from IDE */] = deepCopy;
 browser.runtime.onMessage.addListener(handleCommandMessage);
+// Keep the service worker alive while a content script is waiting for GetInjected / executing
+// scripts. The port stays open for the duration of the injection sequence and is disconnected
+// by the content script once injectScripts() completes.
+browser.runtime.onConnect.addListener(port => {
+  if (port.name === 'vm-keepalive') port.onDisconnect.addListener(() => {});
+});
 browser.commands?.onCommand.addListener(async cmd => {
   try {
     const tab = await getActiveTab();

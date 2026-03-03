@@ -82,7 +82,12 @@ function download(blob) {
 }
 
 function normalizeFilename(name) {
-  return name.replace(/[\\/:*?"<>|]/g, '-');
+  const unsafe = '\\/:*?"<>|';
+  let out = '';
+  for (const ch of name) {
+    out += unsafe.includes(ch) ? '-' : ch;
+  }
+  return out;
 }
 
 async function exportData() {

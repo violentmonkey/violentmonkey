@@ -22,6 +22,9 @@ test('buildManifest keeps MV2 by default', async () => {
   expect(manifest.manifest_version).toBe(2);
   expect(manifest.browser_action).toBeTruthy();
   expect(manifest.action).toBeFalsy();
+  const allJs = (manifest.content_scripts || []).flatMap(script => script.js || []);
+  expect(allJs).toContain('injected-web.js');
+  expect(allJs).toContain('injected.js');
 });
 
 test('buildManifest transforms Chromium target to MV3', async () => {
@@ -44,6 +47,9 @@ test('buildManifest transforms Chromium target to MV3', async () => {
   ]));
   expect(manifest.host_permissions).not.toContain('<all_urls>');
   expect(manifest.minimum_chrome_version).toBe('135.0');
+  const allJs = (manifest.content_scripts || []).flatMap(script => script.js || []);
+  expect(allJs).toContain('injected.js');
+  expect(allJs).toContain('injected-web.js');
 });
 
 test('buildManifest rejects MV3 on Firefox target', async () => {

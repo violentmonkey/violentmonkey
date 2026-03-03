@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Battle Stats Predictor
 // @description Show battle stats prediction, computed by a third party service
-// @version     9.4.0
+// @version     9.4.1
 // @namespace   tdup.battleStatsPredictor
 // @updateURL   https://raw.githubusercontent.com/Zulenka/ProjectSol/master/battle_stats_predictor_mv3.user.js
 // @downloadURL https://raw.githubusercontent.com/Zulenka/ProjectSol/master/battle_stats_predictor_mv3.user.js
@@ -25,14 +25,15 @@
 // @match       https://www.torn.com/preferences.php*
 // @match       https://www.torn.com/loader.php?sid=attack*
 // @run-at      document-end
-// @inject-into content
+// @inject-into auto
 // @grant       GM.xmlHttpRequest
 // @grant       GM_xmlhttpRequest
 // @grant       GM_info
 // @connect     api.torn.com
-// @connect     www.lol-manager.com
+// @connect     stormmotors.org
 // @connect     www.tornstats.com
 // @connect     yata.yt
+// @license     MIT
 // @author      TDup
 // ==/UserScript==
 
@@ -360,6 +361,64 @@ function BSPLogError(code, errorOrMessage, context = {}) {
     }
 }
 
+function BSPSetBootstrapState(state, context) {
+    const runtime = BSPGetRuntimeState();
+    runtime.bootstrapState = String(state || "unknown");
+    runtime.bootstrapStateAt = new Date().toISOString();
+    runtime.bootstrapContext = context || null;
+    try {
+        window.__TDUP_BSP_BOOTSTRAP_STATE__ = {
+            state: runtime.bootstrapState,
+            at: runtime.bootstrapStateAt,
+            context: runtime.bootstrapContext
+        };
+    } catch (_) { }
+}
+
+function BSPGetManagerName() {
+    const info = BSPGetGmInfo();
+    if (!info) return "userscript manager";
+    return String(
+        info.scriptHandler
+        || info.scriptHandlerName
+        || info.scriptHandlerVersion
+        || "userscript manager"
+    );
+}
+
+function BSPGetMv3RemediationHint() {
+    return "If using Chrome 138+, open Extensions > " + BSPGetManagerName() + " > Allow User Scripts, then reload the tab.";
+}
+
+function BSPRegisterGlobalErrorHandlers() {
+    const state = BSPGetRuntimeState();
+    if (state.globalErrorHandlersRegistered) return;
+    state.globalErrorHandlersRegistered = true;
+
+    try {
+        window.addEventListener("error", function (evt) {
+            if (!evt) return;
+            BSPLogError("window-error", evt.error || evt.message || "Unknown window error", {
+                filename: evt.filename || "",
+                line: Number(evt.lineno || 0),
+                column: Number(evt.colno || 0)
+            });
+        }, true);
+    } catch (e) {
+        BSPLogError("register-window-error-handler-failed", e, null);
+    }
+
+    try {
+        window.addEventListener("unhandledrejection", function (evt) {
+            if (!evt) return;
+            const reason = evt.reason;
+            BSPLogError("unhandled-rejection", reason || "Unhandled promise rejection", null);
+        });
+    } catch (e) {
+        BSPLogError("register-unhandledrejection-handler-failed", e, null);
+    }
+}
+
 function BSPFormatDiagnosticsForDisplay(entries) {
     if (!entries || entries.length === 0) return "No diagnostics captured yet.";
     return entries.map(function (entry) {
@@ -443,7 +502,7 @@ function BSPIsAllowedRequestUrl(url) {
         const host = String(parsed.hostname || "").toLowerCase();
         return host === "api.torn.com"
             || host === "www.torn.com"
-            || host === "www.lol-manager.com"
+            || host === "stormmotors.org"
             || host === "www.tornstats.com"
             || host === "yata.yt";
     } catch (_) {
@@ -522,7 +581,7 @@ function BSPXmlHttpRequest(details) {
     return new Promise((resolve, reject) => {
         if (!xhrFn) {
             const err = new Error("BSP: GM.xmlHttpRequest is not available. Check @grant + @connect permissions in your userscript manager.");
-            BSPSetStatus("GM.xmlHttpRequest is unavailable. Check userscript manager permissions (@grant/@connect) and reload Torn.", "error", { code: "gm-xhr-missing" });
+            BSPSetStatus("GM.xmlHttpRequest is unavailable. Check userscript manager permissions (@grant/@connect). " + BSPGetMv3RemediationHint(), "error", { code: "gm-xhr-missing" });
             if (BSPIsDebugEnabled()) {
                 console.warn("[BSP] GM.xmlHttpRequest missing. This usually means the script lacks @grant/@connect permissions in your userscript manager.", err);
             }
@@ -705,7 +764,7 @@ function CanQueryAnyAPI() {
     return document.visibilityState === "visible" && document.hasFocus();
 }
 function GetBSPServer() {
-    return "http://www.lol-manager.com/api";
+    return "https://stormmotors.org/api";
 }
 function BSPStorageGetRaw(key) { return localStorage[key]; }
 function BSPStorageSetRaw(key, value) { localStorage[key] = value; }
@@ -4632,265 +4691,285 @@ function BSPScheduleSettingsButtonHealthCheck() {
 
 (function () {
     'use strict';
+    BSPRegisterGlobalErrorHandlers();
+    BSPSetBootstrapState("started", { version: BSPGetScriptVersion(), url: window.location.href });
     BSPPushDiagnostic("info", "bootstrap-start", "BSP bootstrap started", {
         version: BSPGetScriptVersion(),
         url: window.location.href
     });
 
-    if (!BSPEnsureSingleton()) {
-        BSPPushDiagnostic("warn", "bootstrap-aborted-duplicate", "BSP bootstrap aborted due to duplicate instance", null);
-        return;
-    }
-    BSPCheckInjectionMode();
-    BSPDetectPreexistingBspUi();
+    try {
+        if (!BSPEnsureSingleton()) {
+            BSPSetBootstrapState("aborted-duplicate", null);
+            BSPPushDiagnostic("warn", "bootstrap-aborted-duplicate", "BSP bootstrap aborted due to duplicate instance", null);
+            return;
+        }
+        BSPCheckInjectionMode();
+        BSPDetectPreexistingBspUi();
 
-    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                if (styleInjected == false) {
+                    var ref = document.querySelector('script');
+                    if (ref != undefined && ref.parentNode != undefined) {
+                        LogInfo("Style injected in DOMContentLoaded");
+                        ref.parentNode.insertBefore(styleToAdd, ref);
+                        styleInjected = true;
+                    }
+                }
+            } catch (e) {
+                BSPLogError("domcontentloaded-style-inject-failed", e, null);
+            }
+        });
 
-        if (styleInjected == false) {
-            var ref = document.querySelector('script');
-            if (ref != undefined && ref.parentNode != undefined) {
-                LogInfo("Style injected in DOMContentLoaded");
-                ref.parentNode.insertBefore(styleToAdd, ref);
-                styleInjected = true;
+        InitColors();
+
+        if (!GetStorageBool(StorageKey.IsHidingBSPOptionButtonInToolbar)) {
+            LogInfo("Inject Option Menu...");
+
+            InjectBSPSettingsButtonInProfile(document.querySelector("#sidebar"));
+            LogInfo("Inject Option Menu done.");
+        }
+
+        if (GetStorageBool(StorageKey.UploadDataAPIKeyIsValid) && GetStorageBool(StorageKey.UploadDataIsAutoMode)) {
+            let dateNow = new Date();
+            let dateSaved = new Date(GetStorage(StorageKey.UploadDataLastUploadTime));
+            var time_difference = dateNow - dateSaved;
+            var hours_difference = parseInt(time_difference / (1000 * 60 * 60));
+
+            if (hours_difference > 24) {
+                LogInfo("Auto update attacks (once a day)");
+                CallBSPUploadStats(undefined);
             }
         }
-    });
 
-    InitColors();
-
-    if (!GetStorageBool(StorageKey.IsHidingBSPOptionButtonInToolbar)) {
-        LogInfo("Inject Option Menu...");
-
-        InjectBSPSettingsButtonInProfile(document.querySelector("#sidebar"));
-        LogInfo("Inject Option Menu done.");
-    }
-
-    if (GetStorageBool(StorageKey.UploadDataAPIKeyIsValid) && GetStorageBool(StorageKey.UploadDataIsAutoMode)) {
-        let dateNow = new Date();
-        let dateSaved = new Date(GetStorage(StorageKey.UploadDataLastUploadTime));
-        var time_difference = dateNow - dateSaved;
-        var hours_difference = parseInt(time_difference / (1000 * 60 * 60));
-
-        if (hours_difference > 24) {
-            LogInfo("Auto update attacks (once a day)");
-            CallBSPUploadStats(undefined);
-        }
-    }
-
-    if (IsPage(PageType.Profile))
-        InjectOptionMenu(document.querySelector(".content-title"));
-
-    if (IsPage(PageType.Elimination)) // To remove after Elim. Little hack to force enable elimination injection without user having to open BSP Settings.
-        GetStorageBoolWithDefaultValue(StorageKey.IsBSPEnabledOnPage + PageType.Elimination, true);
-
-    if (window.location.href.startsWith("https://www.torn.com/factions.php")) {
-        InjectImportSpiesButton(document.querySelector(".content-title"));
-    }
-
-    if (!IsSubscriptionValid()) {
-        LogInfo("BSP Subscription invalid");
-        BSPSetStatus("BSP subscription is expired or has not refreshed yet. Open BSP Settings on your profile page to check/update it.", "warn", { code: "subscription-invalid" });
-        return;
-    }
-
-    if (!IsBSPEnabledOnCurrentPage()) {
-        LogInfo("BSP disabled on current page");
-        BSPSetStatus("BSP is disabled on this page (see BSP Settings > Pages).", "info", { code: "bsp-disabled-page" });
-        return;
-    }
-
-    // Cleanup outdated cache so we don't burst the 5mo limit of the localstorage with old & useless predictions that would be renewed anyway on demand.
-    ClearOutdatedPredictionInCache();
-    ClearOutdatedSpiesInCache();
-
-    // Auto import stats daily (if option is enabled)
-    AutoImportStats();
-
-    const pageFlags = {
-        isProfile: IsPage(PageType.Profile),
-        isEliminationMain: IsPage(PageType.Elimination) && !IsPage(PageType.EliminationRevenge),
-        isFactionOrWar: IsPage(PageType.Faction) || IsPage(PageType.War),
-        isFactionRoute: window.location.href.startsWith("https://www.torn.com/factions.php"),
-        isNewGridPage: IsPage(PageType.HallOfFame) || IsPage(PageType.Market) || IsPage(PageType.Friends) || IsPage(PageType.Enemies) || IsPage(PageType.Targets) || IsPage(PageType.RussianRoulette) || IsPage(PageType.EliminationRevenge),
-        isBounty: IsPage(PageType.Bounty),
-        isAttack: IsPage(PageType.Attack)
-    };
-
-    const BSP_MUTATION_FLUSH_MS = 80;
-    const BSP_MUTATION_QUEUE_MAX = 500;
-    const BSP_MUTATION_METRICS = { batches: 0, nodes: 0, lastBatchMs: 0 };
-    const mutationNodeQueue = new Set();
-    let mutationFlushTimer = null;
-    let mutationQueueOverflowed = false;
-
-    function BSPInjectTopUiIfNeeded() {
-        if (pageFlags.isProfile && !GetStorageBool(StorageKey.IsHidingBSPOptionButtonInToolbar)) {
-            InjectBSPSettingsButtonInProfile(document.querySelector("#sidebar"));
+        if (IsPage(PageType.Profile))
             InjectOptionMenu(document.querySelector(".content-title"));
-        }
-        if (pageFlags.isFactionRoute) {
+
+        if (IsPage(PageType.Elimination)) // To remove after Elim. Little hack to force enable elimination injection without user having to open BSP Settings.
+            GetStorageBoolWithDefaultValue(StorageKey.IsBSPEnabledOnPage + PageType.Elimination, true);
+
+        if (window.location.href.startsWith("https://www.torn.com/factions.php")) {
             InjectImportSpiesButton(document.querySelector(".content-title"));
         }
-    }
 
-    function BSPInjectForNode(node, isInit) {
-        if (!isInit && (!node || !node.querySelector)) {
+        if (!IsSubscriptionValid()) {
+            LogInfo("BSP Subscription invalid");
+            BSPSetStatus("BSP subscription is expired or has not refreshed yet. Open BSP Settings on your profile page to check/update it.", "warn", { code: "subscription-invalid" });
+            BSPSetBootstrapState("aborted-subscription-invalid", null);
             return;
         }
 
-        if (pageFlags.isProfile) {
-            InjectInProfilePage(isInit, node);
+        if (!IsBSPEnabledOnCurrentPage()) {
+            LogInfo("BSP disabled on current page");
+            BSPSetStatus("BSP is disabled on this page (see BSP Settings > Pages).", "info", { code: "bsp-disabled-page" });
+            BSPSetBootstrapState("aborted-page-disabled", null);
+            return;
         }
-        else if (pageFlags.isEliminationMain) {
-            InjectInEliminationPage(isInit, node);
+
+        // Cleanup outdated cache so we don't burst the 5mo limit of the localstorage with old & useless predictions that would be renewed anyway on demand.
+        ClearOutdatedPredictionInCache();
+        ClearOutdatedSpiesInCache();
+
+        // Auto import stats daily (if option is enabled)
+        AutoImportStats();
+
+        const pageFlags = {
+            isProfile: IsPage(PageType.Profile),
+            isEliminationMain: IsPage(PageType.Elimination) && !IsPage(PageType.EliminationRevenge),
+            isFactionOrWar: IsPage(PageType.Faction) || IsPage(PageType.War),
+            isFactionRoute: window.location.href.startsWith("https://www.torn.com/factions.php"),
+            isNewGridPage: IsPage(PageType.HallOfFame) || IsPage(PageType.Market) || IsPage(PageType.Friends) || IsPage(PageType.Enemies) || IsPage(PageType.Targets) || IsPage(PageType.RussianRoulette) || IsPage(PageType.EliminationRevenge),
+            isBounty: IsPage(PageType.Bounty),
+            isAttack: IsPage(PageType.Attack)
+        };
+        BSPPushDiagnostic("info", "bootstrap-page-flags", "BSP page mode resolved", pageFlags);
+
+        const BSP_MUTATION_FLUSH_MS = 80;
+        const BSP_MUTATION_QUEUE_MAX = 500;
+        const BSP_MUTATION_METRICS = { batches: 0, nodes: 0, lastBatchMs: 0 };
+        const mutationNodeQueue = new Set();
+        let mutationFlushTimer = null;
+        let mutationQueueOverflowed = false;
+
+        function BSPInjectTopUiIfNeeded() {
+            if (pageFlags.isProfile && !GetStorageBool(StorageKey.IsHidingBSPOptionButtonInToolbar)) {
+                InjectBSPSettingsButtonInProfile(document.querySelector("#sidebar"));
+                InjectOptionMenu(document.querySelector(".content-title"));
+            }
+            if (pageFlags.isFactionRoute) {
+                InjectImportSpiesButton(document.querySelector(".content-title"));
+            }
+        }
+
+        function BSPInjectForNode(node, isInit) {
+            if (!isInit && (!node || !node.querySelector)) {
+                return;
+            }
+
+            if (pageFlags.isProfile) {
+                InjectInProfilePage(isInit, node);
+            }
+            else if (pageFlags.isEliminationMain) {
+                InjectInEliminationPage(isInit, node);
+            }
+            else if (pageFlags.isFactionOrWar) {
+                InjectInFactionPage(node);
+            }
+            else if (pageFlags.isNewGridPage) {
+                InjectInGenericGridPageNewTornFormat(isInit, node);
+            }
+            else if (pageFlags.isBounty) {
+                InjectInBountyPagePage(isInit, node);
+            }
+            else if (pageFlags.isAttack) {
+                InjectInAttackPage(isInit, node);
+            }
+            else {
+                InjectInGenericGridPage(isInit, node);
+            }
+        }
+
+        function BSPCollectMutationNodes(mutations, includeTargets) {
+            const toProcess = new Set();
+            mutations.forEach(function (mutation) {
+                for (const node of mutation.addedNodes) {
+                    if (node && node.nodeType === 1) {
+                        toProcess.add(node);
+                    }
+                }
+                if (includeTargets && (mutation.type === 'attributes' || mutation.type === 'characterData')) {
+                    let target = mutation.target && mutation.target.nodeType === 1 ? mutation.target : mutation.target && mutation.target.parentElement;
+                    if (target && target.nodeType === 1) {
+                        toProcess.add(target);
+                    }
+                }
+            });
+            return toProcess;
+        }
+
+        function BSPFlushMutationQueue() {
+            mutationFlushTimer = null;
+            if (mutationNodeQueue.size === 0) {
+                return;
+            }
+
+            const batchStarted = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+            const nodes = mutationQueueOverflowed ? [document] : Array.from(mutationNodeQueue);
+            mutationNodeQueue.clear();
+            const wasOverflowed = mutationQueueOverflowed;
+            mutationQueueOverflowed = false;
+
+            BSPInjectTopUiIfNeeded();
+            for (let i = 0; i < nodes.length; i++) {
+                BSPInjectForNode(nodes[i], false);
+            }
+
+            const batchEnded = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+            BSP_MUTATION_METRICS.batches += 1;
+            BSP_MUTATION_METRICS.nodes += nodes.length;
+            BSP_MUTATION_METRICS.lastBatchMs = Number((batchEnded - batchStarted).toFixed(2));
+            try { window.__TDUP_BSP_MUTATION_METRICS__ = Object.assign({}, BSP_MUTATION_METRICS); } catch (_) { }
+            if (nodes.length >= 100 || BSP_MUTATION_METRICS.lastBatchMs >= 200) {
+                BSPPushDiagnostic("warn", "mutation-batch-heavy", "Heavy mutation batch processed", {
+                    nodes: nodes.length,
+                    elapsedMs: BSP_MUTATION_METRICS.lastBatchMs,
+                    batches: BSP_MUTATION_METRICS.batches
+                });
+            }
+            if (wasOverflowed) {
+                BSPPushDiagnostic("warn", "mutation-queue-overflow", "Mutation queue overflowed; performed full document pass", {
+                    queueMax: BSP_MUTATION_QUEUE_MAX
+                });
+            }
+        }
+
+        function BSPQueueMutationNodes(nodes) {
+            if (!nodes) return;
+            nodes.forEach(function (node) {
+                if (node && node.nodeType === 1 && node.querySelector) {
+                    if (mutationNodeQueue.size < BSP_MUTATION_QUEUE_MAX) {
+                        mutationNodeQueue.add(node);
+                    } else {
+                        mutationQueueOverflowed = true;
+                    }
+                }
+            });
+            if (!mutationFlushTimer) {
+                mutationFlushTimer = setTimeout(BSPFlushMutationQueue, BSP_MUTATION_FLUSH_MS);
+            }
+        }
+
+        // Inject in already loaded page:
+        if (pageFlags.isProfile) {
+            InjectInProfilePage(true, undefined);
+            setTimeout(InjectInProfilePage, 3000);
         }
         else if (pageFlags.isFactionOrWar) {
-            InjectInFactionPage(node);
-        }
-        else if (pageFlags.isNewGridPage) {
-            InjectInGenericGridPageNewTornFormat(isInit, node);
+            //AutoSyncTornStatsFaction(factionId);
         }
         else if (pageFlags.isBounty) {
-            InjectInBountyPagePage(isInit, node);
+            InjectInBountyPagePage(true, undefined);
+        }
+        else if (pageFlags.isEliminationMain) {
+            InjectInEliminationPage(true, undefined);
+        }
+        else if (pageFlags.isNewGridPage) {
+            InjectInGenericGridPageNewTornFormat(true, undefined);
         }
         else if (pageFlags.isAttack) {
-            InjectInAttackPage(isInit, node);
+            InjectInAttackPage(true, undefined);
         }
         else {
-            InjectInGenericGridPage(isInit, node);
+            InjectInGenericGridPage(true, undefined);
         }
-    }
 
-    function BSPCollectMutationNodes(mutations, includeTargets) {
-        const toProcess = new Set();
-        mutations.forEach(function (mutation) {
-            for (const node of mutation.addedNodes) {
-                if (node && node.nodeType === 1) {
-                    toProcess.add(node);
-                }
-            }
-            if (includeTargets && (mutation.type === 'attributes' || mutation.type === 'characterData')) {
-                let target = mutation.target && mutation.target.nodeType === 1 ? mutation.target : mutation.target && mutation.target.parentElement;
-                if (target && target.nodeType === 1) {
-                    toProcess.add(target);
-                }
-            }
-        });
-        return toProcess;
-    }
+        // Elimination gets its own way of observing changes, because of how the page is built (virtualization)    
+        if (pageFlags.isEliminationMain) {
+            var observer = new MutationObserver(function (mutations, observer) {
+                BSPQueueMutationNodes(BSPCollectMutationNodes(mutations, true));
+            });
 
-    function BSPFlushMutationQueue() {
-        mutationFlushTimer = null;
-        if (mutationNodeQueue.size === 0) {
+            observer.observe(document, {
+                attributes: true,
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+
+            BSPSetBootstrapState("ready", { page: window.location.href, mode: "elimination-observer" });
             return;
         }
 
-        const batchStarted = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
-        const nodes = mutationQueueOverflowed ? [document] : Array.from(mutationNodeQueue);
-        mutationNodeQueue.clear();
-        const wasOverflowed = mutationQueueOverflowed;
-        mutationQueueOverflowed = false;
-
-        BSPInjectTopUiIfNeeded();
-        for (let i = 0; i < nodes.length; i++) {
-            BSPInjectForNode(nodes[i], false);
-        }
-
-        const batchEnded = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
-        BSP_MUTATION_METRICS.batches += 1;
-        BSP_MUTATION_METRICS.nodes += nodes.length;
-        BSP_MUTATION_METRICS.lastBatchMs = Number((batchEnded - batchStarted).toFixed(2));
-        try { window.__TDUP_BSP_MUTATION_METRICS__ = Object.assign({}, BSP_MUTATION_METRICS); } catch (_) { }
-        if (nodes.length >= 100 || BSP_MUTATION_METRICS.lastBatchMs >= 200) {
-            BSPPushDiagnostic("warn", "mutation-batch-heavy", "Heavy mutation batch processed", {
-                nodes: nodes.length,
-                elapsedMs: BSP_MUTATION_METRICS.lastBatchMs,
-                batches: BSP_MUTATION_METRICS.batches
-            });
-        }
-        if (wasOverflowed) {
-            BSPPushDiagnostic("warn", "mutation-queue-overflow", "Mutation queue overflowed; performed full document pass", {
-                queueMax: BSP_MUTATION_QUEUE_MAX
-            });
-        }
-    }
-
-    function BSPQueueMutationNodes(nodes) {
-        if (!nodes) return;
-        nodes.forEach(function (node) {
-            if (node && node.nodeType === 1 && node.querySelector) {
-                if (mutationNodeQueue.size < BSP_MUTATION_QUEUE_MAX) {
-                    mutationNodeQueue.add(node);
-                } else {
-                    mutationQueueOverflowed = true;
-                }
-            }
-        });
-        if (!mutationFlushTimer) {
-            mutationFlushTimer = setTimeout(BSPFlushMutationQueue, BSP_MUTATION_FLUSH_MS);
-        }
-    }
-
-    // Inject in already loaded page:
-    if (pageFlags.isProfile) {
-        InjectInProfilePage(true, undefined);
-        setTimeout(InjectInProfilePage, 3000);
-    }
-    else if (pageFlags.isFactionOrWar) {
-        //AutoSyncTornStatsFaction(factionId);
-    }
-    else if (pageFlags.isBounty) {
-        InjectInBountyPagePage(true, undefined);
-    }
-    else if (pageFlags.isEliminationMain) {
-        InjectInEliminationPage(true, undefined);
-    }
-    else if (pageFlags.isNewGridPage) {
-        InjectInGenericGridPageNewTornFormat(true, undefined);
-    }
-    else if (pageFlags.isAttack) {
-        InjectInAttackPage(true, undefined);
-    }
-    else {
-        InjectInGenericGridPage(true, undefined);
-    }
-
-    // Elimination gets its own way of observing changes, because of how the page is built (virtualization)    
-    if (pageFlags.isEliminationMain) {
         var observer = new MutationObserver(function (mutations, observer) {
-            BSPQueueMutationNodes(BSPCollectMutationNodes(mutations, true));
+            BSPQueueMutationNodes(BSPCollectMutationNodes(mutations, false));
         });
 
-        observer.observe(document, {
-            attributes: true,
-            childList: true,
-            characterData: true,
-            subtree: true
+        var canonical = document.querySelector("link[rel='canonical']");
+        if (canonical != undefined) {
+            var hrefCanon = canonical.href;
+            const urlParams = new URLSearchParams(hrefCanon);
+            ProfileTargetId = urlParams.get('https://www.torn.com/profiles.php?XID');
+        }
+        else {
+            const urlParams = new URL(window.location).searchParams;
+            ProfileTargetId = urlParams.get('XID');
+        }
+
+        BSPScheduleSettingsButtonHealthCheck();
+        observer.observe(document, { attributes: false, childList: true, characterData: false, subtree: true });
+        BSPSetBootstrapState("ready", { page: window.location.href, mode: "default-observer" });
+        BSPPushDiagnostic("info", "bootstrap-ready", "BSP bootstrap completed", {
+            page: window.location.href
         });
-
-        return;
+    } catch (e) {
+        BSPSetBootstrapState("failed", { page: window.location.href });
+        BSPLogError("bootstrap-failed", e, { page: window.location.href });
+        BSPSetStatus("BSP failed during startup. Open console and inspect [BSP] diagnostics.", "error", {
+            code: "bootstrap-failed",
+            context: { hint: BSPGetMv3RemediationHint() }
+        });
     }
-
-    var observer = new MutationObserver(function (mutations, observer) {
-        BSPQueueMutationNodes(BSPCollectMutationNodes(mutations, false));
-    });
-
-    var canonical = document.querySelector("link[rel='canonical']");
-    if (canonical != undefined) {
-        var hrefCanon = canonical.href;
-        const urlParams = new URLSearchParams(hrefCanon);
-        ProfileTargetId = urlParams.get('https://www.torn.com/profiles.php?XID');
-    }
-    else {
-        const urlParams = new URL(window.location).searchParams;
-        ProfileTargetId = urlParams.get('XID');
-    }
-
-    BSPScheduleSettingsButtonHealthCheck();
-    observer.observe(document, { attributes: false, childList: true, characterData: false, subtree: true });
-    BSPPushDiagnostic("info", "bootstrap-ready", "BSP bootstrap completed", {
-        page: window.location.href
-    });
 
 })();
 

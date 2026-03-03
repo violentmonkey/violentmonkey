@@ -87,6 +87,19 @@ test('sendMessageRetry retries on transient port-closed errors', async () => {
   expect(storageLocal.get).toHaveBeenCalled();
 });
 
+test('sendMessageRetry retries on transient channel-closed errors with object payloads', async () => {
+  runtime.sendMessage = jest.fn()
+    .mockRejectedValueOnce({
+      message: 'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received.',
+    })
+    .mockResolvedValueOnce({ ok: true });
+  storageLocal.get = jest.fn(async () => ({}));
+  const res = await sendMessageRetry({ cmd: 'Ping' }, 1000);
+  expect(res).toEqual({ ok: true });
+  expect(runtime.sendMessage).toHaveBeenCalledTimes(2);
+  expect(storageLocal.get).toHaveBeenCalled();
+});
+
 test('sendMessageRetry throws immediately on non-port errors', async () => {
   runtime.sendMessage = jest.fn()
     .mockRejectedValueOnce(new Error('permission denied'));

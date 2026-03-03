@@ -55,14 +55,16 @@ addOwnCommands({
   CheckRemove: checkRemove,
   RemoveScripts: removeScripts,
   GetData: getData,
-  GetMoreIds({ url, [kTop]: isTop, [IDS]: ids }) {
+  GetMoreIds(payload) {
+    const { url, [kTop]: isTop, [IDS]: ids } = payload || {};
     return getScriptsByURL(url, isTop, null, ids);
   },
   /** @return {VMScript} */
   GetScript: getScript,
   GetSizes: getSizes,
   /** @return {Promise<{ items: VMScript[], values? }>} */
-  async ExportZip({ values }) {
+  async ExportZip(payload) {
+    const { values } = payload || {};
     const scripts = getScripts();
     const ids = scripts.map(getPropsId);
     const codeMap = await storage[S_CODE].getMulti(ids);
@@ -77,7 +79,8 @@ addOwnCommands({
   },
   GetTags: () => getScriptsTags(aliveScripts),
   /** @return {Promise<void>} */
-  async MarkRemoved({ id, removed }) {
+  async MarkRemoved(payload) {
+    const { id, removed } = payload || {};
     const script = getScriptById(id);
     if (!script) return;
     if (!removed) {
@@ -95,7 +98,8 @@ addOwnCommands({
     (removed ? removedScripts : aliveScripts).push(script);
   },
   /** @return {Promise<number>} */
-  Move({ id, offset }) {
+  Move(payload) {
+    const { id, offset } = payload || {};
     const script = getScriptById(id);
     const index = aliveScripts.indexOf(script);
     aliveScripts.splice(index, 1);
@@ -106,7 +110,8 @@ addOwnCommands({
   ParseMetaErrors: data => parseMetaWithErrors(data).errors,
   ParseScript: parseScript,
   /** @return {Promise<void>} */
-  UpdateScriptInfo({ id, config, custom }) {
+  UpdateScriptInfo(payload) {
+    const { id, config, custom } = payload || {};
     return updateScriptInfo(id, {
       config,
       custom,
@@ -248,7 +253,9 @@ export function getScriptsByIdsOrAll(ids) {
 }
 
 /** @return {?VMScript} */
-export function getScript({ id, uri, meta, removed }) {
+export function getScript(payload) {
+  const data = payload || {};
+  let { id, uri, meta, removed } = data;
   let script;
   if (id) {
     script = getScriptById(id);
@@ -545,7 +552,8 @@ export async function removeScripts(ids) {
   }
 }
 
-export function checkRemove({ force } = {}) {
+export function checkRemove(payload) {
+  const { force } = payload || {};
   const now = Date.now();
   const ids = removedScripts.filter(script => {
     const { lastModified } = script.props;

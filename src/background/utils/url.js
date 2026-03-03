@@ -9,7 +9,8 @@ export const requestLimited = limitConcurrency(request, 4, 100, 1000,
 );
 
 addOwnCommands({
-  async Request({ url, vet, ...opts }) {
+  async Request(payload) {
+    const { url, vet, ...opts } = payload || {};
     const vettedUrl = vet ? vetUrl(url) : url;
     const fn = isRemote(vettedUrl) && !isCdnUrlRe.test(vettedUrl)
       ? requestLimited

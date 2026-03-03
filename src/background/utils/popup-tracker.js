@@ -3,6 +3,7 @@ import cache from './cache';
 import { getData, getScriptsByURL } from './db';
 import { badges, getFailureReason } from './icon';
 import { addOwnCommands, addPublicCommands, commands } from './init';
+import { getOption } from './options';
 import { executeScriptInTab, getUserScriptsHealth } from './tabs';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
@@ -15,11 +16,29 @@ addOwnCommands({
     const { url = '', id: tabId } = tab;
     const data = commands.GetTabDomain(url);
     const badgeData = badges[tabId] || {};
+    const isAppliedNow = getOption(IS_APPLIED);
     let failure = url ? getFailureReason(url, badgeData, '') : [''];
+    // Tab state may still carry a stale "off" marker from an earlier disabled period.
+    // If global apply is currently enabled, force a fresh injectability probe below.
+    if (failure[1] === IS_APPLIED && badgeData[INJECT] === 'off' && isAppliedNow) {
+      badgeData[INJECT] = null;
+      failure = [''];
+    }
     // FF injects content scripts after update/install/reload
     let reset = !IS_FIREFOX && !failure[0] && badgeData[INJECT] === undefined;
     let cachedSetPopup = cache.pop(getCacheKey(tabId));
     if (reset && (cachedSetPopup ? !cachedSetPopup[0] : cachedSetPopup = {})) {
+      cachedSetPopup[0] = await augmentSetPopup(
+        { [IDS]: {}, menus: {} },
+        { tab, url, [kFrameId]: 0, [kTop]: 1 },
+      );
+    }
+    // MV3: webRequest.onBeforeRequest doesn't fire for chrome-extension:// popup URLs,
+    // so isPopupShown is never set early → sendSetPopup is a no-op when scripts finish →
+    // SetPopup cache is never populated. When INJECT===true (scripts confirmed ran) but
+    // no cache exists, do a fresh augmentation so the popup shows eligible scripts.
+    if (!IS_FIREFOX && !failure[0] && !cachedSetPopup && badgeData[INJECT] === true) {
+      cachedSetPopup = {};
       cachedSetPopup[0] = await augmentSetPopup(
         { [IDS]: {}, menus: {} },
         { tab, url, [kFrameId]: 0, [kTop]: 1 },

@@ -22,7 +22,17 @@ export const ignoreChromeErrors = () => chrome.runtime.lastError;
 export const browserWindows = !process.env.IS_INJECTED && browser.windows;
 export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
 /** @return {'0' | '1' | ''} treating source as abstract truthy/falsy to ensure consistent result */
-const PORT_ERROR_RE = /(Receiving end does not exist)|The message port closed before|moved into back\/forward cache|$/;
+const PORT_ERROR_RE = /Receiving end does not exist|message (?:port|channel) closed before a response was received|moved into back\/forward cache/i;
+
+function getErrorText(err) {
+  return typeof err === 'string'
+    ? err
+    : err?.message || `${err || ''}`;
+}
+
+function isNoReceiverError(err) {
+  return PORT_ERROR_RE.test(getErrorText(err));
+}
 
 export function initHooks() {
   const hooks = new Set();
@@ -122,6 +132,9 @@ export function sendMessage(payload, { retry } = {}) {
  * or when configured to restore the session, https://crbug.com/314686
  */
 export async function sendMessageRetry(payload, maxDuration = 10e3) {
+  const waitForBg = browser.storage?.local?.get
+    ? () => browser.storage.local.get(VIOLENTMONKEY)
+    : () => new Promise(resolve => setTimeout(resolve, 50));
   for (let start = performance.now(); performance.now() - start < maxDuration;) {
     try {
       const data = await sendMessage(payload);
@@ -129,18 +142,18 @@ export async function sendMessageRetry(payload, maxDuration = 10e3) {
         return data;
       }
     } catch (e) {
-      if (!PORT_ERROR_RE.exec(e)[1]) {
+      if (!isNoReceiverError(e)) {
         throw e;
       }
     }
-    // Not using setTimeout which may be cleared by the web page
-    await browser.storage.local.get(VIOLENTMONKEY);
+    // Prefer storage as a resilient async tick in injected contexts.
+    await waitForBg();
   }
   throw new Error(VIOLENTMONKEY + ' cannot connect to the background page.');
 }
 
 export function ignoreNoReceiver(err) {
-  if (!PORT_ERROR_RE.exec(err)[0]) {
+  if (!isNoReceiverError(err)) {
     return Promise.reject(err);
   }
 }

@@ -25,6 +25,7 @@ describe('verify-build-artifacts', () => {
       manifest_version: 3,
       action: { default_title: 'x' },
       background: { service_worker: 'background/index.js' },
+      content_scripts: [{ js: ['injected-web.js', 'injected.js'] }],
       minimum_chrome_version: '135.0',
       permissions: ['storage', 'scripting', 'declarativeNetRequest', 'offscreen', 'userScripts'],
     };
@@ -37,6 +38,7 @@ describe('verify-build-artifacts', () => {
       manifest_version: 3,
       action: { default_title: 'x' },
       background: { service_worker: 'background/index.js' },
+      content_scripts: [{ js: ['injected-web.js', 'injected.js'] }],
       minimum_chrome_version: '135.0',
       permissions: ['storage', 'scripting', 'declarativeNetRequest', 'offscreen', 'userScripts'],
     };
@@ -65,9 +67,22 @@ describe('verify-build-artifacts', () => {
       manifest_version: 3,
       action: { default_title: 'x' },
       background: { service_worker: 'background/index.js' },
+      content_scripts: [{ js: ['injected-web.js', 'injected.js'] }],
       minimum_chrome_version: '134.0',
       permissions: ['storage', 'scripting', 'declarativeNetRequest', 'offscreen', 'userScripts'],
     });
     await expect(run('mv3', join(workDir, 'dist-builds'))).rejects.toThrow('minimum_chrome_version >= 135.0');
+  });
+
+  test('fails when mv3 manifest misses injected-web.js in content scripts', async () => {
+    writeManifest(workDir, 'chrome-mv3', {
+      manifest_version: 3,
+      action: { default_title: 'x' },
+      background: { service_worker: 'background/index.js' },
+      content_scripts: [{ js: ['injected.js'] }],
+      minimum_chrome_version: '135.0',
+      permissions: ['storage', 'scripting', 'declarativeNetRequest', 'offscreen', 'userScripts'],
+    });
+    await expect(run('mv3', join(workDir, 'dist-builds'))).rejects.toThrow('expected injected-web.js in MV3 content_scripts');
   });
 });
