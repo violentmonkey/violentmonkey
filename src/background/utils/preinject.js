@@ -711,15 +711,21 @@ function prepareScript(script, env) {
 }
 
 function triageRealms(scripts, forceContent, tabId, frameId, bag) {
-  // Always allow background-side planting so CSP eval fallbacks can hand off payloads,
-  // including MV3 where local Function() may be blocked.
-  const shouldInjectViaBackground = true;
+  // Run content-realm scripts locally in the isolated world via Function(code)().
+  // The isolated-world defineProperty setter fires when the same world sets window[winKey],
+  // allowing onCodeSet to call fn(gm) and execute the userscript with GM APIs.
+  // Background-side MAIN-world injection is NOT used because Chrome's isolated world does
+  // not share property descriptors with MAIN world — the setter never fires cross-world.
+  // When the page's CSP nonce is available (MV3), we route AUTO scripts to PAGE realm
+  // so nonce-tagged <script> injection in MAIN world uses the same-world setter.
+  const shouldInjectViaBackground = false;
+  const nonceAvailable = IS_MV3 && !forceContent && !!bag?.[INJECT]?.nonce;
   let code;
   let wantsPage;
   const toContent = [];
   for (const /**@type{VMInjection.Script}*/ scr of scripts) {
     const metaStr = scr[META_STR];
-    const runAsContent = IS_MV3 || isContentRealm(scr[INJECT_INTO], forceContent);
+    const runAsContent = (IS_MV3 && !nonceAvailable) || isContentRealm(scr[INJECT_INTO], forceContent);
     if (runAsContent) {
       if (!metaStr[0]) {
         const [, i, from, to] = metaStr;
@@ -741,7 +747,7 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   }
   if (bag) {
     bag[INJECT][PAGE] = IS_MV3
-      ? false
+      ? nonceAvailable && (wantsPage || triagePageRealm(bag[MORE]))
       : wantsPage || triagePageRealm(bag[MORE]);
   }
   if (shouldInjectViaBackground && toContent[0]) {
@@ -759,8 +765,69 @@ function injectContentRealm(toContent, tabId, frameId) {
   for (const [id, dataKey] of toContent) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
+    let code = scr[__CODE].join('');
+    if (IS_MV3) {
+      // For USER_SCRIPT world: append self-invocation with an inline GM API backed by
+      // chrome.runtime.sendMessage (available when world is configured with messaging:true).
+      // USER_SCRIPT world bypasses page CSP for code execution (no eval/Function restriction),
+      // but the isolated-world defineProperty setter on window[winKey] won't fire cross-world.
+      // Self-invocation bypasses the setter mechanism by calling the wrapper directly.
+      const winKeyJson = JSON.stringify(scr.key.win);
+      const scriptIdStr = String(id);
+      const gmInfoJson = JSON.stringify({
+        scriptHandler: 'Violentmonkey',
+        scriptWillUpdate: !!scr.gmi?.scriptWillUpdate,
+        uuid: scr.gmi?.uuid || '',
+        script: {
+          name: scr.meta?.name || '',
+          namespace: scr.meta?.namespace || '',
+          version: scr.meta?.version || '',
+          description: scr.meta?.description || '',
+          matches: scr.meta?.matches || [],
+          grant: scr.meta?.grant || [],
+        },
+      });
+      // language=js
+      code = `${code}
+;(function __vmUSWInvoke(){
+var _fn=window[${winKeyJson}];
+if(typeof _fn!=='function')return;
+delete window[${winKeyJson}];
+var _inf=${gmInfoJson};
+function _xhr(o){
+  if(!o||!o.url)return;
+  var _opts={method:o.method||'GET',url:o.url,
+    headers:o.headers||{},data:o.data||null,
+    anonymous:!!o.anonymous,responseType:o.responseType||'',
+    timeout:+(o.timeout)||0};
+  chrome.runtime.sendMessage(
+    {__vmGM:1,fn:'xhr',scriptId:${JSON.stringify(scriptIdStr)},opts:_opts},
+    function(r){
+      if(chrome.runtime.lastError){
+        var e={status:0,statusText:chrome.runtime.lastError.message||'Error',
+          responseText:'',finalUrl:o.url||'',readyState:4};
+        o.onerror&&o.onerror(e);
+      }else if(r&&r.__vmError){
+        o.onerror&&o.onerror(r.__vmError);
+      }else if(r){
+        if(r.__vmTimeout){o.ontimeout&&o.ontimeout(r.__vmTimeout);}
+        else{o.onreadystatechange&&o.onreadystatechange(r);o.onload&&o.onload(r);}
+      }
+    });
+  return{abort:function(){}};
+}
+var GM={xmlHttpRequest:_xhr,GM_xmlhttpRequest:_xhr,
+  getValue:function(){return undefined;},setValue:function(){},
+  deleteValue:function(){},listValues:function(){return[];},
+  openInTab:function(){},setClipboard:function(){},notification:function(){},
+  info:_inf,GM_info:_inf};
+// VM wrapper uses with(this)with(c)delete c, so this.c must equal the GM API context.
+// Call with {c:GM} as the receiver so the with(c) clause resolves correctly.
+_fn.call({c:GM},GM,function(e){console.error('[VM]',e)});
+})();`;
+    }
     const baseOptions = {
-      code: scr[__CODE].join(''),
+      code,
       [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
       ...frameId > 0 && { [kFrameId]: frameId },
       tryUserScripts: IS_MV3,
@@ -796,16 +863,10 @@ function injectContentRealm(toContent, tabId, frameId) {
 async function executeContentRealmWithImmediateFallback(tabId, frameId, scr, baseOptions) {
   const immediateAttempts = IS_MV3
     ? [{
-      label: 'userscript-main-execute',
-      options: {
-        ...baseOptions,
-        world: 'MAIN',
-        preferRegister: false,
-        allowRegisterFallback: true,
-        // keep legacy fallback disabled here; we rely on userScripts register/execute
-        allowLegacyCodeFallback: false,
-      },
-    }, {
+      // USER_SCRIPT world bypasses page CSP; the self-invoking code in injectContentRealm
+      // calls the wrapper directly so no cross-world window prop setter is needed.
+      // MAIN world attempt removed: cross-world defineProperty setters never fire, and
+      // MAIN world lacks chrome.runtime.sendMessage for the inline GM API stubs.
       label: 'userscript-world-execute',
       options: {
         ...baseOptions,
@@ -975,9 +1036,26 @@ function unregisterScriptFF(bag) {
  * @param {VMInjection.Bag} bag
  */
 function detectStrictCsp(info, bag) {
-  const h = info[kResponseHeaders].find(findCspHeader);
-  if (!h) return;
-  const cspResult = analyzeCspForInject(h.value);
+  // Analyze ALL Content-Security-Policy headers.
+  // Pages may send multiple CSP headers (AND-ed by the browser). A nonce from one
+  // header won't help if another header's strict script-src lacks it.
+  let nonce;
+  let forceContent;
+  for (const h of info[kResponseHeaders]) {
+    if (!findCspHeader(h)) continue;
+    const result = analyzeCspForInject(h.value);
+    if (!result) continue;
+    if (result.forceContent) {
+      forceContent = true;
+    } else if (result.nonce) {
+      if (nonce && nonce !== result.nonce) forceContent = true; // conflicting nonces
+      else nonce = result.nonce;
+    }
+  }
+  // If any header blocks inline without nonce, nonce-based injection won't work
+  const cspResult = forceContent ? { forceContent: true }
+    : nonce ? { nonce }
+    : undefined;
   if (!cspResult) return;
   if (IS_MV3 && info.tabId >= 0) {
     publishCspHint(getCspHintKey(info.tabId, info.url), cspResult, 'headers');

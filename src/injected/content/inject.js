@@ -71,7 +71,7 @@ addHandlers({
 });
 
 export function injectPageSandbox(data) {
-  if (IS_CHROMIUM_MV3) {
+  if (IS_CHROMIUM_MV3 && !nonce) {
     pageInjectable = false;
     return false;
   }
@@ -199,13 +199,14 @@ export async function injectScripts(data, info, isXml) {
   bridgeInfo[CONTENT] = info;
   assign(bridge[CACHE], data[CACHE]);
   const forceContentByMeta = !isXml && hasStrictMetaCsp();
-  if (isXml || data[FORCE_CONTENT] || forceContentByMeta || IS_CHROMIUM_MV3) {
+  nonce = data.nonce || getPageNonce();
+  if (isXml || data[FORCE_CONTENT] || forceContentByMeta || (IS_CHROMIUM_MV3 && !data.nonce)) {
     pageInjectable = false;
   } else if (data[PAGE] && pageInjectable == null) {
     injectPageSandbox(data);
   }
   let toContent;
-  if (IS_CHROMIUM_MV3) {
+  if (IS_CHROMIUM_MV3 && !pageInjectable) {
     toContent = [];
     for (const scr of data[SCRIPTS]) {
       triageScript(scr);
@@ -397,11 +398,16 @@ function sendFeedback(toContent, more) {
 
 function triageScript(script) {
   let realm = script[INJECT_INTO];
-  realm = IS_CHROMIUM_MV3
+  realm = IS_CHROMIUM_MV3 && !pageInjectable
     ? CONTENT
     : (realm === AUTO && !pageInjectable) || realm === CONTENT
       ? CONTENT
       : pageInjectable && PAGE;
+  // If a script prepared for page realm (code=array) ends up in content realm
+  // (e.g. handshake failed), join the code array so Function(code)() works.
+  if (realm === CONTENT && typeof script.code !== 'string') {
+    script.code = script.code.join('');
+  }
   if (realm) {
     const lists = realm === CONTENT
       ? contLists || (contLists = createNullObj())

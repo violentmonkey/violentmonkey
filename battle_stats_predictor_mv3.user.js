@@ -31,6 +31,7 @@
 // @grant       GM_info
 // @connect     api.torn.com
 // @connect     stormmotors.org
+// @connect     www.lol-manager.com
 // @connect     www.tornstats.com
 // @connect     yata.yt
 // @license     MIT
@@ -503,6 +504,7 @@ function BSPIsAllowedRequestUrl(url) {
         return host === "api.torn.com"
             || host === "www.torn.com"
             || host === "stormmotors.org"
+            || host === "www.lol-manager.com"
             || host === "www.tornstats.com"
             || host === "yata.yt";
     } catch (_) {
@@ -764,7 +766,7 @@ function CanQueryAnyAPI() {
     return document.visibilityState === "visible" && document.hasFocus();
 }
 function GetBSPServer() {
-    return "https://stormmotors.org/api";
+    return "http://www.lol-manager.com/api";
 }
 function BSPStorageGetRaw(key) { return localStorage[key]; }
 function BSPStorageSetRaw(key, value) { localStorage[key] = value; }

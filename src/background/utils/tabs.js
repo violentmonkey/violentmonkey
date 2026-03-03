@@ -6,6 +6,7 @@ import { testScript } from './tester';
 import { CHROME, FIREFOX } from './ua';
 import { vetUrl } from './url';
 import { pushAlert } from './alerts';
+import { logBackgroundAction } from './diagnostics';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
@@ -788,10 +789,93 @@ if (extensionManifest.manifest_version === 3) {
   void cleanupStaleUserScriptsAtStartup();
   void getUserScriptsHealth(true);
   void ensureMainWorldBridgeRegistration();
+  // Enable chrome.runtime.sendMessage in USER_SCRIPT world for inline GM API stubs.
+  // Required for the ContentEvalBlocked fallback path where scripts run in USER_SCRIPT world
+  // with self-invoked code that routes GM.xmlHttpRequest through background messaging.
+  getUserScriptsApi()?.configureWorld?.({ messaging: true })?.catch?.(() => {});
   browser.runtime.onInstalled?.addListener(() => {
     void ensureMainWorldBridgeRegistration(true);
+    getUserScriptsApi()?.configureWorld?.({ messaging: true })?.catch?.(() => {});
   });
   browser.runtime.onStartup?.addListener(() => {
     void ensureMainWorldBridgeRegistration();
+    getUserScriptsApi()?.configureWorld?.({ messaging: true })?.catch?.(() => {});
   });
 }
+
+/**
+ * Handles GM API calls proxied from USER_SCRIPT world via chrome.runtime.sendMessage.
+ * Only active in MV3 where USER_SCRIPT world messaging is configured.
+ * Supports the inline GM API stubs injected by injectContentRealm for strict-CSP pages.
+ */
+if (extensionManifest.manifest_version === 3) {
+  chrome.runtime.onUserScriptMessage?.addListener((message, sender, sendResponse) => {
+    if (!message?.__vmGM) return; // not our message
+    if (message.fn === 'xhr') {
+      handleUserScriptGmXhr(message.opts || {}, sender, sendResponse);
+      return true; // keep channel open for async response
+    }
+  });
+}
+
+async function handleUserScriptGmXhr(opts, sender, sendResponse) {
+  const { method = 'GET', url, headers = {}, data, timeout = 0, responseType = '' } = opts;
+  if (!url) {
+    sendResponse({ __vmError: { status: 0, statusText: 'Missing URL', responseText: '', finalUrl: '', readyState: 4 } });
+    return;
+  }
+  const controller = new AbortController();
+  let timeoutId;
+  if (timeout > 0) {
+    timeoutId = setTimeout(() => controller.abort(), timeout);
+  }
+  try {
+    // Build headers; inject Referer from the sender tab if not already provided by the script.
+    const mergedHeaders = { ...headers };
+    const refererKey = Object.keys(mergedHeaders).find(k => k.toLowerCase() === 'referer');
+    if (!refererKey && sender?.url) {
+      mergedHeaders['Referer'] = sender.url;
+    }
+    const fetchOpts = {
+      method,
+      headers: new Headers(mergedHeaders),
+      signal: controller.signal,
+    };
+    if (data && method !== 'GET' && method !== 'HEAD') {
+      fetchOpts.body = data;
+    }
+    const response = await fetch(url, fetchOpts);
+    const responseText = await response.text();
+    if (timeoutId) clearTimeout(timeoutId);
+    let responseJSON = null;
+    if (!responseType || responseType === 'json') {
+      try { responseJSON = JSON.parse(responseText); } catch (e) { /* not JSON */ }
+    }
+    logBackgroundAction('userscript.gm.xhr.response', {
+      url,
+      method,
+      status: response.status,
+      finalUrl: response.url,
+      referer: mergedHeaders['Referer'] || '',
+      isJson: responseJSON !== null,
+      responseSnippet: responseText.slice(0, 500),
+    }, 'debug');
+    sendResponse({
+      finalUrl: response.url,
+      readyState: 4,
+      status: response.status,
+      statusText: response.statusText,
+      responseText,
+      response: responseType === 'json' ? responseJSON : responseText,
+      responseJSON,
+    });
+  } catch (err) {
+    if (timeoutId) clearTimeout(timeoutId);
+    if (err?.name === 'AbortError') {
+      sendResponse({ __vmTimeout: { status: 0, statusText: 'Timeout', responseText: '', finalUrl: url, readyState: 4 } });
+    } else {
+      sendResponse({ __vmError: { status: 0, statusText: String(err?.message || err), responseText: '', finalUrl: url, readyState: 4 } });
+    }
+  }
+}
+
