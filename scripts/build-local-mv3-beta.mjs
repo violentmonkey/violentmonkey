@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
-import { cp, mkdir, readFile, rm } from 'fs/promises';
-import { resolve } from 'path';
+import { cp, mkdir, readFile, writeFile, rm, readdir } from 'fs/promises';
+import { resolve, join, relative } from 'path';
+import { ZipWriter, Uint8ArrayWriter, Uint8ArrayReader } from '@zip.js/zip.js';
 
 const DIST_DIR = resolve('dist');
 const ASSETS_DIR = resolve('dist-assets');
@@ -21,6 +22,27 @@ function run(cmd, env = {}) {
       ...env,
     },
   });
+}
+
+async function createZip(sourceDir, outputPath) {
+  const zipWriter = new ZipWriter(new Uint8ArrayWriter());
+  async function addDir(dir) {
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name);
+      const zipEntryPath = relative(sourceDir, fullPath).replace(/\\/g, '/');
+      if (entry.isDirectory()) {
+        await addDir(fullPath);
+      } else {
+        const content = await readFile(fullPath);
+        await zipWriter.add(zipEntryPath, new Uint8ArrayReader(content));
+      }
+    }
+  }
+  await addDir(sourceDir);
+  const data = await zipWriter.close();
+  await writeFile(outputPath, data);
+  console.log(`> Created zip: ${outputPath}`);
 }
 
 function getVersion(pkg) {
@@ -52,7 +74,7 @@ async function main() {
   const zipPath = resolve('dist-assets', zipName);
   await mkdir(ASSETS_DIR, { recursive: true });
   await rm(zipPath, { force: true });
-  run(`cd dist && zip -rq "../dist-assets/${zipName}" .`);
+  await createZip(DIST_DIR, zipPath);
 
   // 4) Refresh loose unpacked files in a fixed folder for browser reload.
   await rm(UNPACKED_DIR, { recursive: true, force: true });
