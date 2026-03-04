@@ -10,3 +10,39 @@ node_modules/
 .env
 WSL_CODEX_SETUP.md
 *_LOCAL.md
+
+# Temp files created by Claude Code
+tmpclaude-*-cwd
+
+# Plan/doc files
+BSP_EXTENSIVE_BUG_SWEEP_PLAN.md
+BSP_MV3_SMOKE_CHECKLIST.md
+CODE_RELATED_MV3_FIXES-PLAN.md
+CODE_RELATED_MV3_FIXES.md
+DIAGNOSTICS_DEBUG_LOCATION_PLAN.md
+MV3_CSP_FALLBACK_REPAIR_PLAN.md
+MV3_DEBUG_PLAN.md
+SYNTAX_ERROR_EDITOR_NAV_PLAN.md
+VM_DEBUG_DEEP_RESEARCH_BOOTSTRAP.md
+deep-research-report.md
+build-ps.txt
+Chome Extenstion Securty Guidelines.md
+
+# Diagnostics
+projectsaturn-diagnostics-*.json
+
+# Network captures
+*.har
+
+# Misc dev files
+.sandbox-home/
+Tampermonkey/
+tampermonkey-backup-*
+violentmonkey-*.zip
+package-lock.json
+patch-xhr.js
+mv3-backend-canary.js
+battle_stats_predictor.user.js
+scripts/
+test/
+new 10.txt
