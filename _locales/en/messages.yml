@@ -45,6 +45,9 @@ buttonFilter:
   description: Button to show filters menu.
   message: Filters
   touched: false
+buttonGreasyForkPublish:
+  description: Button to upload the current userscript, creating a new one on Greasy Fork
+  message: Publish
 buttonHome:
   description: Button to open homepage.
   message: Homepage
@@ -64,6 +67,9 @@ buttonNew:
 buttonOK:
   description: OK button on dialog.
   message: OK
+buttonPushUpdate:
+  descrption: Button to upload the current code to replace a userscript's contents on Greasy Fork or etc.
+  message: Push update
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Recycle Bin
