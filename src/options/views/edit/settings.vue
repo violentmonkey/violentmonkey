@@ -77,6 +77,9 @@
         </td>
       </tr>
     </table>
+    <div v-if="!isNaN(greasyForkId) && canPublish">
+      Greasy Fork: <button v-text="i18n(greasyForkId ? 'buttonPushUpdate' : 'buttonPublish')" @click="greasyForkPublish(greasyForkId)" />
+    </div>
     <table>
       <tr v-for="([ name, orig, labelA, code, labelB ]) in textAreas" :key="name">
         <td>
@@ -101,6 +104,7 @@
 <script setup>
 import { computed, nextTick, ref, shallowRef } from 'vue';
 import { getScriptHome, i18n } from '@/common';
+import { showMessage } from '@/common/ui';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
 import { objectPick } from '@/common/object';
 import VMSettingsUpdate from './settings-update';
@@ -110,9 +114,11 @@ import {
   store, updateTags,
 } from '../../utils';
 
+const emit = defineEmits(['publishClick']);
 const props = defineProps({
   script: Object,
   readOnly: Boolean,
+  canPublish: Boolean,
 });
 const KII = shallowRef(KNOWN_INJECT_INTO);
 
@@ -162,6 +168,50 @@ function onTagClicked({ target }) {
 
 function onTagsFocused() {
   if (!store.tags) updateTags();
+}
+
+const greasyForkId = computed(() => {
+  const { custom, meta } = props.script;
+  const url = custom[kUpdateURL] || meta[kUpdateURL] || custom[kDownloadURL] || meta[kDownloadURL] || custom.lastInstallURL;
+  if (!url) return 0; // Not published
+  const match = /^https:\/\/update\.greasyfork\.org\/scripts\/(\d+)\/.+\.(?:user|meta)\.js$/.exec(url) || [];
+  return +match[1]; // Potentially updateable when type is integral. Not GreasyFork when NaN
+});
+
+function greasyForkPublish(id) {
+  // API: https://github.com/greasyfork-org/greasyfork/commit/5b973bf68ffb9c4d684c357770680dcfa6b2bd4a
+  const id_url = id ? `s/${id}/` : "_";
+  const url = `https://greasyfork.org/en/script${id_url}versions/prefill`;
+  const doc = window.open().document;
+
+  const textarea = doc.createElement("textarea");
+  textarea.name = "script_version[code]";
+  textarea.value = 'test';
+
+  const form = doc.createElement("form");
+  form.method = "post";
+  form.action = url;
+  form.appendChild(textarea);
+  if (!process.env.DEBUG) {
+    doc.style.display = "none";
+  }
+  doc.body.appendChild(form);
+
+  emit("publishClick", (code, close) => {
+    textarea.value = code;
+    if (!process.env.DEBUG) {
+      form.submit();
+    } else {
+      setTimeout(() => form.submit(), 5000);
+    }
+    showMessage(id ? { text: i18n("msgPrefilledPushUpdateTabOpened") } : {
+      text: i18n("msgPrefilledPublishTabOpened"),
+      timeout: ~0 >>> 1, // max timeout = 24 days
+    });
+    if (!id) {
+      close(); // updateURL will reload upon reopening
+    }
+  });
 }
 </script>
 
