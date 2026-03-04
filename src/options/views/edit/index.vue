@@ -58,6 +58,8 @@
       class="edit-body"
       v-if="nav === 'settings'"
       v-bind="{readOnly, script}"
+      :canPublish="!canSave && !frozen"
+      @publish-click="onPublishClicked"
     />
     <vm-values
       class="edit-body"
@@ -441,6 +443,10 @@ function setupSavePosition({ id: curWndId, tabs }) {
       shouldSavePositionOnSave = true;
     }
   }
+}
+
+function onPublishClicked(callback) {
+  callback($codeComp.getRealContent(), () => close(true));
 }
 </script>
 

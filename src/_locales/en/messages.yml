@@ -64,6 +64,12 @@ buttonNew:
 buttonOK:
   description: OK button on dialog.
   message: OK
+buttonPublish:
+  description: Button to upload the current userscript, creating a new one on Greasy Fork
+  message: Publish userscript
+buttonPushUpdate:
+  descrption: Button to upload the current code to replace a userscript's contents on Greasy Fork
+  message: Push update
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Recycle Bin
@@ -816,6 +822,12 @@ msgNoUpdate:
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
   message: Error updating scripts. Click to open them.
+msgPrefilledPublishTabOpened:
+  description: Message after opening a tab with a prefilled Greasy Fork form upon buttonPublish.
+  message: Prefilled tab opened. As this is the first time, please press Reinstall in Greasy Fork to get the @updateURL
+msgPrefilledPushUpdateTabOpened:
+  description: Message after opening a tab with a prefilled Greasy Fork form upon buttonPushUpdate.
+  message: Prefilled tab opened
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
