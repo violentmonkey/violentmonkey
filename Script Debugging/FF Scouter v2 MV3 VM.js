@@ -14,6 +14,9 @@
 // @grant        GM_addStyle
 // @connect      ffscouter.com
 // @license      GPL-3.0
+// @run-at       document-idle
+// @require      https://code.jquery.com/jquery-3.7.1.min.js
+// @sandbox      DOM
 // ==/UserScript==
  
 const FF_VERSION = "2.71";
@@ -30,13 +33,86 @@ let currentUserId = null;
 const TOAST_ERROR = "error";
 const TOAST_LOG = "log";
 
-// Polyfill for GM_addStyle if not available
+// Polyfills for GM_* functions if not available
 if (typeof GM_addStyle === 'undefined') {
   var GM_addStyle = function(css) {
     const style = document.createElement('style');
     style.textContent = css;
     (document.head || document.documentElement).appendChild(style);
     return style;
+  };
+}
+
+if (typeof GM_setValue === 'undefined') {
+  var GM_setValue = function(key, value) {
+    localStorage.setItem('GM_' + key, JSON.stringify(value));
+  };
+}
+
+if (typeof GM_getValue === 'undefined') {
+  var GM_getValue = function(key, defaultValue) {
+    const value = localStorage.getItem('GM_' + key);
+    if (value === null) return defaultValue;
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return value;
+    }
+  };
+}
+
+if (typeof GM_deleteValue === 'undefined') {
+  var GM_deleteValue = function(key) {
+    localStorage.removeItem('GM_' + key);
+  };
+}
+
+if (typeof GM_listValues === 'undefined') {
+  var GM_listValues = function() {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key.startsWith('GM_')) {
+        keys.push(key.substring(3));
+      }
+    }
+    return keys;
+  };
+}
+
+if (typeof GM_registerMenuCommand === 'undefined') {
+  var GM_registerMenuCommand = function(name, callback, accessKey) {
+    // No-op fallback - menu commands not supported without userscript manager
+    console.log('[FF Scouter V2] GM_registerMenuCommand not available:', name);
+  };
+}
+
+if (typeof GM_xmlhttpRequest === 'undefined') {
+  var GM_xmlhttpRequest = function(details) {
+    const fetchOptions = {
+      method: details.method || 'GET',
+      headers: details.headers || {},
+    };
+    if (details.data) {
+      fetchOptions.body = details.data;
+    }
+    fetch(details.url, fetchOptions)
+      .then(response => {
+        return response.text().then(text => {
+          const responseObj = {
+            responseText: text,
+            status: response.status,
+            statusText: response.statusText,
+            readyState: 4,
+            responseHeaders: [...response.headers].map(([k, v]) => `${k}: ${v}`).join('\r\n'),
+            finalUrl: response.url
+          };
+          if (details.onload) details.onload(responseObj);
+        });
+      })
+      .catch(error => {
+        if (details.onerror) details.onerror({ error: error });
+      });
   };
 }
  
