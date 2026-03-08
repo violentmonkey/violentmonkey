@@ -229,11 +229,11 @@ import {
 } from '@/common';
 import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
-import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch } from '@/common/ui';
+import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
-import { store } from '../utils';
+import { isFullscreenPopup, store } from '../utils';
 
 let mousedownElement;
 let focusBug;
@@ -274,7 +274,7 @@ options.hook((changes) => {
         ? { ...optionsData[key], ...v }
         : v;
       if (key === kPopupWidth) {
-        document.body.style.width = isTouch ? 'auto' : v + 'px';
+        document.body.style.width = isFullscreenPopup ? 'auto' : v + 'px';
       }
     }
   }

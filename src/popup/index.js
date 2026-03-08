@@ -3,10 +3,10 @@ import { i18n, sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadCommandIcon, loadScriptIcon } from '@/common/load-script-icon';
 import { mapEntry } from '@/common/object';
-import { isTouch, render } from '@/common/ui';
+import { render } from '@/common/ui';
 import '@/common/ui/style';
 import App from './views/app';
-import { emptyStore, store } from './utils';
+import { emptyStore, isFullscreenPopup, store } from './utils';
 
 let mutex, mutexResolve, port;
 let hPrev;
@@ -100,7 +100,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     hPrev = Math.max(innerHeight, 100); // ignore the not-yet-resized popup e.g. in Firefox
     window.onresize = onResize;
     // Mobile browsers show the popup maximized to the entire screen, no resizing
-    if (isTouch && hPrev > document.body.clientHeight) onResize();
+    if (isFullscreenPopup && hPrev > document.body.clientHeight) onResize();
   }
 }
 
