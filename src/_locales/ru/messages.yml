@@ -102,10 +102,10 @@ buttonSupport:
   message: Страница поддержки
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: Забрать к локальному единожды
+  message: Забрать из облака на это устройство один раз
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: Отправить на внешнее единожды
+  message: Отправить с этого устройства в облако один раз
 buttonUndo:
   description: Button to undo removement of a script.
   message: Откатить
@@ -598,7 +598,7 @@ labelSyncAnonymous:
   message: Анонимный аккаунт
 labelSyncAuthorize:
   description: Label for button to authorize a service.
-  message: Авторизировать
+  message: Авторизовать
 labelSyncAuthorizing:
   description: Label for button when authorization is in progress.
   message: Авторизация…
@@ -613,7 +613,7 @@ labelSyncPassword:
   message: 'Пароль: '
 labelSyncReauthorize:
   description: Option to reauthorize sync service when expired.
-  message: Повторная авто-авторизация по истечении срока действия
+  message: Повторная авторизация по истечении срока действия
   touched: false
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
@@ -828,17 +828,17 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: 'Пожалуйста, пере-сохраните или переустановите эти скрипты:'
+  message: 'Пожалуйста, пересохраните или переустановите эти скрипты:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (код такой же)'
 msgSavedBlacklist:
   description: Message shown when blacklist are saved.
-  message: Чёрный список сохранен.
+  message: Чёрный список сохранён.
   touched: false
 msgSavedCustomCSS:
   description: Message shown when custom CSS is saved.
-  message: Пользовательский стиль сохранен.
+  message: Пользовательский стиль сохранён.
   touched: false
 msgSavedEditorOptions:
   description: Message shown when editor options are saved.
@@ -846,7 +846,7 @@ msgSavedEditorOptions:
   touched: false
 msgSavedScriptTemplate:
   description: Message shown when custom script template is saved.
-  message: Шаблон нового скрипта обновлен.
+  message: Шаблон нового скрипта обновлён.
   touched: false
 msgScriptUpdated:
   description: Notification message for script updates.
