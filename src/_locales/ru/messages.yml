@@ -102,10 +102,10 @@ buttonSupport:
   message: Страница поддержки
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: Забрать на локальное один раз
+  message: Забрать из облака на это устройство один раз
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: Отправить на удалённый один раз
+  message: Отправить с этого устройства в облако один раз
 buttonUndo:
   description: Button to undo removement of a script.
   message: Откатить
