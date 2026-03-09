@@ -157,6 +157,17 @@ export const GM_API_CTX = {
   GM_xmlhttpRequest: GM4_ALIAS.xmlHttpRequest = function (opts) {
     return onRequestCreate(nullObjFrom(opts), this);
   },
+  GM_cookie: GM4_ALIAS.cookie = {
+    list(details) {
+      return bridge.promise('CookieList', { ...details, scriptId: this.id });
+    },
+    set(details) {
+      return bridge.promise('CookieSet', { ...details, scriptId: this.id });
+    },
+    delete(details) {
+      return bridge.promise('CookieDelete', { ...details, scriptId: this.id });
+    },
+  },
 };
 
 /** Not bound to script context */

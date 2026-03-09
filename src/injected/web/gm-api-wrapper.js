@@ -54,10 +54,16 @@ export function makeGmApiWrapper(script) {
         fn = fnAsync = GM4_ALIAS[gm4name];
       }
       if (fn || (fn = GM_API_CTX[name]) || (fn = fnAsync = GM_API_CTX_GM4ASYNC[name])) {
-        fn = safeBind(fn,
-          fnAsync && gm4name
-            ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
-            : context);
+        const ctx = fnAsync && gm4name
+          ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
+          : context;
+        if (typeof fn === 'object' && fn) {
+          const obj = createNullObj();
+          for (const k of objectKeys(fn)) obj[k] = safeBind(fn[k], ctx);
+          fn = obj;
+        } else {
+          fn = safeBind(fn, ctx);
+        }
       } else if (!(fn = GM_API[name]) && (
         fn = name === 'window.close' && sendTabClose
           || name === 'window.focus' && sendTabFocus
