@@ -15,6 +15,7 @@ export const GM4_ALIAS = createNullObj();
 /** Context-bound + async when used as GM.xxx */
 export const GM_API_CTX_GM4ASYNC = {
   __proto__: null,
+  GM_cookie: gmCookieInvoker,
   /** @this {GMContext} */
   GM_deleteValue(key) {
     return dumpValue(this, false, [key]);
@@ -157,12 +158,6 @@ export const GM_API_CTX = {
   GM_xmlhttpRequest: GM4_ALIAS.xmlHttpRequest = function (opts) {
     return onRequestCreate(nullObjFrom(opts), this);
   },
-  GM_cookie: GM4_ALIAS.cookie = {
-    __proto__: null,
-    list(details) { return bridgeInvoke('CookieList', details, this); },
-    set(details) { return bridgeInvoke('CookieSet', details, this); },
-    delete(details) { return bridgeInvoke('CookieDelete', details, this); },
-  },
 };
 
 /** Not bound to script context */
@@ -199,6 +194,15 @@ export const GM_API = {
   // using the native console.log so the output has a clickable link to the caller's source
   GM_log: logging.log,
 };
+
+/** @this {GMContext} */
+export function gmCookieInvoker(cmd, hasResult, opts, cb) {
+  opts = nullObjFrom(opts);
+  opts.scriptId = this.id;
+  if (this.async) return bridge.promise(cmd, opts);
+  if (cb) return bridge.call(cmd, opts, null, hasResult ? cb : (res, err) => cb(err));
+  bridge.post(cmd, opts);
+}
 
 function webAddElement(parent, tag, attrs) {
   let el;
@@ -254,10 +258,4 @@ function findCommandIdByText(text, hub) {
       return id;
     }
   }
-}
-
-function bridgeInvoke(cmd, details, context) {
-  const opts = nullObjFrom(details);
-  opts.scriptId = context.id;
-  return bridge.promise(cmd, opts);
 }

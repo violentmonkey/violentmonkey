@@ -3,7 +3,6 @@ import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
-import './cookies';
 import './tabs';
 import { sendCmd } from './util';
 import { isEmpty, XHR_COOKIE_RE } from '../util';
@@ -72,6 +71,9 @@ addBackgroundHandlers({
 });
 
 addHandlers({
+  CookieDelete: REIFY,
+  CookieList: REIFY,
+  CookieSet: REIFY,
   Log: data => safeApply(logging[data[0]], logging, data[1]),
   TabFocus: REIFY,
   UpdateValue: REIFY,

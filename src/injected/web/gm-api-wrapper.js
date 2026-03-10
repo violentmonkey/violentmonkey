@@ -1,5 +1,5 @@
 import bridge from './bridge';
-import { GM4_ALIAS, GM_API, GM_API_CTX, GM_API_CTX_GM4ASYNC } from './gm-api';
+import { GM4_ALIAS, GM_API, GM_API_CTX, GM_API_CTX_GM4ASYNC, gmCookieInvoker } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils, safeCopy, thisObjectProto } from './util';
 
@@ -55,12 +55,15 @@ export function makeGmApiWrapper(script) {
       }
       if (fn || (fn = GM_API_CTX[name]) || (fn = fnAsync = GM_API_CTX_GM4ASYNC[name])) {
         const ctx = fnAsync && gm4name
-          ? contextAsync || (contextAsync = assign(createNullObj(), context, { async: true }))
+          ? contextAsync ??= assign(createNullObj(), context, { async: true })
           : context;
-        if (typeof fn === 'object' && fn) {
-          const obj = createNullObj();
-          for (const k of objectKeys(fn)) obj[k] = safeBind(fn[k], ctx);
-          fn = obj;
+        if (fn === gmCookieInvoker) {
+          fn = {
+            __proto__: null,
+            delete: safeBind(fn, ctx, 'CookieDelete', /*hasResult=*/false),
+            list: safeBind(fn, ctx, 'CookieList', /*hasResult=*/true),
+            set: safeBind(fn, ctx, 'CookieSet', /*hasResult=*/false),
+          };
         } else {
           fn = safeBind(fn, ctx);
         }
