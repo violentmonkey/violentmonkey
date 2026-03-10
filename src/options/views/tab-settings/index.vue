@@ -82,10 +82,13 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
+      </section>
+
+      <section>
+        <h3 v-text="i18n('editLabelSettings')"/>
         <tooltip :content="i18n('labelHttpOnlyCookieHint')">
-          <setting-check name="gmCookieHttpOnly">
-            <locale-group i18n-key="labelHttpOnlyCookie"/>
-          </setting-check>
+          <setting-check :name="kGmCookieHttpOnly"
+                         :label="i18n('labelHttpOnlyCookie') + '\n' + i18n('labelScriptOptionRequired')"/>
         </tooltip>
       </section>
 
@@ -117,7 +120,7 @@
 import { i18n } from '@/common';
 import { KNOWN_INJECT_INTO, VM_HOME } from '@/common/consts';
 import options from '@/common/options';
-import { kScriptTemplate, kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
+import { kScriptTemplate, kUpdateEnabledScriptsOnly, kGmCookieHttpOnly } from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
 import { EXTERNAL_LINK_PROPS, focusMe, getActiveElement } from '@/common/ui';
 import { hookSettingsForUI } from '@/common/ui/util';

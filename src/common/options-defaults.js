@@ -3,6 +3,7 @@ import { BLACKLIST, BLACKLIST_NET, FILE_GLOB_ALL } from '@/common/consts';
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
 export const kEditAsString = 'editAsString';
 export const kFiltersPopup = 'filtersPopup';
+export const kGmCookieHttpOnly = 'gmCookieHttpOnly';
 export const kKillTrailingSpaceOnSave = 'killTrailingSpaceOnSave';
 export const kPopupWidth = 'popupWidth';
 export const kShowTrailingSpace = 'showTrailingSpace';
@@ -29,7 +30,7 @@ export default {
   [BLACKLIST_NET]: FILE_GLOB_ALL,
   [kPopupWidth]: 320,
   [kUpdateEnabledScriptsOnly]: true,
-  gmCookieHttpOnly: false,
+  [kGmCookieHttpOnly]: false,
   autoUpdate: 1, // days, 0 = disable
   // ignoreGrant: false,
   lastUpdate: 0,

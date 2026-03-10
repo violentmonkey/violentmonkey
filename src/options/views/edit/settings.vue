@@ -8,6 +8,12 @@
       </label>
     </div>
     <VMSettingsUpdate v-bind="{script}" class="mb-2"/>
+    <div class="mb-2">
+      <label>
+        <input type="checkbox" v-model="config.httpOnly">
+        <span v-text="i18n('labelHttpOnlyCookie')"/>
+      </label>
+    </div>
     <div class="flex flex-wrap mr-1c tags">
       <span v-text="i18n('labelTags')" />
       <input ref="tagsInput" v-model="custom.tags" :disabled="readOnly" @focus.once="onTagsFocused">

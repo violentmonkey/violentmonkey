@@ -162,6 +162,7 @@ declare interface VMScript {
   config: {
     enabled: NumBool;
     removed: NumBool;
+    httpOnly: NumBool;
     /** 2 = allow updates and local edits */
     shouldUpdate: NumBool | 2;
     notifyUpdates?: NumBoolNull;

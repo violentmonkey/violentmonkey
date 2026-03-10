@@ -470,15 +470,6 @@ labelFastFirefoxInjectHint:
     59, faster than the default mode. Similarly to "Synchronous page mode" it
     also increases memory consumption, so you may want to disable it if your
     scripts work correctly without this option.
-labelHttpOnlyCookie:
-  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: Allow GM_cookie to access HTTP-only cookies
-labelHttpOnlyCookieHint:
-  description: Tooltip for the HTTP-only cookie option.
-  message: >-
-    When enabled, scripts can read and write cookies with the HTTP-only flag.
-    This allows scripts to access cookies that cannot be accessed via JavaScript.
-    Use with caution as it may pose security risks.
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback
@@ -494,6 +485,15 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Homepage URL:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: Allow GM_cookie to access HTTP-only cookies
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: >-
+    When enabled, scripts can read and write cookies with the HTTP-only flag.
+    This allows scripts to access cookies that cannot be accessed via
+    JavaScript. Use with caution as it may pose security risks.
 labelIconURL:
   description: Label for the input.
   message: 'Icon URL:'
@@ -573,6 +573,9 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Default)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: (only for scripts with this option enabled in their settings)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Custom Script Template
