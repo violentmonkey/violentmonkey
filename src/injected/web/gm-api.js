@@ -205,18 +205,13 @@ export function gmCookieInvoker(cmd, hasResult, opts, cb) {
 }
 
 function webAddElement(parent, tag, attrs) {
-  let el;
-  let errorInfo;
-  bridge.call('AddElement', { tag, attrs }, parent, function _(res) {
+  let el, err;
+  bridge.call('AddElement', { tag, attrs }, parent, function _(res, cbErr) {
     el = this;
-    errorInfo = res;
-  }, 'cbId');
+    err = cbErr;
+  });
   // DOM error in content script can't be caught by a page-mode userscript so we rethrow it here
-  if (errorInfo) {
-    const err = new SafeError(errorInfo[0]);
-    err.stack += `\n${errorInfo[1]}`;
-    throw err;
-  }
+  if (err) throw err;
   /* A Promise polyfill is not actually necessary because DOM messaging is synchronous,
      but we keep it for compatibility with GM_addStyle in VM of 2017-2019
      https://github.com/violentmonkey/violentmonkey/issues/217

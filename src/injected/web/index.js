@@ -61,12 +61,15 @@ addHandlers({
       )
     );
   },
-  /** @this {Node} */
-  Callback({ id, data }) {
-    if (id === 'Error') throw data;
-    const fn = callbacks[id];
+  Callback({ id, res, err }) {
+    const cb = callbacks[id];
     delete callbacks[id];
-    if (fn) this::fn(data);
+    if (cb) {
+      if (err && cb[1]) err.stack += '\n-----------\n' + cb[1];
+      this::cb[0](res, err);
+    } else if (err) {
+      throw err;
+    }
   },
   GetGrantless() {
     bridge.post('SetGrantless', grantlessUsage);

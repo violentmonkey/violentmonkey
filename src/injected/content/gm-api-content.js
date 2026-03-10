@@ -23,23 +23,15 @@ addBackgroundHandlers({
 
 addHandlers({
   /** @this {Node} */
-  AddElement({ tag, attrs, cbId }, realm) {
-    let el;
-    let res;
-    try {
-      const parent = this
-        || HEAD_TAGS::includes(`${tag}`::toLowerCase()) && elemByTag('head')
-        || elemByTag('body')
-        || elemByTag('*');
-      el = makeElem(tag, attrs);
-      addNonceAttribute(el);
-      parent::appendChild(el);
-    } catch (e) {
-      // A page-mode userscript can't catch DOM errors in a content script so we pass it explicitly
-      // TODO: maybe move try/catch to bridge.onHandle and use bridge.call in all web commands
-      res = [`${e}`, e.stack];
-    }
-    bridge.post('Callback', { id: cbId, data: res }, realm, el);
+  AddElement({ tag, attrs }, realm, nodeRet) {
+    const parent = this
+      || HEAD_TAGS::includes(`${tag}`::toLowerCase()) && elemByTag('head')
+      || elemByTag('body')
+      || elemByTag('*');
+    const el = makeElem(tag, attrs);
+    addNonceAttribute(el);
+    parent::appendChild(el);
+    nodeRet[0] = el;
   },
 
   GetResource({ id, isBlob, key, raw }) {

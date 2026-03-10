@@ -38,12 +38,13 @@ const bridge = {
   pathMaps: createNullObj(),
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {
-    let res;
+    let res, err;
     let handle = handlers[cmd];
     let callbackId = data && getOwnProp(data, CALLBACK_ID);
     if (callbackId) {
       data = data.data;
     }
+    const nodeRet = [null]; // elem must be present to skip a poisoned prototype on arr[0]=val
     try {
       if (!handle) throw data;
       if (handle === REIFY) {
@@ -53,16 +54,16 @@ const bridge = {
       }
       res = handle === true
         ? sendCmd(cmd, data)
-        : node::handle(data, realm || PAGE);
+        : node::handle(data, realm || PAGE, nodeRet);
       if (isPromise(res)) {
         res = await res;
       }
     } catch (e) {
-      callbackId = 'Error';
-      res = e;
+      res = null; // prevent the rejected Promise from being sent to Callback
+      err = e;
     }
-    if (callbackId) {
-      bridge.post('Callback', { id: callbackId, data: res }, realm);
+    if (callbackId || err) {
+      bridge.post('Callback', { res, err, id: callbackId || '' }, realm, nodeRet[0]);
     }
   },
 };
