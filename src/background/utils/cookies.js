@@ -28,6 +28,13 @@ function getCookieUrl(data, src, fallbackToSrcUrl) {
   return targetUrl;
 }
 
+function cookieOpts(data, src) {
+  return {
+    storeId: data.storeId || src.tab?.cookieStoreId,
+    ...FIREFOX >= 59 && { firstPartyDomain: null },
+  };
+}
+
 addPublicCommands({
   /**
    * @param {Object} data
@@ -35,21 +42,18 @@ addPublicCommands({
    * @return {Promise<browser.cookies.Cookie[]>}
    */
   async CookieList(data, src) {
-    const httpOnly = getOption('enableHttpOnlyCookie');
-    const { name, domain, path, secure, session, storeId } = data;
+    const httpOnly = getOption('gmCookieHttpOnly');
+    const { name, domain, path, secure, session } = data;
     const targetUrl = getCookieUrl(data, src, false);
-    const opts = {
+    let cookies = await browser.cookies.getAll({
       url: targetUrl,
       name,
       domain,
       path,
       secure,
       session,
-      storeId: storeId || src.tab?.cookieStoreId,
-      ...FIREFOX >= 59 && { firstPartyDomain: null },
-    };
-    // Filter out httpOnly cookies if not enabled
-    let cookies = await browser.cookies.getAll(opts);
+      ...cookieOpts(data, src),
+    });
     if (!httpOnly) {
       cookies = cookies.filter(c => !c.httpOnly);
     }
@@ -62,7 +66,7 @@ addPublicCommands({
    * @return {Promise<browser.cookies.Cookie|undefined>}
    */
   async CookieSet(data, src) {
-    const httpOnly = getOption('enableHttpOnlyCookie');
+    const httpOnly = getOption('gmCookieHttpOnly');
     if (!httpOnly && data.httpOnly) {
       throw new Error('HTTP-only not allowed by user settings');
     }
@@ -75,7 +79,6 @@ addPublicCommands({
       httpOnly: isHttpOnly,
       expirationDate,
       sameSite,
-      storeId,
     } = data;
     const targetUrl = getCookieUrl(data, src, true);
     if (!targetUrl) {
@@ -88,10 +91,10 @@ addPublicCommands({
       domain,
       path,
       secure: secure ?? targetUrl.startsWith('https:'),
-      httpOnly: isHttpOnly ?? httpOnly,
+      httpOnly: isHttpOnly ?? false,
       expirationDate,
       sameSite,
-      storeId: storeId || src.tab?.cookieStoreId,
+      ...cookieOpts(data, src),
     });
   },
 
@@ -101,13 +104,12 @@ addPublicCommands({
    * @return {Promise<boolean>}
    */
   async CookieDelete(data, src) {
-    const { name, storeId } = data;
+    const { name } = data;
     const targetUrl = getCookieUrl(data, src, true);
     return browser.cookies.remove({
       url: targetUrl,
       name,
-      storeId: storeId || src.tab?.cookieStoreId,
-      ...FIREFOX >= 59 && { firstPartyDomain: null },
+      ...cookieOpts(data, src),
     }).then(removed => !!removed);
   },
 });
