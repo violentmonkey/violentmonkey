@@ -158,15 +158,10 @@ export const GM_API_CTX = {
     return onRequestCreate(nullObjFrom(opts), this);
   },
   GM_cookie: GM4_ALIAS.cookie = {
-    list(details) {
-      return bridge.promise('CookieList', { ...details, scriptId: this.id });
-    },
-    set(details) {
-      return bridge.promise('CookieSet', { ...details, scriptId: this.id });
-    },
-    delete(details) {
-      return bridge.promise('CookieDelete', { ...details, scriptId: this.id });
-    },
+    __proto__: null,
+    list(details) { return bridgeInvoke('CookieList', details, this); },
+    set(details) { return bridgeInvoke('CookieSet', details, this); },
+    delete(details) { return bridgeInvoke('CookieDelete', details, this); },
   },
 };
 
@@ -259,4 +254,10 @@ function findCommandIdByText(text, hub) {
       return id;
     }
   }
+}
+
+function bridgeInvoke(cmd, details, context) {
+  const opts = nullObjFrom(details);
+  opts.scriptId = context.id;
+  return bridge.promise(cmd, opts);
 }
