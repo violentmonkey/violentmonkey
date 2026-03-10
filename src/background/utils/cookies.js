@@ -103,23 +103,11 @@ addPublicCommands({
   async CookieDelete(data, src) {
     const { name, storeId } = data;
     const targetUrl = getCookieUrl(data, src, true);
-    // First, find the cookie to get its storeId if not specified
-    let cookieStoreId = storeId;
-    if (!cookieStoreId) {
-      const cookies = await browser.cookies.getAll({
-        url: targetUrl,
-        name,
-        storeId: src.tab?.cookieStoreId,
-        ...FIREFOX >= 59 && { firstPartyDomain: null },
-      });
-      if (cookies.length) {
-        cookieStoreId = cookies[0].storeId;
-      }
-    }
     return browser.cookies.remove({
       url: targetUrl,
       name,
-      storeId: cookieStoreId || src.tab?.cookieStoreId,
+      storeId: storeId || src.tab?.cookieStoreId,
+      ...FIREFOX >= 59 && { firstPartyDomain: null },
     }).then(removed => !!removed);
   },
 });
