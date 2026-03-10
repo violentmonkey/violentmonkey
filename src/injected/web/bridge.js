@@ -21,7 +21,7 @@ const bridge = {
       cb = resolve;
     });
     if (IS_FIREFOX) setPrototypeOf(res, SafePromiseConstructor);
-    postWithCallback(cmd, data, node, cb);
+    postWithCallback(cmd, data, node, cb, true);
     return res;
   },
   /** @return {?} synchronous */
@@ -29,15 +29,18 @@ const bridge = {
 };
 
 
-function postWithCallback(cmd, data, node, cb) {
-  let res;
+function postWithCallback(cmd, data, node, cb, isPromise) {
+  let res, err;
   const id = safeGetUniqId();
   callbacks[id] = [
-    cb || (val => { res = val; }),
-    !cb && new SafeError().stack,
+    cb || ((a, b) => { res = a; err = b; }),
+    !isPromise && new SafeError().stack, // Promise already tracks the caller
   ];
   bridge.post(cmd, { [CALLBACK_ID]: id, data }, node);
-  if (!cb) return res;
+  if (!cb) {
+    if (err) throw err;
+    return res;
+  }
 }
 
 export default bridge;
