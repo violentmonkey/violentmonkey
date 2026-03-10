@@ -29,6 +29,7 @@ export default {
   [BLACKLIST_NET]: FILE_GLOB_ALL,
   [kPopupWidth]: 320,
   [kUpdateEnabledScriptsOnly]: true,
+  gmCookieHttpOnly: false,
   autoUpdate: 1, // days, 0 = disable
   // ignoreGrant: false,
   lastUpdate: 0,

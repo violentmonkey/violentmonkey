@@ -3,6 +3,7 @@ import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
+import './cookies';
 import './tabs';
 import { sendCmd } from './util';
 import { isEmpty, XHR_COOKIE_RE } from '../util';

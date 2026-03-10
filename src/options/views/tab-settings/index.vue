@@ -82,6 +82,11 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
+        <tooltip :content="i18n('labelHttpOnlyCookieHint')">
+          <setting-check name="gmCookieHttpOnly">
+            <locale-group i18n-key="labelHttpOnlyCookie"/>
+          </setting-check>
+        </tooltip>
       </section>
 
       <vm-editor />

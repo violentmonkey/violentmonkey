@@ -63,6 +63,7 @@ export const GM_API_NAMES = [
   'GM_addElement',
   'GM_addStyle',
   'GM_addValueChangeListener',
+  'GM_cookie',
   'GM_deleteValue',
   'GM_deleteValues',
   'GM_download',

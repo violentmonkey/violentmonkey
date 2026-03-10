@@ -157,6 +157,12 @@ export const GM_API_CTX = {
   GM_xmlhttpRequest: GM4_ALIAS.xmlHttpRequest = function (opts) {
     return onRequestCreate(nullObjFrom(opts), this);
   },
+  GM_cookie: GM4_ALIAS.cookie = {
+    __proto__: null,
+    list(details) { return bridgeInvoke('CookieList', details, this); },
+    set(details) { return bridgeInvoke('CookieSet', details, this); },
+    delete(details) { return bridgeInvoke('CookieDelete', details, this); },
+  },
 };
 
 /** Not bound to script context */
@@ -248,4 +254,10 @@ function findCommandIdByText(text, hub) {
       return id;
     }
   }
+}
+
+function bridgeInvoke(cmd, details, context) {
+  const opts = nullObjFrom(details);
+  opts.scriptId = context.id;
+  return bridge.promise(cmd, opts);
 }
