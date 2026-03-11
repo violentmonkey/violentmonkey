@@ -240,7 +240,7 @@ export function onRequestCreate(opts, context, fileName) {
     [kResponseType]: type,
     [kXhrType]: req[kXhrType] = XHR_TYPES[type] ? type : '',
     events,
-  }, opts, OPTS_TO_PASS));
+  }, opts, OPTS_TO_PASS), null, null, /*cbAsync=*/true);
   if (!res) res = {};
   else if (IS_FIREFOX) setPrototypeOf(res, SafePromiseConstructor);
   setOwnProp(res, 'abort', () => bridge.post('AbortRequest', id));

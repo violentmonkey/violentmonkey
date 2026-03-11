@@ -6,7 +6,7 @@ import './gm-values';
 import './notifications';
 import './requests';
 import './tabs';
-import { bindEvents, CONSOLE_METHODS } from '../util';
+import { addErrorStack, bindEvents, CONSOLE_METHODS } from '../util';
 import { safeConcat } from './util';
 
 // Make sure to call safe::methods() in code that may run after userscripts
@@ -65,7 +65,7 @@ addHandlers({
     const cb = callbacks[id];
     delete callbacks[id];
     if (cb) {
-      if (err && cb[1]) err.stack += '\n-----------\n' + cb[1];
+      if (err && cb[1]) addErrorStack(err, cb[1]);
       this::cb[0](res, err);
     } else if (err) {
       throw err;

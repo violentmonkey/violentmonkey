@@ -13,6 +13,11 @@ export * from '@/common/consts';
 
 export const CONSOLE_METHODS = ['log', 'info', 'warn', ERROR, 'debug'];
 
+export const addErrorStack = (err, localErr) => {
+  err.stack += '\n-----------\n' + localErr.stack;
+  return err;
+};
+
 export const fireBridgeEvent = (eventId, msg) => {
   const detail = cloneInto ? cloneInto(msg, document) : msg;
   const evtMain = new SafeCustomEvent(eventId, { __proto__: null, detail });
