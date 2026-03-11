@@ -8,10 +8,12 @@
       </label>
     </div>
     <VMSettingsUpdate v-bind="{script}" class="mb-2"/>
-    <div class="mb-2">
+    <div class="mb-2" v-if="hasGmCookie || config.httpOnly">
       <label>
         <input type="checkbox" v-model="config.httpOnly">
-        <span v-text="i18n('labelHttpOnlyCookie')"/>
+        <tooltip :content="i18n('labelHttpOnlyCookieHint')">{{
+          i18n('labelHttpOnlyCookie') + $httpOnlyGlobal
+        }}</tooltip>
       </label>
     </div>
     <div class="flex flex-wrap mr-1c tags">
@@ -105,10 +107,13 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref, shallowRef } from 'vue';
+import { computed, nextTick, onActivated, onDeactivated, ref, shallowRef } from 'vue';
+import Tooltip from 'vueleton/lib/tooltip';
 import { getScriptHome, i18n } from '@/common';
 import { KNOWN_INJECT_INTO } from '@/common/consts';
+import hookSetting from '@/common/hook-setting';
 import { objectPick } from '@/common/object';
+import { kGmCookieHttpOnly } from '@/common/options-defaults';
 import VMSettingsUpdate from './settings-update';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
@@ -125,6 +130,11 @@ const KII = shallowRef(KNOWN_INJECT_INTO);
 const highlightMetaKeys = str => str.match(/^(.*?)(@[-a-z]+)(.*)/)?.slice(1) || [str, '', ''];
 const config = computed(() => props.script.config);
 const custom = computed(() => props.script.custom);
+const hasGmCookie = computed(() => {
+  const { grant } = props.script.meta;
+  return grant.includes('GM_cookie') || grant.includes('GM.cookie');
+});
+const $httpOnlyGlobal = ref('');
 const placeholders = computed(() => {
   const { script } = props;
   const { meta } = script;
@@ -149,6 +159,21 @@ const textAreas = [
   [kExclude, kOrigExclude, ...highlightMetaKeys(i18n('labelExclude'))],
   [kExcludeMatch, kOrigExcludeMatch, ...highlightMetaKeys(i18n('labelExcludeMatch'))],
 ];
+
+let revokers;
+
+onActivated(() => {
+  revokers = [
+    hookSetting(kGmCookieHttpOnly, val => {
+      $httpOnlyGlobal.value = val ? ''
+        : '\n' + i18n('labelScriptOptionRequiredGlobal');
+    }),
+  ];
+});
+onDeactivated(() => {
+  revokers.forEach(r => r());
+  revokers = null;
+});
 
 function onTagClicked({ target }) {
   if (target.tagName !== 'A') return;

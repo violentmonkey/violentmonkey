@@ -576,6 +576,9 @@ labelRunAtDefault:
 labelScriptOptionRequired:
   description: Shown after some global options in settings
   message: (only for scripts with this option enabled in their settings)
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: (this option must be also enabled in global settings)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Custom Script Template
