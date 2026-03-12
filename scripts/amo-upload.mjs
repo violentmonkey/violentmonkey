@@ -40,6 +40,7 @@ async function handleAddon() {
             : join(process.env.ASSETS_DIR, process.env.ASSET_ZIP),
           sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
           approvalNotes: `\
+# please use nodejs 20 or 24 because nodejs 22 is known to fail
 yarn && yarn build
 `,
           releaseNotes: {
