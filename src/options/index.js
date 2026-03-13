@@ -43,7 +43,6 @@ function initScript(script, sizes, code) {
     total += val;
     if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
   });
-  $cache.author = meta.author || '';
   $cache.desc = desc;
   $cache.name = name;
   $cache.lowerName = name.toLocaleLowerCase();

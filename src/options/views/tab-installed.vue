@@ -220,7 +220,7 @@ const sortModes = [
   ['exec', i18n('filterExecutionOrder')],
   ['alpha', i18n('filterAlphabeticalOrder'), '', cmpName],
   ['author', i18n('labelAuthor').replace(/\W+/, '').toLowerCase(), '',
-    (a, b) => collator.compare(a.$cache.author, b.$cache.author) || cmpName(a, b)],
+    (a, b) => collator.compare(a.meta.author || '', b.meta.author || '') || cmpName(a, b)],
   [UPDATE, i18n('filterLastUpdateOrder'), '',
     (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
   ['visit', i18n('filterLastVisitOrder'), i18n('filterLastVisitOrderTooltip'),
