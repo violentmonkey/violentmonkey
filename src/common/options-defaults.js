@@ -69,7 +69,7 @@ export default {
     showOrder: false,
     /** @type {boolean} */
     showVisit: false,
-    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'update'|'update-' | 'visit'|'visit-'} */
+    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'author'|'author-' | 'update'|'update-' | 'visit'|'visit-'} */
     sort: 'exec',
     /** @type {boolean} */
     viewSingleColumn: false,

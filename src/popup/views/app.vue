@@ -232,6 +232,7 @@ import { objectPick } from '@/common/object';
 import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
+import { getSortCollator } from '@/common/ui/util';
 import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
 import { isFullscreenPopup, store } from '../utils';
 
@@ -243,7 +244,7 @@ const TARDY_MATCH = i18n('msgTardyMatch');
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const needsReload = reactive({});
-
+const collator = getSortCollator();
 const $extras = ref();
 const $topExtras = ref();
 const optionsData = reactive(objectPick(optionsDefaults, [
@@ -358,7 +359,7 @@ function makeInjectionScopes() {
         updatableScripts[id] = item;
       }
       return item;
-    }).sort((a, b) => (a.key < b.key ? -1 : a.key > b.key));
+    }).sort((a, b) => collator.compare(a.key, b.key));
     return numTotal && {
       name,
       title,

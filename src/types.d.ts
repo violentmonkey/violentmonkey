@@ -191,6 +191,7 @@ declare interface VMScript {
     tags?: string;
   };
   meta: {
+    author?: string;
     description?: string;
     downloadURL?: string;
     exclude: string[];

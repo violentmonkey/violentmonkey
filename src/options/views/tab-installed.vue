@@ -188,6 +188,7 @@ import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import Icon from '@/common/ui/icon';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
+import { getSortCollator } from '@/common/ui/util';
 import {
   createSearchRules, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
   SIZE_TITLES, store, TOGGLE_OFF, TOGGLE_ON,
@@ -212,11 +213,14 @@ const RESTORE = 'restore';
 const TOGGLE = 'toggle';
 const UNDO = 'undo';
 const UPDATE = 'update';
+const collator = getSortCollator();
+const cmpName = (a, b) => collator.compare(a.$cache.lowerName, b.$cache.lowerName);
 /** @type {{ [key:string]: SortMode }} */
 const sortModes = [
   ['exec', i18n('filterExecutionOrder')],
-  ['alpha', i18n('filterAlphabeticalOrder'), '',
-    ({ $cache: { lowerName: a } }, { $cache: { lowerName: b } }) => (a < b ? -1 : a > b)],
+  ['alpha', i18n('filterAlphabeticalOrder'), '', cmpName],
+  ['author', i18n('labelAuthor').replace(/\W+/, '').toLowerCase(), '',
+    (a, b) => collator.compare(a.$cache.author, b.$cache.author) || cmpName(a, b)],
   [UPDATE, i18n('filterLastUpdateOrder'), '',
     (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
   ['visit', i18n('filterLastVisitOrder'), i18n('filterLastVisitOrderTooltip'),

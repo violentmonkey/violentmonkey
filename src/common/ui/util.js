@@ -4,6 +4,11 @@ import { debounce } from '@/common';
 
 export const NORMALIZE = Symbol();
 
+export const getSortCollator = () => new Intl.Collator(undefined, {
+  numeric: true, // 100 > 2
+  sensitivity: 'accent', // ignore case
+});
+
 /** @this {object} enum */
 export function normalizeEnum(val) {
   return hasOwnProperty(this, val) ? val : Object.keys(this)[0];
