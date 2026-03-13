@@ -89,10 +89,11 @@
       </template>
       <label v-show="!current.isAll">
         <span v-text="i18n('valueLabelKey')"/>
-        <input type="text" v-model="current.key" :readOnly="!current.isNew || readOnly"
+        <input type="text" v-model="current.key" :readOnly
                ref="$key"
                class="w-100"
                spellcheck="false"
+               :class="{ dirty: current.dirty = current.dirty & ~1 | current.key !== current.keyOrig }"
                @keydown="onKeyDownInKeyInput"
                @keydown.esc.exact.stop="onCancel">
       </label>
@@ -167,17 +168,12 @@ const trashKeyWidthStyle = computed(() => (
 const PAGE_SIZE = 25;
 const MAX_LENGTH = 1024;
 const MAX_JSON_DURATION = 10; // ms
-const currentObservables = { error: '', dirty: false };
-const cutLength = s => (s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH) : s);
-const reparseJson = (str) => {
-  try {
-    // eslint-disable-next-line no-use-before-define
-    return JSON.stringify(JSON.parse(str), null, jsonIndent);
-  } catch (e) {
-    // This shouldn't happen but the storage may get corrupted or modified directly
-    return str;
-  }
+const currentObservables = {
+  error: '',
+  /** bitmask: key (set v|=1, clear v&=~1) value (set v|=2, clear v&=~2) */
+  dirty: 0,
 };
+const cutLength = s => (s.length > MAX_LENGTH ? s.slice(0, MAX_LENGTH) : s);
 /** Uses a negative tabId which is recognized in bg::values.js */
 const fakeSender = () => ({ tab: { id: Math.random() - 2 }, [kFrameId]: 0 });
 const conditionNotEdit = { condition: '!edit' };
@@ -290,15 +286,23 @@ function getLength(key, raw) {
   const len = key.length + (values.value[key] || raw).length - 1;
   return len < 10_000 ? len : formatByteLength(len);
 }
-function getValue(key, sliced, asString) {
+function getValue(key, sliced, jsonValue) {
   let value = values.value[key];
   const type = value[0];
   value = value.slice(1);
   if (type === 's') {
-    if (!asString || (asString[0] = value, !editAsString.value)) {
+    if (!jsonValue || (jsonValue[0] = value, !editAsString.value)) {
       value = JSON.stringify(value);
     }
-  } else if (!sliced) value = reparseJson(value);
+  } else if (!sliced) {
+    try {
+      value = JSON.parse(value);
+      jsonValue?.push(value);
+      value = JSON.stringify(value, null, jsonIndent);
+    } catch (e) {
+      // This shouldn't happen but the storage may get corrupted or modified directly
+    }
+  }
   return sliced ? cutLength(value) : value;
 }
 function getValueAll() {
@@ -347,19 +351,22 @@ function updateKeyWidthStyle(items, propName) {
 }
 async function updateValue({
   key,
+  keyOrig,
   jsonValue,
   rawValue = dumpScriptValue(jsonValue) || '',
 }, isSave) {
-  if (isSave && keys.value.includes(key)) {
-    addToTrash(key);
-  }
   const { id } = props.script.props;
-  await sendCmdDirectly('UpdateValue', { [id]: { [key]: rawValue } }, undefined, sender);
-  if (rawValue) {
-    values.value[key] = rawValue;
-  } else {
-    delete values.value[key];
+  const valuesObj = values.value;
+  const upd = { [key]: rawValue };
+  const renamed = key !== keyOrig;
+  if (isSave) {
+    if (keyOrig in valuesObj) addToTrash(keyOrig);
+    if (renamed && key in valuesObj) addToTrash(key);
   }
+  if (rawValue) valuesObj[key] = rawValue;
+  if (!rawValue || renamed) delete valuesObj[keyOrig];
+  if (renamed) upd[keyOrig] = null;
+  await sendCmdDirectly('UpdateValue', { [id]: upd }, undefined, sender);
   calcSize();
 }
 
@@ -367,6 +374,7 @@ function onNew() {
   current.value = {
     isNew: true,
     key: '',
+    keyOrig: '',
     value: '',
     ...currentObservables,
   };
@@ -400,14 +408,15 @@ function onRestore(trashKey) {
   updateValue(entry);
 }
 function onEdit(key) {
-  const isStr = [];
-  const value = getValue(key, false, isStr);
-  const jsonValue = isStr[0];
+  const parsed = [];
+  const value = getValue(key, false, parsed);
+  const [jsonValue] = parsed;
   current.value = {
+    keyOrig: key,
     key,
     value,
     jsonValue,
-    isStr: jsonValue != null,
+    isStr: typeof jsonValue === 'string',
     ...currentObservables,
   };
 }
@@ -433,7 +442,7 @@ async function onSave(buttonIndex) {
   }
   if (buttonIndex === 1) {
     cm.markClean();
-    cur.dirty = false;
+    cur.dirty = 0;
   } else {
     current.value = null;
   }
@@ -458,7 +467,7 @@ function onCancel() {
 }
 function onChange(isChanged) {
   const cur = current.value;
-  cur.dirty = isChanged;
+  cur.dirty = cur.dirty & ~2 | 2 * isChanged;
   cur.error = null;
   const t0 = performance.now();
   const str = cm.getValue().trim();
@@ -492,7 +501,7 @@ function onStorageChanged(changes) {
       const curText = cm.getValue();
       if (curText === newText) {
         cur.isNew = false;
-        cur.dirty = false;
+        cur.dirty &= ~2;
       } else if (!cur.dirty) {
         // Updating the current value only if it wasn't yet changed by the user.
         // Keeping the same current.value to avoid triggering `watch` observer
@@ -631,6 +640,9 @@ $lightBorder: 1px solid var(--fill-2);
   }
   .icon:not(.active) {
     fill: var(--fg);
+  }
+  input.dirty {
+    font-style: italic;
   }
 }
 </style>
