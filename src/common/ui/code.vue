@@ -18,6 +18,7 @@
             id="editor-search"
             ref="$search"
             v-model="search.query"
+            v-bind="!FIELD_SIZING && { style: { width: search.query.length + INPUT_EXTRA + 'ch' } }"
           />
         </tooltip>
         <tooltip :content="tooltips.findPrev" align="end">
@@ -30,7 +31,8 @@
       <form class="flex-1" @submit.prevent="replace()" v-if="!readOnly">
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
-        <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
+        <input class="flex-1" type="search" id="editor-replace" v-model="search.replace"
+               v-bind="!FIELD_SIZING && { style: { width: search.replace.length + INPUT_EXTRA + 'ch' } }">
         <tooltip :content="tooltips.replace" align="end">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
@@ -96,6 +98,8 @@ const { insertTab, insertSoftTab } = cmCommands;
 /** Using space prefix to show the command at the top of Help list */
 const Esc = ' back / cancel / close / singleSelection';
 const GM4_API_NAMES = GM_API_NAMES.map(s => GM4_ALIAS[s = s.slice(3)] || s);
+const FIELD_SIZING = CSS.supports('field-sizing', 'content');
+const INPUT_EXTRA = 1.5 + (IS_FIREFOX ? 0 : 3);
 Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
@@ -590,10 +594,11 @@ $selectionDarkBg: rgba(80, 75, 65, .99);
     align-items: center;
     margin-right: .5rem;
   }
-  @supports (field-sizing: content) {
-    input {
+  input {
+    min-width: 3ch;
+    max-width: 50vw;
+    @supports (field-sizing: content) {
       field-sizing: content;
-      min-width: 3ch;
       width: auto;
     }
   }
