@@ -108,7 +108,7 @@
     "vueleton": "^2.0.2"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20 <22 || >= 24"
   },
   "jest": {
     "setupFilesAfterEnv": [
