@@ -15,10 +15,14 @@
       </div>
       <p v-if="frozen && nav === 'code'" v-text="i18n('readonly')"
          class="text-upper text-right text-red"/>
-      <div v-else class="edit-hint text-right ellipsis">
+      <div v-else-if="browserWindows" class="edit-hint text-right ellipsis">
         <a :href="externalEditorInfoUrl"
            v-bind="EXTERNAL_LINK_PROPS"
            v-text="i18n('editHowToHint')"/>
+      </div>
+      <div class="mr-1">
+        <a class="btn-ghost" @click="clipboardCopy" tabindex="0"><IconCopy/></a>
+        <a class="btn-ghost" @click="clipboardPaste" tabindex="0" v-if="!frozen"><IconPaste/></a>
       </div>
       <div class="mr-1">
         <button v-text="i18n('buttonSave')" @click="save"
@@ -91,6 +95,8 @@
 </template>
 
 <script>
+import IconCopy from '~icons/mdi/content-copy';
+import IconPaste from '~icons/mdi/content-paste';
 import {
   browserWindows,
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
@@ -308,6 +314,13 @@ onDeactivated(() => {
   disposeList?.forEach(dispose => dispose());
 });
 
+function clipboardCopy() {
+  navigator.clipboard.writeText($codeComp.getRealContent());
+}
+async function clipboardPaste() {
+  // not using setValue because our `dirty` handler reserves it for the initial unchanged code
+  CM.replaceRange(await navigator.clipboard.readText(), {line: 0, ch: 0}, {line: 1e99, ch: 0}, 'paste');
+}
 async function save() {
   if (!canSave.value) return;
   if (shouldSavePositionOnSave) savePosition();
@@ -528,6 +541,9 @@ function setupSavePosition({ id: curWndId, tabs }) {
   }
   .readonly {
     opacity: .75; /* opacity plays well with custom editor colors */
+  }
+  a.btn-ghost {
+    padding: 0 2px;
   }
 }
 
