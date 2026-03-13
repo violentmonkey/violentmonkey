@@ -255,7 +255,7 @@ export function handleHotkeyOrMenu(id, tab) {
     commands.CheckUpdate();
   } else if (id === 'updateScriptsInTab') {
     id = badges[tab.id]?.[IDS];
-    if (id) commands.CheckUpdate([...id]);
+    if (id) commands.CheckUpdate({ ids: [...id] });
   } else if (id.startsWith(KEY_SHOW_BADGE)) {
     setOption(KEY_SHOW_BADGE, id.slice(KEY_SHOW_BADGE.length + 1));
   }

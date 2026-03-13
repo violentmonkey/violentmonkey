@@ -603,7 +603,10 @@ function handleActionToggle(script) {
  */
 async function handleActionUpdate(what, el) {
   if (el) (el = (el.querySelector('svg') || el.closest('svg') || el).classList).add('rotate');
-  await sendCmdDirectly('CheckUpdate', what && ensureArray(what).map(s => s.props.id));
+  await sendCmdDirectly('CheckUpdate', !!what && {
+    ids: ensureArray(what).map(s => s.props.id),
+    force: what.force,
+  });
   el?.remove('rotate');
 }
 function handleClickTag(tag) {

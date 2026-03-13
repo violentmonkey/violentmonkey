@@ -1,5 +1,5 @@
 import {
-  compareVersion, ensureArray, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
+  compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
 } from '@/common';
 import {
   __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX,
@@ -24,32 +24,33 @@ hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
 
 addOwnCommands({
   /**
-   * @param {number | number[] | 'auto'} [id] - when omitted, all scripts are checked
+   * @param {{}} [_]
+   * @param {number[]} [_.ids] - when omitted, all scripts are checked
+   * @param {boolean} [_.auto] - scheduled auto update
+   * @param {boolean} [_.force] - force (ignore checks)
    * @return {Promise<number>} number of updated scripts
    */
-  async CheckUpdate(id) {
-    const isAuto = id === AUTO;
-    const isAll = isAuto || !id;
-    const scripts = isAll ? getScripts() : ensureArray(id).map(getScriptById).filter(Boolean);
+  async CheckUpdate({ ids, force, [AUTO]: auto } = {}) {
+    const isAll = auto || !ids;
+    const scripts = isAll ? getScripts() : ids.map(getScriptById).filter(Boolean);
     const urlOpts = {
       all: true,
       allowedOnly: isAll,
       enabledOnly: isAll && getOption(kUpdateEnabledScriptsOnly),
     };
     const opts = {
+      force,
       [FETCH_OPTS]: {
         ...NO_CACHE,
-        [MULTI]: isAuto ? AUTO : isAll,
+        [MULTI]: auto ? AUTO : isAll,
       },
     };
     const jobs = scripts.map(script => {
       const curId = script.props.id;
       const urls = getScriptUpdateUrl(script, urlOpts);
-      return urls && (
-        processes[curId] || (
-          processes[curId] = doCheckUpdate(curId, script, urls, opts)
-        )
-      );
+      return urls
+        ? processes[curId] ??= doCheckUpdate(curId, script, urls, opts)
+        : force && fetchResources(script, { update: {}, ...opts });
     }).filter(Boolean);
     const results = await Promise.all(jobs);
     const notes = results.filter(r => r?.text);
@@ -65,6 +66,15 @@ addOwnCommands({
     if (isAll) setOption('lastUpdate', Date.now());
     return results.reduce((num, r) => num + (r === true), 0);
   },
+  /**
+   * @param {{ id: number } & VMScriptSourceOptions} opts
+   * @return {Promise<?string>}
+   */
+  UpdateDeps: opts => fetchResources(getScriptById(opts.id), {
+    [FETCH_OPTS]: { ...NO_CACHE },
+    update: {},
+    ...opts
+  }),
 });
 
 async function doCheckUpdate(id, script, urls, opts) {
@@ -106,6 +116,10 @@ async function downloadUpdate(script, urls, opts) {
   const result = { update, where: { id } };
   announce(i18n('msgCheckingForUpdate'));
   try {
+    if (opts.force) {
+      announceUpdate();
+      return (await requestNewer(downloadURL || updateURL, opts)).data;
+    }
     const { data } = await requestNewer(updateURL, { ...FAST_CHECK, ...opts }) || {};
     const { version, [__CODE]: metaStr } = data ? parseMeta(data, { retMetaStr: true }) : {};
     if (compareVersion(meta.version, version) >= 0) {
@@ -117,11 +131,10 @@ async function downloadUpdate(script, urls, opts) {
       announce(i18n('msgUpdated'));
       return data;
     } else {
-      announce(i18n('msgUpdating'));
-      errorMessage = i18n('msgErrorFetchingScript');
+      announceUpdate();
       return downloadURL === updateURL && metaStr.trim() !== data.trim()
         ? data
-        : (await requestNewer(downloadURL, { ...NO_CACHE, ...opts })).data;
+        : (await requestNewer(downloadURL, opts)).data;
     }
   } catch (error) {
     if (process.env.DEBUG) console.error(error);
@@ -136,6 +149,10 @@ async function downloadUpdate(script, urls, opts) {
       // `null` is transferable in Chrome unlike `undefined`
     });
     sendCmd('UpdateScript', result);
+  }
+  function announceUpdate() {
+    announce(i18n('msgUpdating'));
+    errorMessage = i18n('msgErrorFetchingScript');
   }
 }
 
@@ -152,7 +169,7 @@ function autoUpdate() {
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
     // Wait on startup for things to settle and after unsuspend for network reconnection
-    setTimeout(commands.CheckUpdate, 20e3, AUTO);
+    setTimeout(commands.CheckUpdate, 20e3, { [AUTO]: true });
     elapsed = 0;
   }
   clearTimeout(autoUpdate.timer);

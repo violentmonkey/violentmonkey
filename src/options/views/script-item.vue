@@ -95,7 +95,9 @@
           </tooltip>
           <tooltip
             :disabled="!canUpdate || script.checking"
-            :content="i18n('updateScript')"
+            :content="i18n('updateScript') + ' | ' + i18nUpdateScriptForced"
+            :title="!canUpdate && canUpdateDeps ? i18nUpdateScriptForced : null"
+            v-on="{ contextmenu: (canUpdate || canUpdateDeps) && !script.checking && onUpdate }"
             align="start">
             <a
               class="btn-ghost"
@@ -156,6 +158,7 @@ import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
 const itemMargin = 8;
+const i18nUpdateScriptForced = i18n('updateScriptForced');
 const visitedRecently = new Set();
 const refreshVisited = () => { store.now = Date.now(); };
 const scheduleRefreshVisited = () => setInterval(refreshVisited, 60e3);
@@ -202,6 +205,12 @@ const author = computed(() => {
   };
 });
 const canUpdate = computed(() => props.script.$canUpdate);
+const notDataUrlRe = /^(?!data:)/;
+const canUpdateDeps = computed(() => {
+  const { meta } = props.script;
+  return meta.require.some(notDataUrlRe.test, notDataUrlRe)
+    || Object.values(meta.resources).some(notDataUrlRe.test, notDataUrlRe);
+});
 const description = computed(() => {
   return props.script.custom[kDescription] || getLocaleString(props.script.meta, kDescription);
 });
@@ -246,10 +255,12 @@ const onRemove = () => emitScript('remove');
 const onRestore = () => emitScript('restore');
 const onTagClick = item => emit('clickTag', item);
 const onToggle = () => emitScript('toggle');
-const onUpdate = async () => {
+const onUpdate = async evt => {
+  evt.preventDefault(); // for contextmenu
   if (props.script.$canUpdate !== -1
   || await showConfirmation(i18n('confirmManualUpdate'))) {
-    emitScript('update');
+    (evt = [props.script]).force = evt.type !== 'click';
+    emit('update', evt);
   }
 };
 /**

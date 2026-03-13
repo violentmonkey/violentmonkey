@@ -5,9 +5,14 @@
         <div
           v-for="(label, navKey) in navItems" :key="navKey"
           class="edit-nav-item" :class="{active: nav === navKey}"
-          v-text="label"
           @click="nav = navKey"
-        />
+        >{{
+          label
+        }}<template v-if="navKey === EXTERNALS">
+            <a @click.stop="onUpdateDeps" class="nav-icon"><icon name="refresh"/></a>
+            <span v-text="depsProgress"/>
+          </template>
+        </div>
       </nav>
       <div class="edit-name text-center ellipsis flex-1">
         <span class="subtle" v-if="script.config.removed" v-text="i18n('headerRecycleBin') + ' / '"/>
@@ -70,8 +75,9 @@
     />
     <vm-externals
       class="flex-auto"
-      v-else-if="nav === 'externals'"
+      v-else-if="nav === EXTERNALS"
       :value="script"
+      :updatedDep
     />
     <vm-help
       class="edit-body"
@@ -95,10 +101,11 @@
 </template>
 
 <script>
+import Icon from '@/common/ui/icon';
 import IconCopy from '~icons/mdi/content-copy';
 import IconPaste from '~icons/mdi/content-paste';
 import {
-  browserWindows,
+  browserWindows, getUniqId,
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
@@ -114,6 +121,7 @@ import {
   kOrigInclude, kOrigMatch, kUpdateURL,
 } from '../../utils';
 
+const EXTERNALS = 'externals';
 const CUSTOM_PROPS = {
   [kName]: '',
   [kHomepageURL]: '',
@@ -177,6 +185,7 @@ let disposeList;
 let savedCopy;
 let shouldSavePositionOnSave;
 let toggleUnloadSentry;
+let portId, depsDone, depsTotal;
 
 const emit = defineEmits(['close']);
 const props = defineProps({
@@ -197,6 +206,8 @@ const commands = {
   save,
   close,
 };
+const depsProgress = ref('');
+const updatedDep = ref('');
 const hotkeys = ref();
 const errors = ref();
 const errorsLinks = computed(() => {
@@ -237,7 +248,7 @@ const navItems = computed(() => {
     ...id && {
       values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
     },
-    ...(req || res) && { externals: [req, res]::trueJoin('/') },
+    ...(req || res) && { [EXTERNALS]: [req, res]::trueJoin('/') },
     help: '?',
   };
 });
@@ -312,6 +323,7 @@ onDeactivated(() => {
   store.title = null;
   toggleUnloadSentry(false);
   disposeList?.forEach(dispose => dispose());
+  chrome.runtime.onConnect.removeListener(onUpdateDepsProgress);
 });
 
 function clipboardCopy() {
@@ -427,6 +439,31 @@ function onScript(scr) {
   onChange();
   if (!config.removed) savedCopy = deepCopy(scr);
 }
+async function onUpdateDeps() {
+  depsDone = depsTotal = 0;
+  chrome.runtime.onConnect.addListener(onUpdateDepsProgress);
+  const err = await sendCmdDirectly('UpdateDeps', {
+    id: script.value.props.id,
+    portId: portId = getUniqId(),
+  });
+  if (err) throw new Error(err);
+}
+function onUpdateDepsProgress(port) {
+  if (port.name !== portId) return;
+  port.onMessage.addListener(([url, done]) => {
+    if (done) {
+      ++depsDone;
+      updatedDep.value = url;
+    } else {
+      ++depsTotal;
+    }
+    if (depsDone === depsTotal) {
+      port.disconnect();
+    }
+    depsProgress.value = ` ${depsDone}/${depsTotal}`;
+  });
+}
+
 /** @param {chrome.windows.Window} [wnd] */
 async function savePosition(wnd) {
   if (options.get('editorWindow')) {
@@ -482,7 +519,9 @@ function setupSavePosition({ id: curWndId, tabs }) {
   }
   &-nav-item {
     display: inline-block;
-    padding: 8px 16px;
+    $navPadX: 16px;
+    $navPadY: 8px;
+    padding: $navPadY $navPadX;
     cursor: pointer;
     &.active {
       background: var(--bg);
@@ -491,6 +530,14 @@ function setupSavePosition({ id: curWndId, tabs }) {
     &:not(.active):hover {
       background: var(--fill-0-5);
       box-shadow: 0 -1px 1px var(--fill-4);
+    }
+    a.nav-icon {
+      vertical-align: middle;
+      padding: $navPadY $navPadX;
+      margin-right: -$navPadX;
+      &:not(:hover) {
+        color: inherit;
+      }
     }
   }
   .edit-externals {

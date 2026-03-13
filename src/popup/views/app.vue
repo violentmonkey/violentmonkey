@@ -482,10 +482,10 @@ function onRemoveScript() {
   sendCmdDirectly('MarkRemoved', { id, removed });
 }
 function onUpdateScript() {
-  sendCmdDirectly('CheckUpdate', extras.value.data.props.id);
+  sendCmdDirectly('CheckUpdate', { ids: [extras.value.data.props.id] });
 }
 function onUpdateListed() {
-  sendCmdDirectly('CheckUpdate', Object.keys(store.updatableScripts).map(Number));
+  sendCmdDirectly('CheckUpdate', { ids: Object.keys(store.updatableScripts).map(Number) });
 }
 async function onExclude() {
   const item = extras.value;

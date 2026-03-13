@@ -738,6 +738,9 @@ export async function fetchResources(script, src) {
   if (isRemote(icon)) {
     jobs.push([S_CACHE, icon, ICON_TIMEOUT]);
   }
+  if (!jobs.length) {
+    return;
+  }
   for (let i = 0, type, url, timeout, res; i < jobs.length; i++) {
     [type, url, timeout] = jobs[i];
     if (!(res = pendingDeps[type][url])) {
@@ -758,12 +761,15 @@ export async function fetchResources(script, src) {
   const errors = await Promise.all(jobs);
   const error = errors.map(formatHttpError)::trueJoin('\n');
   if (error) {
-    const message = i18n('msgErrorFetchingResource');
+    let message = i18n('msgErrorFetchingResource');
     sendCmd('UpdateScript', {
       update: { error, message },
       where: { id: getPropsId(script) },
     });
-    return `${message}\n${error}`;
+    message += '\n' + error;
+    return src.force
+      ? { script, text: message }
+      : message;
   }
 }
 
@@ -774,6 +780,7 @@ export async function fetchResources(script, src) {
  * @return {Promise<?>}
  */
 async function fetchResource(src, type, url) {
+  let res;
   if (!isRemote(url)
   || src.update
   || await storage[type].getOne(url) == null) {
@@ -782,12 +789,12 @@ async function fetchResource(src, type, url) {
     try {
       await storage[type].fetch(url, src[FETCH_OPTS]);
     } catch (err) {
-      return err;
-    } finally {
-      if (portId) postToPort(depsPorts, portId, [url, true]);
-      delete pendingDeps[type][url];
+      res = err;
     }
+    if (portId) postToPort(depsPorts, portId, [url, true]);
   }
+  delete pendingDeps[type][url];
+  return res;
 }
 
 function postToPort(ports, id, msg) {

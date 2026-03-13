@@ -1076,6 +1076,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Update
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: Right-click or long touch to force-update including dependencies
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Update all scripts

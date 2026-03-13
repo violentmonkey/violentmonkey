@@ -39,13 +39,13 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onActivated, onDeactivated, ref, watchEffect } from 'vue';
+import { computed, nextTick, onActivated, onDeactivated, ref, watch, watchEffect } from 'vue';
 import { dataUri2text, formatByteLength, getFullUrl, i18n, makeDataUri, sendCmdDirectly }
   from '@/common';
 import VmCode from '@/common/ui/code';
 import { focusMe, hasKeyModifiers } from '@/common/ui/index';
 
-const props = defineProps(['value', 'cmOptions', 'commands', 'install']);
+const props = defineProps(['value', 'cmOptions', 'commands', 'install', 'updatedDep']);
 const $body = ref();
 const $code = ref();
 const $list = ref();
@@ -103,6 +103,12 @@ onActivated(() => {
 });
 onDeactivated(() => {
   isActive.value = false;
+});
+watch(() => props.updatedDep, url => {
+  const [, currentUrl] = all.value[index.value];
+  const deps = dependencies.value;
+  deps[0 + url] = deps[1 + url] = null;
+  if (url === currentUrl) update();
 });
 watchEffect(update);
 
