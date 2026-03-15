@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import { modifiers } from '@violentmonkey/shortcut';
+import { CTRL_META } from '@/common/ui/util';
 
-const ctrlS = modifiers.ctrlcmd === 'm' ? '⌘S' : 'Ctrl-S';
+const ctrlS = CTRL_META + 'S';
 /** XXX compatible with old data format */
 const handleArray = val => (Array.isArray(val) ? val.join('\n') : val || '');
 const handleJSON = val => JSON.stringify(val, null, '  ');

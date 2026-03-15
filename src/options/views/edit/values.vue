@@ -68,17 +68,19 @@
         </div>
       </div>
     </div>
-    <div class="edit-values-panel flex flex-col flex-1 mb-1c" v-if="current">
+    <div class="edit-values-panel flex flex-col flex-1 mb-1c" v-if="current"
+         @keydown="onKeyDown"
+         @keydown.esc.exact.stop="onCancel">
       <div class="control">
         <h4 v-text="current.isAll ? i18n('labelEditValueAll') : i18n('labelEditValue')"/>
         <div class="flex center-items">
           <a tabindex="0" class="mr-1 flex" @click="editorValueShown = !editorValueShown">
             <Icon name="cog" :class="{ active: editorValueShown }"/>
           </a>
-          <button v-for="(text, idx) in [i18n('buttonOK'), i18n('buttonApply')]" :key="text"
-                  v-text="text" @click="onSave(idx)"
+          <button v-for="([text, fn, title], idx) in BUTTONS" :key="text"
+                  v-text="text" @click="fn"
                   :class="{'has-error': current.error, 'save-beacon': !idx}"
-                  :title="current.error"
+                  :title="[title.replace('Ctrl-', CTRL_META), current.error].filter(Boolean).join(' | ')"
                   :disabled="current.error || !current.dirty"/>
           <button v-text="i18n('buttonCancel')" @click="onCancel" title="Esc"/>
         </div>
@@ -93,9 +95,7 @@
                ref="$key"
                class="w-100"
                spellcheck="false"
-               :class="{ dirty: current.dirty = current.dirty & ~1 | current.key !== current.keyOrig }"
-               @keydown="onKeyDownInKeyInput"
-               @keydown.esc.exact.stop="onCancel">
+               :class="{ dirty: current.dirty = current.dirty & ~1 | current.key !== current.keyOrig }">
       </label>
       <div>
         <label v-if="current.isAll" v-text="i18n('valueLabelValueAll')" for="edit-value"/>
@@ -128,7 +128,7 @@
 
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, ref, watch } from 'vue';
-import { dumpScriptValue, formatByteLength, getBgPage, isEmpty, sendCmdDirectly } from '@/common';
+import { dumpScriptValue, formatByteLength, getBgPage, i18n, isEmpty, sendCmdDirectly } from '@/common';
 import { handleTabNavigation, keyboardService } from '@/common/keyboard';
 import { deepCopy, deepEqual, forEachEntry, mapEntry } from '@/common/object';
 import options from '@/common/options';
@@ -141,6 +141,7 @@ import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';
 import { getActiveElement, showMessage } from '@/common/ui';
+import { CTRL_META } from '@/common/ui/util';
 import SettingText from '@/common/ui/setting-text';
 import { K_SAVE, kStorageSize, toggleBoolean } from '../../utils';
 
@@ -153,6 +154,12 @@ const $el = ref();
 const $editAll = ref();
 const $key = ref();
 const $value = ref();
+/** Ctrl-S in editor keeps it open, same behavior as "Apply" */
+const K_OK = 'Shift-Ctrl-S'; // using the order of modifiers in CM
+const BUTTONS = [
+  [i18n('buttonOK'), () => onSave(K_OK), K_OK],
+  [i18n('buttonApply'), onSave, K_SAVE],
+];
 const editAsString = ref();
 const editorValueShown = ref();
 const isActive = ref();
@@ -431,7 +438,8 @@ function onEditAll() {
     ...currentObservables,
   };
 }
-async function onSave(buttonIndex) {
+/** @param {Event | string} arg */
+async function onSave(arg) {
   const cur = current.value;
   if (cur.jsonPaused) {
     cur.jsonPaused = false;
@@ -444,7 +452,7 @@ async function onSave(buttonIndex) {
     showMessage({ text: cur.error });
     return;
   }
-  if (buttonIndex === 1) {
+  if (arg !== K_OK) {
     cm.markClean();
     cur.dirty = 0;
   } else {
@@ -488,9 +496,10 @@ function onChange(isChanged) {
   }
   cur.jsonPaused = performance.now() - t0 > MAX_JSON_DURATION;
 }
-function onKeyDownInKeyInput(evt) {
-  if (CodeMirror.keyName(evt) === K_SAVE) {
-    onSave();
+function onKeyDown(evt) {
+  const key = CodeMirror.keyName(evt);
+  if (key === K_SAVE || key === K_OK) {
+    onSave(key);
   }
 }
 function onStorageChanged(changes) {
