@@ -349,23 +349,28 @@ function updateKeyWidthStyle(items, propName) {
   for (const item of items) max = Math.max(max, (propName ? item[propName] : item).length);
   return { '--keyW': `${max}ch` };
 }
-async function updateValue({
-  key,
-  keyOrig,
-  jsonValue,
-  rawValue = dumpScriptValue(jsonValue) || '',
-}, isSave) {
+async function updateValue(data, isSave) {
+  const {
+    key,
+    keyOrig,
+    jsonValue,
+    rawValue = dumpScriptValue(jsonValue) || '',
+  } = data;
   const { id } = props.script.props;
   const valuesObj = values.value;
   const upd = { [key]: rawValue };
-  const renamed = key !== keyOrig;
+  const renamed = keyOrig != null && key !== keyOrig;
   if (isSave) {
-    if (keyOrig in valuesObj) addToTrash(keyOrig);
-    if (renamed && key in valuesObj) addToTrash(key);
+    data.keyOrig = key;
+    if (key in valuesObj) addToTrash(key);
+    if (renamed && keyOrig in valuesObj) addToTrash(keyOrig);
   }
   if (rawValue) valuesObj[key] = rawValue;
-  if (!rawValue || renamed) delete valuesObj[keyOrig];
-  if (renamed) upd[keyOrig] = null;
+  else delete valuesObj[key];
+  if (renamed) {
+    delete valuesObj[keyOrig];
+    upd[keyOrig] = null;
+  }
   await sendCmdDirectly('UpdateValue', { [id]: upd }, undefined, sender);
   calcSize();
 }
@@ -374,7 +379,6 @@ function onNew() {
   current.value = {
     isNew: true,
     key: '',
-    keyOrig: '',
     value: '',
     ...currentObservables,
   };
@@ -394,8 +398,8 @@ function addToTrash(
 }
 function onRemove(key) {
   if (props.readOnly) return;
-  updateValue({ key });
   addToTrash(key);
+  updateValue({ key });
   if (current.value?.key === key) {
     current.value = null;
   }
