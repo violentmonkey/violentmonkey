@@ -499,6 +499,16 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Adresa domovskej stránky:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: Povoliť GM_cookie prístup k HTTP-only súborom cookies
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: >-
+    Keď je táto funkcia povolená, skripty môžu čítať a zapisovať súbory cookie s
+    príznakom HTTP-only. To umožňuje skriptom prístup k súborom cookie, ku
+    ktorým nie je možné pristupovať prostredníctvom JavaScriptu. Používajte s
+    opatrnosťou, pretože to môže predstavovať bezpečnostné riziko.
 labelIconURL:
   description: Label for the input.
   message: 'Adresa URL ikony:'
@@ -578,6 +588,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Predvolené)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: (len pre skripty, ktoré majú túto možnosť povolenú v nastaveniach)
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: (táto možnosť musí byť povolená aj v globálnych nastaveniach)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Šablóna vlastného skriptu
@@ -1079,6 +1095,11 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Aktualizácia
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: >-
+    Kliknite pravým tlačidlom myši alebo podržte prst na obrazovke, aby ste
+    vynútili aktualizáciu vrátane závislostí
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Aktualizovať všetky skripty

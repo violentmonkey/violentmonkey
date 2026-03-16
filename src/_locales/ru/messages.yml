@@ -493,6 +493,16 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'Адрес домашней страницы:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: Разрешить GM_cookie доступ к куки, доступным только по протоколу HTTP
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: >-
+    При включении скрипты могут читать и записывать куки с флагом «только HTTP».
+    Это позволяет скриптам получать доступ к куки, которые недоступны через
+    JavaScript. Используйте с осторожностью, так как это может представлять
+    угрозу безопасности.
 labelIconURL:
   description: Label for the input.
   message: 'Адрес значка:'
@@ -572,6 +582,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (по умолчанию)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: (только для скриптов, в настройках которых включён этот параметр)
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: (этот параметр должен быть также включён в глобальных настройках)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Шаблон нового скрипта
@@ -1076,6 +1092,11 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Обновить
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: >-
+    Щелчок правой кнопкой мыши или длительное нажатие для принудительного
+    обновления, включая зависимости
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Обновить все скрипты

@@ -501,6 +501,12 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL pentru pagina de start:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: ''
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: ''
 labelIconURL:
   description: Label for the input.
   message: 'URL pentru pictogramă:'
@@ -580,6 +586,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Implicit)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: ''
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: ''
 labelScriptTemplate:
   description: Label for custom script template.
   message: Șablon personalizat pentru scripturi
@@ -1082,6 +1094,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Actualizează
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Actualizează toate scripturile

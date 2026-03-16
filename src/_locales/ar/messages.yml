@@ -332,7 +332,7 @@ hintForBatchAction:
   message: لـ $1 سكربتًا مطابقًا
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` يقوم بتعطيل جميع مفاتيح `@grant` الأخرى.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -490,6 +490,16 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'عنوان الصفحة الرئيسية:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: السماح لـ GM_cookie بالوصول إلى ملفات تعريف الارتباط من نوع HTTP-only
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: >-
+    عند التمكين، يمكن للسكريبتات قراءة وكتابة ملفات تعريف الارتباط التي تحمل
+    علامة HTTP-only. وهذا يسمح للسكريبتات بالوصول إلى ملفات تعريف الارتباط التي
+    لا يمكن الوصول إليها عبر جافا سكريبت. يُرجى استخدام هذا الخيار بحذر لأنه قد
+    يشكل مخاطر أمنية.
 labelIconURL:
   description: Label for the input.
   message: 'عنوان الأيقونة:'
@@ -569,6 +579,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (افتراضي)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: (فقط للسكريبتات التي تم تمكين هذا الخيار في إعداداتها)
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: (يجب أيضًا تمكين هذا الخيار في الإعدادات العامة)
 labelScriptTemplate:
   description: Label for custom script template.
   message: قالب سكربت مخصص
@@ -1063,6 +1079,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: تحديث
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: تحديث جميع السكربتات

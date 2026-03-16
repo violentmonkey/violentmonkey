@@ -341,7 +341,7 @@ hintForBatchAction:
   message: para $1 scripts coincidentes
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` desactiva todas las demás claves `@grant`.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -506,6 +506,16 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL de la página principal:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: Permitir que GM_cookie acceda a cookies HTTP-only
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: >-
+    Cuando está habilitado, los scripts pueden leer y escribir cookies con el
+    atributo HTTP-only. Esto permite que los scripts accedan a cookies a las que
+    normalmente no se puede acceder mediante JavaScript. Úselo con precaución,
+    ya que puede representar riesgos de seguridad.
 labelIconURL:
   description: Label for the input.
   message: 'URL del ícono:'
@@ -585,6 +595,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Predeterminado)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: (solo para scripts con esta opción habilitada en su configuración)
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: (esta opción también debe estar habilitada en la configuración global)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Plantilla de script personalizada
@@ -1088,6 +1104,11 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Actualizar
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: >-
+    Clic derecho o mantener presionado para forzar la actualización incluyendo
+    dependencias
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Actualizar todos los scripts

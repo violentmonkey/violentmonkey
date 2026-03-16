@@ -466,6 +466,12 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 首頁網址：
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: ''
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: ''
 labelIconURL:
   description: Label for the input.
   message: 圖示網址：
@@ -545,6 +551,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: （預設）
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: ''
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: ''
 labelScriptTemplate:
   description: Label for custom script template.
   message: 自訂腳本範本
@@ -1025,6 +1037,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: 更新
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: 更新所有腳本

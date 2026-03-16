@@ -514,6 +514,12 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: "URL de la page d’accueil\_: "
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: ''
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: ''
 labelIconURL:
   description: Label for the input.
   message: 'URL de l''icône :'
@@ -595,6 +601,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Défaut)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: ''
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: ''
 labelScriptTemplate:
   description: Label for custom script template.
   message: Modèle de script personnalisé
@@ -1104,6 +1116,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Mettre à jour
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Mettre à jour tous les scripts

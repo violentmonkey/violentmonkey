@@ -479,6 +479,12 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL Situs Web:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: ''
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: ''
 labelIconURL:
   description: Label for the input.
   message: 'URL Ikon:'
@@ -558,6 +564,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Bawaan)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: ''
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: ''
 labelScriptTemplate:
   description: Label for custom script template.
   message: Templat Skrip Khusus
@@ -1041,6 +1053,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Perbarui
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Perbarui semua skrip
