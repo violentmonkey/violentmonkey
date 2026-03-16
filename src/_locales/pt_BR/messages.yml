@@ -32,8 +32,8 @@ buttonEdit:
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
   message: >-
-    Você também pode clicar com o botão direito do mouse, Ctrl, roda do mouse,
-    no nome do script.
+    Você também pode clicar com o botão direito do mouse, clicar com a tecla
+    Ctrl pressionada ou clicar com a roda do mouse no nome do script.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
   message: Limpar a lixeira agora!
@@ -42,7 +42,7 @@ buttonEnable:
   message: Ativar
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Exportar em zip
+  message: Exportar para zip
 buttonFilter:
   description: Button to show filters menu.
   message: Filtros
@@ -52,10 +52,10 @@ buttonHome:
   message: Página inicial
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Importar a partir do zip
+  message: Importar do zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
-  message: Instalar a partir da URL
+  message: Instalar da URL
 buttonInstallOptions:
   description: Button to show options of installation confirm page.
   message: Opções
@@ -98,7 +98,7 @@ buttonSaved:
   message: Salvo
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: Mostrar editor de estado
+  message: Mostrar status do editor
 buttonSupport:
   description: Button to open support page.
   message: Página de suporte
@@ -123,10 +123,10 @@ buttonVacuum:
   message: Limpar base de dados
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: Dados otimizados
+  message: Dados limpos
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: Otimizando os dados...
+  message: Limpando os dados...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
@@ -487,6 +487,12 @@ labelHomepage:
 labelHomepageURL:
   description: Label of script @homepageURL in custom meta data.
   message: 'URL da página inicial:'
+labelHttpOnlyCookie:
+  description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
+  message: ''
+labelHttpOnlyCookieHint:
+  description: Tooltip for the HTTP-only cookie option.
+  message: ''
 labelIconURL:
   description: Label for the input.
   message: 'URL do ícone:'
@@ -566,6 +572,12 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Padrão)
+labelScriptOptionRequired:
+  description: Shown after some global options in settings
+  message: ''
+labelScriptOptionRequiredGlobal:
+  description: Shown after some options in a script's settings
+  message: ''
 labelScriptTemplate:
   description: Label for custom script template.
   message: Modelo de script personalizado
@@ -1039,6 +1051,9 @@ updateListedCmd:
 updateScript:
   description: Button to update one script.
   message: Atualizar
+updateScriptForced:
+  description: Tooltip for the update icon.
+  message: ''
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Atualize todos os scripts
