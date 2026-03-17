@@ -42,11 +42,7 @@ addPublicCommands({
   },
   /** @return {void} */
   AbortRequest(id) {
-    const req = requests[id];
-    if (req) {
-      req.xhr.abort();
-      clearRequest(req);
-    }
+    requests[id]?.xhr.abort();
   },
   RevokeBlob(url) {
     const timer = cache.pop(`xhrBlob:${url}`);
@@ -282,6 +278,7 @@ async function httpRequest(opts, events, src, cb) {
   for (const evt in events[0]) xhr[`on${evt}`] = callback;
   for (const evt in events[1]) xhr[UPLOAD][`on${evt}`] = callback;
   xhr.onloadend = callback; // always send it for the internal cleanup
+  xhr.onabort = callback; // for gmxhr().abort()
   xhr[onerror] = xhr[UPLOAD][onerror] = callback; // show it in tab's console if there's no callback
   xhr.send(body);
 }
