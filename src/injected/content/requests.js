@@ -1,5 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
-import { sendCmd } from './util';
+import { createObjectURL, decodeResource, makeSafeBlob, sendCmd } from './util';
 import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
 
 const {
@@ -56,8 +56,9 @@ addHandlers({
     const data = !IS_FIREFOX && msg.data;
     const uaData = getUAData && navigator::getUAData();
     const sch = url::slice(0, 5);
-    if (sch === 'data:' || sch === 'blob:') {
-      return requestVirtualUrl(msg, url, realm);
+    const isDataUri = sch === 'data:';
+    if (isDataUri || sch === 'blob:') {
+      return requestVirtualUrl(msg, url, isDataUri, realm);
     }
     requests[msg.id] = {
       __proto__: null,
@@ -113,7 +114,7 @@ addBackgroundHandlers({
         response = req[CHUNKS];
         delete req[CHUNKS];
         if (isBlobXhr(req)) {
-          response = new SafeBlob([response], { type: msg.contentType });
+          response = makeSafeBlob(response, msg.contentType);
         } else if (req[kXhrType]) {
           response = response::getTypedArrayBuffer();
         } else {
@@ -129,34 +130,45 @@ addBackgroundHandlers({
   },
 });
 
-async function requestVirtualUrl(msg, url, realm) {
-  let data, eventLoad;
-  const { events, [kFileName]: fileName } = msg;
-  const wantsData = (eventLoad = events[0][LOAD]) || events[0][LOADEND];
-  if (wantsData || fileName && IS_FIREFOX) {
-    data = await importBlob(url, isBlobXhr(msg));
-  }
+/**
+ * @param {GMReq.Message.Web} msg
+ * @param {string} url
+ * @param {boolean} isDataUri
+ * @param {string} realm
+ * @return {Promise<void>}
+ */
+async function requestVirtualUrl(msg, url, isDataUri, realm) {
+  const { id, [kFileName]: fileName } = msg;
+  const events = msg.events[0];
+  const wantsResult = events[LOAD] || events[LOADEND];
+  const wantsBlob = !wantsResult || isBlobXhr(msg);
+  const data = !isDataUri ? await importBlob(url, wantsBlob)
+    : wantsResult || url.length > 100e3 ? decodeResource(url, wantsBlob ? SafeBlob : SafeUint8Array)
+      : url;
   if (fileName) {
     // download in bg to a) circumvent CSP in Firefox and b) use a single throttled download chain
-    sendCmd('DownloadBlob', [IS_FIREFOX ? data : url, fileName]);
-    data = null;
+    let blob;
+    sendCmd('DownloadBlob', [
+      !isObject(data) ? data
+        : (blob = wantsBlob ? data : makeSafeBlob(data)) &&
+          (IS_FIREFOX ? blob : createObjectURL(blob)),
+      fileName,
+    ]);
   }
-  for (;;) {
-    msg = {
-      id: msg.id,
-      type: eventLoad ? LOAD : LOADEND,
+  let type = events[LOAD] ? LOAD : LOADEND;
+  do {
+    sendHttpRequested({
+      id,
+      type,
       data: {
         finalUrl: url,
         readyState: 4,
         status: 200,
-        [kResponse]: data,
+        [kResponse]: events[type] ? data : null,
         [kResponseHeaders]: '',
       },
-    };
-    sendHttpRequested(msg, realm);
-    if (eventLoad) eventLoad = data = null;
-    else break;
-  }
+    }, realm);
+  } while (type !== LOADEND && (type = LOADEND));
 }
 
 function sendHttpRequested(msg, realm) {

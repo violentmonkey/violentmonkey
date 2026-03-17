@@ -17,7 +17,7 @@ const kTextContent = 'textContent';
 // required in FF to circumvent CSP style-src https://bugzil.la/1706787
 const setTextContent = describeProperty(Node[PROTO], kTextContent).set;
 const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
-const { createObjectURL } = URL;
+export const { createObjectURL } = URL;
 
 /**
  * @param {string} tag
@@ -53,6 +53,13 @@ export const makeElem = (tag, attrs) => {
   return el;
 };
 
+export const makeSafeBlob = (data, type) => new SafeBlob([data], { __proto__: null, type });
+
+/**
+ * @param {string} raw
+ * @param {true | false | typeof Blob | typeof Uint8Array } [isBlob]
+ * @return {string|Uint8Array|Blob|string}
+ */
 export const decodeResource = (raw, isBlob) => {
   let res;
   const pos = raw::stringIndexOf(',');
@@ -77,9 +84,11 @@ export const decodeResource = (raw, isBlob) => {
     }
     if (!isBlob) res = new SafeTextDecoder()::tdDecode(res);
   }
-  return isBlob
-    ? createObjectURL(new SafeBlob([res], { __proto__: null, type: mimeType }))
-    : res;
+  if (isBlob && isBlob !== SafeUint8Array) {
+    res = makeSafeBlob(res, mimeType);
+    if (isBlob !== SafeBlob) res = createObjectURL(res);
+  }
+  return res;
 };
 
 /**
