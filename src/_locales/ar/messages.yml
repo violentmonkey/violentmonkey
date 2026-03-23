@@ -1081,7 +1081,7 @@ updateScript:
   message: تحديث
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: انقر بزر الماوس الأيمن أو المس مع الاستمرار لتحديث إجباري يشمل التبعيات
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: تحديث جميع السكربتات

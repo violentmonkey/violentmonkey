@@ -490,10 +490,13 @@ labelHomepageURL:
   message: 'Liên kết trang chủ:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: Cho phép GM_cookie truy cập cookie HTTP-only
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    Khi bật, các script có thể đọc và ghi cookie có cờ HTTP-only. Điều này cho
+    phép script truy cập các cookie mà JavaScript thông thường không thể truy
+    cập. Hãy thận trọng khi sử dụng vì có thể gây ra rủi ro bảo mật.
 labelIconURL:
   description: Label for the input.
   message: 'URL biểu tượng:'
@@ -577,10 +580,10 @@ labelRunAtDefault:
   message: (Mặc định)
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: (chỉ dành cho script đã bật tùy chọn này trong cài đặt)
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: (tùy chọn này phải được bật cả trong cài đặt toàn cục)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Script template tuỳ chỉnh
@@ -1086,7 +1089,7 @@ updateScript:
   message: Cập nhật
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: Nháy chuột phải hoặc nhấn giữ để buộc cập nhật bao gồm cả các phụ thuộc
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Cập nhật tất cả tập lệnh
