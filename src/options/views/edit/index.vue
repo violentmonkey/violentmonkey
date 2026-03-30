@@ -106,7 +106,7 @@ import IconCopy from '~icons/mdi/content-copy';
 import IconPaste from '~icons/mdi/content-paste';
 import {
   browserWindows, getUniqId,
-  debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty,
+  debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty, isScriptDownloaded,
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { ERR_BAD_PATTERN, VM_DOCS_MATCHING, VM_HOME } from '@/common/consts';
@@ -404,12 +404,13 @@ function onChange(evt) {
   const scr = script.value;
   const { config } = scr;
   const { removed } = config;
+  const downloaded = isScriptDownloaded(scr);
   const remote = scr._remote = !!getScriptUpdateUrl(scr);
   const remoteMode = remote && collectShouldUpdate(config);
-  const fz = !!(removed || remoteMode === 1 || props.readOnly);
+  const fz = !!(removed || downloaded || remoteMode === 1 || props.readOnly);
   frozen.value = fz;
-  frozenNote.value = !removed && (fz || remoteMode >= 1);
-  if (!removed && evt) onDirty();
+  frozenNote.value = !removed && !downloaded && (fz || remoteMode >= 1);
+  if (!removed && !downloaded && evt) onDirty();
 }
 function onDirty() {
   canSave.value = codeDirty.value || !deepEqual(script.value, savedCopy);

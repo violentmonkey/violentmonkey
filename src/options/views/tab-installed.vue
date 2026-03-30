@@ -4,23 +4,6 @@
       <header class="flex">
         <template v-if="!showRecycle">
           <div class="btn-group">
-            <Dropdown
-              v-model="state.menuNew"
-              :class="{active: state.menuNew}"
-              :closeAfterClick="true">
-              <Tooltip :content="i18n('buttonNew')" placement="bottom" align="start" :disabled="state.menuNew">
-                <a class="btn-ghost" tabindex="0" ref="$menuNew">
-                  <Icon name="plus" />
-                </a>
-              </Tooltip>
-              <template #content>
-                <a class="dropdown-menu-item"
-                  v-for="([text, props], i) in NEW_LINKS" :key="i" v-text="text" v-bind="props"/>
-                <a class="dropdown-menu-item" v-if="isEmpty"
-                  v-text="`${i18n('buttonImportData')} / ${i18n('labelSync')}...`"
-                  @click="store.isEmpty = 1; setLocationHash(TAB_SETTINGS)"/>
-              </template>
-            </Dropdown>
             <Tooltip :content="i18n('updateScriptsAll')" placement="bottom" align="start">
               <a class="btn-ghost" tabindex="0" @click="handleActionUpdate(null, $event.target)">
                 <Icon name="refresh" />
@@ -162,7 +145,7 @@
         v-if="state.script"
         :initial="state.script"
         :initial-code="state.code"
-        :read-only="!!state.script.config.removed"
+        :read-only="!!(state.script.config.removed || isScriptDownloaded(state.script))"
         @close="handleEditScript()"
       />
       </KeepAlive>
@@ -172,7 +155,7 @@
 
 <script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
-import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength } from '@/common';
+import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength, isScriptDownloaded } from '@/common';
 import { INFERRED } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
@@ -197,16 +180,6 @@ import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
 
-const NEW_LINKS = [
-  [i18n('buttonNew'),
-    { tabIndex: 0, onclick: () => handleEditScript('_new') }],
-  [i18n('installFrom', 'OpenUserJS'),
-    { href: 'https://openuserjs.org/', ...EXTERNAL_LINK_PROPS }],
-  [i18n('installFrom', 'GreasyFork'),
-    { href: `https://greasyfork.org/scripts`, ...EXTERNAL_LINK_PROPS }],
-  [i18n('buttonInstallFromURL'),
-    { tabIndex: 0, onclick: handleInstallFromURL }],
-];
 const EDIT = 'edit';
 const REMOVE = 'remove';
 const RESTORE = 'restore';
@@ -288,7 +261,6 @@ let columnsForCardsMode = [];
 let narrowMediaRules;
 let scrollTop1, scrollTop2;
 
-const $menuNew = ref();
 const isEmpty = ref();
 const refSearch = ref();
 const refList = ref();
@@ -297,7 +269,6 @@ const kScrollTop = 'scrollTop';
 
 const state = reactive({
   focusedIndex: -1,
-  menuNew: false,
   showHotkeys: false,
   search: store.search = {
     value: '',
@@ -411,23 +382,7 @@ function onUpdate() {
   selectScript(state.focusedIndex);
   renderScripts();
 }
-async function handleInstallFromURL() {
-  try {
-    let url = await showConfirmation(i18n('hintInputURL'), {
-      input: '',
-      ok: { type: 'submit' },
-    });
-    url = url?.trim();
-    if (url) {
-      if (!url.includes('://')) url = `https://${url}`;
-      // test if URL is valid
-      new URL(url);
-      await sendCmdDirectly('ConfirmInstall', { url });
-    }
-  } catch (err) {
-    showMessage({ text: err.message || err });
-  }
-}
+
 async function moveScript(from, to) {
   if (from === to) return;
   const scripts = state.filteredScripts;
@@ -456,10 +411,19 @@ function handleEditScript(id) {
 }
 async function onHashChange() {
   const [tab, id, cacheId] = store.route.paths;
-  const newData = id === '_new' && await sendCmdDirectly('NewScript', +cacheId);
-  const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
+  // Script creation is disabled - scripts come from the API server
+  const newData = null;
+  const script = +id && getCurrentList().find(s => s.props.id === +id);
   const scrollElem1 = scroller.value;
   const scrollElem2 = document.scrollingElement; // for compact layout
+  
+  // Prevent viewing downloaded scripts
+  if (script && isScriptDownloaded(script)) {
+    if (id) setRoute(tab, true); // Strip the invalid id from the URL
+    renderScripts();
+    return;
+  }
+  
   if (script && !state.script) { // going into editor
     scrollTop1 = scrollElem1[kScrollTop];
     scrollTop2 = scrollElem2[kScrollTop];
@@ -730,7 +694,11 @@ function bindKeys() {
         ['G', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
-      handleEditScript(selectedScript.value.props.id);
+      // Script editing disabled - scripts are provided by the API server only
+      // const script = selectedScript.value;
+      // if (!isScriptDownloaded(script)) {
+      //   handleEditScript(script.props.id);
+      // }
     }, [
         [scriptHotkeys[EDIT], conditionScriptFocused, true],
         // Enter should only work when no button is focused
@@ -788,10 +756,7 @@ if (screen.availWidth > 767) {
 watch(getCurrentList, refreshUI);
 watch(() => store.route.paths[1], onHashChange);
 watch(() => store.scripts, val => {
-  if ((isEmpty.value = !val.length) && (val = $menuNew.value)) {
-    val.focus(); // for Tab navigation and focus highlight
-    val.click();
-  }
+  isEmpty.value = !val.length;
 });
 watch(selectedScript, script => {
   keyboardService.setContext('selectedScript', script);

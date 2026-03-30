@@ -32,29 +32,11 @@
       </span>
       <span
         class="menu-area"
-        :data-message="i18n('menuNewScript')"
-        :tabIndex
-        @click="onCreateScript">
-        <icon name="plus"></icon>
-      </span>
-      <span
-        class="menu-area"
         :tabIndex
         :_item.prop="{}"
         @click="showExtras">
         <icon name="more" />
       </span>
-    </div>
-    <div class="menu" v-if="store.injectable" v-show="store.domain">
-      <div class="menu-item menu-area menu-find">
-        <template v-for="(url, text, i) in findUrls" :key="url">
-          <a target="_blank" :class="{ ellipsis: !i, 'mr-1': !i, 'ml-1': i }"
-             :href="url" :data-message="url.split('://')[1]" :tabIndex>
-            <icon name="search" v-if="!i"/>{{text}}
-          </a>
-          <template v-if="!i">/</template>
-        </template>
-      </div>
     </div>
     <div class="failure-reason" v-if="store.failureText">
       <span v-text="store.failureText"/>
@@ -98,15 +80,11 @@
             :tabIndex
             :data-message="item.name"
             @focus="focusedItem = item"
-            @keydown.enter.exact.stop="onEditScript(item)"
             @keydown.space.exact.stop="onToggleScript(item)"
             @click="onToggleScript(item)">
             <img class="script-icon" :src="item.data.safeIcon">
             <icon :name="getSymbolCheck(item.data.config.enabled)"></icon>
-            <div class="script-name ellipsis"
-                 @click.ctrl.exact.stop="onEditScript(item)"
-                 @contextmenu.exact.stop.prevent="onEditScript(item)"
-                 @mousedown.middle.exact.stop="onEditScript(item)">
+            <div class="script-name ellipsis">
               <sup class="syntax" v-if="item.data.syntax" v-text="i18n('msgSyntaxError')"/>
               {{item.name}}
               <a v-if="!store.failure && item.data.more"
@@ -123,12 +101,7 @@
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>
           <div class="submenu-buttons"
-               v-show="showButtons(item)">
-            <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
-            <div class="submenu-button" :tabIndex @click="onEditScript(item)"
-                 :title="i18n('buttonEditClickHint')">
-              <icon name="code"></icon>
-            </div>
+            v-show="showButtons(item)">
             <div
               class="submenu-button"
               :tabIndex
@@ -427,9 +400,6 @@ function onOpenUrl(e) {
   e.preventDefault();
   sendCmdDirectly('TabOpen', { url: el.href }).then(close);
 }
-function onEditScript(item) {
-  sendCmdDirectly('OpenEditor', item.data.props.id).then(close);
-}
 function onCommand(evt) {
   const { type, currentTarget: el } = evt;
   if (type === 'mousedown') {
@@ -464,9 +434,6 @@ function checkReload() {
   if (options.get('autoReload')) {
     return reloadTab();
   }
-}
-function onCreateScript() {
-  sendCmdDirectly('OpenEditor').then(close);
 }
 async function onInjectionFailureFix() {
   // TODO: promisify options.set, resolve on storage write, await it instead of makePause
@@ -590,11 +557,6 @@ onMounted(() => {
       navigate.bind(null, key[0]),
       { condition: '!inputFocus' });
   }
-  keyboardService.register('e', () => {
-    onEditScript(focusedItem.value);
-  }, {
-    condition: '!inputFocus',
-  });
 });
 
 onActivated(() => {

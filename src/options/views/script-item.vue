@@ -78,11 +78,7 @@
     </div>
     <div class="script-buttons script-buttons-left">
       <template v-if="canRender">
-        <tooltip :content="i18n('buttonEdit')" align="start">
-          <a class="btn-ghost" :href="url" :data-hotkey="hotkeys.edit" :tabIndex>
-            <icon name="code"></icon>
-          </a>
-        </tooltip>
+        <!-- Edit button disabled - scripts are provided by the API server only -->
         <template v-if="!isRemoved">
           <tooltip :content="labelEnable" align="start">
             <a

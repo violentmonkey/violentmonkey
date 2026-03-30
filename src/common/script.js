@@ -77,6 +77,14 @@ export function getScriptsTags(scripts) {
 
 /**
  * @param {VMScript} script
+ * @returns {boolean}
+ */
+export function isScriptDownloaded(script) {
+  return !!(script.custom.lastInstallURL || script.custom.downloadURL);
+}
+
+/**
+ * @param {VMScript} script
  * @param {Object} [opts]
  * @param {boolean} [opts.all] - to return all two urls [checkUrl, downloadUrl]
  * @param {boolean} [opts.allowedOnly] - check shouldUpdate
