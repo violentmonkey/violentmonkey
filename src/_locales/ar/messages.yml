@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: تعطيل
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in Feature Injector settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -162,7 +162,7 @@ descEditorOptions:
   message: >-
     خيارات مخصصة لـ CodeMirror والإضافات الخاصة به بصيغة كائن JSON مثل
     <code>{"indentUnit":2, "smartIndent":true}</code>، مع ملاحظة أن بعضها قد لا
-    يعمل في Violentmonkey. راجع <a
+    يعمل في Feature Injector. راجع <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">القائمة الكاملة</a>.
 descEditorOptionsGeneric:
@@ -245,31 +245,31 @@ extDescription:
   message: مدير سكربتات مفتوح المصدر يدعم العديد من المتصفحات
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: Feature Injector
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: موجود في قائمة الحظر في إعدادات Violentmonkey
+  message: موجود في قائمة الحظر في إعدادات Feature Injector
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    لا يمكن لـ Violentmonkey تشغيل سكربتات المستخدم في هذه الصفحة
+    لا يمكن لـ Feature Injector تشغيل سكربتات المستخدم في هذه الصفحة
 
     (أمثلة شائعة: واجهة المتصفح، إضافة، محظور عبر سياسات، موقع محرك بحث في
     Opera)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    تم إعادة تشغيل Violentmonkey. يُرجى إعادة تحميل علامة التبويب لتشغيل سكربتات
+    تم إعادة تشغيل Feature Injector. يُرجى إعادة تحميل علامة التبويب لتشغيل سكربتات
     المستخدم.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     توجد عدة طرق لتثبيت ملف محلي أو تتبع تعديلاته: <1> اسحب الملف وأفلته في صفحة
-    Violentmonkey المفتوحة أو في النافذة المنبثقة، بما في ذلك هذه الصفحة. <2> قم
+    Feature Injector المفتوحة أو في النافذة المنبثقة، بما في ذلك هذه الصفحة. <2> قم
     بتشغيل خادم HTTP محلي لهذا الملف وافتحه عبر http://localhost. <3> فعّل خيار
-    "السماح بالوصول إلى عناوين الملفات" في صفحة تفاصيل Violentmonkey في
+    "السماح بالوصول إلى عناوين الملفات" في صفحة تفاصيل Feature Injector في
     chrome://extensions. هذا الخيار خطير لأن أي سكربت مستخدم قد يقرأ أي ملف
     محلي.
 filterAlphabeticalOrder:
@@ -386,7 +386,7 @@ labelAutoReloadCurrentTab:
   message: إعادة تحميل علامة التبويب الحالية بعد تفعيل/تعطيل سكربت من القائمة
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after Feature Injector is switched off if auto-reload is
     disabled.
   message: ''
   touched: false
@@ -744,10 +744,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: إنشاء سكربت جديد
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Feature Injector, when disabled.
   message: السكربتات معطّلة
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Feature Injector, when enabled.
   message: السكربتات مفعّلة
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -759,14 +759,14 @@ msgDateFormatInfo:
     لحماية النص الحرفي.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when Feature Injector fails fetching a resource/require/icon of
     the script.
   message: خطأ في جلب المورد!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when Feature Injector fails fetching a new version of the script.
   message: خطأ في جلب السكربت!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when Feature Injector fails fetching version data of the script.
   message: فشل في جلب معلومات التحديث.
 msgErrorLoadingData:
   description: >-
@@ -1104,6 +1104,6 @@ valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: سلسلة نصية $1
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open Feature Injector website.
   message: ''
   touched: false

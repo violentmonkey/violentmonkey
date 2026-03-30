@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Uitschakelen
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in Feature Injector settings for editor.
   message: 'Thema''s downloaden:'
   touched: false
 buttonEdit:
@@ -160,7 +160,7 @@ descEditorOptions:
   message: >-
     Aangepaste instellingen voor CodeMirror en uitbreidingen in json-objecten,
     zoals <code>{"indentUnit":2, "smartIndent":true}</code>. Let op: niet alle
-    werken gegarandeerd in Violentmonkey. Bekijk de <a
+    werken gegarandeerd in Feature Injector. Bekijk de <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">volledige lijst</a>.
 descEditorOptionsGeneric:
@@ -245,32 +245,32 @@ extDescription:
   message: Een open source gebruikersscriptbeheerder voor diverse webbrowsers
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: Feature Injector
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Staat op Violentmonkey's zwarte lijst
+  message: Staat op Feature Injector's zwarte lijst
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey kan geen gebruikersscripts uitvoeren op deze pagina
+    Feature Injector kan geen gebruikersscripts uitvoeren op deze pagina
 
     (bijv. interne of extensiepagina's, of vanwege een blokkadebeleid of
     bepaalde Opera-zoekmachine)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey is opnieuw opgestart. Laad het tabblad opnieuw om
+    Feature Injector is opnieuw opgestart. Laad het tabblad opnieuw om
     gebruikersscripts uit te voeren.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Er zijn verschillende manieren op bewerkingen in een lokaal bestand op te
     nemen of bij te houden: <1> Sleep het bestand naar een geopende
-    Violentmonkey-pagina of -pop-up, zoals deze. <2> Installeer een lokale
+    Feature Injector-pagina of -pop-up, zoals deze. <2> Installeer een lokale
     http-server voor dit bestand en open via http://localhost. <3> Schakel
-    toegang tot bestands-url's in voor Violentmonkey op chrome://extensions. Let
+    toegang tot bestands-url's in voor Feature Injector op chrome://extensions. Let
     op: dit wordt afgeraden, omdat elk gebruikersscript lokale bestanden kan
     uitlezen.
 filterAlphabeticalOrder:
@@ -371,7 +371,7 @@ installOptionTrackTooltip:
   message: In Firefox 68 en nieuwer moet het brontabblad geopend blijven.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Over Violentmonkey
+  message: Over Feature Injector
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -387,7 +387,7 @@ labelAutoReloadCurrentTab:
   message: Huidig tabblad herladen na in-/uitschakelen van een script
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after Feature Injector is switched off if auto-reload is
     disabled.
   message: De huidige scripts worden uitgevoerd totdat je het tabblad herlaadt
   touched: false
@@ -741,10 +741,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Script schrijven
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Feature Injector, when disabled.
   message: Scripts zijn uitgeschakeld
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Feature Injector, when enabled.
   message: Scripts zijn ingeschakeld
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -756,14 +756,14 @@ msgDateFormatInfo:
     [vierkante haakjes] om letterlijke tekst te beschermen.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when Feature Injector fails fetching a resource/require/icon of
     the script.
   message: De bron kan niet worden opgehaald!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when Feature Injector fails fetching a new version of the script.
   message: Het script kan niet worden opgehaald!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when Feature Injector fails fetching version data of the script.
   message: De update-informatie kan niet worden opgehaald.
 msgErrorLoadingData:
   description: >-
@@ -1108,6 +1108,6 @@ valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: $1 tekenreeks
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
-  message: Violentmonkey-website
+  description: Label for link to open Feature Injector website.
+  message: Feature Injector-website
   touched: false

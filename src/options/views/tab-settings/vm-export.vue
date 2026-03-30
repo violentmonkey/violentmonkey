@@ -112,7 +112,7 @@ async function exportData() {
       lastUpdated,
     };
     if (withValues) {
-      // `values` are related to scripts by `props.id` in Violentmonkey,
+      // `values` are related to scripts by `props.id` in Feature Injector,
       // but by the global `props.uri` when exported.
       const values = data.values[script.props.id];
       if (values) vm.values[script.props.uri] = values;

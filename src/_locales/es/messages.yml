@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Desactivar
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in Feature Injector settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -164,7 +164,7 @@ descEditorOptions:
   message: >-
     Opciones personalizadas para CodeMirror y complementos en objetos JSON como
     <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo ten en cuenta
-    que algunas de ellas pueden no funcionar en Violentmonkey. Ver <a
+    que algunas de ellas pueden no funcionar en Feature Injector. Ver <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">lista completa</a>.
 descEditorOptionsGeneric:
@@ -253,32 +253,32 @@ extDescription:
     navegadores
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: Feature Injector
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: En la lista negra en la configuración de Violentmonkey
+  message: En la lista negra en la configuración de Feature Injector
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey no puede ejecutar usercripts en esta página
+    Feature Injector no puede ejecutar usercripts en esta página
 
     (ejemplos comunes: interfaz del navegador, una extensión, bloqueado a través
     de políticas, un sitio de motor de búsqueda en Opera)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey fue reiniciado. Recarga la pestaña para ejecutar los
+    Feature Injector fue reiniciado. Recarga la pestaña para ejecutar los
     userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Hay varios métodos para instalar o rastrear ediciones en un archivo local:
     <1> Arrastra y suelta el archivo en una página abierta o menú emergente de
-    Violentmonkey (incluida esta). <2> Instala un servidor HTTP local para ese
+    Feature Injector (incluida esta). <2> Instala un servidor HTTP local para ese
     archivo y ábrelo desde http://localhost. <3> Activa la opción “Permitir el
-    acceso a las URL del archivo” en los detalles de Violentmonkey en la página
+    acceso a las URL del archivo” en los detalles de Feature Injector en la página
     chrome://extensions. Esto es peligroso, ya que cualquier userscript podría
     leer cualquier archivo local.
 filterAlphabeticalOrder:
@@ -401,7 +401,7 @@ labelAutoReloadCurrentTab:
     menú
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after Feature Injector is switched off if auto-reload is
     disabled.
   message: Los scripts actuales seguirán ejecutándose hasta que recargues la pestaña
   touched: false
@@ -762,10 +762,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Crear un nuevo script
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Feature Injector, when disabled.
   message: Scripts deshabilitados
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Feature Injector, when enabled.
   message: Scripts activos
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -777,14 +777,14 @@ msgDateFormatInfo:
     Utiliza [corchetes] para proteger el texto literal.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when Feature Injector fails fetching a resource/require/icon of
     the script.
   message: ¡Error al obtener el recurso!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when Feature Injector fails fetching a new version of the script.
   message: ¡Error al obtener el script!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when Feature Injector fails fetching version data of the script.
   message: No se pudo obtener la información de actualización.
 msgErrorLoadingData:
   description: >-
@@ -1131,6 +1131,6 @@ valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: $1 cadena
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open Feature Injector website.
   message: Visitar Sitio Web
   touched: false

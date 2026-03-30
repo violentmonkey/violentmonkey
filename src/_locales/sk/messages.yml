@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Zakázať
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in Feature Injector settings for editor.
   message: Stiahnuť motívy
   touched: false
 buttonEdit:
@@ -162,7 +162,7 @@ descEditorOptions:
   message: >-
     Vlastné možnosti pre CodeMirror a doplnky v JSON objekte ako
     <code>{"indentUnit":2, "smartIndent":true}</code> avšak niektoré z nich
-    nemusia byť funkčné vo Violentmonkey. Pozri <a
+    nemusia byť funkčné vo Feature Injector. Pozri <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">celý zoznam</a>.
 descEditorOptionsGeneric:
@@ -248,32 +248,32 @@ extDescription:
     prehliadačov
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: Feature Injector
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Na čiernej listine v nastaveniach Violentmonkey
+  message: Na čiernej listine v nastaveniach Feature Injector
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey nemôže spustiť skripty na tejto stránke
+    Feature Injector nemôže spustiť skripty na tejto stránke
 
     (najčastejší prípad: rozhranie prehliadača alebo rozšírenia, blokované cez
     politiku, web vyhľadávača v Opere)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey sa reštartoval. Ak chcete spustiť používateľské skripty, znova
+    Feature Injector sa reštartoval. Ak chcete spustiť používateľské skripty, znova
     načítajte kartu.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     Existuje niekoľko metód na inštaláciu alebo sledovanie úprav v lokálnom
     súbore: <1> Pretiahnite súbor do otvorenej stránky alebo vyskakovacieho okna
-    Violentmonkey, vrátane tejto. <2> Nainštalujte lokálny HTTP server pre tento
+    Feature Injector, vrátane tejto. <2> Nainštalujte lokálny HTTP server pre tento
     súbor a otvorte ho cez stránku http://localhost. <3> V podrobnostiach pre
-    Violentmonkey na stránke chrome://extensions povoľte možnosť "Povoliť
+    Feature Injector na stránke chrome://extensions povoľte možnosť "Povoliť
     prístup k webovým adresám súboru". Je to nebezpečné, pretože akýkoľvek
     používateľský skript môže čítať akýkoľvek lokálny súbor.
 filterAlphabeticalOrder:
@@ -378,7 +378,7 @@ installOptionTrackTooltip:
   message: Karta so zdrojovým súborom by mala byť otvorená vo Firefoxe 68 a novšom.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Informácie o Violentmonkey
+  message: Informácie o Feature Injector
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -394,7 +394,7 @@ labelAutoReloadCurrentTab:
   message: Obnoviť aktuálny list po vypnutí alebo zapnutí skriptu z ponuky
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after Feature Injector is switched off if auto-reload is
     disabled.
   message: Aktuálne skripty budú spustené, kým kartu znovu nenačítate
   touched: false
@@ -753,10 +753,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Vytvoriť nový skript
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Feature Injector, when disabled.
   message: Skripty sú zakázané
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Feature Injector, when enabled.
   message: Skripty sú povolené
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -768,14 +768,14 @@ msgDateFormatInfo:
     doslovného textu použite [hranaté zátvorky].
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when Feature Injector fails fetching a resource/require/icon of
     the script.
   message: Chyba pri načítaní zdroja!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when Feature Injector fails fetching a new version of the script.
   message: Chyba pri načítaní skriptu!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when Feature Injector fails fetching version data of the script.
   message: Načítanie informácií o aktualizácii skončilo chybou.
 msgErrorLoadingData:
   description: >-
@@ -1018,7 +1018,7 @@ searchUseRegex:
   message: Použiť regulárne výrazy
 sideMenuAbout:
   description: 'Side menu: About'
-  message: O Violentmonkey
+  message: O Feature Injector
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Nainštalované skripty
@@ -1122,6 +1122,6 @@ valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: reťazec $1
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open Feature Injector website.
   message: Prejsť na stránku
   touched: false

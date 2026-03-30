@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Онемогући
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in Feature Injector settings for editor.
   message: ''
   touched: false
 buttonEdit:
@@ -164,7 +164,7 @@ descEditorOptions:
   message: >-
     Прилагођене опције за CodeMirror и додатке у JSON објекту као што је
     <code>{"indentUnit":2, "smartIndent":true}</code>, међутим, имајте на уму да
-    неке од њих можда неће радити у Violentmonkey. Погледајте <a
+    неке од њих можда неће радити у Feature Injector. Погледајте <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">целу листу</a>.
 descEditorOptionsGeneric:
@@ -240,22 +240,22 @@ extDescription:
   message: Менаџер корисничких скрипти отвореног кода који подржава много претраживача
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: Feature Injector
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Стављено на црну листу у подешавањима Violentmonkey-а.
+  message: Стављено на црну листу у подешавањима Feature Injector-а.
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey не може да покрене корисничке скрипте на овој страници (чести
+    Feature Injector не може да покрене корисничке скрипте на овој страници (чести
     примери: кориснички интерфејс претраживача, додатак, блокирано политиком,
     сајт за претрагу у Opera-у).
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
-    Violentmonkey је поново покренут. Поново учитајте картицу да бисте покренули
+    Feature Injector је поново покренут. Поново учитајте картицу да бисте покренули
     корисничке скрипте.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
@@ -357,7 +357,7 @@ installOptionTrackTooltip:
     верзијама.
 labelAbout:
   description: Label shown on top of the about page.
-  message: Информације о Violentmonkey
+  message: Информације о Feature Injector
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -375,7 +375,7 @@ labelAutoReloadCurrentTab:
     менија
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after Feature Injector is switched off if auto-reload is
     disabled.
   message: ''
   touched: false
@@ -713,10 +713,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Направи нову скрипту
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Feature Injector, when disabled.
   message: Скрипта је онемогућена
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Feature Injector, when enabled.
   message: Скрипта је омогућена
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -726,14 +726,14 @@ msgDateFormatInfo:
   message: ''
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when Feature Injector fails fetching a resource/require/icon of
     the script.
   message: Грешка при преузимању ресурса!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when Feature Injector fails fetching a new version of the script.
   message: Грешка при преузимању скрипте!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when Feature Injector fails fetching version data of the script.
   message: Грешка приликом преузимања информација о ажурирању.
 msgErrorLoadingData:
   description: >-
@@ -1052,6 +1052,6 @@ valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: ''
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open Feature Injector website.
   message: ''
   touched: false

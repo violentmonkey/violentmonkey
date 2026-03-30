@@ -1,6 +1,6 @@
 {
-  "name": "violentmonkey",
-  "description": "Violentmonkey",
+  "name": "feature-injector",
+  "description": "Feature Injector",
   "version": "2.35.0",
   "scripts": {
     "prepare": "husky install",
@@ -89,15 +89,15 @@
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
-  "author": "Gerald <i@gerald.top>",
+  "author": "Cause & Effect Strategy",
   "repository": {
     "type": "git",
-    "url": "https://github.com/violentmonkey/violentmonkey.git"
+    "url": "https://github.com/rburgessCEStrategy/Injector.git"
   },
   "bugs": {
-    "url": "https://github.com/violentmonkey/violentmonkey/issues"
+    "url": "https://github.com/rburgessCEStrategy/Injector/issues"
   },
-  "homepage": "https://github.com/violentmonkey/violentmonkey",
+  "homepage": "https://github.com/rburgessCEStrategy/Injector",
   "license": "MIT",
   "dependencies": {
     "@violentmonkey/shortcut": "^1.4.4",

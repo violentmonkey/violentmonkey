@@ -39,16 +39,14 @@ function listCommits() {
   return `${prevTag}:\n${list}\n\nCommit log: ${
     process.env.GITHUB_SERVER_URL || 'https://github.com'
   }/${
-    process.env.GITHUB_REPOSITORY || 'violentmonkey/violentmonkey'
+    process.env.GITHUB_REPOSITORY || 'rburgessCEStrategy/Injector'
   }/compare/${tagRange}`;
 }
 
 function getReleaseNote() {
   return `${process.env.PRERELEASE === 'true' ? `\
-**This is a beta release of Violentmonkey (also in [WebStore](\
-https://chrome.google.com/webstore/detail/violentmonkey-beta/opokoaglpekkimldnlggpoagmjegichg\
-)), use it at your own risk.**<br>\
-If you already use Violentmonkey, click \`Export to zip\` in settings before installing the beta.
+**This is a beta release of Feature Injector, use it at your own risk.**<br>\
+If you already use Feature Injector, click \`Export to zip\` in settings before installing the beta.
 
 ` : ''}Notable changes since ${listCommits()}`;
 }

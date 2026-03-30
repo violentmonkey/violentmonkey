@@ -23,7 +23,7 @@ buttonDisable:
   description: Button to disable a script.
   message: Disable
 buttonDownloadThemes:
-  description: Button in Violentmonkey settings for editor.
+  description: Button in Feature Injector settings for editor.
   message: Download themes
   touched: false
 buttonEdit:
@@ -160,7 +160,7 @@ descEditorOptions:
   message: >-
     Custom options for CodeMirror and addons in JSON object like
     <code>{"indentUnit":2, "smartIndent":true}</code> however note that some of
-    them may not work in Violentmonkey. See <a
+    them may not work in Feature Injector. See <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
     rel="noopener noreferrer">full list</a>.
 descEditorOptionsGeneric:
@@ -238,33 +238,33 @@ editValueAllHint:
   message: Show/edit the entire script value storage
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: An open source userscript manager that supports a lot of browsers
+  message: A JS Feature Injector that supports a lot of browsers
 extName:
   description: Name of this extension.
-  message: Violentmonkey
+  message: Feature Injector
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Blacklisted in Violentmonkey's settings
+  message: Blacklisted in Feature Injector's settings
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey cannot run userscripts in this page
+    Feature Injector cannot run userscripts in this page
 
     (common examples: browser UI, an extension, blocked via policies, a search
     engine site in Opera)
 failureReasonRestarted:
   description: Shown in the popup.
-  message: Violentmonkey was restarted. Please reload the tab to run userscripts.
+  message: Feature Injector was restarted. Please reload the tab to run userscripts.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
     There are several methods to install or track edits in a local file: <1>
-    Drag'n'drop the file into an open Violentmonkey page or popup, including
+    Drag'n'drop the file into an open Feature Injector page or popup, including
     this one. <2> Install a local HTTP server for this file and open it via
     http://localhost. <3> Enable "Allow access to file URLs" in details for
-    Violentmonkey in chrome://extensions page. This is dangerous because any
+    Feature Injector in chrome://extensions page. This is dangerous because any
     userscript may read any local file.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
@@ -364,7 +364,7 @@ installOptionTrackTooltip:
   message: The source file tab should be kept open in Firefox 68 and newer.
 labelAbout:
   description: Label shown on top of the about page.
-  message: About Violentmonkey
+  message: About Feature Injector
   touched: false
 labelAdvanced:
   description: Label for button to show advanced settings.
@@ -380,7 +380,7 @@ labelAutoReloadCurrentTab:
   message: Reload current tab after switching on/off a script from menu
 labelAutoReloadCurrentTabDisabled:
   description: >-
-    Tooltip in menu after Violentmonkey is switched off if auto-reload is
+    Tooltip in menu after Feature Injector is switched off if auto-reload is
     disabled.
   message: Current scripts will keep running until you reload the tab
   touched: false
@@ -650,6 +650,21 @@ labelTranslator:
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Update URL:'
+labelLicensing:
+  description: Section header for licensing settings
+  message: Licensing
+labelLicenseEmail:
+  description: Label for license email input
+  message: 'Email Address: '
+labelLicenseKey:
+  description: Label for license key input
+  message: 'License Key: '
+labelLicenseValid:
+  description: Message shown when license is valid
+  message: License key is valid
+labelLicenseInvalid:
+  description: Message shown when license is invalid
+  message: License key is invalid
 labelViewSingleColumn:
   description: >-
     Label for option in dashboard script list to show the scripts in single
@@ -737,10 +752,10 @@ menuNewScript:
   description: Menu item to create a new script.
   message: Create a new script
 menuScriptDisabled:
-  description: Menu item showing the status of Violentmonkey, when disabled.
+  description: Menu item showing the status of Feature Injector, when disabled.
   message: Scripts disabled
 menuScriptEnabled:
-  description: Menu item showing the status of Violentmonkey, when enabled.
+  description: Menu item showing the status of Feature Injector, when enabled.
   message: Scripts enabled
 msgCheckingForUpdate:
   description: Message shown when a script is being checked for updates by version numbers.
@@ -752,14 +767,14 @@ msgDateFormatInfo:
     brackets] to protect literal text.
 msgErrorFetchingResource:
   description: >-
-    Message shown when Violentmonkey fails fetching a resource/require/icon of
+    Message shown when Feature Injector fails fetching a resource/require/icon of
     the script.
   message: Error fetching resource!
 msgErrorFetchingScript:
-  description: Message shown when Violentmonkey fails fetching a new version of the script.
+  description: Message shown when Feature Injector fails fetching a new version of the script.
   message: Error fetching script!
 msgErrorFetchingUpdateInfo:
-  description: Message shown when Violentmonkey fails fetching version data of the script.
+  description: Message shown when Feature Injector fails fetching version data of the script.
   message: Failed fetching update information.
 msgErrorLoadingData:
   description: >-
@@ -1101,6 +1116,6 @@ valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
   message: $1 string
 visitWebsite:
-  description: Label for link to open Violentmonkey website.
+  description: Label for link to open Feature Injector website.
   message: Visit Website
   touched: false

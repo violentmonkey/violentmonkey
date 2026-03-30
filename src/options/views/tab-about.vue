@@ -16,7 +16,7 @@
     <div>
       <label v-text="i18n('labelCurrentLang')"></label>
       <span class="current" v-text="language"></span> |
-      <a :href="VM_HOME + 'localization/'" v-bind="EXTERNAL_LINK_PROPS" v-text="i18n('labelHelpTranslate')"/>
+      <a :href="VM_HOME + 'localization/'" v-bind="EXTERNAL_LINK_PROPS"/>
     </div>
   </div>
 </template>
@@ -29,11 +29,8 @@ import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 const name = extensionManifest.name;
 const version = process.env.VM_VER;
 const language = browser.i18n.getUILanguage();
-const GITHUB = 'https://github.com/violentmonkey/violentmonkey/';
 const LINKS = {
   [VM_HOME]: i18n('labelHomepage'),
-  [GITHUB + 'issues']: i18n('labelFeedback'),
-  [GITHUB + 'graphs/contributors']: i18n('labelContributors'),
   [VM_HOME + 'privacy/']: i18n('labelPrivacyPolicy'),
 };
 </script>

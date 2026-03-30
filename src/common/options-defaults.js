@@ -109,4 +109,6 @@ export default {
   },
   /** @type {'' | 'dark' | 'light'} */
   uiTheme: '',
+  licenseEmail: '',
+  licenseKey: '',
 };

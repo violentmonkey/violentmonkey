@@ -2,8 +2,8 @@ name: __MSG_extName__
 version: __VERSION__
 manifest_version: 2
 description: __MSG_extDescription__
-author: Gerald
-homepage_url: 'https://violentmonkey.github.io/'
+author: Cause & Effect Strategy
+homepage_url: 'https://causeandeffectstrategy.com/'
 icons:
   '16': public/images/icon16.png
   '48': public/images/icon48.png
