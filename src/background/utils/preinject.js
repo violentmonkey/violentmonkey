@@ -637,7 +637,7 @@ function registerScriptDataFF(inject, url) {
     js: [{
       code: `${resolveDataCodeStr}(this,${JSON.stringify(inject)})`,
     }],
-    matches: url.split('#', 1),
+    matches: [url.split('#', 1)[0].replace(/\*/g, '\\$&')], // escape `*` in the URL itself
     [RUN_AT]: 'document_start',
   });
 }
