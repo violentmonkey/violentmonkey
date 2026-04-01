@@ -4,6 +4,7 @@ import {
 import {
   __CODE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
+  kOrigTag, kTag,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import {
@@ -505,17 +506,18 @@ function prepareScript(script, env) {
     inject_into: custom[INJECT_INTO] || null,
     noframes: custom.noframes ?? null,
     override: {
-      merge_excludes: !!custom.origExclude,
-      merge_includes: !!custom.origInclude,
-      merge_matches: !!custom.origMatch,
-      merge_exclude_matches: !!custom.origExcludeMatch,
+      merge_excludes: custom.origExclude,
+      merge_includes: custom.origInclude,
+      merge_matches: custom.origMatch,
+      merge_exclude_matches: custom.origExcludeMatch,
+      merge_tags: custom[kOrigTag],
       use_excludes: custom.exclude || [],
       use_includes: custom.include || [],
       use_matches: custom.match || [],
       use_exclude_matches: custom.excludeMatch || [],
     },
     run_at: custom[RUN_AT] || null,
-    tags: custom.tags?.split(' ').filter(Boolean) || [],
+    tags: custom[kTag] || [],
     user_modified: script.props.lastModified || 0,
   };
   if (wrap) {

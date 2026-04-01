@@ -2,7 +2,7 @@ import {
   encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, i18n, noop, sendCmd,
 } from '@/common';
 import {
-  __CODE, HOMEPAGE_URL, INFERRED, METABLOCK_RE, SUPPORT_URL, TL_AWAIT, UNWRAP,
+  __CODE, HOMEPAGE_URL, INFERRED, kOrigTag, kTag, METABLOCK_RE, SUPPORT_URL, TL_AWAIT, UNWRAP,
 } from '@/common/consts';
 import { formatDate } from '@/common/date';
 import { mapEntry } from '@/common/object';
@@ -83,6 +83,7 @@ const metaOptionalTypes = {
   compatible: arrayType,
   connect: arrayType,
   noframes: booleanType,
+  [kTag]: arrayType,
   [TL_AWAIT]: booleanType,
   [UNWRAP]: booleanType,
 };
@@ -146,6 +147,7 @@ export function getDefaultCustom() {
     origExclude: true,
     origMatch: true,
     origExcludeMatch: true,
+    [kOrigTag]: true,
   };
 }
 

@@ -381,6 +381,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Lista negra
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: ''
 labelContributors:
   description: Label for link to contributors.
   message: Contribuidores
@@ -600,7 +603,7 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 'Nome de utilizador: '
 labelTags:
-  description: Label for custom tags.
+  description: Label for custom tags. Don't translate @tag.
   message: ''
 labelTheme:
   description: Label for the visual theme option.

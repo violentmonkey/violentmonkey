@@ -16,14 +16,6 @@
         }}</tooltip>
       </label>
     </div>
-    <div class="flex flex-wrap mr-1c tags">
-      <span v-text="i18n('labelTags')" />
-      <input ref="tagsInput" v-model="custom.tags" :disabled="readOnly" @focus.once="onTagsFocused">
-      <button v-if="!store.tags" @click.once="onTagsFocused">...</button>
-      <span v-else @click="onTagClicked" class="mr-1c">
-        <a v-for="tag in store.tags" :key="tag" v-text="tag" tabindex="0" />
-      </span>
-    </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
     <!-- Using tables to auto-adjust width, which differs substantially between languages -->
     <table>
@@ -80,7 +72,7 @@
         <td>
           <p v-text="label"/>
         </td>
-        <td>
+        <td class="w-100">
           <input type="text" v-model="custom[name]" :placeholder="placeholders[name]" :disabled="readOnly">
         </td>
       </tr>
@@ -92,32 +84,44 @@
             <span v-text="labelA"/>
             <code v-text="code"/>
             <span v-text="labelB"/>
+            <span :data-num="(custom[name].match(/^(?=[\t ]*\S)/gm) || []).length"/>
           </p>
           <label>
             <input type="checkbox" v-model="custom[orig]" :disabled="readOnly">
             <span v-text="i18n('labelKeepOriginal')"/>
           </label>
         </td>
-        <td>
-          <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])" :disabled="readOnly" />
+        <td v-bind="name === kTag ? { class: 'w-100' } : { colspan: 2 }">
+          <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])"
+                    :disabled="readOnly" :data-area="name" />
         </td>
+        <th v-if="name === kTag">
+          <button v-if="!store.tags" @click="onTagsFocused">...</button>
+          <span v-else @click="onTagClicked" class="mr-1c">
+            <a v-for="tag in store.tags" :key="tag" v-text="tag" tabindex="0" />
+          </span>
+        </th>
       </tr>
     </table>
+    <div class="flex flex-wrap mr-1c">
+      <span v-text="i18n('labelComment')" />
+      <textarea v-model="custom[kComment]" :rows="calcRows(custom[kComment])" />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, ref, shallowRef } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import { getScriptHome, i18n } from '@/common';
-import { KNOWN_INJECT_INTO } from '@/common/consts';
+import { escapeStringForRegExp, getScriptHome, i18n } from '@/common';
+import { KNOWN_INJECT_INTO, kOrigTag, kTag } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
 import { objectPick } from '@/common/object';
 import { kGmCookieHttpOnly } from '@/common/options-defaults';
 import VMSettingsUpdate from './settings-update';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude,
-  kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL,
+  kOrigExcludeMatch, kOrigInclude, kOrigMatch, kUpdateURL, kComment,
   store, updateTags,
 } from '../../utils';
 
@@ -145,7 +149,6 @@ const placeholders = computed(() => {
     [kDownloadURL]: meta[kDownloadURL] || script.custom.lastInstallURL,
   };
 });
-const tagsInput = ref();
 const textInputs = [
   [kName, i18n('labelName')],
   [kHomepageURL, i18n('labelHomepageURL')],
@@ -158,9 +161,12 @@ const textAreas = [
   [kMatch, kOrigMatch, ...highlightMetaKeys(i18n('labelMatch'))],
   [kExclude, kOrigExclude, ...highlightMetaKeys(i18n('labelExclude'))],
   [kExcludeMatch, kOrigExcludeMatch, ...highlightMetaKeys(i18n('labelExcludeMatch'))],
+  [kTag, kOrigTag, ...highlightMetaKeys(i18n('labelTags'))],
 ];
 
 let revokers;
+/** @type {HTMLTextAreaElement} */
+let tagsInput;
 
 onActivated(() => {
   revokers = [
@@ -169,6 +175,10 @@ onActivated(() => {
         : '\n' + i18n('labelScriptOptionRequiredGlobal');
     }),
   ];
+  if (!tagsInput) {
+    tagsInput = document.querySelector(`[data-area="${kTag}"]`);
+    tagsInput.onfocus = onTagsFocused;
+  }
 });
 onDeactivated(() => {
   revokers.forEach(r => r());
@@ -178,17 +188,19 @@ onDeactivated(() => {
 function onTagClicked({ target }) {
   if (target.tagName !== 'A') return;
   const obj = props.script.custom;
-  const curText = obj.tags;
-  const elInput = /**@type {HTMLInputElement}*/ tagsInput.value;
-  const { selectionEnd, selectionStart } = elInput;
-  const tag =
-    (!selectionStart || curText[selectionStart - 1] === ' ' ? '' : ' ') +
-    target.textContent +
-    (curText[selectionEnd] === ' ' ? '' : ' ');
-  const i = selectionStart + tag.length;
-  obj.tags = curText.slice(0, selectionStart) + tag + curText.slice(selectionEnd);
-  elInput.focus();
-  nextTick(() => elInput.setSelectionRange(i, i));
+  const tag = target.textContent;
+  /** @type {string} */
+  let text = obj[kTag];
+  let pos = text.includes(tag)
+    ? text.search(RegExp(`^\\s*${escapeStringForRegExp(tag)}\\s*$`, 'm'))
+    : -1;
+  if (pos < 0) {
+    if (text && !text.endsWith('\n')) text += '\n';
+    obj[kTag] = text + tag;
+    pos = text.length;
+  }
+  tagsInput.focus();
+  nextTick(() => tagsInput.setSelectionRange(pos, pos));
 }
 
 function onTagsFocused() {
@@ -221,16 +233,13 @@ $leftColWidth: 12rem;
       break-inside: avoid-column;
       padding-right: 1em;
       > :nth-child(2) {
-        margin-left: 4em;
+        margin-left: 2em;
       }
-    }
-    > :last-child {
-      width: 100%;
     }
     input[type=checkbox] + span {
       user-select: none;
     }
-    input[type=text] {
+    .w-100 input[type=text] {
       width: 100%;
     }
   }
@@ -246,17 +255,15 @@ $leftColWidth: 12rem;
     height: 16px;
     vertical-align: text-bottom;
   }
+  [data-num]::before {
+    content: ' (' attr(data-num) ')';
+  }
   .tags {
     a:hover {
       text-decoration: underline;
     }
     button {
       line-height: normal; /* to preserve height when <button> is removed */
-    }
-    input {
-      field-sizing: content;
-      padding-right: 1em;
-      flex: 1;
     }
   }
 }

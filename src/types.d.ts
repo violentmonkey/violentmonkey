@@ -169,6 +169,7 @@ declare interface VMScript {
   };
   custom: {
     name?: string;
+    comment?: string;
     /** Installation web page that will be used for inferring a missing @homepageURL */
     from?: string;
     downloadURL?: string;
@@ -186,9 +187,11 @@ declare interface VMScript {
     origExcludeMatch: boolean;
     origInclude: boolean;
     origMatch: boolean;
+    origTag: boolean;
     pathMap?: StringMap;
     runAt?: VMScriptRunAt;
-    tags?: string;
+    /** @since v2.36 */
+    tag?: string[];
   };
   meta: {
     author?: string;
@@ -209,6 +212,7 @@ declare interface VMScript {
     resources: StringMap;
     runAt?: VMScriptRunAt;
     supportURL?: string;
+    tag?: string[];
     topLevelAwait?: boolean;
     unwrap?: boolean;
     version?: string;

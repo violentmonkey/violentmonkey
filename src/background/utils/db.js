@@ -1,7 +1,7 @@
 import {
   dataUri2text, i18n, getScriptHome, isDataUri,
   getScriptName, getScriptsTags, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl, normalizeTag,
+  getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl,
   ignoreChromeErrors,
 } from '@/common';
 import { FETCH_OPTS, INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
@@ -157,7 +157,12 @@ addOwnCommands({
         id,
         uri,
       };
-      const {pathMap} = script.custom = Object.assign({}, defaultCustom, script.custom);
+      const custom = script.custom = { ...defaultCustom, ...script.custom };
+      const { pathMap, tags } = custom;
+      if (tags) {
+        custom.tag = tags.split(/\s+/);
+        delete custom.tags;
+      }
       // Patching the bug in 2.27.0 where data: URI was saved as invalid in pathMap
       if (pathMap) for (const url in pathMap) if (isDataUri(url)) delete pathMap[url];
       maxScriptId = Math.max(maxScriptId, id);
@@ -676,7 +681,6 @@ export async function parseScript(src) {
   }
   // Allowing any http url including localhost as the user may keep multiple scripts there
   if (isValidHttpUrl(src.url)) custom.lastInstallURL = src.url;
-  custom.tags = custom.tags?.split(/\s+/).map(normalizeTag).filter(Boolean).join(' ').toLowerCase();
   if (!srcUpdate) storage.mod.remove(getScriptUpdateUrl(script, { all: true }) || []);
   buildPathMap(script, src.url);
   const depsPromise = fetchResources(script, src);

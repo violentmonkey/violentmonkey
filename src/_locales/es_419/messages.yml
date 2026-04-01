@@ -166,7 +166,7 @@ descEditorOptions:
     <code>{"indentUnit":2, "smartIndent":true}</code> sin embargo ten en cuenta
     que algunas de ellas pueden no funcionar en Violentmonkey. Ver <a
     href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">lista completa</a>. 
+    rel="noopener noreferrer">lista completa</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
   message: >-
@@ -433,6 +433,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Lista negra
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: ''
 labelContributors:
   description: Label for link to contributors.
   message: Colaboradores
@@ -660,8 +663,8 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 'Nombre de usuario: '
 labelTags:
-  description: Label for custom tags.
-  message: 'Etiquetas (separadas por un espacio):'
+  description: Label for custom tags. Don't translate @tag.
+  message: '@tag / etiquetas'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema:'

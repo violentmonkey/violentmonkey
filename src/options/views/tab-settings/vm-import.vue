@@ -22,13 +22,12 @@
 <script>
 import { ensureArray, getUniqId, i18n, sendCmdDirectly } from '@/common';
 import { listenOnce } from '@/common/browser';
-import { RUN_AT_RE } from '@/common/consts';
+import { kOrigTag, kTag, RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import loadZipLibrary from '@/common/zip';
 import { showConfirmation } from '@/common/ui';
 import {
-  kDownloadURL, kExclude, kInclude, kMatch, kOrigExclude, kOrigInclude, kOrigMatch,
-  runInBatch, store,
+  kComment, kDownloadURL, kExclude, kInclude, kMatch, kOrigExclude, kOrigInclude, kOrigMatch, runInBatch, store,
 } from '../../utils';
 </script>
 
@@ -183,6 +182,9 @@ async function doImportBackup(file) {
     const { meta, settings = {}, options: opts } = json;
     if (!meta || !opts) return;
     const ovr = opts.override || {};
+    const tags = opts.tags;
+    const origTags = ovr.orig_tags;
+    const hasOrigTags = !origTags?.length || tags?.length && origTags.every(t => tags.includes(t));
     reports[0].text = 'Tampermonkey';
     /** @type {VMScript} */
     scripts[name] = {
@@ -192,6 +194,9 @@ async function doImportBackup(file) {
       },
       custom: {
         [kDownloadURL]: typeof meta.file_url === 'string' ? meta.file_url : undefined,
+        [kTag]: hasOrigTags && origTags ? tags.filter(t => !origTags.includes(t)) : tags,
+        [kOrigTag]: !!hasOrigTags,
+        [kComment]: ovr[kComment] || undefined,
         noframes: ovr.noframes == null ? undefined : +!!ovr.noframes,
         runAt: RUN_AT_RE.test(opts.run_at) ? opts.run_at : undefined,
         [kExclude]: toStringArray(ovr.use_excludes),

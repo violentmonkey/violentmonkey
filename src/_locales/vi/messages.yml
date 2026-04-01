@@ -413,6 +413,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Danh sách đen
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: ''
 labelContributors:
   description: Label for link to contributors.
   message: Người đóng góp
@@ -643,8 +646,8 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 'Tài khoản:'
 labelTags:
-  description: Label for custom tags.
-  message: 'Thẻ (cách nhau bằng dấu cách):'
+  description: Label for custom tags. Don't translate @tag.
+  message: '@tag / thẻ'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Giao diện: '

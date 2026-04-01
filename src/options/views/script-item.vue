@@ -20,23 +20,23 @@
     <!-- We disable native dragging on name to avoid confusion with exec re-ordering.
     Users who want to open a new tab via dragging the link can drag the icon. -->
     <div class="script-info-1 ellipsis">
-      <a v-text="script.$cache.name" v-bind="viewTable && { draggable: false, href: url, tabIndex }"
+      <a v-text="cache.name" v-bind="viewTable && { draggable: false, href: url, tabIndex }"
          :data-order="isRemoved ? null : script.props.position"
          class="script-name ellipsis" />
       <div class="script-tags" v-if="canRender">
         <a
-          v-for="(item, i) in tags.slice(0, 2)"
+          v-for="(item, i) in cache[kTag].slice(0, 2)"
           :key="i"
           v-text="`#${item}`"
           @click.prevent="onTagClick(item)"
           :class="{ active: activeTags?.includes(item) }"
           :data-tag="item"
         ></a>
-        <Dropdown v-if="tags.length > 2">
+        <Dropdown v-if="cache[kTag].length > 2">
           <a>...</a>
           <template #content>
             <a
-              v-for="(item, i) in tags.slice(2)"
+              v-for="(item, i) in cache[kTag].slice(2)"
               :key="i"
               class="dropdown-menu-item"
               v-text="`#${item}`"
@@ -68,8 +68,8 @@
                  v-if="showVisit">
           {{ visit.show }}
         </tooltip>
-        <tooltip class="size hidden-sm" :content="script.$cache.sizes" align="end">
-          {{ script.$cache.size }}
+        <tooltip class="size hidden-sm" :content="cache.sizes" align="end">
+          {{ cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
           {{ updatedAt.show }}
@@ -152,7 +152,7 @@
 
 <script>
 import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
-import { INFERRED } from '@/common/consts';
+import { INFERRED, kTag } from '@/common/consts';
 import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
@@ -204,6 +204,7 @@ const author = computed(() => {
     name: matches ? matches[1] : text,
   };
 });
+const cache = computed(() => props.script.$cache);
 const canUpdate = computed(() => props.script.$canUpdate);
 const notDataUrlRe = /^(?!data:)/;
 const canUpdateDeps = computed(() => {
@@ -219,9 +220,6 @@ const labelEnable = computed(() => {
 });
 const tabIndex = computed(() => {
   return props.focused ? 0 : -1;
-});
-const tags = computed(() => {
-  return props.script.custom.tags?.split(' ').filter(Boolean) || [];
 });
 const updatedAt = computed(() => {
   const { props: scrProps } = props.script;
