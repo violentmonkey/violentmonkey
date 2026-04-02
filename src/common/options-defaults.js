@@ -111,4 +111,6 @@ export default {
   uiTheme: '',
   licenseEmail: '',
   licenseKey: '',
+  licensedScripts: [],
+  licenseValidated: 0,
 };

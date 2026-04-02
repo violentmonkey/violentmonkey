@@ -13,9 +13,9 @@
     @focus="setScriptFocus(true)"
     @blur="setScriptFocus(false)">
     <div class="script-icon hidden-xs">
-      <a :href="url" :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
+      <span class="script-icon-display">
         <img :src="script.safeIcon" :data-no-icon="script.noIcon">
-      </a>
+      </span>
     </div>
     <!-- We disable native dragging on name to avoid confusion with exec re-ordering.
     Users who want to open a new tab via dragging the link can drag the icon. -->

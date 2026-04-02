@@ -116,6 +116,13 @@ buttonUpdateAll:
   description: Check all scripts for updates.
   message: Check all for updates
   touched: false
+buttonValidate:
+  description: Button to validate license with email and key.
+  message: Validate
+buttonVacuum:
+  description: Check all scripts for updates.
+  message: Check all for updates
+  touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
   message: Vacuum database

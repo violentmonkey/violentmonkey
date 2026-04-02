@@ -22,6 +22,12 @@
           />
         </locale-group>
       </label>
+      <button 
+        @click="validateAndFetchLicensedScripts" 
+        class="mt-1c"
+        :disabled="!settings.licenseEmail || !settings.licenseKey">
+        {{ i18n('buttonValidate') }}
+      </button>
       <div v-if="licenseStatus.message" :class="['status-message', licenseStatus.valid ? 'valid' : 'invalid']">
         {{ licenseStatus.message }}
       </div>
@@ -30,7 +36,7 @@
 </template>
 
 <script setup>
-import { i18n } from '@/common';
+import { i18n, sendCmdDirectly } from '@/common';
 import options from '@/common/options';
 import { reactive, watch } from 'vue';
 import LocaleGroup from '@/common/ui/locale-group';
@@ -43,6 +49,7 @@ const settings = reactive({
 const licenseStatus = reactive({
   valid: false,
   message: '',
+  loading: false,
 });
 
 // Initialize settings from stored options
@@ -54,21 +61,19 @@ Object.assign(settings, {
 // Watch for changes and save them
 watch(() => settings.licenseEmail, (newVal) => {
   options.set('licenseEmail', newVal);
-  validateLicense();
 });
 
 watch(() => settings.licenseKey, (newVal) => {
   options.set('licenseKey', newVal);
-  validateLicense();
 });
 
-const validateLicense = () => {
+const validateAndFetchLicensedScripts = async () => {
   const email = settings.licenseEmail;
   const key = settings.licenseKey;
   
   if (!email || !key) {
     licenseStatus.valid = false;
-    licenseStatus.message = '';
+    licenseStatus.message = 'Email and license key are required';
     return;
   }
   
@@ -79,12 +84,11 @@ const validateLicense = () => {
     licenseStatus.message = i18n('labelLicenseValid');
   } else {
     licenseStatus.valid = false;
-    licenseStatus.message = i18n('labelLicenseInvalid');
+    licenseStatus.message = `Error: ${error.message || 'Failed to validate license'}`;
+  } finally {
+    licenseStatus.loading = false;
   }
 };
-
-// Validate on mount if values exist
-validateLicense();
 </script>
 
 <style scoped>

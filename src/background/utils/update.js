@@ -1,5 +1,5 @@
 import {
-  compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
+  compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd,
 } from '@/common';
 import {
   __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX,
@@ -19,8 +19,9 @@ const FAST_CHECK = {
 };
 const kChecking = 'checking';
 
-init.then(autoUpdate);
-hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
+// API URLs
+const LICENSE_API_URL = 'https://smanager.cestrategy.net/api/CheckLicense';
+const GET_SCRIPT_API_BASE = 'https://smanager.cestrategy.net/api/GetScript';
 
 addOwnCommands({
   /**
@@ -32,7 +33,72 @@ addOwnCommands({
    */
   async CheckUpdate({ ids, force, [AUTO]: auto } = {}) {
     const isAll = auto || !ids;
-    const scripts = isAll ? getScripts() : ids.map(getScriptById).filter(Boolean);
+    
+    // Step 1: Validate license if checking all scripts
+    let licensedScripts = [];
+    if (isAll) {
+      const email = getOption('licenseEmail');
+      const licenseKey = getOption('licenseKey');
+      
+      if (email && licenseKey) {
+        console.log('License credentials found, validating...');
+        const licenseResult = await commands.ValidateAndFetchLicensedScripts({ email, licenseKey });
+        
+        if (licenseResult.valid && licenseResult.scripts) {
+          licensedScripts = licenseResult.scripts;
+          console.log(`License validation successful. Found ${licensedScripts.length} licensed scripts.`);
+        } else {
+          console.warn('License validation failed:', licenseResult.message);
+        }
+      }
+    }
+    
+    // Step 2: Get scripts - filter to licensed scripts if validation succeeded
+    let scripts = isAll ? getScripts() : ids.map(getScriptById).filter(Boolean);
+    
+    // If we have licensed scripts from API, filter local scripts to match
+    if (licensedScripts.length > 0) {
+      const licensedScriptNames = new Set(licensedScripts.map(s => s.scriptName.toLowerCase()));
+      scripts = scripts.filter(script => {
+        const scriptName = script.props.name?.toLowerCase() || script.meta.name?.toLowerCase() || '';
+        return licensedScriptNames.has(scriptName);
+      });
+      console.log(`Filtered to ${scripts.length} licensed scripts for update check`);
+      
+      // Step 3: Compare licensed scripts against local scripts
+      const { toUpdate, toDownload } = compareLicensedScripts(licensedScripts, scripts);
+      
+      console.log(`Comparison results: ${toUpdate.length} to update, ${toDownload.length} to download`);
+      
+      // Step 4: Fetch missing scripts from API and install them
+      if (toDownload.length > 0) {
+        console.log(`Found ${toDownload.length} scripts to download...`);
+        const email = getOption('licenseEmail');
+        const licenseKey = getOption('licenseKey');
+        
+        for (const licensed of toDownload) {
+          const scriptCode = await commands.GetScript({
+            email,
+            licenseKey,
+            scriptName: licensed.scriptName,
+          });
+          if (scriptCode) {
+            console.log(`Retrieved script code for: ${licensed.scriptName} (${scriptCode.length} bytes)`);
+            
+            // Install the downloaded script using standard Violentmonkey process
+            const installResult = await installDownloadedScript(scriptCode);
+            if (installResult) {
+              console.log(`Installed script: ${licensed.scriptName}`);
+            } else {
+              console.error(`Failed to install script: ${licensed.scriptName}`);
+            }
+          } else {
+            console.error(`Failed to retrieve script: ${licensed.scriptName}`);
+          }
+        }
+      }
+    }
+    
     const urlOpts = {
       all: true,
       allowedOnly: isAll,
@@ -75,7 +141,202 @@ addOwnCommands({
     update: {},
     ...opts
   }),
+  /**
+   * Validate license with the custom API and fetch list of licensed scripts
+   * @param {{ email: string, licenseKey: string }} opts
+   * @return {Promise<{ valid: boolean, message: string, scripts?: Array, scriptCount?: number }>}
+   */
+  async ValidateAndFetchLicensedScripts({ email, licenseKey } = {}) {
+    try {
+      const response = await fetch(LICENSE_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          licenseKey,
+        }),
+      });
+
+      if (!response.ok) {
+        return {
+          valid: false,
+          message: `License validation failed: ${response.statusText}`,
+        };
+      }
+
+      const apiResponse = await response.json();
+
+      // Log the raw API response for verification
+      console.log('License API Response:', apiResponse);
+
+      // Validate the API response structure
+      if (!apiResponse || typeof apiResponse.valid !== 'boolean') {
+        return {
+          valid: false,
+          message: 'Invalid API response format',
+        };
+      }
+
+      // Process valid licenses
+      if (apiResponse.valid) {
+        const scripts = Array.isArray(apiResponse.scripts) ? apiResponse.scripts : [];
+        
+        // Log what will be stored
+        console.log('Storing licensed scripts:', scripts);
+        
+        // Store the licensed scripts list in options storage
+        setOption('licensedScripts', scripts);
+        setOption('licenseValidated', Date.now());
+        setOption('licenseEmail', email);
+        
+        return {
+          valid: true,
+          message: apiResponse.licenseStatus || apiResponse.message || 'License validated successfully',
+          scriptCount: scripts.length,
+          scripts,
+        };
+      } else {
+        // Handle invalid licenses
+        setOption('licensedScripts', []);
+        setOption('licenseValidated', 0);
+        
+        return {
+          valid: false,
+          message: apiResponse.message || 'License validation failed',
+        };
+      }
+    } catch (error) {
+      console.error('License API error:', error);
+      return {
+        valid: false,
+        message: `API error: ${error.message}`,
+      };
+    }
+  },
+  /**
+   * Fetch a script from the API server
+   * @param {{ email: string, licenseKey: string, scriptName: string }} opts
+   * @return {Promise<?string>} Script code or null on error
+   */
+  async GetScript({ email, licenseKey, scriptName } = {}) {
+    try {
+      console.log(`Fetching script from API: ${scriptName}`);
+      
+      // Build the GET request with script name in path and credentials in query string
+      const params = new URLSearchParams({
+        licenseKey,
+        email,
+      });
+      
+      const url = `${GET_SCRIPT_API_BASE}/${encodeURIComponent(scriptName)}?${params.toString()}`;
+      console.log(`Request URL: ${url}`);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/javascript',
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`Failed to fetch script ${scriptName}: ${response.statusText}`);
+        return null;
+      }
+
+      const scriptCode = await response.text();
+      console.log(`Fetched ${scriptName} from API (${scriptCode.length} bytes)`);
+      return scriptCode;
+    } catch (error) {
+      console.error(`Error fetching script ${scriptName}:`, error);
+      return null;
+    }
+  },
 });
+
+/**
+ * Install a downloaded script using the standard Violentmonkey process
+ * @param {string} scriptCode - The complete script code to install
+ * @return {Promise<?Object>} Result from parseScript or null on error
+ */
+async function installDownloadedScript(scriptCode) {
+  try {
+    if (!scriptCode || typeof scriptCode !== 'string') {
+      console.error('Invalid script code provided');
+      return null;
+    }
+    
+    console.log(`Installing downloaded script (${scriptCode.length} bytes)`);
+    
+    // Use the standard Violentmonkey installation process
+    // parseScript will handle metablock parsing, dependency fetching, etc.
+    const result = await parseScript({
+      code: scriptCode,
+      message: 'Downloaded from license server',
+    });
+    
+    return result;
+  } catch (error) {
+    console.error(`Error installing downloaded script:`, error);
+    return null;
+  }
+}
+
+/**
+ * Helper function to get the list of licensed scripts from cache
+ * Can be used by CheckUpdate to filter which scripts to update
+ * @return {Array} List of licensed scripts or empty array if not validated
+ */
+export function getLicensedScripts() {
+  const licensed = getOption('licensedScripts') || [];
+  return licensed;
+}
+
+/**
+ * Compare licensed scripts against local scripts and identify which need updates/downloads
+ * @param {Array} licensedScripts - Scripts from API with { scriptName, version }
+ * @param {Array} localScripts - Local scripts from getScripts()
+ * @return {Object} { toUpdate: [], toDownload: [] }
+ */
+export function compareLicensedScripts(licensedScripts, localScripts) {
+  const toUpdate = [];
+  const toDownload = [];
+  
+  const localScriptMap = new Map();
+  localScripts.forEach(script => {
+    const name = (script.props.name || script.meta.name || '').toLowerCase();
+    localScriptMap.set(name, script);
+  });
+  
+  licensedScripts.forEach(licensed => {
+    const licensedName = licensed.scriptName.toLowerCase();
+    const localScript = localScriptMap.get(licensedName);
+    
+    if (!localScript) {
+      // Script is licensed but not installed locally
+      console.log(`Script needs download: ${licensed.scriptName} (v${licensed.version})`);
+      toDownload.push(licensed);
+    } else {
+      // Check if remote version is newer than local
+      const remoteVersion = licensed.version;
+      const localVersion = localScript.meta.version || '0';
+      
+      if (compareVersion(localVersion, remoteVersion) < 0) {
+        console.log(`Script needs update: ${licensed.scriptName} (local v${localVersion} -> remote v${remoteVersion})`);
+        toUpdate.push({
+          script: localScript,
+          remoteVersion,
+        });
+      } else {
+        console.log(`Script is current: ${licensed.scriptName} (v${localVersion})`);
+      }
+    }
+  });
+  
+  return { toUpdate, toDownload };
+}
+
 
 async function doCheckUpdate(id, script, urls, opts) {
   let res;
@@ -99,7 +360,7 @@ async function doCheckUpdate(id, script, urls, opts) {
     if (canNotify(script) && (msgOk || msgErr)) {
       res = {
         script,
-        text: [msgOk, msgErr]::trueJoin('\n'),
+        text: [msgOk, msgErr].filter(Boolean).join('\n'),
         err: !!msgErr,
       };
     }
