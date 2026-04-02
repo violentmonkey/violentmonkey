@@ -96,6 +96,22 @@ addOwnCommands({
             console.error(`Failed to retrieve script: ${licensed.scriptName}`);
           }
         }
+        
+        // After all scripts are downloaded and installed, update their match patterns
+        // to enforce URL restrictions if scriptExecutionUrl is set
+        const scriptExecutionUrl = getOption('scriptExecutionUrl');
+        if (scriptExecutionUrl && toDownload.length > 0) {
+          console.log('Enforcing URL restrictions on newly installed scripts...');
+          try {
+            const result = await commands.UpdateAllScriptMatches({
+              matchUrl: scriptExecutionUrl,
+              licensedScriptNames: toDownload.map(s => s.scriptName),
+            });
+            console.log(`Updated match patterns for downloaded scripts:`, result);
+          } catch (error) {
+            console.error('Failed to update match patterns for downloaded scripts:', error);
+          }
+        }
       }
     }
     
@@ -142,7 +158,104 @@ addOwnCommands({
     ...opts
   }),
   /**
-   * Validate license with the custom API and fetch list of licensed scripts
+   * Update script match patterns to a specific URL
+   * @param {{ scriptId: number, matchUrl: string }} opts
+   * @return {Promise<boolean>} Success or failure
+   */
+  async UpdateScriptMatches({ scriptId, matchUrl } = {}) {
+    try {
+      if (!scriptId || !matchUrl) {
+        console.error('Script ID and match URL are required');
+        return false;
+      }
+      
+      const script = getScriptById(scriptId);
+      if (!script) {
+        console.error(`Script not found: ${scriptId}`);
+        return false;
+      }
+      
+      console.log(`Updating script ${script.props.name} (@${scriptId}) to match: ${matchUrl}`);
+      
+      // Update the script's match pattern
+      script.meta.match = [matchUrl];
+      script.meta.include = [];
+      script.meta.exclude = [];
+      
+      // Save the updated script
+      const result = await parseScript({
+        id: scriptId,
+        meta: script.meta,
+      });
+      
+      console.log(`Updated matches for script ${scriptId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error updating script matches:`, error);
+      return false;
+    }
+  },
+  /**
+   * Update all licensed scripts to match a specific URL
+   * @param {{ matchUrl: string, licensedScriptNames: string[] }} opts
+   * @return {Promise<{ success: boolean, count: number, message?: string }>}
+   */
+  async UpdateAllScriptMatches({ matchUrl, licensedScriptNames = [] } = {}) {
+    try {
+      if (!matchUrl) {
+        return {
+          success: false,
+          count: 0,
+          message: 'Match URL is required',
+        };
+      }
+      
+      console.log(`Updating all licensed scripts to match: ${matchUrl}`);
+      
+      let updatedCount = 0;
+      const allScripts = getScripts();
+      
+      // Find licensed scripts by name
+      for (const script of allScripts) {
+        const scriptName = script.props.name?.toLowerCase() || script.meta.name?.toLowerCase() || '';
+        const isLicensed = licensedScriptNames.some(name => name.toLowerCase() === scriptName);
+        
+        if (isLicensed) {
+          console.log(`Updating licensed script: ${script.props.name}`);
+          
+          // Update the script's match pattern
+          script.meta.match = [matchUrl];
+          script.meta.include = [];
+          script.meta.exclude = [];
+          
+          try {
+            await parseScript({
+              id: script.props.id,
+              meta: script.meta,
+            });
+            updatedCount++;
+            console.log(`Updated matches for: ${script.props.name}`);
+          } catch (err) {
+            console.error(`Failed to update script ${script.props.name}:`, err);
+          }
+        }
+      }
+      
+      return {
+        success: true,
+        count: updatedCount,
+        message: `Updated ${updatedCount} scripts`,
+      };
+    } catch (error) {
+      console.error(`Error updating all script matches:`, error);
+      return {
+        success: false,
+        count: 0,
+        message: `Error: ${error.message}`,
+      };
+    }
+  },
+  /**
    * @param {{ email: string, licenseKey: string }} opts
    * @return {Promise<{ valid: boolean, message: string, scripts?: Array, scriptCount?: number }>}
    */
@@ -269,10 +382,34 @@ async function installDownloadedScript(scriptCode) {
     
     console.log(`Installing downloaded script (${scriptCode.length} bytes)`);
     
+    let modifiedCode = scriptCode;
+    const scriptExecutionUrl = getOption('scriptExecutionUrl');
+    
+    // If a script execution URL is configured, override the @match directive
+    if (scriptExecutionUrl) {
+      console.log(`Configuring script to run only on: ${scriptExecutionUrl}`);
+      
+      // Remove all existing @match, @include, and @exclude directives
+      modifiedCode = modifiedCode
+        .replace(/\/\/\s*@match\s+.+?(?:\n|$)/g, '')
+        .replace(/\/\/\s*@include\s+.+?(?:\n|$)/g, '')
+        .replace(/\/\/\s*@exclude\s+.+?(?:\n|$)/g, '');
+      
+      // Find the metablock end and insert the new @match directive
+      const metablockEnd = modifiedCode.indexOf('==/UserScript==');
+      if (metablockEnd !== -1) {
+        // Insert new @match directive before the metablock closing
+        const insertPos = modifiedCode.lastIndexOf('\n', metablockEnd);
+        const newMatch = `// @match ${scriptExecutionUrl}\n`;
+        modifiedCode = modifiedCode.slice(0, insertPos + 1) + newMatch + modifiedCode.slice(insertPos + 1);
+        console.log(`Added @match directive: ${scriptExecutionUrl}`);
+      }
+    }
+    
     // Use the standard Violentmonkey installation process
     // parseScript will handle metablock parsing, dependency fetching, etc.
     const result = await parseScript({
-      code: scriptCode,
+      code: modifiedCode,
       message: 'Downloaded from license server',
     });
     

@@ -23,13 +23,6 @@
                          class="ml-2" />
         </div>
       </section>
-      <section class="mb-2c">
-        <h3 v-text="i18n('labelBackupMaintenance')" :class="{bright: store.isEmpty === 1}"/>
-        <vm-import></vm-import>
-        <vm-export></vm-export>
-        <hr>
-        <vm-maintenance/>
-      </section>
       <vm-sync></vm-sync>
       <vm-licensing></vm-licensing>
     </div>
@@ -42,8 +35,6 @@ import { keyboardService } from '@/common/keyboard';
 import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { focusMe, getActiveElement } from '@/common/ui';
 import { hookSettingsForUI } from '@/common/ui/util';
-import { store } from '@/options/utils';
-
 const items = {
   autoUpdate: value => Math.max(0, Math.min(365, +value || 0)),
 };
@@ -54,9 +45,6 @@ import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
 import SettingCheck from '@/common/ui/setting-check';
 import LocaleGroup from '@/common/ui/locale-group';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
-import VmImport from './vm-import';
-import VmExport from './vm-export';
-import VmMaintenance from './vm-maintenance';
 import VmSync from './vm-sync';
 import VmLicensing from './vm-licensing';
 

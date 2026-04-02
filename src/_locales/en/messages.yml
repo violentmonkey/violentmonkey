@@ -666,6 +666,9 @@ labelLicenseEmail:
 labelLicenseKey:
   description: Label for license key input
   message: 'License Key: '
+labelScriptExecutionUrl:
+  description: Label for script execution URL input
+  message: 'Script Execution URL: '
 labelLicenseValid:
   description: Message shown when license is valid
   message: License key is valid

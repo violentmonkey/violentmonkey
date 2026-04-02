@@ -113,4 +113,5 @@ export default {
   licenseKey: '',
   licensedScripts: [],
   licenseValidated: 0,
+  scriptExecutionUrl: '',
 };
