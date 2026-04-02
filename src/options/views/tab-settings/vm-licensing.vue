@@ -77,12 +77,24 @@ const validateAndFetchLicensedScripts = async () => {
     return;
   }
   
-  // TODO: Replace with actual license validation logic
-  // This is a placeholder for validation
-  if (email && key && key.length >= 16) {
-    licenseStatus.valid = true;
-    licenseStatus.message = i18n('labelLicenseValid');
-  } else {
+  try {
+    licenseStatus.loading = true;
+    licenseStatus.message = 'Validating license...';
+    
+    // Validate license and fetch scripts from the API
+    const result = await sendCmdDirectly('ValidateAndFetchLicensedScripts', {
+      email,
+      licenseKey: key,
+    });
+    
+    if (result.valid) {
+      licenseStatus.valid = true;
+      licenseStatus.message = `License valid! ${result.scriptCount || 0} scripts available.`;
+    } else {
+      licenseStatus.valid = false;
+      licenseStatus.message = result.message || 'Invalid license';
+    }
+  } catch (error) {
     licenseStatus.valid = false;
     licenseStatus.message = `Error: ${error.message || 'Failed to validate license'}`;
   } finally {
