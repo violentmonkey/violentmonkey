@@ -2,12 +2,12 @@ import {
   compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd,
 } from '@/common';
 import {
-  __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX,
+  __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS,
 } from '@/common/consts';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
-import { addOwnCommands, commands, init } from './init';
+import { addOwnCommands, commands } from './init';
 import { parseMeta } from './script';
-import { getOption, hookOptions, setOption } from './options';
+import { getOption, setOption } from './options';
 import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { requestNewer } from './storage-fetch';
 
@@ -183,7 +183,7 @@ addOwnCommands({
       script.meta.exclude = [];
       
       // Save the updated script
-      const result = await parseScript({
+      await parseScript({
         id: scriptId,
         meta: script.meta,
       });
@@ -559,19 +559,6 @@ function canNotify(script) {
   return getOption('notifyUpdatesGlobal')
     ? allowed
     : script.config.notifyUpdates ?? allowed;
-}
-
-function autoUpdate() {
-  const interval = getUpdateInterval();
-  if (!interval) return;
-  let elapsed = Date.now() - getOption('lastUpdate');
-  if (elapsed >= interval) {
-    // Wait on startup for things to settle and after unsuspend for network reconnection
-    setTimeout(commands.CheckUpdate, 20e3, { [AUTO]: true });
-    elapsed = 0;
-  }
-  clearTimeout(autoUpdate.timer);
-  autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
 }
 
 export function getUpdateInterval() {

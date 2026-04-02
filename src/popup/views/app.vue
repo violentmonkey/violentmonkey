@@ -236,7 +236,6 @@ const topExtras = ref();
 
 const activeLinks = computed(makeActiveLinks);
 const injectionScopes = computed(makeInjectionScopes);
-const findUrls = computed(makeFindUrls);
 const reloadHint = computed(makeReloadHint);
 const tabIndex = computed(() => extras.value ? -1 : 0);
 
@@ -342,13 +341,6 @@ function makeInjectionScopes() {
         : `${numTotal}`,
     };
   }).filter(Boolean);
-}
-function makeFindUrls() {
-  const query = encodeURIComponent(store.domain);
-  return {
-    [`${i18n('menuFindScripts')} (GF)`]: `https://greasyfork.org/scripts/by-site/${query}`,
-    OUJS: `https://openuserjs.org/?q=${query}`,
-  };
 }
 function makeReloadHint() {
   return (

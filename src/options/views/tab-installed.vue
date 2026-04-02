@@ -159,12 +159,12 @@ import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLengt
 import { INFERRED } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
-import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
+import { getActiveElement, isTouch, showConfirmation, vFocus } from '@/common/ui';
 import hookSetting from '@/common/hook-setting';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
 import { keyboardService, handleTabNavigation } from '@/common/keyboard';
-import { TAB_SETTINGS } from '@/common/safe-globals';
+
 import { loadData } from '@/options';
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
@@ -173,7 +173,7 @@ import Icon from '@/common/ui/icon';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import { getSortCollator } from '@/common/ui/util';
 import {
-  createSearchRules, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
+  createSearchRules, formatSizesStr, markRemove, performSearch, runInBatch,
   SIZE_TITLES, store, TOGGLE_OFF, TOGGLE_ON,
 } from '../utils';
 import toggleDragging from '../utils/dragging';
@@ -410,7 +410,7 @@ function handleEditScript(id) {
   }
 }
 async function onHashChange() {
-  const [tab, id, cacheId] = store.route.paths;
+  const [tab, id] = store.route.paths;
   // Script creation is disabled - scripts come from the API server
   const newData = null;
   const script = +id && getCurrentList().find(s => s.props.id === +id);
