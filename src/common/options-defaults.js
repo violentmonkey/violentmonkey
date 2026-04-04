@@ -94,12 +94,14 @@ export default {
 // ==UserScript==
 // @name        New script {{name}}
 // @namespace   ${VIOLENTMONKEY} Scripts
-// @match       {{url}}
 // @icon        {{icon}}
+// @version     1.0.0
+//
+// @match       {{url}}
 // @grant       none
-// @version     1.0
+//
 // @author      -
-// @description {{date}}
+// @description
 // ==/UserScript==
 `,
   showAdvanced: true,
