@@ -12,6 +12,7 @@
     <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
                    v-show="$EW?.value"/>
   </div>
+  <setting-check name="pageMenuCommands" :label="i18n('labelPageMenuCommands')"/>
   <div class="mid">
     <label>{{ i18n('labelWidth') }}
       <input v-model="popupWidth" type="range"

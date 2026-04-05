@@ -48,6 +48,8 @@ export default {
   closeAfterInstall: false,
   editAfterInstall: false,
   helpForLocalFile: true,
+  /** Show GM_registerMenuCommand entries in the page/frame context menu (disabled by default). */
+  pageMenuCommands: false,
   trackLocalFile: false,
   autoReload: false,
   features: null,

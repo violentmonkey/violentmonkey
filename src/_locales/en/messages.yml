@@ -694,6 +694,9 @@ menuCommands:
   description: Menu item to list script commands.
   message: Script commands
   touched: false
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: Show script commands in page menu
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Open Dashboard

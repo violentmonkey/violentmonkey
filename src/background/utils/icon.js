@@ -7,6 +7,7 @@ import { popupTabs } from './popup-tracker';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
+import { tryHandlePageMenuCommand } from './page-context-menu-commands';
 import { FIREFOX, ua } from './ua';
 
 /** 1x + HiDPI 1.5x, 2x */
@@ -124,7 +125,8 @@ init.then(async () => {
   }
 });
 
-contextMenus?.onClicked.addListener(({ menuItemId: id }, tab) => {
+contextMenus?.onClicked.addListener(({ menuItemId: id, frameId }, tab) => {
+  if (tryHandlePageMenuCommand(id, tab, frameId)) return;
   handleHotkeyOrMenu(id, tab);
 });
 tabsOnRemoved.addListener(id => delete badges[id]);

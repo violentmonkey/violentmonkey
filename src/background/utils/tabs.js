@@ -40,6 +40,7 @@ export const getTabUrl = tab => (
 );
 export const tabsOnUpdated = browser.tabs.onUpdated;
 export const tabsOnRemoved = browser.tabs.onRemoved;
+export const tabsOnActivated = browser.tabs.onActivated;
 export let injectableRe = /^(https?|file|ftps?):/;
 export let fileSchemeRequestable;
 let cookieStorePrefix;
