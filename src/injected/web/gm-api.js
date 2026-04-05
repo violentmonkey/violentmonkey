@@ -142,6 +142,7 @@ export const GM_API_CTX = {
     const cmd = ensureNestedProp(commands, id, key);
     cmd.cb = cb;
     cmd.text = text;
+    opts.displayName = this.displayName;
     bridge.post('RegisterMenu', { id, key, val: opts });
     return key;
   },

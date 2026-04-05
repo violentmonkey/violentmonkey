@@ -12,7 +12,7 @@ import {
 } from '@/common/object';
 import { CACHE_KEYS, getScriptsByURL, kTryVacuuming, PROMISE, REQ_KEYS, VALUE_IDS } from './db';
 import { setBadge } from './icon';
-import { addOwnCommands, addPublicCommands } from './init';
+import { addOwnCommands, addPublicCommands, commands } from './init';
 import { clearNotifications } from './notifications';
 import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
@@ -219,7 +219,7 @@ addPublicCommands({
       [S_CACHE]: envCache,
     };
   },
-  Run({ [IDS]: ids, reset }, src) {
+  Run({ [IDS]: ids, menus, reset }, src) {
     const {
       [kDocumentId]: docId,
       [kTop]: isTop,
@@ -237,6 +237,9 @@ addPublicCommands({
     }
     if (reset === 'bfcache' && hasIds) {
       addValueOpener(ids, tabId, getFrameDocId(isTop, docId, src[kFrameId]));
+    }
+    if (reset) {
+      commands.UpdateTabMenuCommands(menus, src);
     }
   },
 });

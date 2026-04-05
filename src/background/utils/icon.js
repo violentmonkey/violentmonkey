@@ -7,6 +7,7 @@ import { popupTabs } from './popup-tracker';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
+import { tryHandlePageMenuCommand } from './page-context-menu-commands';
 import { FIREFOX, ua } from './ua';
 
 /** 1x + HiDPI 1.5x, 2x */
@@ -241,6 +242,7 @@ export function getFailureReason(url, data, def = titleDefault) {
 }
 
 export function handleHotkeyOrMenu(id, tab) {
+  if (tryHandlePageMenuCommand(id, tab)) return;
   if (id === SKIP_SCRIPTS) {
     commands[SKIP_SCRIPTS](tab);
   } else if (id === TAB_SETTINGS) {

@@ -2,7 +2,7 @@ import bridge, { addBackgroundHandlers, addHandlers, grantless } from './bridge'
 import { addNonceAttribute } from './inject';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
-const menus = createNullObj();
+export const menus = createNullObj();
 const HEAD_TAGS = ['script', 'style', 'link', 'meta'];
 const { toLowerCase } = '';
 const { [IDS]: ids } = bridge;
@@ -46,11 +46,13 @@ addHandlers({
   RegisterMenu({ id, key, val }) {
     (menus[id] || (menus[id] = createNullObj()))[key] = val;
     sendSetPopup(true);
+    sendCmd('UpdateTabMenuCommands', menus);
   },
 
   UnregisterMenu({ id, key }) {
     delete menus[id]?.[key];
     sendSetPopup(true);
+    sendCmd('UpdateTabMenuCommands', menus);
   },
 });
 
