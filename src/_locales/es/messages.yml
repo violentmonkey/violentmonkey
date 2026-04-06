@@ -435,7 +435,7 @@ labelBlacklist:
   message: Lista negra
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Comentario
 labelContributors:
   description: Label for link to contributors.
   message: Colaboradores

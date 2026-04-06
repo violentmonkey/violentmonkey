@@ -424,7 +424,7 @@ labelBlacklist:
   message: Kara Liste
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Yorum
 labelContributors:
   description: Label for link to contributors.
   message: Katkıda bulunanlar

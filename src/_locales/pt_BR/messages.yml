@@ -167,10 +167,20 @@ descEditorOptions:
     rel="noopener noreferrer">lista completa</a>.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
-  message: ''
+  message: >-
+    Opções booleanas podem ser alternadas clicando duas vezes no valor:
+    <code>true</code> = ativado, <code>false</code> = desativado. Opções
+    numéricas terminadas em <code>Delay</code>, <code>Interval</code>,
+    <code>Rate</code>, <code>Time</code> estão em milissegundos.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
-  message: ''
+  message: >-
+    Opções não padronizadas: <code>autocompleteOnTyping</code> é um atraso em
+    milissegundos para exibir sugestões de preenchimento automático após a
+    digitação (<code>0</code> = desativar), <code>killTrailingSpaceOnSave</code>
+    remove automaticamente espaços extras ao final de cada linha ao salvar,
+    <code>showTrailingSpace</code> mostra os espaços ao final das linhas como
+    pontos.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
@@ -332,7 +342,11 @@ hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: >-
+    Um script em sandbox não pode alterar estas propriedades globais: $1.
+
+    Para corrigir o script, adicione `@grant none` para desativar o sandbox ou
+    use `unsafeWindow` em vez de `window`.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Inserir URL:'
@@ -416,7 +430,7 @@ labelBlacklist:
   message: Lista negra
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Comentário
 labelContributors:
   description: Label for link to contributors.
   message: Colaboradores
@@ -492,10 +506,14 @@ labelHomepageURL:
   message: 'URL da página inicial:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: Permitir que o GM_cookie acesse cookies HTTP-only
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    Quando ativado, os scripts podem ler e gravar cookies com o sinalizador
+    HTTP-only. Isso permite que os scripts acessem cookies que não podem ser
+    acessados via JavaScript. Use com cautela, pois isso pode representar riscos
+    de segurança.
 labelIconURL:
   description: Label for the input.
   message: 'URL do ícone:'
@@ -577,10 +595,10 @@ labelRunAtDefault:
   message: (Padrão)
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: (apenas para scripts com essa opção ativada em suas configurações)
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: (essa opção também precisa ser ativada nas configurações globais)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Modelo de script personalizado
@@ -641,7 +659,7 @@ labelSyncUsername:
   message: 'Nome do usuário: '
 labelTags:
   description: Label for custom tags. Don't translate @tag.
-  message: ''
+  message: '@tag / tags'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Tema: '
@@ -888,7 +906,13 @@ msgSyntaxError:
   message: Erro de sintaxe?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: ''
+  message: >-
+    O script não existia ou não correspondia à URL quando a página foi
+    carregada, o que ocorre em sites do tipo Single-Page Application (SPA), como
+    Facebook ou Instagram, que utilizam navegação simulada. Você pode recarregar
+    a aba para executar o script. Para corrigir o script, use @match para todo o
+    site e, em seguida, detecte as alterações usando MutationObserver ou a API
+    window.navigation.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Script atualizado.
@@ -1036,7 +1060,26 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: ''
+  message: >-
+    * A tecla <kbd>Enter</kbd> adiciona o texto ao histórico de preenchimento
+    automático
+
+    * Todas as condições diferenciam maiúsculas de minúsculas (case-insensitive)
+
+    * Condições separadas por espaços podem ser combinadas
+
+    * Pesquisar por metadados: <code>"Script Incrível" "Descrição"</code>
+
+    * Pesquisar por tags: <code>#tag1 #tag2</code>
+
+    * Pesquisar por nome do script: <code>name:"nome incrível"</code>
+
+    * Pesquisar por código do script: <code>code:"código incrível"</code>
+
+    * Pesquisa negativa: <code>!#tag2 !name:"indesejado"</code>
+
+    * Expressões regulares: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? com espaço"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Alternar injeção de script de usuário
@@ -1056,7 +1099,9 @@ updateScript:
   message: Atualizar
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: >-
+    Clique com o botão direito do mouse ou mantenha o dedo pressionado para
+    forçar a atualização, incluindo as dependências
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Atualize todos os scripts
