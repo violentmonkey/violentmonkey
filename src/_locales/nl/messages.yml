@@ -421,7 +421,7 @@ labelBlacklist:
   message: Zwarte lijst
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Opmerking
 labelContributors:
   description: Label for link to contributors.
   message: Bijdragers
@@ -497,7 +497,7 @@ labelHomepageURL:
   message: 'Website-url:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: GM_cookie toestaan om http-cookies op te vragen
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
   message: ''

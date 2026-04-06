@@ -422,7 +422,7 @@ labelBlacklist:
   message: Чёрный список
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Комментарий
 labelContributors:
   description: Label for link to contributors.
   message: Участники

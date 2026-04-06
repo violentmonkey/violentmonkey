@@ -428,7 +428,7 @@ labelBlacklist:
   message: Čierna listina
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Komentár
 labelContributors:
   description: Label for link to contributors.
   message: Prispievatelia
