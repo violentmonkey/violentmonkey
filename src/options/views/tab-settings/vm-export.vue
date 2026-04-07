@@ -156,7 +156,7 @@ async function exportData() {
       overflow: hidden;
       min-width: 10em;
     }
-    button[disabled] { // Hide a disabled `reset` button
+    button[disabled] { 
       display: none;
     }
   }

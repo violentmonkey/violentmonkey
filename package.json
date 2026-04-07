@@ -1,7 +1,7 @@
 {
   "name": "feature-injector",
   "description": "Feature Injector",
-  "version": "2.35.0",
+  "version": "0.80.1",
   "scripts": {
     "prepare": "husky install",
     "dev": "gulp dev",

