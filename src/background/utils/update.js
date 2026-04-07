@@ -23,20 +23,79 @@ const kChecking = 'checking';
 const LICENSE_API_URL = 'https://smanager.cestrategy.net/api/CheckLicense';
 const GET_SCRIPT_API_BASE = 'https://smanager.cestrategy.net/api/GetScript';
 
+function normalizeMatchUrl(input) {
+  try {
+    return `${new URL(`${input}`.trim()).origin}/*`;
+  } catch {
+    return '';
+  }
+}
+
 addOwnCommands({
+  /**
+   * Validate license info, run a full licensed update pass, then enforce URL restrictions.
+   * @param {{ email: string, licenseKey: string, matchUrl?: string }} opts
+   * @return {Promise<{ success: boolean, valid: boolean, scriptCount: number, updatedCount: number, matchCount: number, message: string }>}
+   */
+  async SyncLicensedScripts({ email, licenseKey, matchUrl } = {}) {
+    matchUrl = matchUrl && normalizeMatchUrl(matchUrl);
+    if (matchUrl) {
+      setOption('scriptExecutionUrl', matchUrl);
+    }
+    const licenseResult = await commands.ValidateAndFetchLicensedScripts({ email, licenseKey });
+    if (!licenseResult.valid) {
+      return {
+        success: false,
+        valid: false,
+        scriptCount: 0,
+        updatedCount: 0,
+        matchCount: 0,
+        message: licenseResult.message || 'License validation failed',
+      };
+    }
+    const licensedScripts = licenseResult.scripts || [];
+    const updatedCount = await commands.CheckUpdate({ licensedScripts });
+    let matchCount = 0;
+    if (matchUrl) {
+      const matchResult = await commands.UpdateAllScriptMatches({
+        matchUrl,
+        licensedScriptNames: licensedScripts.map(script => script.scriptName),
+      });
+      if (!matchResult.success) {
+        return {
+          success: false,
+          valid: true,
+          scriptCount: licensedScripts.length,
+          updatedCount,
+          matchCount: 0,
+          message: matchResult.message || 'License saved, but failed to update script URLs',
+        };
+      }
+      matchCount = matchResult.count || 0;
+    }
+    return {
+      success: true,
+      valid: true,
+      scriptCount: licensedScripts.length,
+      updatedCount,
+      matchCount,
+      message: licenseResult.message || 'License saved successfully',
+    };
+  },
   /**
    * @param {{}} [_]
    * @param {number[]} [_.ids] - when omitted, all scripts are checked
    * @param {boolean} [_.auto] - scheduled auto update
    * @param {boolean} [_.force] - force (ignore checks)
+   * @param {Array} [_.licensedScripts] - prevalidated licensed scripts to reuse
    * @return {Promise<number>} number of updated scripts
    */
-  async CheckUpdate({ ids, force, [AUTO]: auto } = {}) {
+  async CheckUpdate({ ids, force, licensedScripts: providedLicensedScripts, [AUTO]: auto } = {}) {
     const isAll = auto || !ids;
     
     // Step 1: Validate license if checking all scripts
-    let licensedScripts = [];
-    if (isAll) {
+    let licensedScripts = providedLicensedScripts || [];
+    if (isAll && !licensedScripts.length) {
       const email = getOption('licenseEmail');
       const licenseKey = getOption('licenseKey');
       
@@ -164,6 +223,7 @@ addOwnCommands({
    */
   async UpdateScriptMatches({ scriptId, matchUrl } = {}) {
     try {
+      matchUrl = normalizeMatchUrl(matchUrl);
       if (!scriptId || !matchUrl) {
         console.error('Script ID and match URL are required');
         return false;
@@ -202,6 +262,7 @@ addOwnCommands({
    */
   async UpdateAllScriptMatches({ matchUrl, licensedScriptNames = [] } = {}) {
     try {
+      matchUrl = normalizeMatchUrl(matchUrl);
       if (!matchUrl) {
         return {
           success: false,

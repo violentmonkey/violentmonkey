@@ -45,7 +45,16 @@ addPublicCommands({
     const tabId = src.tab.id;
     const key = getCacheKey(tabId);
     if (popupTabs[tabId]) {
-      return; // allowing the visible popup's onMessage to handle this message
+      popupTabs[tabId].postMessage({
+        cmd: 'SetPopup',
+        data,
+        src: {
+          tab: src.tab,
+          url: src.url,
+          [kFrameId]: src[kFrameId],
+        },
+      });
+      return;
     }
     augmentSetPopup(data, src, key);
   }
@@ -91,8 +100,8 @@ async function isInjectable(tabId, badgeData) {
 function onPopupOpened(port) {
   const [cmd, cached, tabId] = port.name.split(':');
   if (cmd !== 'Popup') return;
-  if (!cached) notifyTab(+tabId, true);
   popupTabs[tabId] = port;
+  if (!cached) notifyTab(+tabId, true);
   port.onDisconnect.addListener(() => {
     delete popupTabs[tabId];
     notifyTab(+tabId, false);

@@ -62,8 +62,11 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const { frameScripts } = store;
     const scope = isTop ? store[SCRIPTS] : frameScripts;
     const { grantless } = data;
-    const metas = (data[SCRIPTS] || [])?.filter(({ props: { id } }) => ids.includes(id))
-      || (Object.assign(data, await sendCmdDirectly('GetData', { ids }).catch(() => ({}))))[SCRIPTS] || [];
+    let metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id)) || [];
+    if (!metas.length) {
+      Object.assign(data, await sendCmdDirectly('GetData', { ids }).catch(() => ({})));
+      metas = data[SCRIPTS] || [];
+    }
     metas.forEach(script => {
       loadScriptIcon(script, data);
       let v;
@@ -147,11 +150,19 @@ async function initialize() {
   if (!port) {
     try {
       port = browser.runtime.connect({ name: `Popup:${cached ? 'C' : ''}:${data.tab.id}` });
-      if (port) port.onMessage.addListener(initialize); // for non-injectable tab
+      if (port) port.onMessage.addListener(onPortMessage);
     } catch (err) {
       if (process.env.DEBUG) console.warn('Port connection failed:', err);
       port = null;
     }
+  }
+}
+
+function onPortMessage(message) {
+  if (message?.cmd === 'SetPopup') {
+    handlers.SetPopup(message.data, message.src);
+  } else {
+    initialize();
   }
 }
 

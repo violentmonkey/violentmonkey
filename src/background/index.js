@@ -34,21 +34,37 @@ function handleCommandMessage({ cmd, data, url, [kTop]: mode } = {}, src) {
   // The `src` is omitted when invoked via sendCmdDirectly unless fakeSrc is set.
   // The `origin` is Chrome-only, it can't be spoofed by a compromised tab unlike `url`.
   if (src) {
-    let me = src.origin;
-    if (url) src.url = url; // MessageSender.url doesn't change on soft navigation
-    me = me ? me === extensionOrigin : `${url || src.url}`.startsWith(extensionRoot);
-    if (!me && func.isOwn && !src.fake) {
+    let safeSrc;
+    let safeUrl = url;
+    try {
+      safeUrl ||= src.url;
+      safeSrc = {
+        tab: src.tab && { ...src.tab },
+        url: safeUrl,
+        origin: src.origin,
+        fake: src.fake,
+        [kFrameId]: src[kFrameId],
+        [kDocumentId]: src[kDocumentId],
+        [kTop]: src[kTop],
+      };
+    } catch {
+      safeSrc = { url: safeUrl };
+    }
+    let me = safeSrc.origin;
+    me = me ? me === extensionOrigin : `${safeUrl || ''}`.startsWith(extensionRoot);
+    if (!me && func.isOwn && !safeSrc.fake) {
       throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
     }
     // TODO: revisit when link-preview is shipped in Chrome to fix tabId-dependent functionality
-    if (!src.tab) {
+    if (!safeSrc.tab) {
       if (!me && (IS_FIREFOX ? !func.isOwn : !mode)) {
         if (process.env.DEBUG) console.log('No src.tab, ignoring:', ...arguments);
         return;
       }
-      src.tab = false; // allowing access to props
+      safeSrc.tab = false; // allowing access to props
     }
-    if (mode) src[kTop] = mode;
+    if (mode) safeSrc[kTop] = mode;
+    src = safeSrc;
   }
   return handleCommandMessageAsync(func, data, src);
 }

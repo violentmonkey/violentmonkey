@@ -32,10 +32,11 @@
           />
         </locale-group>
       </label>
-      <button 
-        @click="validateAndFetchLicensedScripts" 
+      <button
+        type="button"
+        @click="saveLicenseInformation"
         class="mt-1c"
-        :disabled="!settings.licenseEmail || !settings.licenseKey">
+        :disabled="licenseStatus.loading || !settings.licenseEmail || !settings.licenseKey">
         {{ i18n('Save License Information') }}
       </button>
       <div v-if="licenseStatus.message" :class="['status-message', licenseStatus.valid ? 'valid' : 'invalid']">
@@ -48,7 +49,7 @@
 <script setup>
 import { i18n, sendCmdDirectly } from '@/common';
 import options from '@/common/options';
-import { reactive, watch, ref } from 'vue';
+import { reactive, watch } from 'vue';
 import LocaleGroup from '@/common/ui/locale-group';
 
 const settings = reactive({
@@ -62,8 +63,6 @@ const licenseStatus = reactive({
   message: '',
   loading: false,
 });
-
-const isUpdatingMatches = ref(false);
 
 // Initialize settings from stored options
 Object.assign(settings, {
@@ -85,86 +84,56 @@ watch(() => settings.scriptExecutionUrl, (newVal) => {
   options.set('scriptExecutionUrl', newVal);
 });
 
-const validateAndFetchLicensedScripts = async () => {
+function normalizeMatchUrl(input) {
+  try {
+    return `${new URL(input.trim()).origin}/*`;
+  } catch {
+    return '';
+  }
+}
+
+const saveLicenseInformation = async () => {
   const email = settings.licenseEmail;
   const key = settings.licenseKey;
+  const matchUrl = normalizeMatchUrl(settings.scriptExecutionUrl);
   
   if (!email || !key) {
     licenseStatus.valid = false;
     licenseStatus.message = 'Email and license key are required';
     return;
   }
+
+  if (!matchUrl) {
+    licenseStatus.valid = false;
+    licenseStatus.message = 'A valid script execution URL is required';
+    return;
+  }
+  if (settings.scriptExecutionUrl !== matchUrl) {
+    settings.scriptExecutionUrl = matchUrl;
+  }
   
   try {
     licenseStatus.loading = true;
-    licenseStatus.message = 'Validating license...';
+    licenseStatus.message = 'Saving license information and syncing scripts...';
     
-    // Validate license and fetch scripts from the API
-    const result = await sendCmdDirectly('ValidateAndFetchLicensedScripts', {
+    const result = await sendCmdDirectly('SyncLicensedScripts', {
       email,
       licenseKey: key,
-    });
-    
-    if (result.valid) {
-      licenseStatus.valid = true;
-      licenseStatus.message = `License valid! ${result.scriptCount || 0} scripts available. Click "Update Script URLs" to enforce URL restrictions.`;
-      
-    } else {
-      licenseStatus.valid = false;
-      licenseStatus.message = result.message || 'Invalid license';
-    }
-  } catch (error) {
-    licenseStatus.valid = false;
-    licenseStatus.message = `Error: ${error.message || 'Failed to validate license'}`;
-  } finally {
-    licenseStatus.loading = false;
-  }
-
-  //ensure all scripts are limited to the site URL
-   await updateAllScriptMatches();
-};
-
-const updateAllScriptMatches = async () => {
-  const matchUrl = settings.scriptExecutionUrl;
-  
-  if (!matchUrl) {
-    licenseStatus.valid = false;
-    licenseStatus.message = 'Script execution URL is required';
-    return;
-  }
-  
-  try {
-    isUpdatingMatches.value = true;
-    licenseStatus.message = 'Updating script URLs...';
-    
-    // Get licensed scripts from options
-    const licensedScripts = options.get('licensedScripts') || [];
-    
-    if (licensedScripts.length === 0) {
-      licenseStatus.message = 'No licensed scripts found';
-      return;
-    }
-    
-    // Update @match patterns for each licensed script
-    // Note: In a real implementation, you'd get the script IDs from the extension
-    // For now, we'll call a command that handles this
-    const result = await sendCmdDirectly('UpdateAllScriptMatches', {
       matchUrl,
-      licensedScriptNames: licensedScripts.map(s => s.scriptName),
     });
     
     if (result.success) {
       licenseStatus.valid = true;
-      licenseStatus.message = `Updated ${result.count || 0} scripts to run on: ${matchUrl}`;
+      licenseStatus.message = `License saved. Checked ${result.scriptCount || 0} licensed scripts, updated ${result.updatedCount || 0}, enforced URL rules on ${result.matchCount || 0}.`;
     } else {
       licenseStatus.valid = false;
-      licenseStatus.message = result.message || 'Failed to update scripts';
+      licenseStatus.message = result.message || 'Failed to save license information';
     }
   } catch (error) {
     licenseStatus.valid = false;
-    licenseStatus.message = `Error: ${error.message || 'Failed to update scripts'}`;
+    licenseStatus.message = `Error: ${error.message || 'Failed to save license information'}`;
   } finally {
-    isUpdatingMatches.value = false;
+    licenseStatus.loading = false;
   }
 };
 </script>

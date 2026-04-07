@@ -162,7 +162,7 @@ addOwnCommands({
 
 addPublicCommands({
   /** @return {Promise<VMInjection>} */
-  async GetInjected({ url, [FORCE_CONTENT]: forceContent, done }, src) {
+  async GetInjected({ url, [FORCE_CONTENT]: forceContent, csp, done }, src) {
     const { tab, [kFrameId]: frameId, [kTop]: isTop } = src;
     const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
@@ -178,12 +178,22 @@ addPublicCommands({
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
     const bag = bagP[INJECT] ? bagP : await bagP[PROMISE];
+    // Manifest V3: Use CSP info from content script when webRequest unavailable
+    if (!hasWebRequest && csp?.nonce) {
+      bag[INJECT].nonce = csp.nonce;
+    }
+    if (!hasWebRequest && csp?.strict && !forceContent) {
+      bag[FORCE_CONTENT] = bag[INJECT][FORCE_CONTENT] = true;
+    }
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[SCRIPTS];
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
       addValueOpener(scripts, tabId, frameDoc);
+      if (isTop && scripts.length) {
+        setBadge(scripts.map(({ props: { id } }) => id), true, src);
+      }
       if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
         updateVisitedTime(scripts);
       }

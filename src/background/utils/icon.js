@@ -24,7 +24,7 @@ export const getImageData = url => iconCache[url] || (iconCache[url] = loadIcon(
 // Firefox Android does not support such APIs, use noop
 const browserAction = (() => {
   // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
-  const api = chrome.browserAction;
+  const api = chrome[BROWSER_ACTION] || chrome.browserAction;
   // Some methods like setBadgeText added callbacks only in Chrome 67+.
   const makeMethod = fn => (...args) => {
     try {

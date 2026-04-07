@@ -10,16 +10,33 @@ import { Run, finish } from './cmd-run';
 
 const { [IDS]: ids } = bridge;
 
+// Detect CSP headers/meta tags for Manifest V3 compatibility (webRequest unavailable)
+function detectPageCsp() {
+  const cspMeta = document.querySelector('meta[http-equiv="content-security-policy"]');
+  const cspValue = cspMeta?.getAttribute('content') || '';
+  const nonceMatch = cspValue.match(/'nonce-([^']+)'/);
+  const scriptSrc = cspValue.match(/script-src([^;]*)/);
+  const defaultSrc = cspValue.match(/default-src([^;]*)/);
+  const isStrict = scriptSrc && !scriptSrc[1].includes("'unsafe-inline'")
+    || defaultSrc && !defaultSrc[1].includes("'unsafe-inline'");
+  return {
+    nonce: nonceMatch?.[1],
+    strict: cspValue && isStrict && !nonceMatch,
+  };
+}
+
 // Make sure to call obj::method() in code that may run after CONTENT userscripts
 async function init() {
   const isXml = document instanceof XMLDocument;
   const xhrData = getXhrInjection();
+  const cspInfo = detectPageCsp();
   const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && location.href,
     // XML document's appearance breaks when script elements are added
     [FORCE_CONTENT]: isXml,
+    csp: cspInfo,
     done: !!(xhrData || global.vmData),
   }, {
     retry: true,
