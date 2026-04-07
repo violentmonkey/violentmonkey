@@ -159,7 +159,7 @@
           <div class="submenu-commands">
             <div
               class="menu-item menu-area"
-              v-for="({ autoClose = true, safeIcon, text, title }, key) in store.commands[item.id]"
+              v-for="({ autoClose = true, safeIcon, text, title }, key) in store.menus[scope.depth][item.id]"
               :key
               :tabIndex
               :cmd.prop="[item.id, key, autoClose]"
@@ -253,7 +253,7 @@ const optionsData = reactive(objectPick(optionsDefaults, [
   kPopupWidth,
   kUpdateEnabledScriptsOnly,
 ]));
-const activeMenu = ref('scripts');
+const activeMenu = ref(SCRIPTS);
 const showSettings = ref();
 const extras = ref();
 const focusedItem = ref();
@@ -316,13 +316,13 @@ function makeInjectionScopes() {
   const enabledOnly = optionsData[kUpdateEnabledScriptsOnly];
   let updatableScripts;
   return [
-    injectable && ['scripts', i18n('menuMatchedScripts'), groupDisabled || null],
-    injectable && groupDisabled && ['disabled', i18n('menuMatchedDisabledScripts'), false],
-    ['frameScripts', i18n('menuMatchedFrameScripts')],
+    injectable && [0, SCRIPTS, i18n('menuMatchedScripts'), groupDisabled || null],
+    injectable && groupDisabled && [0, 'disabled', i18n('menuMatchedDisabledScripts'), false],
+    [1, 'frameScripts', i18n('menuMatchedFrameScripts')],
   ]
   .filter(Boolean)
-  .map(([name, title, groupByEnabled]) => {
-    let list = store[name] || store.scripts;
+  .map(([depth, name, title, groupByEnabled]) => {
+    let list = store[SCRIPTS][depth];
     if (groupByEnabled != null) {
       list = list.filter(script => !script.config.enabled === !groupByEnabled);
     }
@@ -361,6 +361,7 @@ function makeInjectionScopes() {
       return item;
     }).sort((a, b) => collator.compare(a.key, b.key));
     return numTotal && {
+      depth,
       name,
       title,
       list,
