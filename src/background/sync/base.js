@@ -699,6 +699,13 @@ let unregister;
 export async function openAuthPage(url, redirectUri) {
   unregister?.(); // otherwise our new tabId will be ignored
   const tabId = (await browser.tabs.create({ url })).id;
+  
+  // Manifest V3 doesn't support webRequest - skip auth interception
+  if (!browser.webRequest?.onBeforeRequest) {
+    if (process.env.DEBUG) console.warn('webRequest not available in Manifest V3 - auth flow may not work');
+    return;
+  }
+  
   /**
    * @param {chrome.webRequest.WebResponseDetails} info
    * @returns {chrome.webRequest.BlockingResponse}

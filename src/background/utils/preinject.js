@@ -34,16 +34,26 @@ let xhrInject = false; // must be initialized for proper comparison when togglin
 let xhrInjectKey;
 
 const sessionId = getUniqId();
-const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
+// Manifest V3 doesn't support webRequest API - check for availability
+const hasWebRequest = !!browser.webRequest?.onHeadersReceived;
+const API_HEADERS_RECEIVED = hasWebRequest ? browser.webRequest.onHeadersReceived : null;
 const API_CONFIG = {
   urls: ['*://*/*'], // `*` scheme matches only http and https
   types: ['main_frame', 'sub_frame'],
 };
-const API_EXTRA = [
-  'blocking', // used for xhrInject and to make Firefox fire the event before GetInjected
-  kResponseHeaders,
-  browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
-].filter(Boolean);
+const getAPIExtra = () => {
+  if (!hasWebRequest) return [];
+  const extra = [
+    'blocking', // used for xhrInject and to make Firefox fire the event before GetInjected
+    kResponseHeaders,
+  ];
+  // Safely access optional enum
+  if (browser.webRequest?.OnHeadersReceivedOptions?.EXTRA_HEADERS) {
+    extra.push(browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS);
+  }
+  return extra.filter(Boolean);
+};
+const API_EXTRA = getAPIExtra();
 const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
@@ -126,7 +136,7 @@ const OPT_HANDLERS = {
   defaultInjectInto(value) {
     value = normalizeRealm(value);
     cache.destroy();
-    if (injectInto) { // already initialized, so we should update the listener
+    if (injectInto && hasWebRequest) { // already initialized, so we should update the listener
       if (value === CONTENT) {
         API_HEADERS_RECEIVED.removeListener(onHeadersReceived);
       } else if (isApplied && IS_FIREFOX && !xhrInject) {
@@ -312,6 +322,8 @@ function toggleXhrInject(enable) {
   xhrInject = enable;
   xhrInjectKey ??= extensionRoot.match(XHR_COOKIE_RE)[1];
   cache.destroy();
+  // Skip webRequest calls in Manifest V3
+  if (!hasWebRequest) return;
   API_HEADERS_RECEIVED.removeListener(onHeadersReceived);
   if (enable) {
     API_HEADERS_RECEIVED.addListener(onHeadersReceived, API_CONFIG, API_EXTRA);
@@ -320,6 +332,17 @@ function toggleXhrInject(enable) {
 
 function togglePreinject(enable) {
   isApplied = enable;
+  // Skip webRequest setup in Manifest V3 - content scripts handle injection
+  if (!hasWebRequest) {
+    tabsOnRemoved[`${enable ? 'add' : 'remove'}Listener`](onTabRemoved);
+    browser.tabs.onReplaced[`${enable ? 'add' : 'remove'}Listener`](onTabReplaced);
+    if (!enable) {
+      cache.destroy();
+      clearFrameData();
+      clearStorageCache();
+    }
+    return;
+  }
   // Using onSendHeaders because onHeadersReceived in Firefox fires *after* content scripts.
   // And even in Chrome a site may be so fast that preinject on onHeadersReceived won't be useful.
   const onOff = `${enable ? 'add' : 'remove'}Listener`;

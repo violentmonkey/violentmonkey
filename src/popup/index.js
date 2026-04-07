@@ -35,22 +35,26 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
    * because we only show the iframe menu for unique scripts that don't run in the main page */
   const isTop = frameId === 0;
   if (!data[MORE]) {
-    Object.assign(data[IDS], await sendCmdDirectly('GetMoreIds', {
+    const moreIds = await sendCmdDirectly('GetMoreIds', {
       url,
       [kTop]: isTop,
       [IDS]: data[IDS],
-    }));
+    }).catch(err => {
+      if (process.env.DEBUG) console.warn('GetMoreIds failed:', err);
+      return {};
+    });
+    Object.assign(data[IDS], moreIds);
   }
   if (!isTop) await mutex;
   else {
     store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
   }
   // Ensuring top script's menu wins over a per-frame menu with different commands
-  const commands = store.commands = Object.assign(data.menus, !isTop && store.commands);
+  const commands = store.commands = Object.assign(data.menus || {}, !isTop && store.commands);
   const idMapAllFrames = store.idMap;
   const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
   const idMapOld = idMapAllFrames[frameId] || (idMapAllFrames[frameId] = {});
-  const idMap = data[IDS]::mapEntry(null, (id, val) => val !== idMapOld[id] && id);
+  const idMap = (data[IDS] || {})::mapEntry(null, (id, val) => val !== idMapOld[id] && id);
   const ids = Object.keys(idMap).map(Number);
   if (ids.length) {
     Object.assign(idMapOld, idMap);
@@ -58,8 +62,8 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const { frameScripts } = store;
     const scope = isTop ? store[SCRIPTS] : frameScripts;
     const { grantless } = data;
-    const metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id))
-      || (Object.assign(data, await sendCmdDirectly('GetData', { ids })))[SCRIPTS];
+    const metas = (data[SCRIPTS] || [])?.filter(({ props: { id } }) => ids.includes(id))
+      || (Object.assign(data, await sendCmdDirectly('GetData', { ids }).catch(() => ({}))))[SCRIPTS] || [];
     metas.forEach(script => {
       loadScriptIcon(script, data);
       let v;
@@ -115,7 +119,11 @@ function initMutex(delay = 100) {
 async function initialize() {
   initMutex();
   Object.assign(store, emptyStore());
-  let [cached, data, [failure, reason, reason2]] = await sendCmdDirectly('InitPopup');
+  let [cached, data, [failure, reason, reason2]] = await sendCmdDirectly('InitPopup').catch(err => {
+    // Service worker may not be ready yet, return default empty state
+    if (process.env.DEBUG) console.warn('InitPopup failed:', err);
+    return [null, { tab: { id: 0, url: '' }, scripts: [] }, ['', '', '']];
+  });
   if (!reason) {
     failure = '';
   } else if (reason === INJECT_INTO) {
@@ -137,8 +145,13 @@ async function initialize() {
     for (const id in cached) handlers.SetPopup(...cached[id]);
   }
   if (!port) {
-    port = browser.runtime.connect({ name: `Popup:${cached ? 'C' : ''}:${data.tab.id}` });
-    port.onMessage.addListener(initialize); // for non-injectable tab
+    try {
+      port = browser.runtime.connect({ name: `Popup:${cached ? 'C' : ''}:${data.tab.id}` });
+      if (port) port.onMessage.addListener(initialize); // for non-injectable tab
+    } catch (err) {
+      if (process.env.DEBUG) console.warn('Port connection failed:', err);
+      port = null;
+    }
   }
 }
 

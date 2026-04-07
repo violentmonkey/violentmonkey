@@ -18,7 +18,7 @@ async function buildManifest(base) {
     // Do not support i18n in beta version
     const name = 'Feature Injector BETA';
     data.name = name;
-    data.browser_action.default_title = name;
+    data.action.default_title = name;
   }
   return data;
 }
@@ -50,15 +50,27 @@ class ListBackgroundScriptsPlugin {
       const dist = compilation.outputOptions.path;
       const path = `${dist}/manifest.json`;
       const manifest = await buildManifest();
+      
+      // Get the compiled background script file from webpack
       const bgId = 'background/index';
       const bgEntry = compilation.entrypoints.get(bgId);
-      const scripts = bgEntry.chunks.flatMap(c => [...c.files]);
-      if (`${manifest.background.scripts}` !== `${scripts}`) {
-        manifest.background.scripts = scripts;
-        await fs.writeFile(path,
-          JSON.stringify(manifest, null, this.minify ? 0 : 2),
-          { encoding: 'utf8' });
+      
+      if (bgEntry) {
+        // Get the compiled background script files
+        const bgScripts = bgEntry.chunks.flatMap(c => [...c.files]);
+        if (bgScripts.length > 0) {
+          // Firefox v109+ uses background.scripts array (Manifest V3)
+          // Chrome uses background.service_worker
+          // Set both for compatibility - each browser will use the appropriate one
+          if (!manifest.background) manifest.background = {};
+          manifest.background.scripts = bgScripts;
+          manifest.background.service_worker = bgScripts[0];
+        }
       }
+      
+      await fs.writeFile(path,
+        JSON.stringify(manifest, null, this.minify ? 0 : 2),
+        { encoding: 'utf8' });
     });
   }
 }

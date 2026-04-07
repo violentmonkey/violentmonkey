@@ -40,9 +40,11 @@ const API_FILTER = {
   urls: ['<all_urls>'],
   types: ['xmlhttprequest'],
 };
-const EXTRA_HEADERS = [
+// Manifest V3 doesn't have webRequest API
+const hasWebRequest = !!browser.webRequest?.onBeforeSendHeaders;
+const EXTRA_HEADERS = hasWebRequest ? [
   browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
-].filter(Boolean);
+].filter(Boolean) : [];
 const headersToInject = {};
 /** @param {chrome.webRequest.HttpHeader} header */
 const isVmVerify = header => header.name === VM_VERIFY;
@@ -123,18 +125,24 @@ export function toggleHeaderInjector(reqId, headers) {
      * Registering just once to avoid a bug in Chrome:
      * it adds a new internal registration even if the function reference is the same */
     if (isEmpty(headersToInject)) {
-      API_EVENTS::forEachEntry(([name, [listener, ...options]]) => {
-        browser.webRequest[name].addListener(listener, API_FILTER, options);
-      });
+      // Skip in Manifest V3 where webRequest is not available
+      if (hasWebRequest) {
+        API_EVENTS::forEachEntry(([name, [listener, ...options]]) => {
+          browser.webRequest[name].addListener(listener, API_FILTER, options);
+        });
+      }
     }
     // Adding even if empty so that the toggle-off `if` runs just once even when called many times
     headersToInject[reqId] = headers;
   } else if (reqId in headersToInject) {
     delete headersToInject[reqId];
     if (isEmpty(headersToInject)) {
-      API_EVENTS::forEachEntry(([name, [listener]]) => {
-        browser.webRequest[name].removeListener(listener);
-      });
+      // Skip in Manifest V3 where webRequest is not available
+      if (hasWebRequest) {
+        API_EVENTS::forEachEntry(([name, [listener]]) => {
+          browser.webRequest[name].removeListener(listener);
+        });
+      }
     }
   }
 }
@@ -195,6 +203,7 @@ function string2byteString(str) {
 
 // Chrome 74-91 needs an extraHeaders listener at tab load start, https://crbug.com/1074282
 // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
-if (CHROME >= 74 && CHROME <= 91) {
+// Skip in Manifest V3 where webRequest is not available
+if (hasWebRequest && CHROME >= 74 && CHROME <= 91) {
   browser.webRequest.onBeforeSendHeaders.addListener(noop, API_FILTER, EXTRA_HEADERS);
 }

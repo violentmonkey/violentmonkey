@@ -95,9 +95,14 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
-      browser.tabs.executeScript(tabId, {
-        code: `console.warn(${JSON.stringify(error)})`,
-      });
+      // Manifest V3 doesn't support tabs.executeScript
+      if (browser.tabs.executeScript) {
+        browser.tabs.executeScript(tabId, {
+          code: `console.warn(${JSON.stringify(error)})`,
+        }).catch(() => {}); // Silent fail in case of permission issues
+      } else if (process.env.DEBUG) {
+        console.warn('tabs.executeScript not available - error console logging skipped');
+      }
       browser.tabs.update(tabId, { url });
     }
   }
@@ -129,33 +134,35 @@ browser.tabs.onCreated.addListener((tab) => {
   }
 });
 
-browser.webRequest.onBeforeRequest.addListener((req) => {
-  const { method, tabId, url } = req;
-  if (method !== 'GET') {
-    return;
-  }
-  // open a real URL for simplified userscript URL listed in devtools of the web page
-  if (url.startsWith(extensionRoot)) {
-    return { redirectUrl: resolveVirtualUrl(url) };
-  }
-  let isWhitelisted;
-  if (!cache.has(`bypass:${url}`)
-  && ((isWhitelisted = whitelistRe.test(url)) || !blacklistRe.test(url))) {
-    maybeInstallUserJs(tabId, url, isWhitelisted);
-    return IS_FIREFOX
-      ? { cancel: true } // for sites with strict CSP in FF
-      : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
-  }
-}, {
-  urls: [
-    // 1. *:// comprises only http/https
-    // 2. the API ignores #hash part
-    // 3. Firefox: onBeforeRequest does not work with file:// or moz-extension://
-    '*://*/*.user.js',
-    '*://*/*.user.js?*',
-    `${FILE_GLOB_ALL}.user.js`,
-    `${FILE_GLOB_ALL}.user.js?*`,
-    `${extensionRoot}*.user.js`,
-  ],
-  types: ['main_frame'],
-}, ['blocking']);
+if (browser.webRequest?.onBeforeRequest) {
+  browser.webRequest.onBeforeRequest.addListener((req) => {
+    const { method, tabId, url } = req;
+    if (method !== 'GET') {
+      return;
+    }
+    // open a real URL for simplified userscript URL listed in devtools of the web page
+    if (url.startsWith(extensionRoot)) {
+      return { redirectUrl: resolveVirtualUrl(url) };
+    }
+    let isWhitelisted;
+    if (!cache.has(`bypass:${url}`)
+    && ((isWhitelisted = whitelistRe.test(url)) || !blacklistRe.test(url))) {
+      maybeInstallUserJs(tabId, url, isWhitelisted);
+      return IS_FIREFOX
+        ? { cancel: true } // for sites with strict CSP in FF
+        : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
+    }
+  }, {
+    urls: [
+      // 1. *:// comprises only http/https
+      // 2. the API ignores #hash part
+      // 3. Firefox: onBeforeRequest does not work with file:// or moz-extension://
+      '*://*/*.user.js',
+      '*://*/*.user.js?*',
+      `${FILE_GLOB_ALL}.user.js`,
+      `${FILE_GLOB_ALL}.user.js?*`,
+      `${extensionRoot}*.user.js`,
+    ],
+    types: ['main_frame'],
+  }, ['blocking']);
+}

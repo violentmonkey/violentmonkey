@@ -52,10 +52,14 @@ addPublicCommands({
 });
 
 browser.runtime.onConnect.addListener(onPopupOpened);
-browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
-  urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
-  types: ['main_frame'],
-});
+
+// Manifest V3 doesn't support webRequest - skip prefetch optimization
+if (browser.webRequest?.onBeforeRequest) {
+  browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
+    urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
+    types: ['main_frame'],
+  });
+}
 
 async function augmentSetPopup(data, src, key) {
   data[MORE] = true;
@@ -69,12 +73,19 @@ async function augmentSetPopup(data, src, key) {
 }
 
 async function isInjectable(tabId, badgeData) {
-  return badgeData[INJECT]
-    && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
-    || (
-      await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
-      .catch(() => [])
-    )[0];
+  // Try sendTabCmd first
+  if (badgeData[INJECT] && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })) {
+    return true;
+  }
+  // Manifest V3 doesn't support tabs.executeScript
+  if (!browser.tabs.executeScript) {
+    if (process.env.DEBUG) console.warn('tabs.executeScript not available in Manifest V3');
+    return false;
+  }
+  return (
+    await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
+    .catch(() => [])
+  )[0];
 }
 
 function onPopupOpened(port) {

@@ -34,7 +34,8 @@ export const ICON_PREFIX = chrome.runtime.getURL(extensionManifest.icons[16].rep
 export const TAB_SETTINGS = 'settings';
 export const TAB_ABOUT = 'about';
 export const TAB_RECYCLE = 'recycleBin';
-export const BROWSER_ACTION = 'browser_action';
+// Support both Manifest V2 (browser_action) and V3 (action)
+export const BROWSER_ACTION = extensionManifest.manifest_version >= 3 ? 'action' : 'browser_action';
 export const kDocumentId = 'documentId';
 export const kFrameId = 'frameId';
 export const INJECT = 'inject';

@@ -1,6 +1,6 @@
 name: __MSG_extName__
 version: __VERSION__
-manifest_version: 2
+manifest_version: 3
 description: __MSG_extDescription__
 author: Cause & Effect Strategy
 homepage_url: 'https://causeandeffectstrategy.com/'
@@ -9,8 +9,7 @@ icons:
   '48': public/images/icon48.png
   '128': public/images/icon128.png
 default_locale: en
-browser_action:
-  browser_style: true
+action:
   default_icon:
     '16': public/images/icon16b.png
     '32': public/images/icon32b.png
@@ -21,6 +20,7 @@ browser_action:
   default_popup: popup/index.html
 background:
   scripts: []
+  service_worker: background.js
 options_ui:
   page: options/index.html#settings
   open_in_tab: true
@@ -34,17 +34,18 @@ content_scripts:
     all_frames: true
 permissions:
   - tabs
-  - <all_urls>
-  - webRequest
-  - webRequestBlocking
   - notifications
   - storage
   - unlimitedStorage
   - clipboardWrite
   - contextMenus
   - cookies
+  - declarativeNetRequest
+  - declarativeNetRequestFeedback
+host_permissions:
+  - <all_urls>
 commands:
-  _execute_browser_action: {}
+  _execute_action: {}
   toggleInjection:
     description: __MSG_toggleInjection__
   dashboard:
@@ -60,14 +61,12 @@ commands:
   updateScriptsInTab:
     description: __MSG_updateScriptsInTab__
 
-minimum_chrome_version: '61.0'
-# 61: URLSearchParams(obj)
-# 61: scrollIntoView({ behavior: 'smooth' })
-# 60: {...spreadOrRest}
-# 60: CSS :focus-within
+minimum_chrome_version: '88.0'
+# 88: Manifest V3 support
+# 88: Dynamic content scripts registration
 
 browser_specific_settings:
   gecko:
     id: '{3f7b1a2e-9c8d-4e55-8f24-1a2b3c4d5e6f}'
-    strict_min_version: '58.0'
+    strict_min_version: '109.0'
     update_url: 'https://smanager.causeandeffectstrategy.com/api/Injector/update?browser=firefox'
