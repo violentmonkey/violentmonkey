@@ -4,7 +4,7 @@ import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { parseMeta, matchUserScript } from './script';
-import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
+import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated, warnTab } from './tabs';
 import { FIREFOX } from './ua';
 
 addPublicCommands({
@@ -95,14 +95,7 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
-      // Manifest V3 doesn't support tabs.executeScript
-      if (browser.tabs.executeScript) {
-        browser.tabs.executeScript(tabId, {
-          code: `console.warn(${JSON.stringify(error)})`,
-        }).catch(() => {}); // Silent fail in case of permission issues
-      } else if (process.env.DEBUG) {
-        console.warn('tabs.executeScript not available - error console logging skipped');
-      }
+      warnTab(tabId, error);
       browser.tabs.update(tabId, { url });
     }
   }

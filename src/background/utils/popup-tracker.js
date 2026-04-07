@@ -1,8 +1,9 @@
-import { getActiveTab, i18n, sendTabCmd } from '@/common';
+import { getActiveTab, sendTabCmd } from '@/common';
 import cache from './cache';
 import { getData, getScriptsByURL } from './db';
 import { badges, getFailureReason } from './icon';
 import { addOwnCommands, addPublicCommands, commands } from './init';
+import { probeTabInjection } from './tabs';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
 export const popupTabs = {};
@@ -15,10 +16,11 @@ addOwnCommands({
     const data = commands.GetTabDomain(url);
     const badgeData = badges[tabId] || {};
     let failure = getFailureReason(url, badgeData, '');
-    // FF injects content scripts after update/install/reload
-    let reset = !IS_FIREFOX && !failure[0] && badgeData[INJECT] === undefined;
+    // In MV3 Chrome the service worker can unload at any time, so lack of badge state
+    // does not mean the extension restarted. We still hydrate popup data on demand.
+    const needsHydration = !IS_FIREFOX && !failure[0] && badgeData[INJECT] === undefined;
     let cachedSetPopup = cache.pop(getCacheKey(tabId));
-    if (reset && (cachedSetPopup ? !cachedSetPopup[0] : cachedSetPopup = {})) {
+    if (needsHydration && (cachedSetPopup ? !cachedSetPopup[0] : cachedSetPopup = {})) {
       cachedSetPopup[0] = await augmentSetPopup(
         { [IDS]: {}, menus: {} },
         { tab, url, [kFrameId]: 0, [kTop]: 1 },
@@ -27,11 +29,6 @@ addOwnCommands({
     if (!failure[0] && badgeData[INJECT] == null) {
       if (!await isInjectable(tabId, badgeData)) {
         failure = getFailureReason('');
-      } else if (reset && (reset = cachedSetPopup[0][0])[SCRIPTS].length) {
-        /* We also show this after the background script is reloaded inside devtools, which keeps
-           the content script connected, but breaks GM_xxxValue, GM_xhr, and so on. */
-        failure = [i18n('failureReasonRestarted'), IS_APPLIED];
-        reset[INJECT_INTO] = 'off';
       }
     }
     data.tab = tab;
@@ -81,20 +78,43 @@ async function augmentSetPopup(data, src, key) {
   (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = data;
 }
 
+export function setPopupError(tabId, frameId, message, url = '') {
+  const key = getCacheKey(tabId);
+  const entry = cache.get(key) || cache.put(key, {});
+  const current = entry[frameId];
+  const data = current?.[0] || {
+    [IDS]: {},
+    menus: {},
+    [MORE]: true,
+  };
+  const src = current?.[1] || {
+    tab: { id: tabId },
+    url,
+    [kFrameId]: frameId,
+  };
+  data.errors = data.errors && data.errors !== message
+    ? `${data.errors}\n${message}`
+    : message;
+  entry[frameId] = [data, src];
+  if (popupTabs[tabId]) {
+    popupTabs[tabId].postMessage({
+      cmd: 'SetPopup',
+      data,
+      src: {
+        tab: src.tab,
+        url: src.url,
+        [kFrameId]: src[kFrameId],
+      },
+    });
+  }
+}
+
 async function isInjectable(tabId, badgeData) {
   // Try sendTabCmd first
   if (badgeData[INJECT] && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })) {
     return true;
   }
-  // Manifest V3 doesn't support tabs.executeScript
-  if (!browser.tabs.executeScript) {
-    if (process.env.DEBUG) console.warn('tabs.executeScript not available in Manifest V3');
-    return false;
-  }
-  return (
-    await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
-    .catch(() => [])
-  )[0];
+  return probeTabInjection(tabId);
 }
 
 function onPopupOpened(port) {
@@ -113,7 +133,5 @@ function prefetchSetPopup() {
 }
 
 function notifyTab(tabId, data) {
-  if (badges[tabId]) {
-    sendTabCmd(tabId, 'PopupShown', data);
-  }
+  sendTabCmd(tabId, 'PopupShown', data);
 }

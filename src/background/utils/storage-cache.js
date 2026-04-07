@@ -131,11 +131,13 @@ export const cachedStorageApi = storage.api = {
 setInterval(() => {
   dbKeys.forEach((val, key) => !val && dbKeys.delete(key));
 }, TTL_TINY);
-window[WATCH_STORAGE] = fn => {
+const watchStorageGlobal = fn => {
   const id = performance.now();
   watchers[id] = fn;
   return id;
 };
+global[WATCH_STORAGE] = watchStorageGlobal;
+if (typeof window !== 'undefined') window[WATCH_STORAGE] = watchStorageGlobal;
 browser.runtime.onConnect.addListener(port => {
   if (port.name === 'undoImport') return undoImport(port);
   if (!port.name.startsWith(WATCH_STORAGE)) return;
@@ -240,7 +242,7 @@ async function undoImport(port) {
     await cachedStorageApi.set(old);
     port.postMessage(true);
     await sendCmd('Reload', delay);
-    location.reload();
+    global.location?.reload?.();
   });
   old = await api.get();
   if (!drop) port.postMessage(true);

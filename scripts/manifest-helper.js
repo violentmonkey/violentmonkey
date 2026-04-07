@@ -8,6 +8,14 @@ async function readManifest() {
   return data;
 }
 
+function getBrowserTarget() {
+  return (process.env.BROWSER || 'chrome').toLowerCase();
+}
+
+function isFirefoxTarget() {
+  return getBrowserTarget() === 'firefox';
+}
+
 async function buildManifest(base) {
   const data = base ? { ...base } : await readManifest();
   data.version = getVersion();
@@ -19,6 +27,22 @@ async function buildManifest(base) {
     const name = 'Feature Injector BETA';
     data.name = name;
     data.action.default_title = name;
+  }
+  if (!isFirefoxTarget()) {
+    data.permissions ||= [];
+    if (!data.permissions.includes('scripting')) {
+      data.permissions.push('scripting');
+    }
+    if (!data.permissions.includes('userScripts')) {
+      data.permissions.push('userScripts');
+    }
+  } else if (data.permissions) {
+    data.permissions = data.permissions.filter(permission => (
+      permission !== 'scripting' && permission !== 'userScripts'
+    ));
+  }
+  if (!isFirefoxTarget() && data.background) {
+    delete data.background.scripts;
   }
   return data;
 }
@@ -59,12 +83,13 @@ class ListBackgroundScriptsPlugin {
         // Get the compiled background script files
         const bgScripts = bgEntry.chunks.flatMap(c => [...c.files]);
         if (bgScripts.length > 0) {
-          // Firefox v109+ uses background.scripts array (Manifest V3)
-          // Chrome uses background.service_worker
-          // Set both for compatibility - each browser will use the appropriate one
           if (!manifest.background) manifest.background = {};
-          manifest.background.scripts = bgScripts;
           manifest.background.service_worker = bgScripts[0];
+          if (isFirefoxTarget()) {
+            manifest.background.scripts = bgScripts;
+          } else {
+            delete manifest.background.scripts;
+          }
         }
       }
       

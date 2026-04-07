@@ -18,6 +18,7 @@ let invokeContent;
 let nonce;
 let getAttribute;
 let querySelector;
+let forceContentAll;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -32,7 +33,7 @@ addHandlers({
   InjectList: IS_FIREFOX && injectPageList,
 });
 
-export function injectPageSandbox(data) {
+export async function injectPageSandbox(data) {
   pageInjectable = false;
   const VAULT_WRITER = data[kSessionId] + 'VW';
   const VAULT_WRITER_ACK = VAULT_WRITER + '*';
@@ -61,17 +62,21 @@ export function injectPageSandbox(data) {
     setOwnProp(global, VAULT_WRITER, tellBridgeToWriteVault, false);
   }
   if (useOpener(opener) || useOpener(window !== top && parent)) {
-    startHandshake();
+    await startHandshake();
   } else {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
      * environment and easily hack into our communication channel before our content scripts run.
      * Content scripts will see `document.opener = null`, not the original opener, so we have
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
-    inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
-      if (!IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
-        startHandshake();
-      }
+    await new SafePromise(resolve => {
+      inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
+        if (!IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
+          startHandshake().then(resolve);
+        } else {
+          resolve();
+        }
+      });
     });
   }
   return pageInjectable;
@@ -106,14 +111,21 @@ export function injectPageSandbox(data) {
    * Instead, we'll send the ids via a temporary handshakeId event, to which the web-bridge
    * will listen only during its initial phase using vault-protected DOM methods.
    * TODO: simplify this when strict_min_version >= 63 (attachShadow in FF) */
-  function startHandshake() {
+  async function startHandshake() {
     /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
      * otherwise a same-origin parent page could use it to spoof the handshake. */
     window::on(handshakeId, handshaker, { capture: true, once: true });
-    inject({
-      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
-        + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
-    });
+    const code = `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
+      + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`;
+    if (!IS_FIREFOX) {
+      try {
+        await sendCmd('InjectPageSandbox', { code }, { retry: true });
+      } catch (error) {
+        inject({ code });
+      }
+    } else {
+      inject({ code });
+    }
     // Clean up in case CSP prevented the script from running
     window::off(handshakeId, handshaker, true);
   }
@@ -144,10 +156,11 @@ export async function injectScripts(data, info, isXml) {
   bridgeInfo[PAGE] = info;
   bridgeInfo[CONTENT] = info;
   assign(bridge[CACHE], data[CACHE]);
+  forceContentAll = !IS_FIREFOX && !!data[FORCE_CONTENT];
   if (isXml || data[FORCE_CONTENT]) {
     pageInjectable = false;
   } else if (data[PAGE] && pageInjectable == null) {
-    injectPageSandbox(data);
+    await injectPageSandbox(data);
   }
   const toContent = data[SCRIPTS]
     .filter(scr => triageScript(scr) === CONTENT)
@@ -201,6 +214,7 @@ export async function injectScripts(data, info, isXml) {
   }
   // release for GC
   bridgeInfo = contLists = pageLists = VMInitInjection = null;
+  forceContentAll = null;
 }
 
 function didPageLoseInjectability(toContent, scripts) {
@@ -246,18 +260,20 @@ function sendFeedback(toContent, more) {
 
 function triageScript(script) {
   let realm = script[INJECT_INTO];
-  realm = (realm === AUTO && !pageInjectable) || realm === CONTENT
+  realm = forceContentAll || (realm === AUTO && !pageInjectable) || realm === CONTENT
     ? CONTENT
     : pageInjectable && PAGE;
   if (realm) {
+    const { [META_STR]: metaStr } = script;
+    const metaSource = metaStr[0] || isObject(script.code) && script.code[metaStr[1]];
     const lists = realm === CONTENT
       ? contLists || (contLists = createNullObj())
       : pageLists || (pageLists = createNullObj());
-    const { gmi, [META_STR]: metaStr, pathMap, [RUN_AT]: runAt } = script;
+    const { gmi, pathMap, [RUN_AT]: runAt } = script;
     const list = lists[runAt] || (lists[runAt] = []);
     safePush(list, script);
     setOwnProp(gmi, 'scriptMetaStr', metaStr[0]
-      || script.code[metaStr[1]]::slice(metaStr[2], metaStr[3]));
+      || (metaSource ? metaSource::slice(metaStr[2], metaStr[3]) : ''));
     delete script[META_STR];
     if (pathMap) bridge.pathMaps[script.id] = pathMap;
   } else {
@@ -293,8 +309,12 @@ function inject(item, iframeCb) {
   let iframeDoc;
   if (iframeCb) {
     iframe = makeElem('iframe', {
-      /* Preventing other content scripts */// eslint-disable-next-line no-script-url
-      src: 'javascript:void 0',
+      ...IS_FIREFOX
+        ? {
+          /* Preventing other content scripts */// eslint-disable-next-line no-script-url
+          src: 'javascript:void 0',
+        }
+        : { src: 'about:blank' },
       sandbox: 'allow-same-origin allow-scripts',
       style: 'display:none!important',
     });
@@ -363,10 +383,29 @@ async function injectPageList(runAt) {
       if (runAt === 'end') await 0;
       tardyQueueCheck([scr]);
       // Exposing window.vmXXX setter just before running the script to avoid interception
-      if (!scr.meta.unwrap) bridge.post('Plant', scr.key);
-      inject(scr);
+      if (!scr.meta.unwrap) bridge.post('Plant', {
+        ...scr.key,
+        keepAlive: !IS_FIREFOX,
+      });
+      if (!IS_FIREFOX) {
+        const code = isObject(scr.code) ? scr.code.join('') : scr.code;
+        try {
+          await sendCmd('InjectPageScript', {
+            code,
+            runAt: `document_${scr[RUN_AT]}`.replace('body', 'start'),
+          }, { retry: true });
+        } catch (error) {
+          inject(scr);
+        } finally {
+          if (!scr.meta.unwrap) bridge.post('CleanupPlant', scr.key);
+        }
+      } else {
+        inject(scr);
+      }
       scr.code = '';
-      if (scr.meta.unwrap) Run(scr.id);
+      if (scr.meta.unwrap) {
+        Run(scr.id);
+      }
     }
   }
 }
@@ -389,7 +428,9 @@ function setupContentInvoker() {
 function tardyQueueCheck(scripts) {
   for (const { id } of scripts) {
     if (tardyQueue[id]) {
-      if (bridgeIds[id] === 1) bridgeIds[id] = ID_INJECTING;
+      if (bridgeIds[id] === 1) {
+        bridgeIds[id] = ID_INJECTING;
+      }
       delete tardyQueue[id];
     }
   }

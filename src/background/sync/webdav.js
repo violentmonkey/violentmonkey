@@ -139,7 +139,7 @@ const WebDAV = BaseService.extend({
     const { anonymous, username, password } = config;
     if (anonymous) return true;
     if (!username || !password) return false;
-    const auth = window.btoa(`${username}:${password}`);
+    const auth = btoa(`${username}:${password}`);
     this.headers = { Authorization: `Basic ${auth}` };
     return true;
   },

@@ -1,6 +1,7 @@
 import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
 import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
+import { setPopupErrors } from './gm-api-content';
 import './notifications';
 import './requests';
 import './tabs';
@@ -12,16 +13,24 @@ const { [IDS]: ids } = bridge;
 
 // Detect CSP headers/meta tags for Manifest V3 compatibility (webRequest unavailable)
 function detectPageCsp() {
-  const cspMeta = document.querySelector('meta[http-equiv="content-security-policy"]');
-  const cspValue = cspMeta?.getAttribute('content') || '';
+  const cspValue = Array.from(document.querySelectorAll('meta[http-equiv]'))
+    .filter(meta => meta.getAttribute('http-equiv')?.toLowerCase() === 'content-security-policy')
+    .map(meta => meta.getAttribute('content') || '')
+    .filter(Boolean)
+    .join('; ');
+  const attrNonce = document.querySelector('script[nonce],style[nonce]')?.nonce
+    || document.querySelector('script[nonce],style[nonce]')?.getAttribute('nonce');
   const nonceMatch = cspValue.match(/'nonce-([^']+)'/);
-  const scriptSrc = cspValue.match(/script-src([^;]*)/);
-  const defaultSrc = cspValue.match(/default-src([^;]*)/);
+  const nonce = nonceMatch?.[1] || attrNonce;
+  const scriptSrc = cspValue.match(/(?:^|;)\s*script-src\s+([^;]*)/i);
+  const scriptElemSrc = cspValue.match(/(?:^|;)\s*script-src-elem\s+([^;]*)/i);
+  const defaultSrc = cspValue.match(/(?:^|;)\s*default-src\s+([^;]*)/i);
   const isStrict = scriptSrc && !scriptSrc[1].includes("'unsafe-inline'")
-    || defaultSrc && !defaultSrc[1].includes("'unsafe-inline'");
+    || scriptElemSrc && !scriptElemSrc[1].includes("'unsafe-inline'")
+    || !scriptSrc && !scriptElemSrc && defaultSrc && !defaultSrc[1].includes("'unsafe-inline'");
   return {
-    nonce: nonceMatch?.[1],
-    strict: cspValue && isStrict && !nonceMatch,
+    nonce,
+    strict: cspValue && isStrict && !nonce,
   };
 }
 
@@ -51,13 +60,14 @@ async function init() {
   const info = data.info;
   const injectInto = bridge[INJECT_INTO] = data[INJECT_INTO];
   assign(ids, data[IDS]);
+  setPopupErrors(data.errors);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
   }
   if (IS_FIREFOX && info) { // must redefine now as it's used by injectPageSandbox
     IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
-  if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
+  if (data[EXPOSE] != null && !isXml && !data[FORCE_CONTENT] && await injectPageSandbox(data)) {
     addHandlers({ GetScriptVer: true });
     bridge.post('Expose', data[EXPOSE]);
   }

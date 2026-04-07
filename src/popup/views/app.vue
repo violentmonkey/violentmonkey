@@ -150,7 +150,7 @@
       </div>
     </div>
     <div class="failure-reason" v-if="note || store.injectionFailure" :class="{note}">
-      <div v-text="note || i18n('menuInjectionFailed')"/>
+      <div v-text="note || store.injectionFailure?.text || i18n('menuInjectionFailed')"/>
       <a v-text="i18n('menuInjectionFailedFix')" href="#"
          v-if="!note && store.injectionFailure.fixable"
          @click.prevent="onInjectionFailureFix"/>

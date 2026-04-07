@@ -98,6 +98,7 @@ init.then(async () => {
   forEachTab(updateState);
   if (!isApplied) setIcon(); // sets the dimmed icon as default
   if (contextMenus) {
+    await new Promise(resolve => contextMenus.removeAll(resolve)).then(ignoreChromeErrors);
     const addToIcon = (id, title, opts) => (
       new Promise(resolve => (
         contextMenus.create({
@@ -222,11 +223,15 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
       || await (iconCache[url] || (iconCache[url] = loadIcon(url))) && iconDataCache[url];
   }
   // imageData doesn't work in Firefox Android, so we also set path here
-  browserAction.setIcon({
+  const dataToSet = {
     tabId,
     path: pathData,
-    imageData: iconData,
-  });
+  };
+  if (typeof ImageData !== 'undefined'
+  && Object.values(iconData).every(img => img instanceof ImageData)) {
+    dataToSet.imageData = iconData;
+  }
+  browserAction.setIcon(dataToSet);
 }
 
 /** Omitting `data` = check whether injection is allowed for `url` */
@@ -262,6 +267,10 @@ export function handleHotkeyOrMenu(id, tab) {
 }
 
 async function loadIcon(url) {
+  if (typeof Image === 'undefined' || typeof document === 'undefined') {
+    iconCache[url] = url;
+    return url;
+  }
   const img = new Image();
   const isOwn = url.startsWith(ICON_PREFIX);
   img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android

@@ -74,11 +74,18 @@ addHandlers({
   GetGrantless() {
     bridge.post('SetGrantless', grantlessUsage);
   },
-  async Plant({ data: dataKey, win: winKey }) {
+  async Plant({ data: dataKey, win: winKey, keepAlive }) {
     setOwnProp(window, winKey, onCodeSet, true, 'set');
+    if (keepAlive) {
+      return;
+    }
     /* Cleaning up for a script that didn't compile at all due to a syntax error.
      * Note that winKey can be intercepted via MutationEvent in this case. */
     await 0;
+    delete toRun[dataKey];
+    delete window[winKey];
+  },
+  CleanupPlant({ data: dataKey, win: winKey }) {
     delete toRun[dataKey];
     delete window[winKey];
   },
@@ -130,6 +137,9 @@ addHandlers({
 
 function onCodeSet(fn) {
   const item = toRun[fn.name];
+  if (!item) {
+    return;
+  }
   const el = document::getCurrentScript();
   const { gm, wrapper = global, grantless } = makeGmApiWrapper(item);
   if (grantless) grantlessUsage[item.id] = grantless;

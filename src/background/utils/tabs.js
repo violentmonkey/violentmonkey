@@ -8,7 +8,7 @@ import { vetUrl } from './url';
 
 const openers = {};
 const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
-  || !!(window.AbortSignal && browserWindows); // and FF57+ except mobile
+  || !!(globalThis.AbortSignal && browserWindows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
 export const NEWTAB_URL_RE = re`/
 ^(
@@ -40,6 +40,9 @@ export const getTabUrl = tab => (
 );
 export const tabsOnUpdated = browser.tabs.onUpdated;
 export const tabsOnRemoved = browser.tabs.onRemoved;
+export const canExecuteArbitraryCodeInTab = !!browser.tabs.executeScript;
+let canExecuteViaUserScripts = !IS_FIREFOX && !!browser.userScripts?.execute;
+let userScriptsChecked;
 export let injectableRe = /^(https?|file|ftps?):/;
 export let fileSchemeRequestable;
 let cookieStorePrefix;
@@ -77,6 +80,24 @@ addOwnCommands({
 });
 
 addPublicCommands({
+  InjectPageSandbox({ code, runAt = 'document_start' }, src) {
+    return executeArbitraryCodeInTab(
+      src.tab.id,
+      code,
+      src[kFrameId],
+      runAt,
+      'MAIN',
+    );
+  },
+  InjectPageScript({ code, runAt = 'document_start' }, src) {
+    return executeArbitraryCodeInTab(
+      src.tab.id,
+      code,
+      src[kFrameId],
+      runAt,
+      'MAIN',
+    );
+  },
   /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
   async TabOpen({
     url,
@@ -240,5 +261,119 @@ export async function reloadTabForScript(script) {
   const { url, id } = await getActiveTab();
   if (injectableRe.test(url) && testScript(url, script)) {
     return browser.tabs.reload(id);
+  }
+}
+
+export async function probeTabInjection(tabId, frameId = 0) {
+  await refreshUserScriptsAvailability();
+  if (canExecuteViaUserScripts) {
+    const result = await executeUserScriptCode(tabId, 'window.__FI_PROBE__ = 1;', frameId)
+      .catch(noop);
+    return result?.length >= 0;
+  }
+  if (browser.scripting?.executeScript) {
+    const result = await browser.scripting.executeScript({
+      target: {
+        tabId,
+        ...(frameId > 0 && { frameIds: [frameId] }),
+      },
+      injectImmediately: true,
+      func: () => 1,
+    }).catch(noop);
+    return result?.[0]?.result;
+  }
+  if (!browser.tabs.executeScript) {
+    return false;
+  }
+  return (
+    await browser.tabs.executeScript(tabId, {
+      code: '1',
+      [RUN_AT]: 'document_start',
+      [kFrameId]: frameId,
+    }).catch(() => [])
+  )[0];
+}
+
+export function warnTab(tabId, message, frameId = 0) {
+  return logTabConsole(tabId, 'warn', message, frameId);
+}
+
+export function debugTab(tabId, message, frameId = 0) {
+  return logTabConsole(tabId, 'info', message, frameId);
+}
+
+function logTabConsole(tabId, level, message, frameId = 0) {
+  if (browser.scripting?.executeScript) {
+    return browser.scripting.executeScript({
+      target: {
+        tabId,
+        ...(frameId > 0 && { frameIds: [frameId] }),
+      },
+      func: (lvl, text) => console[lvl](text),
+      args: [level, message],
+    }).catch(noop);
+  }
+  if (browser.tabs.executeScript) {
+    return browser.tabs.executeScript(tabId, {
+      code: `console.${level}(${JSON.stringify(message)})`,
+      [kFrameId]: frameId,
+    }).catch(noop);
+  }
+  return Promise.resolve();
+}
+
+export function canExecuteDynamicCodeInTab() {
+  return canExecuteArbitraryCodeInTab || canExecuteViaUserScripts;
+}
+
+export async function refreshUserScriptsAvailability() {
+  if (IS_FIREFOX || userScriptsChecked && canExecuteViaUserScripts) return canExecuteViaUserScripts;
+  try {
+    if (!browser.userScripts?.getScripts) {
+      canExecuteViaUserScripts = false;
+    } else {
+      await browser.userScripts.getScripts();
+      canExecuteViaUserScripts = true;
+    }
+  } catch {
+    canExecuteViaUserScripts = false;
+  }
+  userScriptsChecked = true;
+  return canExecuteViaUserScripts;
+}
+
+export function executeArbitraryCodeInTab(tabId, code, frameId = 0, runAt = 'document_start', world = 'USER_SCRIPT') {
+  if (browser.tabs.executeScript) {
+    return browser.tabs.executeScript(tabId, {
+      code,
+      [RUN_AT]: runAt,
+      [kFrameId]: frameId,
+    });
+  }
+  if (canExecuteViaUserScripts) {
+    return executeUserScriptCode(tabId, code, frameId, runAt, world);
+  }
+  return Promise.reject(new Error('No dynamic code execution API available'));
+}
+
+function executeUserScriptCode(tabId, code, frameId = 0, runAt = 'document_start', world = 'USER_SCRIPT') {
+  try {
+    return browser.userScripts.execute({
+      target: {
+        tabId,
+        ...(frameId > 0 && { frameIds: [frameId] }),
+      },
+      js: [{ code }],
+      injectImmediately: runAt === 'document_start',
+      world,
+    }).catch(err => {
+      canExecuteViaUserScripts = false;
+      userScriptsChecked = true;
+      throw err;
+    });
+  } catch (err) {
+    canExecuteViaUserScripts = false;
+    userScriptsChecked = true;
+    return Promise.reject(err);
   }
 }

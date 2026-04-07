@@ -31,6 +31,15 @@ Object.assign(handlers, {
 });
 
 async function setPopup(data, { [kFrameId]: frameId, url }) {
+  if (data.errors) {
+    store.failure = 'injection-error';
+    store.failureText = data.errors;
+    store.injectionFailure = {
+      ...store.injectionFailure,
+      fixable: !!store.injectionFailure?.fixable,
+      text: data.errors,
+    };
+  }
   /* SetPopup from a sub-frame may come first so we need to wait for the main page
    * because we only show the iframe menu for unique scripts that don't run in the main page */
   const isTop = frameId === 0;
@@ -90,7 +99,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
         script.grantless = i18n('hintGrantless', v.length > 50 ? v.slice(0, 50) + '...' : v);
       }
       script[MORE] = more;
-      script.syntax = state === ID_INJECTING;
+      script.syntax = state === ID_INJECTING && !data.errors;
       if (badRealm && !store.injectionFailure) {
         store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
       }

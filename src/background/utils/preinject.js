@@ -15,6 +15,7 @@ import { addOwnCommands, addPublicCommands } from './init';
 import { clearNotifications } from './notifications';
 import { hookOptionsInit } from './options';
 import { popupTabs } from './popup-tracker';
+import { setPopupError } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
 import { kSetCookie } from './requests-core';
 import { updateVisitedTime } from './script';
@@ -23,7 +24,16 @@ import {
   S_VALUE_PRE,
 } from './storage';
 import { clearStorageCache, onStorageChanged } from './storage-cache';
-import { getFrameDocId, getFrameDocIdAsObj, tabsOnRemoved } from './tabs';
+import {
+  canExecuteArbitraryCodeInTab,
+  canExecuteDynamicCodeInTab,
+  executeArbitraryCodeInTab,
+  getFrameDocId,
+  getFrameDocIdAsObj,
+  refreshUserScriptsAvailability,
+  tabsOnRemoved,
+  warnTab,
+} from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
 import { ua } from './ua';
 
@@ -32,6 +42,7 @@ let injectInto;
 let ffInject;
 let xhrInject = false; // must be initialized for proper comparison when toggling
 let xhrInjectKey;
+const CHROME_USER_SCRIPTS_WARNING = 'Feature Injector: Chrome MV3 requires Allow User Scripts to be enabled in the extension details page to execute userscripts on this page.';
 
 const sessionId = getUniqId();
 // Manifest V3 doesn't support webRequest API - check for availability
@@ -114,7 +125,7 @@ const normalizeScriptRealm = (custom, meta) => (
   normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO])
 );
 const isContentRealm = (val, force) => (
-  val === CONTENT || val === AUTO && force
+  force && !IS_FIREFOX || val === CONTENT || val === AUTO && force
 );
 /** @param {chrome.webRequest.WebRequestHeadersDetails | chrome.webRequest.WebResponseHeadersDetails} info */
 const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameId];
@@ -178,6 +189,9 @@ addPublicCommands({
     const bagKey = getKey(url, isTop);
     const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
     const bag = bagP[INJECT] ? bagP : await bagP[PROMISE];
+    if (!IS_FIREFOX && !hasWebRequest) {
+      await refreshUserScriptsAvailability();
+    }
     // Manifest V3: Use CSP info from content script when webRequest unavailable
     if (!hasWebRequest && csp?.nonce) {
       bag[INJECT].nonce = csp.nonce;
@@ -188,8 +202,17 @@ addPublicCommands({
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[SCRIPTS];
+    if (!IS_FIREFOX && !hasWebRequest && scripts?.length && !canExecuteDynamicCodeInTab()) {
+      inject.errors = [inject.errors, CHROME_USER_SCRIPTS_WARNING].filter(Boolean).join('\n');
+      if (isTop) {
+        warnTab(tabId, CHROME_USER_SCRIPTS_WARNING, frameId);
+      }
+    }
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
+      if (inject.errors) {
+        setPopupError(tabId, frameId, inject.errors, url);
+      }
       addValueOpener(scripts, tabId, frameDoc);
       if (isTop && scripts.length) {
         setBadge(scripts.map(({ props: { id } }) => id), true, src);
@@ -621,12 +644,17 @@ function triageRealms(scripts, forceContent, tabId, frameId, bag) {
   for (const /**@type{VMInjection.Script}*/ scr of scripts) {
     const metaStr = scr[META_STR];
     if (isContentRealm(scr[INJECT_INTO], forceContent)) {
-      if (!metaStr[0]) {
-        const [, i, from, to] = metaStr;
-        metaStr[0] = scr[__CODE][i].slice(from, to);
+      if (canExecuteDynamicCodeInTab()) {
+        if (!metaStr[0]) {
+          const [, i, from, to] = metaStr;
+          metaStr[0] = scr[__CODE][i].slice(from, to);
+        }
+        code = '';
+        toContent.push([scr.id, scr.key.data, !canExecuteArbitraryCodeInTab && !scr.meta[UNWRAP]]);
+      } else {
+        metaStr[0] = '';
+        code = ID_BAD_REALM;
       }
-      code = '';
-      toContent.push([scr.id, scr.key.data]);
     } else {
       metaStr[0] = '';
       code = forceContent ? ID_BAD_REALM : scr[__CODE];
@@ -649,14 +677,35 @@ function triagePageRealm(env, forceContent) {
 }
 
 function injectContentRealm(toContent, tabId, frameId) {
-  for (const [id, dataKey] of toContent) {
+  if (!canExecuteDynamicCodeInTab()) {
+    setPopupError(tabId, frameId, CHROME_USER_SCRIPTS_WARNING);
+    return;
+  }
+  for (const [id, dataKey, useMainWorld] of toContent) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
-    if (!scr || scr.key.data !== dataKey) continue;
-    browser.tabs.executeScript(tabId, {
-      code: scr[__CODE].join(''),
-      [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
-      [kFrameId]: frameId,
-    }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
+    if (!scr || scr.key.data !== dataKey) {
+      continue;
+    }
+    executeArbitraryCodeInTab(
+      tabId,
+      scr[__CODE].join(''),
+      frameId,
+      `document_${scr[RUN_AT]}`.replace('body', 'start'),
+      useMainWorld ? 'MAIN' : 'USER_SCRIPT',
+    ).then((results) => {
+      const error = results?.find?.(res => res?.error)?.error;
+      if (error) {
+        setPopupError(tabId, frameId, `${scr.displayName}: ${error}`);
+        sendTabCmd(tabId, 'SetPopupError', `${scr.displayName}: ${error}`, { [kFrameId]: frameId });
+        return;
+      }
+      if (scr.meta[UNWRAP]) {
+        sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId });
+      }
+    }, (error) => {
+      setPopupError(tabId, frameId, `${scr.displayName}: ${error?.message || error}`);
+      sendTabCmd(tabId, 'SetPopupError', `${scr.displayName}: ${error?.message || error}`, { [kFrameId]: frameId });
+    });
   }
 }
 

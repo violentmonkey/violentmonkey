@@ -9,6 +9,7 @@ const { [IDS]: ids } = bridge;
 let setPopupThrottle;
 let isPopupShown;
 let grantlessUsage;
+let injectionErrors;
 
 addBackgroundHandlers({
   async PopupShown(state) {
@@ -18,6 +19,11 @@ addBackgroundHandlers({
       bridge.post('GetGrantless', null, realm);
     }
     sendSetPopup();
+  },
+  SetPopupError(message) {
+    injectionErrors = message;
+    logging.warn(message);
+    sendSetPopup(true);
   },
 }, true);
 
@@ -66,8 +72,13 @@ export async function sendSetPopup(isDelayed) {
     await sendCmd('SetPopup', {
       [IDS]: ids,
       [INJECT_INTO]: bridge[INJECT_INTO],
+      errors: injectionErrors,
       grantless: grantlessUsage,
       menus,
     });
   }
+}
+
+export function setPopupErrors(errors) {
+  injectionErrors = errors;
 }
