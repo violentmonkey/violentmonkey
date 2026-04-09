@@ -16,8 +16,8 @@
         <locale-group i18n-key="labelLicenseKey">
           <input
             v-model="settings.licenseKey"
-            type="password"
-            placeholder="••••••••••••••••"
+            type="Text"
+            placeholder="SMGR-XXXX-XXXX-XXXX"
             class="w-full"
           />
         </locale-group>

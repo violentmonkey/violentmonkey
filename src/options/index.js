@@ -1,6 +1,6 @@
 import '@/common/browser';
 import {
-  formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmdDirectly, trueJoin,
+  formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmd, trueJoin,
 } from '@/common';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
@@ -68,7 +68,8 @@ export function loadData() {
 
 async function requestData(id) {
   const [data] = await Promise.all([
-    sendCmdDirectly('GetData', { id, sizes: true }, { retry: true }),
+    // Firefox can expose dead background-page objects in direct calls during live updates.
+    sendCmd('GetData', { id, sizes: true }, { retry: true }),
     options.ready,
   ]);
   const { [SCRIPTS]: allScripts, sizes, ...auxData } = data;
@@ -112,7 +113,7 @@ function initMain() {
       if (!script) return; // We're in editor that doesn't have data for all scripts
       const removed = update.config?.removed;
       const oldTags = oldScript?.custom.tags;
-      const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
+      const [sizes] = await sendCmd('GetSizes', [where.id]);
       const { search } = store;
       Object.assign(script, update);
       if (script.error && !update.error) script.error = null;

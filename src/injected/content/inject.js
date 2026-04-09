@@ -63,6 +63,15 @@ export async function injectPageSandbox(data) {
   }
   if (useOpener(opener) || useOpener(window !== top && parent)) {
     await startHandshake();
+  } else if (!IS_FIREFOX) {
+    await startHandshake();
+    if (!pageInjectable) {
+      await new SafePromise(resolve => {
+        inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
+          startHandshake().then(resolve);
+        });
+      });
+    }
   } else {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
      * environment and easily hack into our communication channel before our content scripts run.

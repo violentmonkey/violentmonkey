@@ -678,7 +678,9 @@ function triagePageRealm(env, forceContent) {
 
 function injectContentRealm(toContent, tabId, frameId) {
   if (!canExecuteDynamicCodeInTab()) {
-    setPopupError(tabId, frameId, CHROME_USER_SCRIPTS_WARNING);
+    if (!IS_FIREFOX && !hasWebRequest) {
+      setPopupError(tabId, frameId, CHROME_USER_SCRIPTS_WARNING);
+    }
     return;
   }
   for (const [id, dataKey, useMainWorld] of toContent) {

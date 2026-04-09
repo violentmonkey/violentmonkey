@@ -81,22 +81,10 @@ addOwnCommands({
 
 addPublicCommands({
   InjectPageSandbox({ code, runAt = 'document_start' }, src) {
-    return executeArbitraryCodeInTab(
-      src.tab.id,
-      code,
-      src[kFrameId],
-      runAt,
-      'MAIN',
-    );
+    return executeMainWorldCodeInSenderTab(src, code, runAt);
   },
   InjectPageScript({ code, runAt = 'document_start' }, src) {
-    return executeArbitraryCodeInTab(
-      src.tab.id,
-      code,
-      src[kFrameId],
-      runAt,
-      'MAIN',
-    );
+    return executeMainWorldCodeInSenderTab(src, code, runAt);
   },
   /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
   async TabOpen({
@@ -298,10 +286,6 @@ export function warnTab(tabId, message, frameId = 0) {
   return logTabConsole(tabId, 'warn', message, frameId);
 }
 
-export function debugTab(tabId, message, frameId = 0) {
-  return logTabConsole(tabId, 'info', message, frameId);
-}
-
 function logTabConsole(tabId, level, message, frameId = 0) {
   if (browser.scripting?.executeScript) {
     return browser.scripting.executeScript({
@@ -354,6 +338,16 @@ export function executeArbitraryCodeInTab(tabId, code, frameId = 0, runAt = 'doc
     return executeUserScriptCode(tabId, code, frameId, runAt, world);
   }
   return Promise.reject(new Error('No dynamic code execution API available'));
+}
+
+function executeMainWorldCodeInSenderTab(src, code, runAt = 'document_start') {
+  return executeArbitraryCodeInTab(
+    src.tab.id,
+    code,
+    src[kFrameId],
+    runAt,
+    'MAIN',
+  );
 }
 
 function executeUserScriptCode(tabId, code, frameId = 0, runAt = 'document_start', world = 'USER_SCRIPT') {
