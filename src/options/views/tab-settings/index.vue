@@ -63,7 +63,7 @@
               </locale-group> <ruby v-text="i18n('labelXhrInjectNote')"/>
             </setting-check>
           </tooltip>
-          <label v-if="!settings.xhrInject">
+          <label>
             <setting-check name="ffInject"/>
             <tooltip :content="i18n('labelFastFirefoxInjectHint')">
               <locale-group i18n-key="labelFastFirefoxInject">

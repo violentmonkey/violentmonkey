@@ -91,9 +91,14 @@ const propsToClear = {
   [S_VALUE_PRE]: VALUE_IDS,
 };
 const expose = {};
-const resolveDataCodeStr = `(${(global, data) => {
-  if (global.vmResolve) global.vmResolve(data); // `window` is a const which is inaccessible here
-  else global.vmData = data; // Ran earlier than the main content script so just drop the payload
+const resolveDataCodeStr = `(${(global, key, data) => {
+  // Using `global` and `key` as parameters because global consts aren't accessible here
+  if (typeof global[key] === 'function') {
+    global[key](data);
+  } else if (global[process.env.INIT_FUNC_NAME] !== 1) { // eslint-disable-line no-undef
+    // Ran earlier than the main content script so let's just drop the payload
+    global[key] = data;
+  }
 }})`;
 const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
@@ -637,7 +642,7 @@ function registerScriptDataFF(inject, url) {
   }
   return contentScriptsAPI.register({
     js: [{
-      code: `${resolveDataCodeStr}(this,${JSON.stringify(inject)})`,
+      code: `${resolveDataCodeStr}(this,"${VIOLENTMONKEY}",${JSON.stringify(inject)})`,
     }],
     matches: [url.split('#', 1)[0].replace(/\*/g, '\\$&')], // escape `*` in the URL itself
     [RUN_AT]: 'document_start',
