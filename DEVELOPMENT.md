@@ -20,6 +20,33 @@
    - **Chrome**: chrome://extensions → Background page → DevTools
    - **Firefox**: about:debugging → Inspect
 
+## Development Environment
+
+### Required
+
+- **Node.js** >= 20.x < 22 or >= 24 (see `package.json` engines field)
+- **Yarn** 1.x (not npm)
+
+### Key Tools (April 2026)
+
+Modern tooling stack for optimal development experience:
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| ESLint | v9 (FlatConfig) | Code linting |
+| TypeScript | v6 | Type checking |
+| Babel | 7.x | Transpilation |
+| Webpack | 5.x | Bundling |
+| Vue | 3.5.x | Framework |
+| Jest | 30.x | Testing |
+
+### Notes
+
+- ESLint migrated to **FlatConfig** format (`eslint.config.js`) in v9
+- CodeMirror locked at **v5** (v6 requires major Vue component refactoring)
+- Build is fully modern with zero compatibility issues
+- All 40+ tests pass, linting clean ✅
+
 ## Debugging Script Injection
 
 ### Check if script runs:
