@@ -385,7 +385,7 @@ labelAuthor:
   message: 'Автор: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Обновить текущую вкладку при включении или отключении скрипта из меню
+  message: Обновлять текущую вкладку при включении или отключении скрипта из меню
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
