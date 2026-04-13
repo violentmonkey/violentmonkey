@@ -20,6 +20,7 @@ export const store = reactive({
   title: null,
 });
 
+export const kComment = 'comment';
 export const kInclude = 'include';
 export const kMatch = 'match';
 export const kExclude = 'exclude';

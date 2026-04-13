@@ -430,6 +430,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Blacklist
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: Kommentar
 labelContributors:
   description: Label for link to contributors.
   message: Mitwirkende
@@ -506,10 +509,14 @@ labelHomepageURL:
   message: 'Homepage-URL:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: GM_cookie Zugriff auf HTTP-only-Cookies erlauben
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    Wenn aktiviert, können Skripte Cookies mit der HTTP-only-Flag lesen und in
+    diesen schreiben. Dies erlaubt Skripten auf Cookies zuzugreifen, bei denen
+    dieses via JavaScript nicht möglich wäre. Nutzen Sie dies mit Vorsicht, da
+    dies Sicherheitsrisiken bergen kann.
 labelIconURL:
   description: Label for the input.
   message: 'Icon-URL:'
@@ -593,10 +600,10 @@ labelRunAtDefault:
   message: (Standard)
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: (nur für Skripte, die diese Option in ihren Einstellungen aktiviert haben)
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: (diese Option muss ebenfalls in den globalen Einstellungen aktiviert sein)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Benutzerdefinierte Skriptvorlage
@@ -656,8 +663,8 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 'Benutzername: '
 labelTags:
-  description: Label for custom tags.
-  message: 'Tags (leerzeichen-separiert):'
+  description: Label for custom tags. Don't translate @tag.
+  message: '@tag / Tags'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Theme: '
@@ -1108,7 +1115,9 @@ updateScript:
   message: Aktualisierung
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: >-
+    Rechtsklick oder langer Touch, um ein Update inklusive der Abhängigkeiten zu
+    erzwingen
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Alle Skripte aktualisieren

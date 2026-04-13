@@ -1,3 +1,4 @@
+const { resolve } = require('path');
 const webpack = require('webpack');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
@@ -79,6 +80,10 @@ module.exports = [
     config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '../css/css$': resolve('src/common/ui/codemirror-ovr/css.js'),
+    };
     (config.ignoreWarnings ??= []).push({
       // suppressing a false warning (the HTML spec allows it) as we don't need SSR
       message: /<tr> cannot be child of <table>/,

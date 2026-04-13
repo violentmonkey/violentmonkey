@@ -1,4 +1,5 @@
-import { escapeStringForRegExp, normalizeTag } from '@/common';
+import { escapeStringForRegExp } from '@/common';
+import { kTag } from '@/common/consts';
 
 const reToken = re`/\s*
   (!)?
@@ -49,7 +50,6 @@ export function createSearchRules(search) {
       parsed: str,
     });
     if (prefix === '#') {
-      str = normalizeTag(str).replace(/\./g, '\\.');
       if (str) (negative ? excludeTags : includeTags).push(str);
     } else {
       if (re1 || re2) {
@@ -71,8 +71,9 @@ export function createSearchRules(search) {
   [includeTags, excludeTags].forEach((tags, negative) => {
     if (tags.length) {
       rules.unshift({
-        scope: 'tags',
-        re: new RegExp(`(?:^|\\s)(${tags.join('|').toLowerCase()})(\\s|$)`, 'u'),
+        scope: kTag,
+        // searching anywhere in a tag to enable incremental search
+        re: RegExp(tags.map(escapeStringForRegExp).join('|'), 'i'),
         negative: !!negative,
       });
     }
@@ -90,8 +91,10 @@ export function createSearchRules(search) {
  */
 export function testSearchRule({ re, negative, scope }) {
   return negative ^ (
-    re.test(this[scope || 'desc'])
-    || !scope && re.test(this.code)
+    (scope === kTag
+      ? this[kTag].some(re.test, re)
+      : re.test(this[scope || 'desc'])
+    ) || !scope && re.test(this.code)
   );
 }
 

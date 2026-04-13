@@ -670,7 +670,7 @@ export function autoSync() {
   if (!getOption('syncAutomatically')) {
     console.info('[sync] auto-sync disabled, check later');
     const service = getService();
-    service.prepare();
+    service?.prepare();
     return syncLater();
   }
   sync();

@@ -394,6 +394,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: 黑名單
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: ''
 labelContributors:
   description: Label for link to contributors.
   message: 貢獻者
@@ -616,8 +619,8 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 使用者名稱：
 labelTags:
-  description: Label for custom tags.
-  message: 標籤（以空格分隔）：
+  description: Label for custom tags. Don't translate @tag.
+  message: '@tag / 標籤'
 labelTheme:
   description: Label for the visual theme option.
   message: 佈景主題：

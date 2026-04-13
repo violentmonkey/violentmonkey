@@ -1,4 +1,4 @@
-import { HOMEPAGE_URL, INFERRED, RUN_AT_RE, SUPPORT_URL } from './consts';
+import { HOMEPAGE_URL, INFERRED, kTag, RUN_AT_RE, SUPPORT_URL } from './consts';
 import { getLocaleString } from './string';
 import { i18n, tryUrl } from './util';
 
@@ -68,11 +68,16 @@ export function getScriptPrettyUrl(script, displayName) {
 }
 
 export function getScriptsTags(scripts) {
-  const uniq = new Set();
-  for (const { custom: { tags } } of scripts) {
-    if (tags) tags.split(/\s+/).forEach(uniq.add, uniq);
+  // Collecting all tag arrays in a simple index
+  const all = [];
+  for (const { meta: { [kTag]: metaTags }, custom: { [kTag]: customTags } } of scripts) {
+    if (metaTags?.length) all.push(metaTags);
+    if (customTags?.length) all.push(customTags);
   }
-  return [...uniq].sort();
+  return all.length
+    // Flattening arrays + deduplicating, both in one super fast native op
+    ? [...new Set([].concat(...all))].sort()
+    : all;
 }
 
 /**

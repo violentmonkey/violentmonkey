@@ -18,9 +18,37 @@
                          :label="i18n('labelEnabledScriptsOnly')" />
         </div>
         <div class="ml-2c flex flex-col">
-          <setting-check name="notifyUpdates" :label="i18n('labelNotifyUpdates')" />
-          <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')"
-                         class="ml-2" />
+          <label>
+            <span v-text="i18n('labelInjectionMode')"></span>
+            <select v-for="opt in ['defaultInjectInto']" v-model="settings[opt]" :key="opt">
+              <option v-for="(_, mode) in items[opt]" :key="mode" v-text="mode" />
+            </select>
+            <a class="ml-1" :href="VM_HOME + 'posts/inject-into-context/'" v-bind="EXTERNAL_LINK_PROPS" v-text="i18n('learnInjectionMode')"/>
+          </label>
+          <tooltip :content="i18n('labelXhrInjectHint')">
+            <setting-check name="xhrInject">
+              <locale-group i18n-key="labelXhrInject">
+                <code>page</code>
+              </locale-group> <ruby v-text="i18n('labelXhrInjectNote')"/>
+            </setting-check>
+          </tooltip>
+          <label>
+            <setting-check name="ffInject"/>
+            <tooltip :content="i18n('labelFastFirefoxInjectHint')">
+              <locale-group i18n-key="labelFastFirefoxInject">
+                <code>page</code>
+              </locale-group>
+            </tooltip>
+          </label>
+        </div>
+        <div class="flex flex-col">
+          <locale-group i18n-key="labelExposeStatus">
+            <setting-check v-for="([key, host]) in expose" :key="host"
+                           :name="`expose.${key}`" class="ml-2 mr-1c">
+              <span v-text="host" />
+              <a :href="`https://${host}`" v-bind="EXTERNAL_LINK_PROPS">&nearr;</a>
+            </setting-check>
+          </locale-group>
         </div>
       </section>
       <vm-sync></vm-sync>

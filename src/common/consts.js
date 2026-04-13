@@ -90,3 +90,5 @@ export const GM4_ALIAS = {
   getResourceURL: 'getResourceUrl',
   xmlhttpRequest: 'xmlHttpRequest',
 };
+export const kOrigTag = 'origTag';
+export const kTag = 'tag';

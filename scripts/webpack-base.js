@@ -69,7 +69,7 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
 
 const splitVendor = prefix => ({
   [prefix]: {
-    test: new RegExp(`node_modules[/\\\\]${prefix}`),
+    test: new RegExp(prefix),
     name: `public/lib/${prefix}`,
     chunks: 'all',
     priority: 100,

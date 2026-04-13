@@ -418,6 +418,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: قائمة الحظر
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: ''
 labelContributors:
   description: Label for link to contributors.
   message: المساهمون
@@ -644,8 +647,8 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 'اسم المستخدم: '
 labelTags:
-  description: Label for custom tags.
-  message: 'الوسوم (مفصولة بمسافات):'
+  description: Label for custom tags. Don't translate @tag.
+  message: الوسوم @tag
 labelTheme:
   description: Label for the visual theme option.
   message: 'السمة: '
@@ -1081,7 +1084,7 @@ updateScript:
   message: تحديث
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: انقر بزر الماوس الأيمن أو المس مع الاستمرار لتحديث إجباري يشمل التبعيات
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: تحديث جميع السكربتات

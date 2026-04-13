@@ -424,6 +424,9 @@ labelBadgeUnique:
 labelBlacklist:
   description: Label for global blacklist settings in security section.
   message: Чорний список
+labelComment:
+  description: Label for a comment text in the script editor settings.
+  message: ''
 labelContributors:
   description: Label for link to contributors.
   message: Учасники
@@ -647,8 +650,8 @@ labelSyncUsername:
   description: Label for input to hold username.
   message: 'Ім''я користувача:'
 labelTags:
-  description: Label for custom tags.
-  message: Теги (розділені пробілом)
+  description: Label for custom tags. Don't translate @tag.
+  message: '@tag / теги'
 labelTheme:
   description: Label for the visual theme option.
   message: 'Тема:'

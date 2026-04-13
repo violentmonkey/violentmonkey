@@ -2,7 +2,7 @@ import '@/common/browser';
 import { i18n, sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadCommandIcon, loadScriptIcon } from '@/common/load-script-icon';
-import { mapEntry } from '@/common/object';
+import { forEachValue, mapEntry } from '@/common/object';
 import { render } from '@/common/ui';
 import '@/common/ui/style';
 import App from './views/app';
@@ -58,8 +58,8 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
   else {
     store[IS_APPLIED] = data[INJECT_INTO] !== 'off'; // isApplied at the time of GetInjected
   }
-  // Ensuring top script's menu wins over a per-frame menu with different commands
-  const commands = store.commands = Object.assign(data.menus || {}, !isTop && store.commands);
+  const depth = isTop ? 0 : 1;
+  const menus = Object.assign(store.menus[depth], data.menus);
   const idMapAllFrames = store.idMap;
   const idMapMain = idMapAllFrames[0] || (idMapAllFrames[0] = {});
   const idMapOld = idMapAllFrames[frameId] || (idMapAllFrames[frameId] = {});
@@ -67,9 +67,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
   const ids = Object.keys(idMap).map(Number);
   if (ids.length) {
     Object.assign(idMapOld, idMap);
-    // frameScripts may be appended multiple times if iframes have unique scripts
-    const { frameScripts } = store;
-    const scope = isTop ? store[SCRIPTS] : frameScripts;
+    const scope = store[SCRIPTS][depth];
     const { grantless } = data;
     let metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id)) || [];
     if (!metas.length) {
@@ -88,6 +86,8 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       else if (isTop || !(id in idMapMain)) {
         scope.push(script);
         if (isTop) { // removing script from frameScripts if it ran there before the main frame
+          // frameScripts may be appended multiple times if iframes have unique scripts
+          const frameScripts = store[SCRIPTS][1];
           const i = frameScripts.findIndex(({ props }) => props.id === id);
           if (i >= 0) frameScripts.splice(i, 1);
         }
@@ -103,13 +103,10 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       if (badRealm && !store.injectionFailure) {
         store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
       }
+      menus[id]::forEachValue(cmd => {
+        loadCommandIcon(cmd, store);
+      });
     });
-  }
-  for (const scriptId in commands) {
-    const scriptCommands = commands[scriptId];
-    for (const id in scriptCommands) {
-      loadCommandIcon(scriptCommands[id], store);
-    }
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
   if (!hPrev) {

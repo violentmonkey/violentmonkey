@@ -2,6 +2,7 @@ import '@/common/browser';
 import {
   formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmd, trueJoin,
 } from '@/common';
+import { kOrigTag, kTag } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import options from '@/common/options';
@@ -9,13 +10,15 @@ import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
 import {
-  formatSizesStr, kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store, updateTags,
+  formatSizesStr, kComment, kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store,
+  updateTags,
 } from './utils';
 import App from './views/app';
 
+const NON_WS_RE = /\S/;
 let updateThrottle;
 
-initMain();
+loadData();
 render(App);
 
 /**
@@ -24,9 +27,8 @@ render(App);
  * @param {string} [code]
  */
 function initScript(script, sizes, code) {
-  const $cache = script.$cache || (script.$cache = {});
-  const meta = script.meta || {};
-  const { custom } = script;
+  const $cache = script.$cache ??= {};
+  const { custom, meta } = script;
   const localeName = getLocaleString(meta, kName);
   const desc = [
     meta[kName],
@@ -35,6 +37,7 @@ function initScript(script, sizes, code) {
     getLocaleString(meta, kDescription),
     custom[kName],
     custom[kDescription],
+    custom[kComment],
   ]::trueJoin('\n');
   const name = custom[kName] || localeName;
   let total = 0;
@@ -46,12 +49,12 @@ function initScript(script, sizes, code) {
   $cache.desc = desc;
   $cache.name = name;
   $cache.lowerName = name.toLocaleLowerCase();
-  $cache.tags = custom.tags || '';
   $cache.size = formatByteLength(total, true).replace(' ', '');
   $cache.sizes = formatSizesStr(str);
   $cache.sizeNum = total;
   $cache.sizesNum = sizes;
   $cache[kStorageSize] = sizes[2];
+  $cache[kTag] = getUniqTags(script, custom, meta);
   if (code) $cache.code = code;
   script.$canUpdate = getScriptUpdateUrl(script)
     && (script.config.shouldUpdate ? 1 : -1 /* manual */);
@@ -87,64 +90,77 @@ async function requestData(id) {
   if (store.loaded !== 'all') store.loaded = !!id || 'all';
 }
 
-function initMain() {
-  loadData();
-  Object.assign(handlers, {
-    ScriptsUpdated() {
-      loadData();
-    },
-    UpdateSync(data) {
-      store.sync = data;
-    },
-    async UpdateScript({ update, where, code } = {}) {
-      if (!update) return;
-      if (updateThrottle
-      || (updateThrottle = store.batch)
-      && (updateThrottle = Promise.race([updateThrottle, makePause(500)]))) {
-        await updateThrottle;
-        updateThrottle = null;
-      }
-      const i1 = store.scripts.findIndex(item => item.props.id === where.id);
-      const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
-      // JS engines like V8 deoptimize when accessing an array element out of bounds
-      const oldScript = i1 >= 0 ? store.scripts[i1] : i2 >= 0 ? store.removedScripts[i2] : null;
-      const script = oldScript
-        || update.meta && store.canRenderScripts && {}; // a new script was just saved or installed
-      if (!script) return; // We're in editor that doesn't have data for all scripts
-      const removed = update.config?.removed;
-      const oldTags = oldScript?.custom.tags;
-      const [sizes] = await sendCmd('GetSizes', [where.id]);
-      const { search } = store;
-      Object.assign(script, update);
-      if (script.error && !update.error) script.error = null;
-      initScript(script, sizes, code);
-      if (search) performSearch([script], search.rules);
-      if (removed != null) {
-        if (removed) {
-          // Note that we don't update store.scripts even if a script is removed,
-          // because we want to keep the removed script there to allow the user
-          // to undo an accidental removal.
-          // We will update store.scripts when the installed list is rerendered.
-          store.needRefresh = true;
-        } else {
-          // Restored from the recycle bin.
-          store.removedScripts = store.removedScripts.filter(rs => rs.props.id !== where.id);
-        }
-      }
-      // Update the new list
-      const i = script.config.removed ? i2 : i1;
-      if (i < 0) {
-        script.message = '';
-        const list = script.config.removed ? 'removedScripts' : SCRIPTS;
-        store[list] = [...store[list], script];
-      }
-      if (store.tags && (
-        removed != null ||
-        (oldTags || '') !== (script.custom.tags || '')
-      )) updateTags();
-    },
-    RemoveScripts(ids) {
-      store.removedScripts = store.removedScripts.filter(script => !ids.includes(script.props.id));
-    },
-  });
+/**
+ * @param {VMScript} script
+ * @param {VMScript['custom']} [custom]
+ * @param {VMScript['meta']} [meta]
+ * when omitted, author @tag is always used and a joined single string is returned
+ * @return {string[] | string}
+ */
+function getUniqTags(script, custom = script.custom, meta) {
+  const authorTags = (!meta || custom[kOrigTag]) && (meta || script.meta)[kTag] || [];
+  const userTags = custom[kTag] || [];
+  const tags = !authorTags.length ? userTags
+    : !userTags.length ? authorTags
+      : [...authorTags, ...userTags];
+  const uniqTags = tags.length ? [...new Set(tags.filter(NON_WS_RE.test, NON_WS_RE))] : tags;
+  return meta ? uniqTags : uniqTags.join('\n');
 }
+
+Object.assign(handlers, {
+  ScriptsUpdated() {
+    loadData();
+  },
+  UpdateSync(data) {
+    store.sync = data;
+  },
+  async UpdateScript({ update, where, code } = {}) {
+    if (!update) return;
+    if (updateThrottle
+    || (updateThrottle = store.batch)
+    && (updateThrottle = Promise.race([updateThrottle, makePause(500)]))) {
+      await updateThrottle;
+      updateThrottle = null;
+    }
+    const i1 = store.scripts.findIndex(item => item.props.id === where.id);
+    const i2 = store.removedScripts.findIndex(item => item.props.id === where.id);
+    // JS engines like V8 deoptimize when accessing an array element out of bounds
+    const oldScript = i1 >= 0 ? store.scripts[i1] : i2 >= 0 ? store.removedScripts[i2] : null;
+    const script = oldScript
+      || update.meta && store.canRenderScripts && {}; // a new script was just saved or installed
+    if (!script) return; // We're in editor that doesn't have data for all scripts
+    const removed = update.config?.removed;
+    const oldTags = oldScript ? getUniqTags(oldScript) : '';
+    const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
+    const { search } = store;
+    Object.assign(script, update);
+    if (script.error && !update.error) script.error = null;
+    initScript(script, sizes, code);
+    if (search) performSearch([script], search.rules);
+    if (removed != null) {
+      if (removed) {
+        // Note that we don't update store.scripts even if a script is removed,
+        // because we want to keep the removed script there to allow the user
+        // to undo an accidental removal.
+        // We will update store.scripts when the installed list is rerendered.
+        store.needRefresh = true;
+      } else {
+        // Restored from the recycle bin.
+        store.removedScripts = store.removedScripts.filter(rs => rs.props.id !== where.id);
+      }
+    }
+    // Update the new list
+    const i = script.config.removed ? i2 : i1;
+    if (i < 0) {
+      script.message = '';
+      const list = script.config.removed ? 'removedScripts' : SCRIPTS;
+      store[list] = [...store[list], script];
+    }
+    if (store.tags && (removed != null ? oldTags : oldTags !== getUniqTags(script))) {
+      updateTags();
+    }
+  },
+  RemoveScripts(ids) {
+    store.removedScripts = store.removedScripts.filter(script => !ids.includes(script.props.id));
+  },
+});

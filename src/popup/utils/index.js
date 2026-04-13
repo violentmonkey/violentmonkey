@@ -2,10 +2,11 @@ import { reactive } from 'vue';
 import { isTouch } from '@/common/ui';
 
 export const emptyStore = () => ({
-  scripts: [],
-  frameScripts: [],
+  /** [top, frames] */
+  [SCRIPTS]: [[], []],
+  /** [top, frames] */
+  menus: [{}, {}],
   idMap: {},
-  commands: {},
   domain: '',
   injectionFailure: null,
   injectable: true,

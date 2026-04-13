@@ -109,7 +109,7 @@ import {
   debounce, formatByteLength, getScriptName, getScriptUpdateUrl, i18n, isEmpty, isScriptDownloaded,
   nullBool2string, sendCmdDirectly, trueJoin,
 } from '@/common';
-import { ERR_BAD_PATTERN, VM_DOCS_MATCHING, VM_HOME } from '@/common/consts';
+import { ERR_BAD_PATTERN, VM_DOCS_MATCHING, VM_HOME, kOrigTag, kTag } from '@/common/consts';
 import { deepCopy, deepEqual, objectPick } from '@/common/object';
 import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@/common/ui';
 import { keyboardService } from '@/common/keyboard';
@@ -118,11 +118,12 @@ import { getUnloadSentry } from '@/common/router';
 import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude, kOrigExcludeMatch,
-  kOrigInclude, kOrigMatch, kUpdateURL,
+  kOrigInclude, kOrigMatch, kUpdateURL, kComment,
 } from '../../utils';
 
 const EXTERNALS = 'externals';
 const CUSTOM_PROPS = {
+  [kComment]: '',
   [kName]: '',
   [kHomepageURL]: '',
   [kUpdateURL]: '',
@@ -132,7 +133,7 @@ const CUSTOM_PROPS = {
   [kOrigExclude]: true,
   [kOrigMatch]: true,
   [kOrigExcludeMatch]: true,
-  tags: '',
+  [kOrigTag]: true,
 };
 const toProp = val => val !== '' ? val : null; // `null` removes the prop from script object
 const CUSTOM_LISTS = [
@@ -140,6 +141,7 @@ const CUSTOM_LISTS = [
   kMatch,
   kExclude,
   kExcludeMatch,
+  kTag,
 ];
 const toList = text => (
   text.trim()
@@ -230,6 +232,7 @@ const hashPattern = computed(() => {
       )) {
         return val.length > 100 ? val.slice(0, 100) + '...' : val;
       }
+      if (key === kExcludeMatch) break; // the last key for site targets
     }
   }
 });

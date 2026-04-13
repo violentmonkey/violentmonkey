@@ -4,6 +4,7 @@ import {
 import {
   __CODE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
   BLACKLIST, HOMEPAGE_URL, KNOWN_INJECT_INTO, META_STR, METABLOCK_RE, NEWLINE_END_RE,
+  kOrigTag, kTag,
 } from '@/common/consts';
 import initCache from '@/common/cache';
 import {
@@ -111,9 +112,14 @@ const propsToClear = {
   [S_VALUE_PRE]: VALUE_IDS,
 };
 const expose = {};
-const resolveDataCodeStr = `(${(global, data) => {
-  if (global.vmResolve) global.vmResolve(data); // `window` is a const which is inaccessible here
-  else global.vmData = data; // Ran earlier than the main content script so just drop the payload
+const resolveDataCodeStr = `(${(global, key, data) => {
+  // Using `global` and `key` as parameters because global consts aren't accessible here
+  if (typeof global[key] === 'function') {
+    global[key](data);
+  } else if (global[process.env.INIT_FUNC_NAME] !== 1) { // eslint-disable-line no-undef
+    // Ran earlier than the main content script so let's just drop the payload
+    global[key] = data;
+  }
 }})`;
 const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
@@ -572,17 +578,18 @@ function prepareScript(script, env) {
     inject_into: custom[INJECT_INTO] || null,
     noframes: custom.noframes ?? null,
     override: {
-      merge_excludes: !!custom.origExclude,
-      merge_includes: !!custom.origInclude,
-      merge_matches: !!custom.origMatch,
-      merge_exclude_matches: !!custom.origExcludeMatch,
+      merge_excludes: custom.origExclude,
+      merge_includes: custom.origInclude,
+      merge_matches: custom.origMatch,
+      merge_exclude_matches: custom.origExcludeMatch,
+      merge_tags: custom[kOrigTag],
       use_excludes: custom.exclude || [],
       use_includes: custom.include || [],
       use_matches: custom.match || [],
       use_exclude_matches: custom.excludeMatch || [],
     },
     run_at: custom[RUN_AT] || null,
-    tags: custom.tags?.split(' ').filter(Boolean) || [],
+    tags: custom[kTag] || [],
     user_modified: script.props.lastModified || 0,
   };
   if (wrap) {
@@ -730,9 +737,9 @@ function registerScriptDataFF(inject, url) {
   }
   return contentScriptsAPI.register({
     js: [{
-      code: `${resolveDataCodeStr}(this,${JSON.stringify(inject)})`,
+      code: `${resolveDataCodeStr}(this,"${VIOLENTMONKEY}",${JSON.stringify(inject)})`,
     }],
-    matches: url.split('#', 1),
+    matches: [url.split('#', 1)[0].replace(/\*/g, '\\$&')], // escape `*` in the URL itself
     [RUN_AT]: 'document_start',
   });
 }

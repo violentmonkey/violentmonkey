@@ -12,13 +12,13 @@ exports[`createSearchRules 2`] = `
   "rules": [
     {
       "negative": true,
-      "re": /\\(\\?:\\^\\|\\\\s\\)\\(c\\)\\(\\\\s\\|\\$\\)/u,
-      "scope": "tags",
+      "re": /c/i,
+      "scope": "tag",
     },
     {
       "negative": false,
-      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\|b\\)\\(\\\\s\\|\\$\\)/u,
-      "scope": "tags",
+      "re": /a\\|b/i,
+      "scope": "tag",
     },
     {
       "negative": false,
@@ -82,8 +82,8 @@ exports[`createSearchRules 3`] = `
   "rules": [
     {
       "negative": false,
-      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a-b\\|b\\)\\(\\\\s\\|\\$\\)/u,
-      "scope": "tags",
+      "re": /a-b\\|b/i,
+      "scope": "tag",
     },
     {
       "negative": false,
@@ -130,8 +130,8 @@ exports[`createSearchRules 4`] = `
   "rules": [
     {
       "negative": false,
-      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/u,
-      "scope": "tags",
+      "re": /a\\\\\\.b\\|b/i,
+      "scope": "tag",
     },
     {
       "negative": false,
@@ -167,8 +167,8 @@ exports[`createSearchRules 5`] = `
   "rules": [
     {
       "negative": false,
-      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/u,
-      "scope": "tags",
+      "re": /a\\\\\\.b\\|b/i,
+      "scope": "tag",
     },
     {
       "negative": false,
@@ -204,8 +204,8 @@ exports[`createSearchRules 6`] = `
   "rules": [
     {
       "negative": false,
-      "re": /\\(\\?:\\^\\|\\\\s\\)\\(a\\\\\\.b\\|b\\)\\(\\\\s\\|\\$\\)/u,
-      "scope": "tags",
+      "re": /a\\\\\\.b\\|b/i,
+      "scope": "tag",
     },
     {
       "negative": true,

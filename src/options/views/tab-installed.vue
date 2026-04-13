@@ -580,7 +580,10 @@ function handleClickTag(tag) {
     state.search.value = tokens.map(token => `${token.prefix}${token.raw}`).join(' ');
   } else {
     // add tag
-    state.search.value = [state.search.value.trim(), `#${tag} `].filter(Boolean).join(' ');
+    state.search.value = [
+      state.search.value.trim(),
+      /\s/.test(tag) ? `#"${tag}" ` : `#${tag} `,
+    ]::trueJoin(' ');
   }
 }
 function handleSmoothScroll(delta) {

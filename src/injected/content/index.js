@@ -37,26 +37,24 @@ function detectPageCsp() {
 // Make sure to call obj::method() in code that may run after CONTENT userscripts
 async function init() {
   const isXml = document instanceof XMLDocument;
-  const xhrData = getXhrInjection();
-  const cspInfo = detectPageCsp();
+  const FF_HAS_CS_API = IS_FIREFOX && Event[PROTO].composedPath;
+  /** Could be a DOM element with an `id` attribute equal to ours */
+  const ffDataRaw = FF_HAS_CS_API && global[VIOLENTMONKEY];
+  const ffData = ffDataRaw?.[kSessionId] && delete global[VIOLENTMONKEY] && ffDataRaw;
+  const xhrData = !ffData && getXhrInjection();
   const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
     url: IS_FIREFOX && location.href,
     // XML document's appearance breaks when script elements are added
     [FORCE_CONTENT]: isXml,
-    csp: cspInfo,
-    done: !!(xhrData || global.vmData),
+    done: !!(ffData || xhrData),
   }, {
     retry: true,
   });
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   /** @type {VMInjection} */
-  const data = xhrData || (
-    IS_FIREFOX && Event[PROTO].composedPath
-      ? await getDataFF(dataPromise)
-      : await dataPromise
-  );
+  const data = ffData || xhrData || await (FF_HAS_CS_API ? getDataFF(dataPromise) : dataPromise);
   const info = data.info;
   const injectInto = bridge[INJECT_INTO] = data[INJECT_INTO];
   assign(ids, data[IDS]);
@@ -109,13 +107,12 @@ addHandlers({
 init().catch(IS_FIREFOX && logging.error); // Firefox can't show exceptions in content scripts
 
 async function getDataFF(viaMessaging) {
-  // global !== window in FF content scripts
-  const data = global.vmData || await SafePromise.race([
-    new SafePromise(resolve => { global.vmResolve = resolve; }),
+  const data = await SafePromise.race([
+    // global !== window in FF content scripts
+    new SafePromise(resolve => { global[VIOLENTMONKEY] = resolve; }),
     viaMessaging,
   ]);
-  delete global.vmResolve;
-  delete global.vmData;
+  delete global[VIOLENTMONKEY];
   return data;
 }
 
