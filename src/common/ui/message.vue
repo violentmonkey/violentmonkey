@@ -5,14 +5,13 @@
       <p v-text="content.desc" v-if="content.desc"></p>
     </div>
     <form v-if="message.buttons" @submit.prevent ref="refForm">
-      <!-- eslint-disable vue/no-mutating-props -->
+      <!-- eslint-disable-next-line vue/no-mutating-props -->
       <input
         class="mb-1"
         type="text"
         v-if="message.input !== false"
         v-model="message.input"
       />
-      <!-- eslint-enable vue/no-mutating-props -->
       <div class="mr-1c">
         <button
           v-for="({text, type, onClick, ...extras}, index) in message.buttons"

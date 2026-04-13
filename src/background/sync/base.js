@@ -86,7 +86,7 @@ export function getURI(name) {
   }
   try {
     return decodeURIComponent(name.slice(3));
-  } catch (err) {
+  } catch (_err) {
     return name.slice(3);
   }
 }
@@ -198,7 +198,7 @@ function parseScriptData(raw) {
         });
       }
     }
-  } catch (e) {
+  } catch (_e) {
     data.code = raw;
   }
   return data;

@@ -1,4 +1,4 @@
-/* eslint-disable max-classes-per-file */
+ 
 import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
 import { ERR_BAD_PATTERN, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';

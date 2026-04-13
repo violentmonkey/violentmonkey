@@ -1,5 +1,4 @@
-/* eslint-disable one-var, one-var-declaration-per-line, no-unused-vars,
-   prefer-const */
+ 
 
 /**
  * `safeCall` is used by our modified babel-plugin-safe-bind.js.

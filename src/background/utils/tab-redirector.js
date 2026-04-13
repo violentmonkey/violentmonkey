@@ -143,7 +143,7 @@ if (browser.webRequest?.onBeforeRequest) {
       maybeInstallUserJs(tabId, url, isWhitelisted);
       return IS_FIREFOX
         ? { cancel: true } // for sites with strict CSP in FF
-        : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
+        : { redirectUrl: 'javascript:void 0' };  
     }
   }, {
     urls: [

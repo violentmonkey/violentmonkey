@@ -152,9 +152,9 @@ const DIGITS_RE = /^\d+$/; // using regexp to avoid +'1e2' being parsed as 100
 /** @return -1 | 0 | 1 */
 export function compareVersion(ver1, ver2) {
   // Used in safe context
-  // eslint-disable-next-line no-restricted-syntax
+   
   const [, main1 = ver1 || '', pre1] = VERSION_RE.exec(ver1);
-  // eslint-disable-next-line no-restricted-syntax
+   
   const [, main2 = ver2 || '', pre2] = VERSION_RE.exec(ver2);
   const delta = compareVersionChunk(main1, main2)
     || !pre1 - !pre2 // 1.2.3-pre-release is less than 1.2.3
@@ -326,7 +326,7 @@ export function tryUrl(str, base) {
     if (str ?? base) {
       return new URL(str, base).href; // throws on invalid urls
     }
-  } catch (e) {
+  } catch (_e) {
     // undefined
   }
 }

@@ -8,7 +8,7 @@ const COMPLETE_SINGLE = 'completeSingle';
 const PICKED = 'picked';
 const TIMER = 'timer';
 
-// eslint-disable-next-line no-return-assign
+ 
 const getMyState = ({ [STATE]: state }) => (state[ID] || (state[ID] = {}));
 
 const delayedComplete = cm => {

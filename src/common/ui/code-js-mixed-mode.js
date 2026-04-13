@@ -398,8 +398,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     stream.backUp(stream.pos - stream.start - 1);
     // switch to local mode for subsequent text
     // and use end quote position to detect the end of the local html mode
-    (state[kLocalState] = cmStartState(state[kLocalMode] = this.mode))
-      [kLocalHtmlPlainStringEndPos] = oldPos;
+    (state[kLocalState] = cmStartState(state[kLocalMode] = this.mode))[kLocalHtmlPlainStringEndPos] = oldPos;
   }
 
   /** @this {Rule} */

@@ -11,7 +11,7 @@ let localStorage = {};
  * Since it allows object-like access, we'll map it to a variable with a fallback to a dummy. */
 try {
   (localStorage = global.localStorage).getItem('foo');
-} catch (e) {
+} catch (_e) {
   localStorage = {};
 }
 

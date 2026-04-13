@@ -363,7 +363,7 @@ async function loadDeps() {
       deps.value[depsUrl] = target[fullUrl] = await getFile(fullUrl, { isBlob, useCache: true });
       finished += 1;
       updateStatus();
-    } catch (e) {
+    } catch (_e) {
       deps.value[depsUrl] = false;
       return url;
     }
@@ -407,10 +407,10 @@ async function getScript(url) {
     return fileHandle
       ? await (await fileHandle.getFile()).text()
       : cachedCodePromise && await cachedCodePromise || await getFile(url);
-  } catch (e) {
+  } catch (_e) {
     // eslint-disable-next-line no-ex-assign
-    if ((e = e.message)?.startsWith('{')) try { e = 'HTTP ' + JSON.parse(e).status; } catch {/**/}
-    message.value = i18n('msgErrorLoadingData') + (e ? '\n' + e : '');
+    if ((_e = _e.message)?.startsWith('{')) try { _e = 'HTTP ' + JSON.parse(_e).status; } catch {/**/}
+    message.value = i18n('msgErrorLoadingData') + (_e ? '\n' + _e : '');
   } finally {
     cachedCodePromise = null;
   }
@@ -448,8 +448,8 @@ async function installScript(evt, parsedMeta) {
     } else if (btnId === '+close') {
       closeTab();
     }
-  } catch (err) {
-    message.value = `${err}`;
+  } catch (_err) {
+    message.value = `${_err}`;
     installable.value = true;
   }
 }
@@ -465,7 +465,7 @@ async function trackLocalFile() {
   if (fso) {
     try {
       await fso.observe(fileHandle);
-    } catch (err) {
+    } catch (_err) {
       fso = null;
     }
   }
@@ -487,7 +487,7 @@ async function onFileChanged() {
     await loadDeps();
     await installScript(null, parsedMeta);
     sameCode.value = false;
-  } catch (e) { /* NOP */ }
+  } catch (_e) { /* NOP */ }
 }
 async function checkSameCode() {
   const { name, namespace } = script.value.meta || {};

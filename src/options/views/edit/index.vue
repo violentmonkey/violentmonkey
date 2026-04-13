@@ -219,7 +219,7 @@ const errorsLinks = computed(() => {
     patterns && VM_DOCS_MATCHING,
   ].filter(Boolean);
 });
-const hashPattern = computed(() => { // eslint-disable-line vue/return-in-computed-property
+const hashPattern = computed(() => {
   for (const sectionKey of ['meta', 'custom']) {
     for (const key of CUSTOM_LISTS) {
       let val = script.value[sectionKey][key];

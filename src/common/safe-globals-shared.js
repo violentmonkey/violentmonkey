@@ -6,7 +6,7 @@
  * Not exporting NodeJS built-in globals as this file is imported in the test scripts.
  */
 
-const global = process.env.TEST ? globalThis : this; // eslint-disable-line no-undef
+const global = process.env.TEST ? globalThis : this;  
 const { window } = global; // it's unforgeable so we extract it primarily to improve minification
 export const VIOLENTMONKEY = 'Feature Injector';
 export const AUTO = 'auto';

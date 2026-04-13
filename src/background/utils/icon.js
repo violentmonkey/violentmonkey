@@ -30,7 +30,7 @@ const browserAction = (() => {
     try {
       // Suppress the "no tab id" error when setting an icon/badge as it cannot be reliably prevented
       api::fn(...args, ignoreChromeErrors);
-    } catch (e) {
+    } catch (_e) {
       api::fn(...args);
     }
   };
@@ -301,7 +301,7 @@ async function loadIcon(url) {
   try {
     res = canvas.toDataURL();
     if (isOwn) iconDataCache[url] = ctx.getImageData(0, 0, width, height);
-  } catch (err) {
+  } catch (_err) {
     res = url;
   }
   iconCache[url] = res;

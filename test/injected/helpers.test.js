@@ -2,7 +2,7 @@ import { jsonDump } from '@/injected/web/util';
 
 test('jsonDump', () => {
   const sameChildObj = { foo: 1 };
-  // eslint-disable-next-line no-restricted-syntax
+   
   for (const obj of [
     1,
     null,

@@ -13,7 +13,7 @@ export default function initCache({
   // to start an operation that reuses the same value of now(), and batch(false) to end it
   let batchStarted;
   let batchStartTime;
-  // eslint-disable-next-line no-return-assign
+   
   const getNow = () => batchStarted && batchStartTime || (batchStartTime = performance.now());
   const OVERRUN = 1000; // in ms, to reduce frequency of calling setTimeout
   const exports = {
@@ -74,7 +74,7 @@ export default function initCache({
     // delete all keys to make sure onDispose is called for each value
     if (onDispose) {
       // cache inherits null so we don't need to check hasOwnProperty
-      // eslint-disable-next-line guard-for-in
+       
       for (const key in cache) {
         del(key);
       }
@@ -96,7 +96,7 @@ export default function initCache({
   function trim() {
     const now = performance.now();
     let closestExpiry = Number.MAX_SAFE_INTEGER;
-    // eslint-disable-next-line guard-for-in
+     
     for (const key in cache) {
       const { expiry } = cache[key];
       if (expiry < now) {

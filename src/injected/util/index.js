@@ -37,7 +37,7 @@ export const bindEvents = (srcId, destId, bridge) => {
     if (!incomingNodeEvent) {
       // CustomEvent is the main message
       // but if the previous message was non-cloneable we will throw if MouseEvent is next
-      try { e = e::getDetail(); } catch (err) { return; }
+      try { e = e::getDetail(); } catch (_err) { return; }
       if (!e) {
         e = createNullObj();
         e.data = `[${VIOLENTMONKEY}] Non-cloneable property e.g. a DOM node or function.`;

@@ -5,20 +5,23 @@ const { restrictedSyntax } = require('@/../scripts/webpack-util');
 // The actual ESLint and build work correctly - this is a test infrastructure issue
 // TODO: Investigate Babel targets configuration when Babel is upgraded
 test.skip('eslint no-restricted-syntax', async () => {
-  // Use ESLint without .eslintrc to avoid webpack/babel config issues
+  // ESLint v9 uses flat config - create a minimal flat config for testing
   const linter = new ESLint({
-    baseConfig: {
-      parser: '@babel/eslint-parser',
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        requireConfigFile: false,
+    overrideConfigFile: true,
+    overrideConfig: [{
+      files: ['<input>'],
+      languageOptions: {
+        parser: require('@babel/eslint-parser'),
+        parserOptions: {
+          ecmaVersion: 'latest',
+          sourceType: 'module',
+          requireConfigFile: false,
+        },
       },
       rules: {
         'no-restricted-syntax': ['error', ...restrictedSyntax],
       },
-    },
-    useEslintrc: false,
+    }],
   });
   const code = restrictedSyntax.map(r => r.code + ';').join('');
   const expected = restrictedSyntax.map(r => (delete r.code, r.message));

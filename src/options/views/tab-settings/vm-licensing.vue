@@ -106,7 +106,7 @@ watch(() => settings.scriptExecutionUrl, (newVal) => {
       }
       options.set('scriptExecutionUrl', normalized);
       licenseStatus.message = '';  // Clear any previous error
-    } catch (err) {
+    } catch (_err) {
       // Invalid URL - notify user and don't save
       licenseStatus.valid = false;
       licenseStatus.message = `Invalid Script URL: ${newVal.trim()} (Example: https://example.com)`;

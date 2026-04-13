@@ -25,9 +25,9 @@ if (!IS_FIREFOX && !browser?.runtime) {
     } else if (isFunction(srcVal)) {
       res = metaVal === 0 || isSyncMethodName(key) || !hasOwnProperty(src, key)
         ? srcVal::bind(src)
-        : wrapAsync(src, srcVal); // eslint-disable-line no-use-before-define
+        : wrapAsync(src, srcVal);  
     } else if (isObject(srcVal) && metaVal !== 0) {
-      res = proxifyGroup(srcVal, metaVal); // eslint-disable-line no-use-before-define
+      res = proxifyGroup(srcVal, metaVal);  
     } else {
       res = srcVal;
     }

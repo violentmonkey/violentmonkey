@@ -306,7 +306,7 @@ function getValue(key, sliced, jsonValue) {
       value = JSON.parse(value);
       jsonValue?.push(value);
       value = JSON.stringify(value, null, jsonIndent);
-    } catch (e) {
+    } catch (_e) {
       // This shouldn't happen but the storage may get corrupted or modified directly
     }
   }

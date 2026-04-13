@@ -18,7 +18,7 @@ const config = {
   redirect_uri: VM_HOME + 'auth_dropbox.html',
 };
 
-const escRE = /[\u007f-\uffff]/g; // eslint-disable-line no-control-regex
+const escRE = /[\u007f-\uffff]/g;  
 const escFunc = (m) =>
   `\\u${(m.charCodeAt(0) + 0x10000).toString(16).slice(1)}`;
 

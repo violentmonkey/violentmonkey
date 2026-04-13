@@ -94,7 +94,7 @@ export async function injectPageSandbox(data) {
     let ok;
     try {
       ok = opener && describeProperty(opener.location, 'href').get;
-    } catch (e) {
+    } catch (_e) {
       // Old Chrome throws in sandboxed frames, TODO: remove `try` when minimum_chrome_version >= 86
     }
     if (ok) {
@@ -106,7 +106,7 @@ export async function injectPageSandbox(data) {
         try {
           opener::fire(new SafeMouseEvent(VAULT_WRITER, { relatedTarget: window }));
           opener::fire(new SafeCustomEvent(VAULT_WRITER, { detail: vaultId }));
-        } catch (e) { /* FF quirk or bug: opener may reject our fire */ }
+        } catch (_e) { /* FF quirk or bug: opener may reject our fire */ }
         window::off(VAULT_WRITER_ACK, setOk, true);
       } else {
         ok = opener[VAULT_WRITER];
@@ -129,7 +129,7 @@ export async function injectPageSandbox(data) {
     if (!IS_FIREFOX) {
       try {
         await sendCmd('InjectPageSandbox', { code }, { retry: true });
-      } catch (error) {
+      } catch (_error) {
         inject({ code });
       }
     } else {
@@ -320,7 +320,7 @@ function inject(item, iframeCb) {
     iframe = makeElem('iframe', {
       ...IS_FIREFOX
         ? {
-          /* Preventing other content scripts */// eslint-disable-next-line no-script-url
+          /* Preventing other content scripts */ 
           src: 'javascript:void 0',
         }
         : { src: 'about:blank' },
@@ -403,7 +403,7 @@ async function injectPageList(runAt) {
             code,
             runAt: `document_${scr[RUN_AT]}`.replace('body', 'start'),
           }, { retry: true });
-        } catch (error) {
+        } catch (_error) {
           inject(scr);
         } finally {
           if (!scr.meta.unwrap) bridge.post('CleanupPlant', scr.key);

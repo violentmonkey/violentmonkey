@@ -9,7 +9,7 @@ let changes;
 addOwnCommands({
   /** @return {Object} */
   GetAllOptions() {
-    return Object.assign({}, defaults, options); // eslint-disable-line no-use-before-define
+    return Object.assign({}, defaults, options);  
   },
   /**
    * @param {{ [key:string]: PlainJSONValue }} data

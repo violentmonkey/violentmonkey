@@ -136,7 +136,7 @@ function parseRaw(req, msg, propName) {
       && PARSEABLE_TYPES::indexOf(ct = getContentType(msg) || kContentTextHtml) >= 0
     || responseType === 'json') {
       try { res = ct ? new SafeDOMParser()::parseFromString(res, ct) : jsonParse(res); }
-      catch (e) { res = null; /* per specification */ }
+      catch (_e) { res = null; /* per specification */ }
     }
     if (responseType === kDocument) {
       const otherPropName = propName === kResponse ? kResponseXML : kResponse;
@@ -178,9 +178,9 @@ export function onRequestCreate(opts, context, fileName) {
     if (url === location) { url = url.href; } // safe window.location is unforgeable
     else {
       try { url = url::URLToString(); } // safe window.URL getter
-      catch (e) {
+      catch (_e) {
         try { url = `${url}`; } // unsafe toString may throw e.g. for Symbol or if spoofed
-        catch (e2) { err = e2; }
+        catch (_e2) { err = _e2; }
       }
     }
     opts.url = url;
@@ -275,12 +275,12 @@ function getContentType(msg) {
 function getFormData(data) {
   try {
     return [[...data::formDataEntries()], 'fd']; // eslint-disable-line no-restricted-syntax
-  } catch (e) {
+  } catch (_e) {
     /**/
   }
   try {
     return [data::urlSearchParamsToString(), 'usp'];
-  } catch (e) {
+  } catch (_e) {
     /**/
   }
 }

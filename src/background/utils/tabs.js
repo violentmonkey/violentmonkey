@@ -52,7 +52,7 @@ try {
   // but we use a try-catch anyway to detect this feature in nonstandard browsers
   tabsOnUpdated.addListener(noop, { properties: ['status'] });
   tabsOnUpdated.removeListener(noop);
-} catch (e) {
+} catch (_e) {
   tabsOnUpdated.addListener = new Proxy(tabsOnUpdated.addListener, {
     apply: (fn, thisArg, args) => thisArg::fn(args[0]),
   });

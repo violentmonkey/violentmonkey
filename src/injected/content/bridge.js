@@ -7,7 +7,7 @@ export const grantless = createNullObj();
 /** @type {function(VMInjection)[]} */
 export const onScripts = [];
 const addHandlersImpl = (dest, src, force) => {
-  if (force || INJECT_INTO in bridge) { // eslint-disable-line no-use-before-define
+  if (force || INJECT_INTO in bridge) {  
     assign(dest, src);
   } else {
     onScripts.push(() => assign(dest, src));

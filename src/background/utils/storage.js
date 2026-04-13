@@ -7,7 +7,7 @@ let api = browser.storage.local;
 /** @prop {VMStorageFetch} [fetch] */
 class VMStorageArea {
   constructor(name, prefix) {
-    storageByPrefix[prefix] = this; // eslint-disable-line no-use-before-define
+    storageByPrefix[prefix] = this;  
     this.name = name;
     this.prefix = prefix;
   }
@@ -102,7 +102,7 @@ export const storageByPrefix = {};
 const storage = {
   get api() { return api; },
   set api(val) { api = val; },
-  /** @return {?VMStorageArea} */// eslint-disable-next-line no-use-before-define
+  /** @return {?VMStorageArea} */ 
   forKey: key => storageByPrefix[/^\w+:|$/.exec(key)[0]],
   base: new VMStorageArea('base', ''),
   [S_CACHE]: new VMStorageArea(S_CACHE, S_CACHE_PRE),

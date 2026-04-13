@@ -1,6 +1,0 @@
-**/*.js
-!src/**
-!test/**
-!scripts/*
-!gulpfile.js
-src/public/**

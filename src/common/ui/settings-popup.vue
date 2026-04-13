@@ -119,7 +119,7 @@ const settings = reactive({});
 const popupWidth = ref();
 const $popupWidthNumber = ref();
 const $EW = ref();
-const isCustomBadgeColor = computed(() => { // eslint-disable-line vue/return-in-computed-property
+const isCustomBadgeColor = computed(() => {
   for (const name in badgeColorEnum) {
     if (settings[name] !== optionsDefaults[name]) {
       return true;
@@ -128,7 +128,7 @@ const isCustomBadgeColor = computed(() => { // eslint-disable-line vue/return-in
 });
 const onResetBadgeColors = () => {
   for (const name in badgeColorEnum) {
-    settings[name] = optionsDefaults[name]; // eslint-disable-line vue/no-mutating-props
+    settings[name] = optionsDefaults[name];  
   }
 };
 const onMouseUp = () => {

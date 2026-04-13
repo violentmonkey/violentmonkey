@@ -6,7 +6,7 @@ const isProd = process.env.NODE_ENV === 'production';
 function exec(cmd) {
   try {
     return childProcess.execSync(cmd, { encoding: 'utf8' }).trim();
-  } catch (e) {
+  } catch (_e) {
     // ignore
   }
 }
