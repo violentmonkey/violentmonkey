@@ -47,11 +47,11 @@
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
     "babel-plugin-transform-modern-regexp": "^0.0.6",
-    "cross-env": "7.0.3",
+    "cross-env": "10",
     "cross-spawn": "^7.0.6",
     "css-loader": "^7.1.4",
     "css-minimizer-webpack-plugin": "^8.0.0",
-    "del": "^6.1.1",
+    "del": "6",
     "eslint": "9",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jest": "29",
@@ -105,7 +105,7 @@
   "dependencies": {
     "@violentmonkey/shortcut": "^1.4.4",
     "@zip.js/zip.js": "2.8.26",
-    "codemirror": "^5.65.21",
+    "codemirror": "5",
     "tldts": "^7.0.28",
     "vue": "^3.5.32",
     "vueleton": "^2.0.2"

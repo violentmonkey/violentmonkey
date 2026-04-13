@@ -73,12 +73,16 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
 }
 
 function getCodeMirrorThemes() {
-  const name = 'neo.css';
-  return fs.readdirSync(
-    require.resolve(`codemirror/theme/${name}`).slice(0, -name.length),
-    { withFileTypes: true },
-  ).map(e => e.isFile() && e.name.endsWith('.css') && e.name.slice(0, -4))
-  .filter(Boolean);
+  // CodeMirror v6 uses a different theme system than v5
+  // Return a list of commonly used themes that can be loaded via CSS or custom themes
+  return [
+    'default',
+    'material',
+    'neo',
+    'monokai',
+    'dracula',
+    'tomorrow-night',
+  ];
 }
 
 function readGlobalsFile(path, babelOpts = {}) {
