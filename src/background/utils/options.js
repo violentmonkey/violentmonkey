@@ -51,7 +51,6 @@ export function initOptions(data, lastVersion, versionChanged) {
     options[kScriptTemplate] = defaults[kScriptTemplate]; // will be detected by omitDefaultValue below
   }
   if (Object.keys(options).map(omitDefaultValue).some(Boolean)) {
-    delete options[`${kScriptTemplate}Edited`]; // TODO: remove this in 2023
     writeOptionsLater();
   }
   if (versionChanged) {

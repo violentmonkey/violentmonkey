@@ -707,8 +707,8 @@ export async function openAuthPage(url, redirectUri) {
   }
   
   /**
-   * @param {chrome.webRequest.WebResponseDetails} info
-   * @returns {chrome.webRequest.BlockingResponse}
+   * @param {Object} info - webRequest listener argument
+   * @returns {Object} Blocking response for webRequest
    */
   const handler = (info) => {
     if (getService().checkAuth?.(info.url)) {

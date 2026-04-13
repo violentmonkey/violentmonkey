@@ -45,7 +45,7 @@ let xhrInjectKey;
 const CHROME_USER_SCRIPTS_WARNING = 'Feature Injector: Chrome MV3 requires Allow User Scripts to be enabled in the extension details page to execute userscripts on this page.';
 
 const sessionId = getUniqId();
-// Manifest V3 doesn't support webRequest API - check for availability
+// Manifest V3 doesn't support webRequest API - check for availability (Firefox MV2 only)
 const hasWebRequest = !!browser.webRequest?.onHeadersReceived;
 const API_HEADERS_RECEIVED = hasWebRequest ? browser.webRequest.onHeadersReceived : null;
 const API_CONFIG = {
@@ -121,6 +121,7 @@ const getKey = (url, isTop) => (
 const normalizeRealm = val => (
   KNOWN_INJECT_INTO[val] ? val : injectInto || AUTO
 );
+/** @typedef {Object} chrome.webRequest.WebRequestHeadersDetails - Unused MV2 type reference (FF only) */
 const normalizeScriptRealm = (custom, meta) => (
   normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO])
 );
@@ -413,7 +414,13 @@ function onSendHeaders(info) {
   }
 }
 
-/** @param {chrome.webRequest.WebResponseHeadersDetails} info */
+/**
+ * @param {Object} info - webRequest.onHeadersReceived listener argument (Firefox MV2 only)
+ * @param {string} info.url
+ * @param {Array} info.responseHeaders
+ * @param {number} info.tabId
+ * @param {number} info.frameId
+ */
 function onHeadersReceived(info) {
   const key = getKey(info.url, isTopFrame(info));
   const bag = cache.get(key);
@@ -427,7 +434,10 @@ function onHeadersReceived(info) {
 }
 
 /**
- * @param {chrome.webRequest.WebResponseHeadersDetails} info
+ * @param {Object} details - webRequest.onHeadersReceived listener argument (Firefox MV2 only)
+ * @param {Array} details.responseHeaders
+ * @param {number} details.frameId
+ * @param {number} details.tabId
  * @param {VMInjection.Bag} bag
  */
 function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, [kFrameId]: frameId, tabId }, bag) {
@@ -522,6 +532,7 @@ function prepareScripts(env) {
 }
 
 /**
+ * Prepares a script for execution by wrapping and normalizing its metadata.
  * @param {VMScript} script
  * @param {VMInjection.EnvStart} env
  * @return {VMInjection.Script}
@@ -735,7 +746,8 @@ function unregisterScriptFF(bag) {
 }
 
 /**
- * @param {chrome.webRequest.WebResponseHeadersDetails} info
+ * @param {Object} info - webRequest.onHeadersReceived listener argument (Firefox MV2 only)
+ * @param {Array} info.responseHeaders
  * @param {VMInjection.Bag} bag
  */
 function detectStrictCsp(info, bag) {

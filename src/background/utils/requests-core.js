@@ -35,7 +35,7 @@ export const FORBIDDEN_HEADER_RE = re`/
   upgrade|
   via
 )$/ix`;
-/** @type {chrome.webRequest.RequestFilter} */
+/** @type {Object} Filter for webRequest API listener (FF only) */
 const API_FILTER = {
   urls: ['<all_urls>'],
   types: ['xmlhttprequest'],
@@ -46,7 +46,7 @@ const EXTRA_HEADERS = hasWebRequest ? [
   browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
 ].filter(Boolean) : [];
 const headersToInject = {};
-/** @param {chrome.webRequest.HttpHeader} header */
+/** @param {{name: string, value?: string}} header */
 const isVmVerify = header => header.name === VM_VERIFY;
 export const kCookie = 'cookie';
 export const kSetCookie = 'set-cookie';
@@ -69,7 +69,12 @@ const API_EVENTS = {
   ],
 };
 
-/** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+/**
+ * @param {Object} details - webRequest.onHeadersReceived listener argument (MV2 Firefox)
+ * @param {Array} details.responseHeaders
+ * @param {string} details.requestId
+ * @param {string} details.url
+ */
 function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
   const req = requests[verify[requestId]];
   if (req) {
@@ -87,7 +92,12 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
   }
 }
 
-/** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+/**
+ * @param {Object} details - webRequest.onBeforeSendHeaders listener argument (MV2 Firefox)
+ * @param {Array} details.requestHeaders
+ * @param {string} details.requestId
+ * @param {string} details.url
+ */
 function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
   // only the first call during a redirect/auth chain will have VM-Verify header
   const reqId = verify[requestId] || headers.find(isVmVerify)?.value;

@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky install",
     "dev": "gulp dev",
-    "build:bundle": "cross-env NODE_ENV=production gulp build",
+    "build:bundle": "cross-env NODE_ENV=production NODE_OPTIONS=--no-deprecation gulp build",
     "build": "cross-env BROWSER=chrome run-s ci build:bundle",
     "build:firefox": "cross-env BROWSER=firefox run-s ci build:bundle",
     "build:selfHosted": "cross-env BROWSER=chrome TARGET=selfHosted BETA=1 run-s ci build:bundle",
@@ -77,7 +77,7 @@
     "postcss-scss": "^4.0.4",
     "postcss-simple-vars": "^6.0.3",
     "prettier": "^3.0.2",
-    "sharp": "^0.32.6",
+    "sharp": "^0.34.5",
     "style-loader": "^3.3.3",
     "svg-sprite-loader": "^6.0.11",
     "terser-webpack-plugin": "^5.3.9",

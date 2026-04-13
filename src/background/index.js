@@ -55,7 +55,9 @@ function handleCommandMessage({ cmd, data, url, [kTop]: mode } = {}, src) {
     if (!me && func.isOwn && !safeSrc.fake) {
       throw new SafeError(`Command is only allowed in extension context: ${cmd}`);
     }
-    // TODO: revisit when link-preview is shipped in Chrome to fix tabId-dependent functionality
+    // KNOWN ISSUE: Chrome link-preview removes tabId info in message.sender
+    // See: https://crbug.com/1146484
+    // Revisit when link-preview is shipped to proper support tabId-dependent functionality
     if (!safeSrc.tab) {
       if (!me && (IS_FIREFOX ? !func.isOwn : !mode)) {
         if (process.env.DEBUG) console.log('No src.tab, ignoring:', ...arguments);
