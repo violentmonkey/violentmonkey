@@ -166,8 +166,7 @@ function logError(err) {
 
 function copyZip() {
   return gulp.src([
-    'node_modules/@zip.js/zip.js/dist/zip-no-worker.min.js',
-    'node_modules/@zip.js/zip.js/dist/z-worker.js',
+    'node_modules/@zip.js/zip.js/dist/zip.min.js',
   ])
   .pipe(gulp.dest(`${DIST}/public/lib`));
 }

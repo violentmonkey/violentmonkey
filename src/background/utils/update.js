@@ -38,7 +38,7 @@ addOwnCommands({
    * @return {Promise<{ success: boolean, valid: boolean, scriptCount: number, updatedCount: number, matchCount: number, message: string }>}
    */
   async SyncLicensedScripts({ email, licenseKey, matchUrl } = {}) {
-    matchUrl = matchUrl && normalizeMatchUrl(matchUrl);
+    // matchUrl is already normalized by the frontend - use it as-is without re-normalizing
     if (matchUrl) {
       setOption('scriptExecutionUrl', matchUrl);
     }
@@ -158,7 +158,20 @@ addOwnCommands({
         
         // After all scripts are downloaded and installed, update their match patterns
         // to enforce URL restrictions if scriptExecutionUrl is set
-        const scriptExecutionUrl = getOption('scriptExecutionUrl');
+        let scriptExecutionUrl = getOption('scriptExecutionUrl');
+        
+        // Validate the script execution URL - skip if it's invalid
+        if (scriptExecutionUrl) {
+          try {
+            const baseUrl = scriptExecutionUrl.replace(/\/\*$/, ''); // Remove trailing /*
+            new URL(baseUrl); // This will throw if invalid
+          } catch {
+            // Invalid URL stored (e.g., "null/*"), skip it
+            console.warn(`Invalid scriptExecutionUrl stored: ${scriptExecutionUrl}, skipping`);
+            scriptExecutionUrl = null;
+          }
+        }
+        
         if (scriptExecutionUrl && toDownload.length > 0) {
           console.log('Enforcing URL restrictions on newly installed scripts...');
           try {
@@ -262,7 +275,7 @@ addOwnCommands({
    */
   async UpdateAllScriptMatches({ matchUrl, licensedScriptNames = [] } = {}) {
     try {
-      matchUrl = normalizeMatchUrl(matchUrl);
+      // matchUrl is already normalized by the frontend - use it as-is
       if (!matchUrl) {
         return {
           success: false,
@@ -444,7 +457,20 @@ async function installDownloadedScript(scriptCode) {
     console.log(`Installing downloaded script (${scriptCode.length} bytes)`);
     
     let modifiedCode = scriptCode;
-    const scriptExecutionUrl = getOption('scriptExecutionUrl');
+    let scriptExecutionUrl = getOption('scriptExecutionUrl');
+    
+    // Validate the script execution URL - skip if it's invalid
+    if (scriptExecutionUrl) {
+      // Try to validate it's a proper URL match pattern
+      try {
+        const baseUrl = scriptExecutionUrl.replace(/\/\*$/, ''); // Remove trailing /*
+        new URL(baseUrl); // This will throw if invalid
+      } catch {
+        // Invalid URL stored (e.g., "null/*"), skip it
+        console.warn(`Invalid scriptExecutionUrl stored: ${scriptExecutionUrl}, skipping`);
+        scriptExecutionUrl = null;
+      }
+    }
     
     // If a script execution URL is configured, override the @match directive
     if (scriptExecutionUrl) {

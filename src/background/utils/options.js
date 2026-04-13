@@ -64,6 +64,20 @@ export function initOptions(data, lastVersion, versionChanged) {
       val[key] += '-'; // Until reverse sort was implemented, 'size' was reversed by design
     }
   }
+  
+  // Clean up invalid scriptExecutionUrl value (April 2026)
+  // If scriptExecutionUrl is stored as "null/*" or similar invalid value, clear it
+  const scriptExecutionUrl = options.scriptExecutionUrl;
+  if (scriptExecutionUrl) {
+    try {
+      const baseUrl = `${scriptExecutionUrl}`.replace(/\/\*$/, '');
+      new URL(baseUrl);
+    } catch {
+      // Invalid URL stored, clear it
+      if (process.env.DEBUG) console.info('Clearing invalid scriptExecutionUrl:', scriptExecutionUrl);
+      setOption('scriptExecutionUrl', '');
+    }
+  }
 }
 
 /**

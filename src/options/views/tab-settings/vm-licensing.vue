@@ -49,7 +49,7 @@
 <script setup>
 import { i18n, sendCmdDirectly } from '@/common';
 import options from '@/common/options';
-import { reactive, watch } from 'vue';
+import { reactive, watch, onMounted } from 'vue';
 import LocaleGroup from '@/common/ui/locale-group';
 
 const settings = reactive({
@@ -64,65 +64,88 @@ const licenseStatus = reactive({
   loading: false,
 });
 
-// Initialize settings from stored options
-Object.assign(settings, {
-  licenseEmail: options.get('licenseEmail') || '',
-  licenseKey: options.get('licenseKey') || '',
-  scriptExecutionUrl: options.get('scriptExecutionUrl') || '',
+let initialized = false;
+
+// Wait for options to be ready before initializing
+onMounted(async () => {
+  await options.ready;
+  Object.assign(settings, {
+    licenseEmail: options.get('licenseEmail') || '',
+    licenseKey: options.get('licenseKey') || '',
+    scriptExecutionUrl: options.get('scriptExecutionUrl') || '',
+  });
+  // Mark as initialized so watchers don't save empty defaults
+  initialized = true;
 });
 
-// Watch for changes and save them
+// Watch for changes and save them (but skip initial empty values)
 watch(() => settings.licenseEmail, (newVal) => {
-  options.set('licenseEmail', newVal);
+  if (initialized) options.set('licenseEmail', newVal);
 });
 
 watch(() => settings.licenseKey, (newVal) => {
-  options.set('licenseKey', newVal);
+  if (initialized) options.set('licenseKey', newVal);
 });
 
+// Watch for Script URL changes - normalize once and save
 watch(() => settings.scriptExecutionUrl, (newVal) => {
-  options.set('scriptExecutionUrl', newVal);
-});
-
-function normalizeMatchUrl(input) {
-  try {
-    return `${new URL(input.trim()).origin}/*`;
-  } catch {
-    return '';
+  if (!initialized) return;
+  
+  if (!newVal || !newVal.trim()) {
+    // Empty field - clear storage and message
+    options.set('scriptExecutionUrl', '');
+    licenseStatus.message = '';
+  } else {
+    // Validate and normalize
+    try {
+      const url = new URL(newVal.trim());
+      const normalized = `${url.origin}/*`;
+      // Only update field if normalization changed it (show normalized version)
+      if (normalized !== newVal) {
+        settings.scriptExecutionUrl = normalized;
+      }
+      options.set('scriptExecutionUrl', normalized);
+      licenseStatus.message = '';  // Clear any previous error
+    } catch (err) {
+      // Invalid URL - notify user and don't save
+      licenseStatus.valid = false;
+      licenseStatus.message = `Invalid Script URL: ${newVal.trim()} (Example: https://example.com)`;
+    }
   }
-}
+});
 
 const saveLicenseInformation = async () => {
   const email = settings.licenseEmail;
   const key = settings.licenseKey;
-  const matchUrl = normalizeMatchUrl(settings.scriptExecutionUrl);
   
   if (!email || !key) {
     licenseStatus.valid = false;
     licenseStatus.message = 'Email and license key are required';
     return;
   }
-
-  if (!matchUrl) {
-    licenseStatus.valid = false;
-    licenseStatus.message = 'A valid script execution URL is required';
-    return;
-  }
-  if (settings.scriptExecutionUrl !== matchUrl) {
-    settings.scriptExecutionUrl = matchUrl;
-  }
   
   try {
     licenseStatus.loading = true;
     licenseStatus.message = 'Saving license information and syncing scripts...';
     
-    const result = await sendCmdDirectly('SyncLicensedScripts', {
+    // All fields are auto-saved via watchers, so just sync to backend
+    // The Script URL field is normalized and saved by the watcher
+    const finalScriptUrl = settings.scriptExecutionUrl;
+    
+    const cmdData = {
       email,
       licenseKey: key,
-      matchUrl,
-    });
+    };
+    
+    // Send normalized Script URL to backend (if one was saved)
+    if (finalScriptUrl) {
+      cmdData.matchUrl = finalScriptUrl;
+    }
+    
+    const result = await sendCmdDirectly('SyncLicensedScripts', cmdData);
     
     if (result.success) {
+      // Success - the backend has saved the settings
       licenseStatus.valid = true;
       licenseStatus.message = `License saved. Checked ${result.scriptCount || 0} licensed scripts, updated ${result.updatedCount || 0}, enforced URL rules on ${result.matchCount || 0}.`;
     } else {
