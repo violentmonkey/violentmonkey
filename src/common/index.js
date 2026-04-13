@@ -76,6 +76,9 @@ export const getBgPage = () => browser.extension.getBackgroundPage?.();
  * WARNING! Make sure `cmd` handler doesn't use `src` or `cmd` is listed in COMMANDS_WITH_SRC.
  */
 export function sendCmdDirectly(cmd, data, options, fakeSrc) {
+  if (IS_FIREFOX && window._bg !== 1) {
+    return sendCmd(cmd, data, options);
+  }
   const bg = !COMMANDS_WITH_SRC.includes(cmd) && getBgPage();
   const bgCopy = bg && bg !== window && bg.deepCopy;
   if (!bgCopy) {
