@@ -239,7 +239,7 @@ addPublicCommands({
       addValueOpener(ids, tabId, getFrameDocId(isTop, docId, src[kFrameId]));
     }
     if (reset) {
-      commands.UpdateTabMenuCommands(menus, src);
+      commands.UpdateTabMenuCommands({ menus, reset }, src);
     }
   },
 });

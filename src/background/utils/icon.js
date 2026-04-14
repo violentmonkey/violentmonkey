@@ -125,7 +125,8 @@ init.then(async () => {
   }
 });
 
-contextMenus?.onClicked.addListener(({ menuItemId: id }, tab) => {
+contextMenus?.onClicked.addListener(({ menuItemId: id, frameId }, tab) => {
+  if (tryHandlePageMenuCommand(id, tab, frameId)) return;
   handleHotkeyOrMenu(id, tab);
 });
 tabsOnRemoved.addListener(id => delete badges[id]);
@@ -242,7 +243,6 @@ export function getFailureReason(url, data, def = titleDefault) {
 }
 
 export function handleHotkeyOrMenu(id, tab) {
-  if (tryHandlePageMenuCommand(id, tab)) return;
   if (id === SKIP_SCRIPTS) {
     commands[SKIP_SCRIPTS](tab);
   } else if (id === TAB_SETTINGS) {

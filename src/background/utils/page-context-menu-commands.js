@@ -149,12 +149,12 @@ function maybeRebuildForActiveTab(updatedTabId) {
 
 addPublicCommands({
   /** Sync in-memory menu state from a content-script frame; see file comment for merge/routing rules. */
-  UpdateTabMenuCommands(menus, { tab, [kFrameId]: frameId, [kTop]: isTop }) {
+  UpdateTabMenuCommands({ menus, reset }, { tab, [kFrameId]: frameId, [kTop]: isTop }) {
     if (!tab?.id) return;
     const routes = nest(routeTab, tab.id);
     const byTab = nest(tabFrameMenus, tab.id);
     if (isEmpty(menus)) {
-      if (isTop) {
+      if (reset && isTop) {
         delete tabFrameMenus[tab.id];
         delete routeTab[tab.id];
       } else {
@@ -170,14 +170,14 @@ addPublicCommands({
         for (const sid in oldFrameMenus) {
           for (const key in oldFrameMenus[sid]) {
             const rkey = `${sid}:${key}`;
-            if (routes[rkey] === frameId) delete routes[rkey];
+            if (routes[rkey]?.[frameId]) delete routes[rkey][frameId];
           }
         }
       }
       byTab[frameId] = menus;
       for (const sid in menus) {
         for (const key in menus[sid]) {
-          routes[`${sid}:${key}`] = frameId;
+          nest(routes, `${sid}:${key}`)[frameId] = true;
         }
       }
     }
@@ -233,16 +233,15 @@ if (contextMenus && init) {
  * @param {chrome.tabs.Tab} tab
  * @returns {boolean} true if handled
  */
-export function tryHandlePageMenuCommand(id, tab) {
+export function tryHandlePageMenuCommand(id, tab, frameId) {
   if (typeof id !== 'string' || !id.startsWith(CMD_PREFIX)) return false;
-  const rest = id.slice(CMD_PREFIX.length);
-  const m = /^(\d+):(\d+):([\s\S]+)$/.exec(rest);
+  const m = /^(\d+):(\d+):([\s\S]+)$/.exec(id.slice(CMD_PREFIX.length));
   if (!m) return false;
   const [, encTabId, scriptId, encKey] = m;
   if (+encTabId !== tab.id) return false;
   const key = decodeURIComponent(encKey);
-  const sid = `${scriptId}:${key}`;
-  const frameId = routeTab[tab.id]?.[sid];
+  const routes = routeTab[tab.id]?.[`${scriptId}:${key}`];
+  if (!(routes[frameId] || (frameId = parseInt(Object.keys(routes)[0]), routes[frameId]))) return false;
   // Synthetic event so injected Command handler runs like a context-menu activation from the popup.
   const evt = {
     type: 'mouseup',

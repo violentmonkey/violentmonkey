@@ -46,13 +46,13 @@ addHandlers({
   RegisterMenu({ id, key, val }) {
     (menus[id] || (menus[id] = createNullObj()))[key] = val;
     sendSetPopup(true);
-    sendCmd('UpdateTabMenuCommands', menus);
+    sendCmd('UpdateTabMenuCommands', { menus });
   },
 
   UnregisterMenu({ id, key }) {
     delete menus[id]?.[key];
     sendSetPopup(true);
-    sendCmd('UpdateTabMenuCommands', menus);
+    sendCmd('UpdateTabMenuCommands', { menus });
   },
 });
 
