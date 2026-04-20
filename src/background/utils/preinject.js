@@ -80,7 +80,7 @@ const META_KEYS_TO_ENSURE = [
 const META_KEYS_TO_ENSURE_FROM = [
   [HOMEPAGE_URL, 'homepage'],
 ];
-const META_KEYS_TO_PLURALIZE_RE = /^(?:(m|excludeM)atch|(ex|in)clude)$/;
+const META_KEYS_TO_PLURALIZE_RE = /^(?:(m|excludeM)atch|(ex|in)clude|tag)$/;
 const pluralizeMetaKey = (s, consonant) => s + (consonant ? 'es' : 's');
 const pluralizeMeta = key => key.replace(META_KEYS_TO_PLURALIZE_RE, pluralizeMetaKey);
 const propsToClear = {
