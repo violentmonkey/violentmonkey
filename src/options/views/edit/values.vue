@@ -542,16 +542,22 @@ $lightBorder: 1px solid var(--fill-2);
   gap: 1em;
   overflow: hidden;
   @media (max-width: 1200px) {
+    &-panel {
+      flex: 1 1 100%;
+    }
     &[data-editing] {
       flex-direction: column;
       > :first-child {
-        flex: 0 1 min-content;
+        flex: 0 0 min-content;
         overflow-y: auto;
         max-height: 40vh;
         @media (max-height: 600px) {
           display: none;
         }
       }
+    }
+    .trash {
+      flex-shrink: 1000;
     }
   }
   nav {
@@ -577,6 +583,7 @@ $lightBorder: 1px solid var(--fill-2);
     cursor: pointer;
     .main > &:first-child {
       padding: 8px 6px;
+      display: block;
     }
     &:not(:first-child) {
       border-top: 0;
