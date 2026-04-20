@@ -96,7 +96,7 @@
                ref="$key"
                class="w-100"
                spellcheck="false"
-               :class="{ dirty: current.dirty = current.dirty & ~1 | current.key !== current.keyOrig }">
+               :class="{ dirty: (current.dirty = current.dirty & ~1 | (k = current.key !== current.keyOrig), k) }">
       </label>
       <div>
         <label v-if="current.isAll" v-text="i18n('valueLabelValueAll')" for="edit-value"/>
