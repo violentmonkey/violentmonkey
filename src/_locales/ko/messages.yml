@@ -102,10 +102,10 @@ buttonSupport:
   message: 지원 페이지
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: 로컬로 일회성 가져오기
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: 원격으로 일회성 내보내기
 buttonUndo:
   description: Button to undo removement of a script.
   message: 실행 취소
@@ -118,13 +118,13 @@ buttonUpdateAll:
   touched: false
 buttonVacuum:
   description: Button to vacuum extension data.
-  message: 데이터베이스 청소
+  message: 데이터베이스 정리
 buttonVacuumed:
   description: Message shown when data is vacuumed.
-  message: 데이터 청소됨
+  message: 데이터 정리 완료됨
 buttonVacuuming:
   description: Message shown when data vacuum is in progress.
-  message: 데이터 청소 중...
+  message: 데이터 정리 중...
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
@@ -142,13 +142,13 @@ confirmUndoImport:
   message: 데이터베이스의 모든 변경 사항 되돌리기 (가져오기, 업데이트, 수정, 사용자 지정)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: 이 목록과 일치하는 URL에는 스크립트가 삽입되지 않습니다.
+  message: 인젝션 블랙리스트 (해당 사이트 내에서 스크립트 실행을 허용하지 않습니다.)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: 네트워크 블랙리스트 (스크립트의 사이트 접속 및 쿠키 사용을 차단합니다.)
 descCustomCSS:
   description: Description of custom CSS section.
-  message: 옵션 페이지와 스크립트 설치 페이지를 위한 커스텀 CSS입니다. 만약 이게 뭔지 모르신다면 수정하지 마세요.
+  message: 옵션 페이지 및 스크립트 설치 페이지를 위한 사용자 정의 CSS입니다. 해당 기능의 용도를 정확히 모르신다면 편집하지 마세요.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
@@ -176,16 +176,16 @@ descScriptTemplate:
     <{{date:format}}> 형식. 예: <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: 그룹
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: 숨기기
 disabledScriptsSelector:
   description: Label of the option.
-  message: ''
+  message: '비활성화된 스크립트:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: 보기
 editHelpDocumention:
   description: Label in the editor help tab for the documentation link.
   message: '유저스크립트의 메타데이터와 <code>GM</code> API 문서:'
@@ -203,7 +203,7 @@ editLabelSettings:
   message: 스크립트 설정
 editLongLine:
   description: Shown in the editor in lines that were cut due to being too long
-  message: 줄이 너무 깁니다
+  message: 입력한 줄의 길이가 너무 깁니다.
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: |-
@@ -265,10 +265,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: 최근 방문 시간
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: 스크립트의 대상이 되는 사이트에 마지막으로 접속한 기록입니다.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: 전체
@@ -310,12 +310,15 @@ hintForBatchAction:
   message: 일치하는 스크립트 $1개
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none`은 다른 모든 `@grant` 키를 무효화합니다.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: |-
+    샌드박스 처리된 스크립트는 이 전역 속성을 변경할 수 없음: $1.
+    수정하려면 `@grant none`을 추가해 샌드박스를 해제하거나,
+    `window` 대신 `unsafeWindow`를 사용하세요.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL 입력:'
@@ -395,7 +398,7 @@ labelBlacklist:
   message: 블랙리스트
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: 주석
 labelContributors:
   description: Label for link to contributors.
   message: 기여자
@@ -469,13 +472,15 @@ labelHomepageURL:
   message: '홈페이지 URL:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: GM_cookie의 HTTP-only 쿠키 접근 허용
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    활성화 시 스크립트가 HTTP-only 플래그가 설정된 쿠키를 읽고 쓸 수 있습니다. 이를 통해 JavaScript로는 접근할 수 없는
+    쿠키에 접근이 가능해집니다. 보안 위험이 발생할 수 있으므로 주의하여 사용하십시오.
 labelIconURL:
   description: Label for the input.
-  message: ''
+  message: '아이콘 URL:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
   message: 스크립트 데이터 가져오기
@@ -536,7 +541,7 @@ labelReinstall:
   description: >-
     Shown in the title of the confirm page while trying to install a script
     that's already installed.
-  message: 스크립트 재설치 중
+  message: 스크립트 재설치
 labelRelated:
   description: Label of related links.
   message: '관련된 링크: '
@@ -554,10 +559,10 @@ labelRunAtDefault:
   message: (기본 값)
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: (설정에서 이 옵션이 활성화된 스크립트에만 해당됩니다.)
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: (이 옵션은 전역 설정에서도 활성화해야 합니다.)
 labelScriptTemplate:
   description: Label for custom script template.
   message: 사용자 스크립트 템플릿
@@ -575,7 +580,7 @@ labelShowOrder:
   message: 실행 순서 표시
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: 최근 방문 시각 표시
 labelSync:
   description: Label for sync options.
   message: 동기화
@@ -590,7 +595,7 @@ labelSyncAuthorizing:
   message: 인증 중
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: 자동으로 동기화
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: 없음
@@ -639,7 +644,7 @@ labelViewTable:
   message: 표 형식
 labelWidth:
   description: Width.
-  message: ''
+  message: '너비:'
 labelXhrInject:
   description: >-
     (`$1` will be shown as `page`) Option in Advanced settings to enable
@@ -803,7 +808,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: 스크립트를 재설치하시거나 다시 저장하세요.
+  message: 스크립트를 재설치하거나 다시 저장하세요.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (변경 없음)'
@@ -920,10 +925,10 @@ optionUpdate:
   message: 업데이트
 popupSettings:
   description: Item inside the popup's "⋮" menu
-  message: ''
+  message: 팝업 설정
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: '마우스 우클릭: 팝업 설정'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: 읽기 전용
@@ -976,7 +981,7 @@ skipScriptsMsg:
   message: 이 페이지에서 유저스크립트를 비활성화했습니다. 스크립트를 실행하려면 탭을 새로고침하거나 탐색하세요.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: ''
+  message: '정렬 순서:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: 추적 중단
@@ -1017,7 +1022,7 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: ''
+  message: 유저스크립트 인젝션 토글
 trackEdits:
   description: Button in a script installation dialog.
   message: 외부 편집 추적
@@ -1034,13 +1039,13 @@ updateScript:
   message: 업데이트
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: 마우스 오른쪽 버튼을 클릭하거나 길게 터치하여 종속 파일을 포함한 전체 업데이트를 강제로 실행
 updateScriptsAll:
   description: Command/button to update all scripts.
-  message: ''
+  message: 모든 스크립트 업데이트
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
-  message: ''
+  message: 현재 탭에서 실행 중인 스크립트 업데이트
 valueLabelKey:
   description: Label for key of a script value.
   message: 키 (문자열)
@@ -1052,10 +1057,10 @@ valueLabelValueAll:
   message: 모든 값 (JSON 직렬화)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: 값 (JSON 또는 $1로 직렬화됨)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1 문자열
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 웹 사이트 방문
