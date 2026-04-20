@@ -255,9 +255,6 @@ $leftColWidth: 12rem;
     height: 16px;
     vertical-align: text-bottom;
   }
-  [data-num]::before {
-    content: ' (' attr(data-num) ')';
-  }
   .tags {
     a:hover {
       text-decoration: underline;

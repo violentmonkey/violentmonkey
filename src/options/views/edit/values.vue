@@ -33,8 +33,8 @@
            @keydown.up.exact="onUpDown">
         <a
           ref="$editAll"
-          class="edit-values-row flex"
-          @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')"/>
+          class="edit-values-row"
+          @click="onEditAll" tabindex="0" v-text="i18n('editValueAllHint')" :data-num="keys.length"/>
         <div
           v-for="key in pageKeys"
           :key
@@ -52,14 +52,15 @@
         </div>
       </div>
       <div class="edit-values-empty mt-1" v-if="!loading && !keys.length" v-text="i18n('noValues')"/>
-      <h3 v-text="i18n('headerRecycleBin')" v-if="trash"/>
+      <h3 v-text="i18n('headerRecycleBin')" v-if="trash" :data-num="Object.keys(trash).length"/>
       <div class="edit-values-table trash monospace-font"
            @keydown.down.exact="onUpDown"
            @keydown.up.exact="onUpDown"
            :style="trashKeyWidthStyle"
            v-if="trash">
         <!-- eslint-disable-next-line vue/no-unused-vars -->
-        <div v-for="({ key, cut, len }, trashKey) in trash" :key="trashKey"
+        <div v-for="({ key, cut, len, t }, trashKey) in trash" :key="trashKey"
+             :title="t"
              class="edit-values-row flex"
              @click="onRestore(trashKey)">
           <a class="ellipsis" v-text="key" tabindex="0"/>
@@ -401,6 +402,7 @@ function addToTrash(
     rawValue,
     cut,
     len,
+    t: new Date().toLocaleTimeString(),
   };
 }
 function onRemove(key) {

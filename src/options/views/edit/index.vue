@@ -595,6 +595,9 @@ function setupSavePosition({ id: curWndId, tabs }) {
   a.btn-ghost {
     padding: 0 2px;
   }
+  [data-num]::after {
+    content: ' (' attr(data-num) ')';
+  }
 }
 
 .touch body {
