@@ -2,29 +2,33 @@ import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge'
 import { createObjectURL, decodeResource, makeSafeBlob, sendCmd } from './util';
 import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
 
-const {
-  fetch: safeFetch,
-  FileReader: SafeFileReader,
-  FormData: SafeFormData,
-} = global;
-const { arrayBuffer: getArrayBuffer, blob: getBlob } = ResponseProto;
-const BlobProto = SafeBlob[PROTO];
-const getBlobType = describeProperty(BlobProto, 'type').get;
-const getTypedArrayBuffer = describeProperty(getPrototypeOf(SafeUint8Array[PROTO]), 'buffer').get;
-const getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
-const readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
-const fdAppend = SafeFormData[PROTO].append;
-const U8_set = SafeUint8Array[PROTO].set;
 const CHUNKS = 'chunks';
 const LOAD = 'load';
 const LOADEND = 'loadend';
 const isBlobXhr = req => req[kXhrType] === 'blob';
 /** @type {GMReq.Content} */
 const requests = createNullObj();
+let BlobProto, getArrayBuffer, getBlob, getBlobType, getTypedArrayBuffer;
+let SafeFileReader, getReaderResult, readAsDataURL;
+let SafeFormData, fdAppend;
+let U8_set;
+let safeFetch;
 let navigator, getUAData, getUAProps, getHighEntropyValues;
 let SafeDOMParser, parseFromString;
 
 onScripts.push(data => {
+  safeFetch = fetch;
+  BlobProto = SafeBlob[PROTO];
+  SafeFileReader = FileReader;
+  SafeFormData = FormData;
+  U8_set = SafeUint8Array[PROTO].set;
+  fdAppend = SafeFormData[PROTO].append;
+  getArrayBuffer = ResponseProto.arrayBuffer;
+  getBlob = ResponseProto.blob;
+  getBlobType = describeProperty(BlobProto, 'type').get;
+  getReaderResult = describeProperty(SafeFileReader[PROTO], 'result').get;
+  getTypedArrayBuffer = describeProperty(getPrototypeOf(SafeUint8Array[PROTO]), 'buffer').get;
+  readAsDataURL = SafeFileReader[PROTO].readAsDataURL;
   SafeDOMParser = DOMParser;
   parseFromString = SafeDOMParser[PROTO].parseFromString;
   // The tab may have a different UA due to a devtools override or about:config
