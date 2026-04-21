@@ -15,7 +15,6 @@ export let
   safeBind,
   // window
   SafeCustomEvent,
-  SafeDOMParser,
   SafeDOMException,
   SafeError,
   SafeEventTarget,
@@ -115,7 +114,6 @@ export const VAULT = (() => {
   res = [
     // window
     SafeCustomEvent = res[i += 1] || src.CustomEvent,
-    SafeDOMParser = res[i += 1] || src.DOMParser,
     SafeDOMException = res[i += 1] || src.DOMException,
     SafeError = res[i += 1] || src.Error,
     SafeEventTarget = res[i += 1] || src.EventTarget,
@@ -163,7 +161,6 @@ export const VAULT = (() => {
     jsonStringify = res[i += 1] || src.JSON.stringify,
     logging = res[i += 1] || nullObjFrom((srcFF || src).console),
     mathRandom = res[i += 1] || src.Math.random,
-    parseFromString = res[i += 1] || SafeDOMParser[PROTO].parseFromString,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     SafePromise = res[i += 1] || src.Promise,

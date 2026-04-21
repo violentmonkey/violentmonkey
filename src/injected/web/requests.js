@@ -135,8 +135,13 @@ function parseRaw(req, msg, propName) {
       && propName === kResponseXML
       && PARSEABLE_TYPES::indexOf(ct = getContentType(msg) || kContentTextHtml) >= 0
     || responseType === 'json') {
-      try { res = ct ? new SafeDOMParser()::parseFromString(res, ct) : jsonParse(res); }
-      catch (e) { res = null; /* per specification */ }
+      try {
+        if (ct) {
+          bridge.call('ParseHTML', [res, ct], null, function () { res = this; });
+        } else {
+          res = jsonParse(res);
+        }
+      } catch (e) { res = null; /* per specification */ }
     }
     if (responseType === kDocument) {
       const otherPropName = propName === kResponse ? kResponseXML : kResponse;

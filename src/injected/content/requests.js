@@ -22,8 +22,11 @@ const isBlobXhr = req => req[kXhrType] === 'blob';
 /** @type {GMReq.Content} */
 const requests = createNullObj();
 let navigator, getUAData, getUAProps, getHighEntropyValues;
+let SafeDOMParser, parseFromString;
 
 onScripts.push(data => {
+  SafeDOMParser = DOMParser;
+  parseFromString = SafeDOMParser[PROTO].parseFromString;
   // The tab may have a different UA due to a devtools override or about:config
   navigator = global.navigator;
   getUAProps = [];
@@ -74,6 +77,9 @@ addHandlers({
     return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
+  ParseHTML(args, realm, nodeRet) {
+    nodeRet[0] = safeApply(parseFromString, new SafeDOMParser(), args);
+  },
   UA: () => navigator::getUAProps[0](),
   UAD() {
     if (getUAData) {
