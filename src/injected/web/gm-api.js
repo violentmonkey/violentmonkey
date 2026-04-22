@@ -171,7 +171,7 @@ export const GM_API = {
    * @returns {HTMLElement} it also has .then() so it should be compatible with TM
    */
   GM_addElement(parent, tag, attributes) {
-    return isString(parent)
+    return !parent ? null : isString(parent)
       ? webAddElement(null, parent, tag)
       : webAddElement(parent, tag, attributes);
   },
