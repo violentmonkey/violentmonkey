@@ -363,6 +363,7 @@ $removedItemHeight: calc(
   &.removed {
     grid-template-columns: $iconSize auto 1fr auto auto;
     height: $removedItemHeight;
+    padding-top: $removedItemPadB;
     padding-bottom: $removedItemPadB;
   }
   &:not(.removed) {
@@ -396,7 +397,9 @@ $removedItemHeight: calc(
     display: flex;
     gap: 8px;
     align-items: center;
-    align-self: flex-start;
+    .script:not(.removed) & {
+      align-self: flex-start;
+    }
   }
   &-name {
     font-weight: 500;
@@ -658,7 +661,7 @@ $removedItemHeight: calc(
     [data-hotkey-table]::after {
       content: none;
     }
-    .size {
+    .script:not(.removed) .size {
       position: absolute;
       bottom: 10px;
       right: 40px;
