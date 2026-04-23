@@ -4,7 +4,9 @@ import {
   getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl,
   ignoreChromeErrors,
 } from '@/common';
-import { FETCH_OPTS, INFERRED, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT } from '@/common/consts';
+import {
+  FETCH_OPTS, INFERRED, kTag, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT,
+} from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
 import {
@@ -158,9 +160,9 @@ addOwnCommands({
         uri,
       };
       const custom = script.custom = { ...defaultCustom, ...script.custom };
-      const { pathMap, tags } = custom;
-      if (tags) {
-        custom.tag = tags.split(/\s+/);
+      const { pathMap, tags, [kTag]: tag } = custom;
+      if (tags || typeof tag === 'string'/* script installed in an older VM */) {
+        custom[kTag] = (tags || tag).split(/\s+/);
         delete custom.tags;
       }
       // Patching the bug in 2.27.0 where data: URI was saved as invalid in pathMap
