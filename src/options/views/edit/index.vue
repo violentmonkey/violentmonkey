@@ -4,13 +4,13 @@
       <nav>
         <div
           v-for="(label, navKey) in navItems" :key="navKey"
-          class="edit-nav-item" :class="{active: nav === navKey}"
+          class="edit-nav-item" :class="{ active: nav === navKey, 'with-icon': navKey === EXTERNALS }"
           @click="nav = navKey"
         >{{
           label
         }}<template v-if="navKey === EXTERNALS">
-            <a @click.stop="onUpdateDeps" class="nav-icon"><icon name="refresh"/></a>
-            <span v-text="depsProgress"/>
+            <a @click.stop="onUpdateDeps"><icon name="refresh"/></a>
+            <span v-text="depsProgress" v-if="depsProgress"/>
           </template>
         </div>
       </nav>
@@ -534,12 +534,20 @@ function setupSavePosition({ id: curWndId, tabs }) {
       background: var(--fill-0-5);
       box-shadow: 0 -1px 1px var(--fill-4);
     }
-    a.nav-icon {
-      vertical-align: middle;
-      padding: $navPadY $navPadX;
-      margin-right: -$navPadX;
-      &:not(:hover) {
-        color: inherit;
+    &.with-icon {
+      padding-right: 0;
+      > a {
+        padding: $navPadY;
+        margin: -$navPadY 0 -$navPadY $navPadY;
+        &:not(:hover) {
+          color: inherit;
+        }
+        svg {
+          transform: translateY(2px); /* the icon is not centered innately */
+        }
+      }
+      > span {
+        padding-right: $navPadX;
       }
     }
   }
