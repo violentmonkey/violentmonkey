@@ -10,8 +10,8 @@ import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
 import {
-  formatSizesStr, kComment, kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store,
-  updateTags,
+  formatSizesStr, kComment, kDescription, kName, kStorageSize, performSearch, SIZE_TITLES,
+  sortedScripts, store, updateTags,
 } from './utils';
 import App from './views/app';
 
@@ -58,7 +58,7 @@ function initScript(script, sizes, code) {
   if (code) $cache.code = code;
   script.$canUpdate = getScriptUpdateUrl(script)
     && (script.config.shouldUpdate ? 1 : -1 /* manual */);
-  loadScriptIcon(script, store, true);
+  loadScriptIcon(script, store, true, sortedScripts);
 }
 
 export function loadData() {

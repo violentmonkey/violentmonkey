@@ -27,7 +27,7 @@
               </a>
             </Tooltip>
           </div>
-          <div v-if="state.filteredScripts.length" class="btn-group">
+          <div v-if="filteredScripts.length" class="btn-group">
             <a
               v-for="({ icon, num }, key) in batchActions" :key
               class="btn-ghost"
@@ -45,7 +45,7 @@
             </a>
             <Tooltip :content="state.sizes" placement="bottom">
               <div class="btn-hint subtle"
-                   v-text="i18n('hintForBatchAction', `${state.filteredScripts.length}`)"
+                   v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
                    :data-size="state.size"/>
             </Tooltip>
             <Tooltip :content="i18n('buttonUndo')" placement="bottom" align="start">
@@ -134,7 +134,7 @@
         :data-show-order="filters.showOrder || null"
         :data-table="filters.viewTable || null">
         <ScriptItem
-          v-for="(script, index) in state.sortedScripts"
+          v-for="(script, index) in sortedScripts"
           v-show="!state.search.rules.length || script.$cache.show !== false"
           :key="script.props.id"
           :focused="selectedScript === script"
@@ -190,8 +190,8 @@ import Icon from '@/common/ui/icon';
 import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
 import { getSortCollator } from '@/common/ui/util';
 import {
-  createSearchRules, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
-  SIZE_TITLES, store, TOGGLE_OFF, TOGGLE_ON,
+  createSearchRules, filteredScripts, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
+  SIZE_TITLES, sortedScripts, store, TOGGLE_OFF, TOGGLE_ON,
 } from '../utils';
 import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
@@ -304,8 +304,6 @@ const state = reactive({
     error: null,
     ...createSearchRules(''),
   },
-  sortedScripts: [],
-  filteredScripts: [],
   script: null,
   code: '',
   numColumns: 1,
@@ -324,12 +322,15 @@ const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
 const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith('exec'));
 const draggable = computed(() => isTouch && draggableRaw.value);
 const currentSortCompare = computed(() => sortModes[filters.sort]?.compare);
-const selectedScript = computed(() => state.filteredScripts[state.focusedIndex]);
+const selectedScript = computed(() => filteredScripts.value[state.focusedIndex]);
 const message = computed(() => {
   if (!store.loaded) {
     return null;
   }
-  if (state.search.rules.length ? !state.sortedScripts.find(s => s.$cache.show !== false) : !state.sortedScripts.length) {
+  if (state.search.rules.length
+    ? !sortedScripts.value.find(s => s.$cache.show !== false)
+    : !sortedScripts.value.length
+  ) {
     return i18n('labelNoSearchScripts');
   }
   return null;
@@ -363,9 +364,9 @@ const ALL_BATCH_ACTIONS = {
   },
 };
 const batchActions = computed(() => {
-  const scripts = state.filteredScripts;
+  const scripts = filteredScripts.value;
   const num = scripts.length;
-  const allShown = num === state.sortedScripts.length;
+  const allShown = num === sortedScripts.value.length;
   let res = ALL_BATCH_ACTIONS;
   let toEnable = 0;
   let toUpdate = 0;
@@ -400,14 +401,14 @@ async function refreshUI() {
 function sortScripts(scripts) {
   const cmp = currentSortCompare.value;
   if (cmp) scripts.sort(combinedCompare(cmp));
-  state.sortedScripts = scripts;
+  sortedScripts.value = scripts;
 }
 function onUpdate() {
   const scripts = [...getCurrentList()];
   const rules = state.search.rules;
   if (rules.length) performSearch(scripts, rules);
   sortScripts(scripts);
-  state.filteredScripts = rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
+  filteredScripts.value = rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
   selectScript(state.focusedIndex);
   renderScripts();
 }
@@ -430,7 +431,7 @@ async function handleInstallFromURL() {
 }
 async function moveScript(from, to) {
   if (from === to) return;
-  const scripts = state.filteredScripts;
+  const scripts = filteredScripts.value;
   const allScripts = store.scripts;
   const script = scripts[from];
   const aFrom = allScripts.indexOf(script);
@@ -492,7 +493,8 @@ async function renderScripts() {
   /* Skip rendering as the editor is being closed right now and we only have 1 script,
      we'll render in the next call after all scripts data is requested. */
   || store.title) return;
-  const { length } = state.sortedScripts;
+  const scripts = sortedScripts.value;
+  const { length } = scripts;
   let limit = 9;
   const batchRender = reactive({ limit });
   state.batchRender = batchRender;
@@ -502,7 +504,7 @@ async function renderScripts() {
     if (step && state.search.rules.length) {
       // Only visible items contribute to the batch size
       for (let vis = 0; vis < step && limit < length; limit += 1) {
-        vis += state.sortedScripts[limit].$cache.show ? 1 : 0;
+        vis += scripts[limit].$cache.show ? 1 : 0;
       }
     } else {
       limit += step || 1;
@@ -563,7 +565,7 @@ function adjustScriptWidth() {
     : widths.findIndex(w => window.innerWidth < w) + 1 || widths.length + 1;
 }
 function selectScript(index) {
-  index = Math.min(index, state.filteredScripts.length - 1);
+  index = Math.min(index, filteredScripts.value.length - 1);
   index = Math.max(index, -1);
   if (index !== state.focusedIndex) {
     state.focusedIndex = index;
@@ -638,7 +640,7 @@ function handleBatchAction(e) {
   if (stateBA.action === action) {
     // Confirmed
     const baVal = batchActions.value[action] || {};
-    const scripts = state.filteredScripts;
+    const scripts = filteredScripts.value;
     const arg = baVal.arg?.(scripts) || scripts;
     const fn = baVal.fn;
     const batchArgs = [fn, arg, button];
@@ -688,7 +690,7 @@ function bindKeys() {
       let index = state.focusedIndex;
       if (index < 0) index = 0;
       else index += state.numColumns;
-      if (index < state.filteredScripts.length) {
+      if (index < filteredScripts.value.length) {
         selectScript(index);
       }
     }, [
@@ -727,7 +729,7 @@ function bindKeys() {
         ['g g', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
-      selectScript(state.filteredScripts.length - 1);
+      selectScript(filteredScripts.value.length - 1);
     }, [
         ['ctrlcmd-end', conditionAll],
         ['G', conditionNotSearch, true],
@@ -802,7 +804,7 @@ watch(selectedScript, script => {
 watch(() => state.showHotkeys, value => {
   keyboardService.setContext('showHotkeys', value);
 });
-watch(() => state.filteredScripts, value => {
+watch(filteredScripts, value => {
   const totals = Array(SIZE_TITLES.length).fill(0);
   for (const script of value) {
     for (let i = 0; i < totals.length; i++) {

@@ -1,9 +1,11 @@
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { getScriptsTags, i18n, sendCmdDirectly } from '@/common';
 import { route } from '@/common/router';
 
 export * from './search';
 
+export const filteredScripts = ref([]);
+export const sortedScripts = ref([]);
 export const store = reactive({
   route,
   batch: null,

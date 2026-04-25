@@ -266,12 +266,17 @@ async function loadIcon(url) {
   const isOwn = url.startsWith(ICON_PREFIX);
   img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
     : url.startsWith('data:') ? url
-      : makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url))
-        || url;
-  await new Promise((resolve) => {
+      : makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url));
+  if (!img.src) {
+    // not saving to iconCache[url] because it may be a temporary network problem
+    return;
+  }
+  if (!await new Promise((resolve) => {
     img.onload = resolve;
-    img.onerror = resolve;
-  });
+    img.onerror = () => resolve();
+  })) {
+    return;
+  }
   let res;
   let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
   let { width, height } = img;
