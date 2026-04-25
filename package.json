@@ -37,7 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
     "@violentmonkey/types": "^0.3.1",
-    "@vue/compiler-sfc": "^3.5.25",
+    "@vue/compiler-sfc": "^3.5.33",
     "@vue/eslint-config-typescript": "^13.0.0",
     "amo-upload": "^0.5.5",
     "autoprefixer": "^10.4.15",
@@ -104,7 +104,7 @@
     "@zip.js/zip.js": "2.4.4",
     "codemirror": "^5.65.20",
     "tldts": "^7.0.19",
-    "vue": "^3.5.25",
+    "vue": "^3.5.33",
     "vueleton": "^2.0.2"
   },
   "engines": {
