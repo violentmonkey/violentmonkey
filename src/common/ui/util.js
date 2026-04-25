@@ -5,7 +5,7 @@ import { isMacintosh } from '@violentmonkey/shortcut';
 
 export const NORMALIZE = Symbol();
 export const CTRL_META = isMacintosh ? '⌘' : 'Ctrl-';
-export const getSortCollator = () => new Intl.Collator(undefined, {
+export const getSortCollator = () => new Intl.Collator(['en', chrome.i18n.getUILanguage()], {
   numeric: true, // 100 > 2
   sensitivity: 'accent', // ignore case
 });
