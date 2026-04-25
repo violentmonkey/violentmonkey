@@ -45,7 +45,7 @@ aside {
     padding-top: .6rem;
     padding-bottom: .6rem;
     color: var(--fill-8);
-    white-space: nowrap;
+    text-align: right;
     &.active,
     &:hover {
       color: var(--fg);

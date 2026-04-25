@@ -32,7 +32,14 @@ import About from './tab-about';
 
 const tabs = [
   { name: SCRIPTS, comp: Installed, label: i18n('sideMenuInstalled') },
-  { name: TAB_SETTINGS, comp: Settings, label: i18n('sideMenuSettings') },
+  {
+    name: TAB_SETTINGS, comp: Settings,
+    label: [
+      i18n('sideMenuSettings'),
+      i18n('optionUpdate'),
+      i18n('labelSync'),
+    ].join('\xA0| '),
+  },
   { name: TAB_ABOUT, comp: About, label: i18n('sideMenuAbout') },
   { name: TAB_RECYCLE, comp: Installed, label: i18n('buttonRecycleBin') },
 ];
