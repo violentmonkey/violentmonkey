@@ -14,7 +14,7 @@
     @blur="setScriptFocus(false)">
     <div class="script-icon hidden-xs">
       <a :href="url" :data-hotkey="hotkeys.edit" data-hotkey-table tabIndex="-1">
-        <img :src="script.safeIcon" :data-no-icon="script.noIcon">
+        <img :src="cache.safeIcon" :data-no-icon="cache.noIcon">
       </a>
     </div>
     <!-- We disable native dragging on name to avoid confusion with exec re-ordering.

@@ -9,11 +9,11 @@ const KEY_DEFAULT = 'noIcon';
  * @param {VMScript} script
  * @param {{cache?:{}, isHiDPI?:boolean}} [store]
  * @param {boolean} [showDefault]
- * @param {{ value: VMScript[] }} [scriptsRef]
+ * @param {object} [target]
  */
-export async function loadScriptIcon(script, store, showDefault, scriptsRef) {
+export async function loadScriptIcon(script, store, showDefault, target = script) {
   let def;
-  let res = script[KEY];
+  let res = target[KEY];
   const { icon: customIcon, pathMap } = script.custom || {};
   const icon = customIcon || script.meta.icon;
   const { cache = {}, isHiDPI } = store || {};
@@ -22,22 +22,17 @@ export async function loadScriptIcon(script, store, showDefault, scriptsRef) {
   );
   if (!url || url !== res) {
     // exposing scripts with no icon for user's CustomCSS
-    script[KEY_DEFAULT] = def ? '' : null;
+    target[KEY_DEFAULT] = def ? '' : null;
     // creates an observable property so Vue will see the change after `await`
-    if (!(KEY in script)) {
-      script[KEY] = null;
+    if (!(KEY in target)) {
+      target[KEY] = null;
     }
     if (url) {
-      res = cache[url]
+      target[KEY] = res = cache[url]
         || isDataUri(url) && url
-        || isHiDPI && def; // Using our big icon directly as its data URI is rendered slower
-      if (!res
-      && (def || isValidHttpUrl(url))
-      && (res = cache[url] = await sendCmdDirectly('GetImageData', url).catch(noop))
-      && scriptsRef) {
-        script = scriptsRef.value.find(s => s.props.id === script.props.id) || script;
-      }
-      script[KEY] = res;
+        || isHiDPI && def // Using our big icon directly as its data URI is rendered slower
+        || (def || isValidHttpUrl(url))
+          && (cache[url] = await sendCmdDirectly('GetImageData', url).catch(noop));
     }
   }
   return res;
