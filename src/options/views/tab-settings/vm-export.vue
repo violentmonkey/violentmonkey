@@ -96,6 +96,7 @@ async function exportData() {
     settings: options.get(),
   };
   delete vm.settings.sync;
+  delete vm.settings.modified;
   if (withValues) vm.values = {};
   const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
     let name = normalizeFilename(getScriptName(script));

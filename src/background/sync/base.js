@@ -16,12 +16,19 @@ import {
   USER_CONFIG,
 } from '@/common/consts-sync';
 import {
+  deepEqual,
   forEachEntry,
   objectSet,
   objectPick,
   objectGet,
 } from '@/common/object';
-import { getOption, setOption } from '../utils';
+import {
+  getOption,
+  setOption,
+  buildOptionsDiff,
+  applyOptionsDiff,
+  mergeOptionsDiff
+} from '../utils';
 import { sortScripts, updateScriptInfo } from '../utils/db';
 import { script as pluginScript } from '../plugin';
 import {
@@ -242,6 +249,7 @@ export const BaseService = serviceFactory({
   displayName: 'BaseService',
   urlPrefix: '',
   metaFile: VIOLENTMONKEY,
+  optionsFile: 'options',
   properties: {
     authType: 'oauth',
   },
@@ -270,7 +278,8 @@ export const BaseService = serviceFactory({
     return !!token;
   },
   getSyncData() {
-    return Promise.all([this.getMeta(), this.list(), this.getLocalData()]);
+    return Promise.all([this.getMeta(), this.list(), this.getLocalData(),
+      this.getOptions()]);
   },
 
   initialize() {
@@ -351,6 +360,15 @@ export const BaseService = serviceFactory({
         data,
       }));
   },
+  getOptions() {
+    return this.get({ name: this.optionsFile })
+      .then((data) => JSON.parse(data))
+      .catch(()    => ({}))
+      .then((data) => ({
+        name: this.optionsFile,
+        data,
+      }));
+  },
   _requestDelay: 0,
   async _request(options) {
     options = Object.assign({}, NO_CACHE, options);
@@ -411,6 +429,33 @@ export const BaseService = serviceFactory({
   getLocalData() {
     return pluginScript.list();
   },
+  async syncOptions(remoteDiff, mode) {
+    const local = buildOptionsDiff();
+    const remote = remoteDiff || {};
+    let diff = null;
+    switch (mode) {
+      case SYNC_PUSH:
+        diff = local;
+        break;
+      case SYNC_PULL:
+        logInfo('Applying remote options:', remote);
+        applyOptionsDiff(remote);
+        break;
+      case SYNC_MERGE:
+      default:
+        diff = mergeOptionsDiff(local, remote);
+        logInfo('Applying merged options:', diff);
+        applyOptionsDiff(diff);
+        if (deepEqual(diff, remote))
+          diff = null;
+        break;
+    }
+    if (diff) {
+        logInfo('Uploading options diff:', diff);
+        return this.put({ name: this.optionsFile },
+          JSON.stringify(diff));
+    }
+  },
   async sync() {
     try {
       await this.prepare();
@@ -438,10 +483,12 @@ export const BaseService = serviceFactory({
       finished: 0,
       total: 0,
     };
-    const [remoteMeta, remoteData, localData] = await this.getSyncData();
+    const [remoteMeta, remoteData, localData,
+      remoteOptions] = await this.getSyncData();
     const remoteMetaData = remoteMeta.data || {};
     const remoteMetaInfo = remoteMetaData.info || {};
     const remoteTimestamp = remoteMetaData.timestamp || 0;
+    const remoteOptionsDiff = remoteOptions && remoteOptions.data || {};
     let remoteChanged =
       !remoteTimestamp ||
       Object.keys(remoteMetaInfo).length !== remoteData.length;
@@ -614,6 +661,12 @@ export const BaseService = serviceFactory({
           });
         }),
     );
+    if (getOption('syncSettings')) {
+      promiseQueue.push(
+        Promise.all(promiseQueue).then(() =>
+          this.syncOptions(remoteOptionsDiff, currentSyncMode)),
+      );
+    }
     promiseQueue.push(
       Promise.all(promiseQueue).then(() => {
         const promises = [];

@@ -78,8 +78,12 @@ const toggleUnloadSentry = getUnloadSentry(() => {
   text.value = handle(savedValue);
 });
 const revoke = hookSetting(props.name, val => {
-  savedValue = val;
-  text.value = savedValueText = handle(val);
+  const base = props.json && savedValue
+    ? savedValue: defaultValue;
+  const merged = props.json && base
+    ? {...base,...val } : val;
+  savedValue = merged;
+  text.value = savedValueText = handle(merged);
 });
 
 defineExpose({
