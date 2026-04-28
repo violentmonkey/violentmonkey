@@ -1,5 +1,5 @@
 import bridge, { addHandlers, onScripts } from './bridge';
-import { sendSetPopup } from './gm-api-content';
+import { sendSetPopup, menus } from './gm-api-content';
 import { nextTask, sendCmd } from './util';
 
 const getPersisted = describeProperty(PageTransitionEvent[PROTO], 'persisted').get;
@@ -42,7 +42,7 @@ export function Run(id, realm) {
 async function report(delay, reset = !sent) {
   while (--delay >= 0) await nextTask();
   // not awaiting to clear `pending` immediately
-  sendCmd('Run', { reset, [IDS]: runningIds });
+  sendCmd('Run', { reset, [IDS]: runningIds, menus });
   sendSetPopup(!!pending);
   pending = false;
   sent = true;
