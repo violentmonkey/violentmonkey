@@ -367,13 +367,15 @@ async function save() {
       message: '',
       bumpDate: true,
     });
-    const newId = res?.where?.id;
+    const newId = res.where.id;
+    const newScript = res.update;
     CM.markClean();
     codeDirty.value = false; // triggers onDirty which sets canSave
     canSave.value = false; // ...and set it explicitly in case codeDirty was false
     frozenNote.value = false;
     errors.value = res.errors;
-    script.value = res.update; // triggers onScript+onChange to handle the new `meta` and `props`
+    newScript.$cache = scr.$cache; // retains kStorageSize, the rest will be updated in initScript later
+    script.value = newScript; // triggers onScript+onChange to handle the new `meta` and `props`
     if (newId && !id) history.replaceState(null, scriptName.value, `${ROUTE_SCRIPTS}/${newId}`);
     fatal.value = null;
   } catch (err) {
