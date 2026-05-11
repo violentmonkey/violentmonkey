@@ -557,6 +557,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: per-scriptmeldingen negeren (tabblad 'instellingen' in de bewerker)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Privacybeleid

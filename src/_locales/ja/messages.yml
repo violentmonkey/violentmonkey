@@ -528,6 +528,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: スクリプトごとの通知を無視 (エディタの「設定」タブ内)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: 個人情報保護方針

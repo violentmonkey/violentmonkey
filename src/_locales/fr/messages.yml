@@ -581,6 +581,9 @@ labelNotifyUpdatesGlobal:
   message: >-
     ignorer le paramètre de notification par script (onglet "Configuration" dans
     l'éditeur)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Politique de confidentialité

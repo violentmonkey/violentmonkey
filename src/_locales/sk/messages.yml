@@ -568,6 +568,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignorovať nastavenie upozornenia (záložka "Nastavenia" v editore)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Zásady ochrany osobných údajov

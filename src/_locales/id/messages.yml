@@ -544,6 +544,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: abaikan notifikasi per skrip (tab "pengaturan" di dalam penyunting)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Kebijakan Privasi

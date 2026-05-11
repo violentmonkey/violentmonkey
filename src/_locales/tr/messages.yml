@@ -563,6 +563,9 @@ labelNotifyUpdatesGlobal:
   message: >-
     betiklerin özel bildirim ayarlarını görmezden gel (düzenleyicideki "ayarlar"
     sekmesindeki)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Gizlilik Politikası

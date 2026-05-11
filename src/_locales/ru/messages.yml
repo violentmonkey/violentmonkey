@@ -562,6 +562,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: Игнорировать уведомления скриптов (вкладка настроек в редакторе)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: Показывать команды скрипта в меню страницы
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Политика конфиденциальности

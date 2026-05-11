@@ -549,6 +549,9 @@ labelNotifyUpdatesGlobal:
   message: >-
     szkriptenkénti szabályok figyelmen kívül hagyása ("Beállítások" fül a
     szerkesztőben)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Adatvédelmi irányelvek

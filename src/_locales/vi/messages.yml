@@ -558,6 +558,9 @@ labelNotifyUpdatesGlobal:
   message: >-
     Bỏ qua thông báo trên mỗi script (thay đổi trong cài đặt ở mục chỉnh sửa
     script)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: ''
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Chính sách bảo mật

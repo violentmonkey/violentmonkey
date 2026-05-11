@@ -553,6 +553,9 @@ labelNotifyUpdates:
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
   message: ignore per-script notification ("settings" tab in editor)
+labelPageMenuCommands:
+  description: Checkbox item in page context menu and option to enable script commands.
+  message: Show script commands in page menu
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Privacy Policy
@@ -694,9 +697,6 @@ menuCommands:
   description: Menu item to list script commands.
   message: Script commands
   touched: false
-labelPageMenuCommands:
-  description: Checkbox item in page context menu and option to enable script commands.
-  message: Show script commands in page menu
 menuDashboard:
   description: Label for menu item to open dashboard.
   message: Open Dashboard
