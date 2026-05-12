@@ -32,8 +32,8 @@ const encode = new TextEncoder();
 
 // Per Sig V4: only unreserved chars (RFC 3986) are left unencoded in path segments.
 function encodeSegment(s) {
-  return s.replace(/[^A-Za-z0-9\-._~]/g, (c) =>
-    '%' + toHex(encode.encode(c)).toUpperCase(),
+  return encodeURIComponent(s).replace(/[!'()*]/g, (c) =>
+    '%' + c.charCodeAt(0).toString(16).toUpperCase(),
   );
 }
 
