@@ -28,31 +28,31 @@ const DEFAULT_CONFIG = {
   [S3_PREFIX]: '',
 };
 
+const encode = new TextEncoder();
+
 // Per Sig V4: only unreserved chars (RFC 3986) are left unencoded in path segments.
 function encodeSegment(s) {
   return s.replace(/[^A-Za-z0-9\-._~]/g, (c) =>
-    [...new TextEncoder().encode(c)]
-      .map(b => `%${b.toString(16).toUpperCase().padStart(2, '0')}`)
-      .join(''),
+    '%' + toHex(encode.encode(c)).toUpperCase(),
   );
-}
-
-async function sha256hex(data) {
-  const buf = typeof data === 'string' ? new TextEncoder().encode(data) : data;
-  const hash = await crypto.subtle.digest('SHA-256', buf);
-  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function hmacSha256(key, data) {
-  const keyBuf = typeof key === 'string' ? new TextEncoder().encode(key) : key;
-  const k = await crypto.subtle.importKey(
-    'raw', keyBuf, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
-  );
-  return new Uint8Array(await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(data)));
 }
 
 function toHex(buf) {
-  return [...buf].map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function sha256hex(data) {
+  const buf = typeof data === 'string' ? encode.encode(data) : data;
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return toHex(new Uint8Array(hash));
+}
+
+async function hmacSha256(key, data) {
+  const keyBuf = typeof key === 'string' ? encode.encode(key) : key;
+  const k = await crypto.subtle.importKey(
+    'raw', keyBuf, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
+  );
+  return new Uint8Array(await crypto.subtle.sign('HMAC', k, encode.encode(data)));
 }
 
 async function getSigningKey(secret, datestamp, region) {
@@ -122,15 +122,15 @@ function parseListXml(xml) {
       || parent.getElementsByTagName(tag)[0];
   }
 
-  const items = elsByTag(doc, 'Contents').flatMap((el) => {
+  const items = elsByTag(doc, 'Contents').map((el) => {
     const key = elByTag(el, 'Key')?.textContent || '';
     const name = key.split('/').pop();
-    if (!isScriptFile(name)) return [];
+    if (!isScriptFile(name)) return null;
     const size = +(elByTag(el, 'Size')?.textContent || 0);
-    return [normalize({ name, size })];
-  });
+    return normalize({ name, size });
+  }).filter(Boolean);
 
-  const nextToken = elByTag(doc, 'NextContinuationToken')?.textContent || null;
+  const nextToken = elByTag(doc, 'NextContinuationToken')?.textContent;
   return { items, nextToken };
 }
 
@@ -178,7 +178,6 @@ const S3 = BaseService.extend({
   metaError(res) {
     if (res.status !== 404) throw res;
   },
-
   _prefixSegments() {
     return this._prefix.split('/').filter(Boolean);
   },
@@ -195,11 +194,10 @@ const S3 = BaseService.extend({
     });
     return this.loadData({ method, url, headers, body });
   },
-
   async list() {
     const listPrefix = this._prefix ? `${this._prefix}/` : '';
     const items = [];
-    let continuationToken = null;
+    let continuationToken;
     do {
       const queryParams = { delimiter: '/', 'list-type': '2', prefix: listPrefix };
       if (continuationToken) queryParams['continuation-token'] = continuationToken;
@@ -233,8 +231,6 @@ const S3 = BaseService.extend({
   },
 });
 
-register(S3);
-
 function normalize(item) {
   return {
     name: item.name,
@@ -242,3 +238,5 @@ function normalize(item) {
     uri: getURI(item.name),
   };
 }
+
+register(S3);

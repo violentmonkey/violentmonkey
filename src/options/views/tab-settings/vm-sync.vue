@@ -127,42 +127,14 @@
           />
         </label>
       </div>
-      <label class="sync-server-url flex pre">
-        <span v-text="i18n('labelSyncS3AccessKeyId')"></span>
+      <label v-for="{ key, label, type, placeholder } in S3_FIELDS" :key="key" class="sync-server-url flex pre">
+        <span v-text="i18n(label)"></span>
         <input
-          type="text"
+          :type="type"
           class="flex-1"
-          v-model="rUserConfig[ACCESS_KEY_ID]"
+          v-model="rUserConfig[key]"
           :disabled="!rCanUpdateConfig"
-        />
-      </label>
-      <label class="sync-server-url flex pre">
-        <span v-text="i18n('labelSyncS3SecretAccessKey')"></span>
-        <input
-          type="password"
-          class="flex-1"
-          v-model="rUserConfig[SECRET_ACCESS_KEY]"
-          :disabled="!rCanUpdateConfig"
-        />
-      </label>
-      <label class="sync-server-url flex pre">
-        <span v-text="i18n('labelSyncS3Endpoint')"></span>
-        <input
-          type="url"
-          class="flex-1"
-          v-model="rUserConfig[S3_ENDPOINT]"
-          :disabled="!rCanUpdateConfig"
-          placeholder="https://s3.example.com"
-        />
-      </label>
-      <label class="sync-server-url flex pre">
-        <span v-text="i18n('labelSyncS3Prefix')"></span>
-        <input
-          type="text"
-          class="flex-1"
-          v-model="rUserConfig[S3_PREFIX]"
-          :disabled="!rCanUpdateConfig"
-          placeholder="Violentmonkey"
+          :placeholder="placeholder"
         />
       </label>
       <div>
@@ -226,6 +198,12 @@ import {
 } from '@/background/sync/state-machine';
 
 const SYNC_CURRENT = 'sync.current';
+const S3_FIELDS = [
+  { key: ACCESS_KEY_ID, label: 'labelSyncS3AccessKeyId', type: 'text' },
+  { key: SECRET_ACCESS_KEY, label: 'labelSyncS3SecretAccessKey', type: 'password' },
+  { key: S3_ENDPOINT, label: 'labelSyncS3Endpoint', type: 'url', placeholder: 'https://s3.example.com' },
+  { key: S3_PREFIX, label: 'labelSyncS3Prefix', type: 'text', placeholder: 'Violentmonkey' },
+];
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
   name: '',
