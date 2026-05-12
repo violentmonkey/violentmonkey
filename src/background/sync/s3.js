@@ -21,7 +21,7 @@ import {
 
 const DEFAULT_CONFIG = {
   [BUCKET]: '',
-  [REGION]: 'us-east-1',
+  [REGION]: '',
   [S3_ENDPOINT]: '',
   [ACCESS_KEY_ID]: '',
   [SECRET_ACCESS_KEY]: '',
