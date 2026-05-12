@@ -169,7 +169,7 @@ const S3 = BaseService.extend({
     this._region = region;
     this._accessKeyId = accessKeyId;
     this._secretAccessKey = secretAccessKey;
-    this._prefix = c[S3_PREFIX]?.trim() || VIOLENTMONKEY;
+    this._prefix = c[S3_PREFIX]?.trim() ?? '';
     return true;
   },
   async requestAuth() {
@@ -201,7 +201,7 @@ const S3 = BaseService.extend({
     const items = [];
     let continuationToken = null;
     do {
-      const queryParams = { 'list-type': '2', prefix: listPrefix };
+      const queryParams = { delimiter: '/', 'list-type': '2', prefix: listPrefix };
       if (continuationToken) queryParams['continuation-token'] = continuationToken;
       const { url, headers } = await signS3Request({
         method: 'GET',
