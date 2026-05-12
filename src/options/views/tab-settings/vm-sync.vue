@@ -107,6 +107,72 @@
         />
       </div>
     </fieldset>
+    <fieldset v-if="rService && rAuthType === S3_AUTH" class="mt-1c">
+      <div class="mr-2c">
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncS3Bucket')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[BUCKET]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncS3Region')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[REGION]"
+            :disabled="!rCanUpdateConfig"
+            placeholder="us-east-1"
+          />
+        </label>
+      </div>
+      <label class="sync-server-url flex pre">
+        <span v-text="i18n('labelSyncS3AccessKeyId')"></span>
+        <input
+          type="text"
+          class="flex-1"
+          v-model="rUserConfig[ACCESS_KEY_ID]"
+          :disabled="!rCanUpdateConfig"
+        />
+      </label>
+      <label class="sync-server-url flex pre">
+        <span v-text="i18n('labelSyncS3SecretAccessKey')"></span>
+        <input
+          type="password"
+          class="flex-1"
+          v-model="rUserConfig[SECRET_ACCESS_KEY]"
+          :disabled="!rCanUpdateConfig"
+        />
+      </label>
+      <label class="sync-server-url flex pre">
+        <span v-text="i18n('labelSyncS3Endpoint')"></span>
+        <input
+          type="url"
+          class="flex-1"
+          v-model="rUserConfig[S3_ENDPOINT]"
+          :disabled="!rCanUpdateConfig"
+          placeholder="https://s3.example.com"
+        />
+      </label>
+      <label class="sync-server-url flex pre">
+        <span v-text="i18n('labelSyncS3Prefix')"></span>
+        <input
+          type="text"
+          class="flex-1"
+          v-model="rUserConfig[S3_PREFIX]"
+          :disabled="!rCanUpdateConfig"
+          placeholder="Violentmonkey"
+        />
+      </label>
+      <div>
+        <button
+          v-text="i18n('buttonSave')"
+          @click.prevent="onSaveUserConfig"
+          :disabled="!rCanUpdateConfig"
+        />
+      </div>
+    </fieldset>
     <div class="flex mr-2c">
       <setting-check
         name="syncAutomatically"
@@ -126,8 +192,15 @@ import IconCloudDownload from '~icons/mdi/cloud-download';
 import IconSync from '~icons/mdi/sync';
 import { i18n, sendCmdDirectly } from '@/common';
 import {
+  ACCESS_KEY_ID,
   ANONYMOUS,
+  BUCKET,
   PASSWORD,
+  REGION,
+  S3_AUTH,
+  S3_ENDPOINT,
+  S3_PREFIX,
+  SECRET_ACCESS_KEY,
   SERVER_URL,
   SYNC_MERGE,
   SYNC_PULL,
