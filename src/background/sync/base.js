@@ -690,7 +690,7 @@ export function setConfig(config) {
   const service = getService();
   if (service) {
     service.setUserConfig(config);
-    return service.sync();
+    return autoSync();
   }
 }
 
