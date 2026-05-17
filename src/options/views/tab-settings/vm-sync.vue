@@ -107,6 +107,43 @@
         />
       </div>
     </fieldset>
+    <fieldset v-if="rService && rAuthType === S3_AUTH" class="mt-1c">
+      <div class="mr-2c">
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncS3Bucket')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[BUCKET]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncS3Region')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[REGION]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+      </div>
+      <label v-for="{ key, label, type, placeholder } in S3_FIELDS" :key="key" class="sync-server-url flex pre">
+        <span v-text="i18n(label)"></span>
+        <input
+          :type="type"
+          class="flex-1"
+          v-model="rUserConfig[key]"
+          :disabled="!rCanUpdateConfig"
+          :placeholder="placeholder"
+        />
+      </label>
+      <div>
+        <button
+          v-text="i18n('buttonSave')"
+          @click.prevent="onSaveUserConfig"
+          :disabled="!rCanUpdateConfig"
+        />
+      </div>
+    </fieldset>
     <div class="flex mr-2c">
       <setting-check
         name="syncAutomatically"
@@ -126,8 +163,15 @@ import IconCloudDownload from '~icons/mdi/cloud-download';
 import IconSync from '~icons/mdi/sync';
 import { i18n, sendCmdDirectly } from '@/common';
 import {
+  ACCESS_KEY_ID,
   ANONYMOUS,
+  BUCKET,
   PASSWORD,
+  REGION,
+  S3_AUTH,
+  S3_ENDPOINT,
+  S3_PREFIX,
+  SECRET_ACCESS_KEY,
   SERVER_URL,
   SYNC_MERGE,
   SYNC_PULL,
@@ -153,6 +197,12 @@ import {
 } from '@/background/sync/state-machine';
 
 const SYNC_CURRENT = 'sync.current';
+const S3_FIELDS = [
+  { key: ACCESS_KEY_ID, label: 'labelSyncS3AccessKeyId', type: 'text' },
+  { key: SECRET_ACCESS_KEY, label: 'labelSyncS3SecretAccessKey', type: 'password' },
+  { key: S3_ENDPOINT, label: 'labelSyncS3Endpoint', type: 'url', placeholder: 'https://s3.example.com' },
+  { key: S3_PREFIX, label: 'labelSyncS3Prefix', type: 'text' },
+];
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
   name: '',
