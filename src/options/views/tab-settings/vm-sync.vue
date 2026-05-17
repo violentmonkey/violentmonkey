@@ -123,7 +123,6 @@
             type="text"
             v-model="rUserConfig[REGION]"
             :disabled="!rCanUpdateConfig"
-            placeholder="us-east-1"
           />
         </label>
       </div>
@@ -202,7 +201,7 @@ const S3_FIELDS = [
   { key: ACCESS_KEY_ID, label: 'labelSyncS3AccessKeyId', type: 'text' },
   { key: SECRET_ACCESS_KEY, label: 'labelSyncS3SecretAccessKey', type: 'password' },
   { key: S3_ENDPOINT, label: 'labelSyncS3Endpoint', type: 'url', placeholder: 'https://s3.example.com' },
-  { key: S3_PREFIX, label: 'labelSyncS3Prefix', type: 'text', placeholder: 'Violentmonkey' },
+  { key: S3_PREFIX, label: 'labelSyncS3Prefix', type: 'text' },
 ];
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
