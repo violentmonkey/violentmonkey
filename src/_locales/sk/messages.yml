@@ -570,7 +570,7 @@ labelNotifyUpdatesGlobal:
   message: ignorovať nastavenie upozornenia (záložka "Nastavenia" v editore)
 labelPageMenuCommands:
   description: Checkbox item in page context menu and option to enable script commands.
-  message: ''
+  message: Zobraziť príkazy skriptu v ponuke stránky
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Zásady ochrany osobných údajov
@@ -646,6 +646,24 @@ labelSyncReauthorize:
 labelSyncRevoke:
   description: Label for button to revoke authorization for a service.
   message: Odvolať
+labelSyncS3AccessKeyId:
+  description: Label for S3 access key ID input.
+  message: ''
+labelSyncS3Bucket:
+  description: Label for S3 bucket name input.
+  message: ''
+labelSyncS3Endpoint:
+  description: Label for custom S3-compatible endpoint URL input (leave blank for AWS).
+  message: ''
+labelSyncS3Prefix:
+  description: Label for S3 key prefix input (folder within the bucket).
+  message: ''
+labelSyncS3Region:
+  description: Label for S3 region input.
+  message: ''
+labelSyncS3SecretAccessKey:
+  description: Label for S3 secret access key input.
+  message: ''
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Stav synchronizácie skriptu
