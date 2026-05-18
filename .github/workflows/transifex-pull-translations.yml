@@ -5,31 +5,56 @@ on:
   schedule:
     - cron: '0 1 * * 1'
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '24'
+
       - name: Install deps
         run: yarn
+
       - name: Update translations
         run: node scripts/transifex.mjs pull
         env:
           TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: i18n-patch
-          commit-message: 'chore: update locale files from Transifex'
-          title: Update locale files from Transifex
-          body: >-
-            Violentmonkey updates translations from Transifex every week automatically.
 
-            If you want to help translate into your language, please join [our transifex project](https://explore.transifex.com/violentmonkey/violentmonkey-nex/).
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No translation changes detected. Exiting."
+            exit 0
+          fi
+
+          git checkout -B i18n-patch
+          git add .
+          git commit -m 'chore: update locale files from Transifex'
+
+          git push origin i18n-patch -f
+
+          if ! gh pr view i18n-patch --json state | grep -q "OPEN"; then
+            gh pr create \
+              --title "Update locale files from Transifex" \
+              --body "Violentmonkey updates translations from Transifex every week automatically.
+
+              If you want to help translate into your language, please join [our transifex project](https://explore.transifex.com/violentmonkey/violentmonkey-nex/)." \
+              --head i18n-patch \
+              --base master
+          else
+            echo "Existing PR found. Branch has been force-pushed and PR is automatically updated."
+          fi
