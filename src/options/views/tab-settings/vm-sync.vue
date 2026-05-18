@@ -126,8 +126,12 @@
           />
         </label>
       </div>
-      <label v-for="{ key, label, type, placeholder } in S3_FIELDS" :key="key" class="sync-server-url flex pre">
-        <span v-text="i18n(label)"></span>
+      <label
+        v-for="{ key, label, type, placeholder } in S3_FIELDS"
+        :key="key"
+        class="sync-server-url flex pre"
+      >
+        <span v-text="label"></span>
         <input
           :type="type"
           class="flex-1"
@@ -198,10 +202,19 @@ import {
 
 const SYNC_CURRENT = 'sync.current';
 const S3_FIELDS = [
-  { key: ACCESS_KEY_ID, label: 'labelSyncS3AccessKeyId', type: 'text' },
-  { key: SECRET_ACCESS_KEY, label: 'labelSyncS3SecretAccessKey', type: 'password' },
-  { key: S3_ENDPOINT, label: 'labelSyncS3Endpoint', type: 'url', placeholder: 'https://s3.example.com' },
-  { key: S3_PREFIX, label: 'labelSyncS3Prefix', type: 'text' },
+  { key: ACCESS_KEY_ID, label: i18n('labelSyncS3AccessKeyId'), type: 'text' },
+  {
+    key: SECRET_ACCESS_KEY,
+    label: i18n('labelSyncS3SecretAccessKey'),
+    type: 'password',
+  },
+  {
+    key: S3_ENDPOINT,
+    label: i18n('labelSyncS3Endpoint'),
+    type: 'url',
+    placeholder: 'https://s3.example.com',
+  },
+  { key: S3_PREFIX, label: i18n('labelSyncS3Prefix'), type: 'text' },
 ];
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
