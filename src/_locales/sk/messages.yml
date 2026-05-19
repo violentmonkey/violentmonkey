@@ -198,7 +198,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: zobraziť
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentácia k bloku metadát požívateľského skriptu a <code>GM</code> API:'
 editHelpKeyboard:

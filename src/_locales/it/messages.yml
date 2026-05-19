@@ -204,7 +204,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: mostra
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentazione sul blocco di metadati userscript e API <code>GM</code>:'
 editHelpKeyboard:

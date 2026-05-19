@@ -197,7 +197,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: tonen
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'Documentatie over gebruikersscript metagegevensblok en <code>GM</code> API:'
 editHelpKeyboard:

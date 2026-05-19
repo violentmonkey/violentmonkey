@@ -185,7 +185,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: 表示
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'ユーザースクリプトのメタデータ部分と <code>GM</code> API の説明文書:'
 editHelpKeyboard:

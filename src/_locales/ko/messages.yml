@@ -186,7 +186,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: 보기
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: '유저스크립트의 메타데이터와 <code>GM</code> API 문서:'
 editHelpKeyboard:

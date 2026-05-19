@@ -1,7 +1,7 @@
 <template>
   <div class="edit-help mb-2c">
     <div>
-      <h3 v-html="i18n('editHelpDocumention')"/>
+      <h3 v-html="i18n('editHelpDocumentation')"/>
       <a :href="API_URL" v-bind="EXTERNAL_LINK_PROPS" v-text="API_TEXT"/>
     </div>
     <div class="keyboard">

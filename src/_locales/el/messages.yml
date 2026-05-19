@@ -207,7 +207,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: εμφάνιση
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: Οδηγίες για τα μεταδεδομένα και τεκμηρίωση για το <code>GM</code> API
 editHelpKeyboard:
