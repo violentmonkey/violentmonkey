@@ -186,7 +186,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: 显示
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 用户脚本 metadata 区域和 <code>GM</code> API 的相关文档：
 editHelpKeyboard:

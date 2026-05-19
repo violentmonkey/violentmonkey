@@ -201,7 +201,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: mostrar
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: >-
     Documentación sobre el bloque de metadatos de userscript y la API de

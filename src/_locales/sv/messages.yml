@@ -197,7 +197,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: visa
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'Dokumentation om användarskriptmetadatablock och <code>GM</code> API:'
 editHelpKeyboard:

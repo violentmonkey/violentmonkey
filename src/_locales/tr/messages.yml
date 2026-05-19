@@ -199,7 +199,7 @@ disabledScriptsSelector:
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
   message: göster
-editHelpDocumention:
+editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'Kullanıcı betiği meta veri bloku ve <code>GM</code> API belgeleri:'
 editHelpKeyboard:
