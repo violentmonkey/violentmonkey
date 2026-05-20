@@ -15,6 +15,8 @@ const cacheMat = initCache({ lifetime: 60 * 60e3 });
 const cacheInc = initCache({ lifetime: 60 * 60e3 });
 const cacheResultMat = initCache({ lifetime: 60e3 });
 const cacheResultInc = initCache({ lifetime: 60e3 });
+export const ERR_GLOB_HOST_SUFFIX = 'top-level domain with "*" should be replaced with ".tld" or @include';
+const RE_GLOB_HOST_SUFFIX = /\*[^.]*\.?$/;
 /** Simple matching for valid patterns */
 const RE_MATCH_PARTS = re`/^
   (\*|http([s*])?|file|ftp|urn):\/\/
@@ -79,10 +81,20 @@ hookOptionsInit((changes) => {
 export class MatchTest {
   constructor(rule, scheme, httpMod, host, path) {
     const isWild = scheme === '*' || httpMod === '*';
+    const isWildHost = host === '*';
     this.scheme = isWild ? 'http' : scheme;
     this.scheme2 = isWild ? 'https' : null;
-    this.host = host === '*' ? null : hostMatcher(host);
+    this.host = isWildHost ? null : hostMatcher(host);
     this.path = path === '*' ? null : pathMatcher(path);
+    if (!isWildHost && host.match(RE_GLOB_HOST_SUFFIX)) {
+      this.err = `${ERR_BAD_PATTERN} ${rule}: ${ERR_GLOB_HOST_SUFFIX} /^${
+        escapeStringForRegExp(scheme).replace(/\*/g, '[^:]*?')
+      }://${
+        escapeStringForRegExp(host).replace(/\*/g, '[^/]*?')
+      }/${
+        str2RE(path)
+      }$/`;
+    }
   }
 
   test() {
@@ -101,12 +113,15 @@ export class MatchTest {
     if (rule === '<all_urls>') return matchAlways; // checking it second as it's super rare
     // Report failed parts in detail
     parts = rule.match(RE_MATCH_BAD);
-    parts = !parts ? '' : (
-      (parts[3] != null ? `${parts[3] ? 'unknown' : 'missing'} scheme, ` : '')
-      + (parts[4] !== '://' ? 'missing "://", ' : '')
-      || (parts[6] == null ? 'missing "/" for path, ' : '')
-    ).slice(0, -2) + ' in ';
-    throw `${ERR_BAD_PATTERN} ${parts}${rule}`;
+    throw `${ERR_BAD_PATTERN} ${rule}: ${!parts ? '' : [
+      parts[3] != null && `${parts[3] ? 'unknown' : 'missing'} scheme`,
+      parts[4] !== '://' && 'missing "://"',
+      parts[5] !== '*' && parts[5].match(RE_GLOB_HOST_SUFFIX) && ERR_GLOB_HOST_SUFFIX,
+      parts[6] == null && 'missing "/" for path',
+    ].filter(Boolean)
+      .map((s, i, arr) => (arr.length > 1 ? (i + 1) + ') ' : '') + s)
+      .join(', ')
+    }`;
   }
 }
 
@@ -231,7 +246,8 @@ function testRules(url, script, ...list) {
                 : err;
               batchErrors.push(err);
             }
-          } else if (url && (urlResults[rule] = +!!m.test(url))) {
+          }
+          if (url && m.test && (urlResults[rule] = +!!m.test(url))) {
             return true;
           }
         }

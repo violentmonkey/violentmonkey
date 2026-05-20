@@ -1,5 +1,8 @@
-import { MatchTest, resetBlacklist, testScript, testBlacklist } from '@/background/utils/tester';
+import {
+  ERR_GLOB_HOST_SUFFIX, MatchTest, resetBlacklist, testBlacklist, testScript,
+} from '@/background/utils/tester';
 import cache from '@/background/utils/cache';
+import { ERR_BAD_PATTERN } from '@/common/consts';
 
 afterEach(cache.destroy);
 
@@ -426,10 +429,10 @@ describe('@match error reporting', () => {
       ['foo://*/*', 'unknown scheme'],
       ['*//*/*', 'missing "://"'],
       ['http:/*/', 'missing "://"'],
-      ['htp:*', 'unknown scheme, missing "://"'],
-      ['https://foo*', 'missing "/" for path'],
+      ['htp:*', '1) unknown scheme, 2) missing "://"'],
+      ['https://foo*', `1) ${ERR_GLOB_HOST_SUFFIX}, 2) missing "/" for path`],
     ]) {
-      expect(() => MatchTest.try(rule)).toThrow(`Bad pattern: ${err} in ${rule}`);
+      expect(() => MatchTest.try(rule)).toThrow(`${ERR_BAD_PATTERN} ${rule}: ${err}`);
     }
   });
 });
