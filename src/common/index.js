@@ -148,18 +148,12 @@ export function getTab(tabId) {
 
 /** @return {Promise<chrome.tabs.Tab | void>} */
 export async function getActiveTab(windowId = -2 /*chrome.windows.WINDOW_ID_CURRENT*/) {
-  return (
-    await browser.tabs.query({
-      active: true,
-      [kWindowId]: windowId,
-    })
-  )[0] || browserWindows && (
-    // Chrome bug workaround when an undocked devtools window is focused
-    await browser.tabs.query({
-      active: true,
-      [kWindowId]: (await browserWindows.getCurrent()).id,
-    })
-  )[0];
+  let [res] = await browser.tabs.query({ active: true, [kWindowId]: windowId });
+  // Chrome bug workaround when an undocked devtools window is focused
+  if (!res && browserWindows && (res = await browserWindows.getCurrent().catch(noop))) {
+    [res] = await browser.tabs.query({ active: true, [kWindowId]: res.id });
+  }
+  return res;
 }
 
 export function makePause(ms) {
