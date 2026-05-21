@@ -396,7 +396,7 @@ function toggleMenu(name) {
 async function showExtras(evt) {
   const el = evt.currentTarget; // get element with @click, not the inner stuff like icon
   const item = el._item;
-  const isPerItem = item;
+  const isPerItem = item.id;
   const what = isPerItem ? extras : topExtras;
   if (!what.value) {
     evt.stopPropagation(); // prevent app's @click from resetting extras and topExtras
