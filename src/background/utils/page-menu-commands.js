@@ -28,6 +28,8 @@ const SCOPE = {
 };
 const clipString = s => s.length <= MAX_TITLE_LEN ? s : s.slice(0, MAX_TITLE_LEN) + '...';
 
+/** tabId for which contextMenu is currently showing commands */
+let menuTabId;
 /**
  * Per-tab, per-frame snapshots of `menus` from the content script (scriptId -> commandKey -> opts).
  * @type {{[tabId: string]: {[frameId: string]: {[scriptId: string]: {[menuId: string]: {
@@ -132,11 +134,10 @@ function onTabRemoved(tabId) {
   if (!tabData) return;
   delete tabData[tabId];
   delete tabRoutes[tabId];
-  rebuildForActiveTab();
 }
 
 function onTabActivated({ tabId }) {
-  if (!tabData) return;
+  if (!tabData || tabId === menuTabId) return;
   rebuildPageCommandMenuTab(tabId);
 }
 
@@ -195,11 +196,16 @@ function rebuildPageCommandMenuTab(tabId) {
     }
   }
   contextMenus.update(ROOT_ID, { visible: commandCount > 0 }, ignoreChromeErrors);
+  menuTabId = tabId;
 }
 
 async function rebuildForActiveTab(windowId, updatedTabId) {
   const t = await getActiveTab(windowId);
-  if (t && (updatedTabId == null || t.id === updatedTabId)) {
+  if (t && (
+    updatedTabId == null
+      ? t.id !== menuTabId // already prepared
+      : t.id === updatedTabId
+  )) {
     rebuildPageCommandMenuTab(t.id);
   }
 }
@@ -214,6 +220,7 @@ function removeSubMenus() {
 }
 
 function setEnabled(value) {
+  menuTabId = null; // to re-create the menu
   tabData = value && {};
   tabRoutes = value && {};
   const onOff = value ? 'addListener' : 'removeListener';
