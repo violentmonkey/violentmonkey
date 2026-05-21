@@ -651,6 +651,7 @@ function injectContentRealm(toContent, tabId, frameId) {
 // TODO: rework the whole thing to register scripts individually with real `matches`
 // (this will also allow proper handling of @noframes)
 function registerScriptDataFF(inject, url) {
+  addMenuConfig(inject);
   for (const scr of inject[SCRIPTS]) {
     scr.code = scr[__CODE];
   }
