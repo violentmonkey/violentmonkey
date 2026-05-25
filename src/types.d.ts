@@ -233,6 +233,30 @@ declare interface VMScript {
   },
 }
 
+declare interface UIScriptCache {
+  code?: string;
+  desc: string;
+  lowerName: string;
+  /** Name search result for highlighting the match */
+  mark?: RegExpExecArray;
+  name: string;
+  /** Search result grouping priority, 0: hide, 1: code, 2: desc, 3: tag, 4: name */
+  show?: number;
+  size: string;
+  sizeNum: number;
+  sizes: string;
+  sizesNum: number[];
+  storageSize: number;
+  tag: string | string[];
+}
+
+declare interface UIScript extends VMScript {
+  $cache: Partial<UIScriptCache>;
+  $canUpdate: 1 | -1 | void;
+  safeIcon: string | null;
+  noIcon: '' | null;
+}
+
 declare interface VMScriptSourceOptions extends DeepPartial<Omit<VMScript, 'inferred'>> {
   code?: string;
 

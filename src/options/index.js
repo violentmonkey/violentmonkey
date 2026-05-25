@@ -22,7 +22,7 @@ loadData();
 render(App);
 
 /**
- * @param {VMScript} script
+ * @param {UIScript} script
  * @param {number[]} sizes
  * @param {string} [code]
  */

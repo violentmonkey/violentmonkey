@@ -77,7 +77,7 @@
             </a>
           </Tooltip>
           <template #content>
-            <div v-show="currentSortCompare">
+            <div v-show="currentSort">
               <SettingCheck name="filters.showEnabledFirst"
                 :label="i18n('optionShowEnabledFirst')" />
             </div>
@@ -135,7 +135,7 @@
         :data-table="filters.viewTable || null">
         <ScriptItem
           v-for="(script, index) in sortedScripts"
-          v-show="!state.search.rules.length || script.$cache.show !== false"
+          v-show="script.$cache.show !== 0"
           :key="script.props.id"
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
@@ -232,10 +232,8 @@ const sortModes = [
   (res[key + '-'] = /**@namespace SortMode*/{
     text: text + ' ⯆',
     title: title,
-    compare: compare ? (a, b) => compare(b, a) :
-      /** @param {VMScript} a
-       * @param {VMScript} b */
-      (a, b) => b.props.position - a.props.position,
+    reversed: true,
+    compare: compare || ((a, b) => a.props.position - b.props.position),
   }),
   res
 ), {});
@@ -247,11 +245,6 @@ const filters = reactive({
   /** @type {Boolean} */ viewTable: null,
   sort: '',
 });
-const combinedCompare = cmpFunc => (
-  filters.showEnabledFirst
-    ? ((a, b) => b.config.enabled - a.config.enabled || cmpFunc(a, b))
-    : cmpFunc
-);
 filters::forEachKey(key => {
   hookSetting(`filters.${key}`, (val) => {
     filters[key] = key === 'sort' && !sortModes[val]
@@ -321,14 +314,14 @@ const state = reactive({
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
 const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith('exec'));
 const draggable = computed(() => isTouch && draggableRaw.value);
-const currentSortCompare = computed(() => sortModes[filters.sort]?.compare);
+const currentSort = computed(() => sortModes[filters.sort]);
 const selectedScript = computed(() => filteredScripts.value[state.focusedIndex]);
 const message = computed(() => {
   if (!store.loaded) {
     return null;
   }
   if (state.search.rules.length
-    ? !sortedScripts.value.find(s => s.$cache.show !== false)
+    ? !sortedScripts.value.find(s => s.$cache.show !== 0)
     : !sortedScripts.value.length
   ) {
     return i18n('labelNoSearchScripts');
@@ -399,8 +392,17 @@ async function refreshUI() {
   onHashChange();
 }
 function sortScripts(scripts) {
-  const cmp = currentSortCompare.value;
-  if (cmp) scripts.sort(combinedCompare(cmp));
+  const { compare, reversed } = currentSort.value || {};
+  if (compare) {
+    const searching = state.search.rules.length;
+    const enabledFirst = filters.showEnabledFirst;
+    scripts.sort(!enabledFirst && !searching && !reversed
+      ? compare
+      : (a, b) => enabledFirst && (b.config.enabled - a.config.enabled)
+        || searching && (b.$cache.show - a.$cache.show)
+        || (reversed ? compare(b, a) : compare(a, b)),
+    );
+  }
   sortedScripts.value = scripts;
 }
 function onUpdate() {
@@ -408,7 +410,7 @@ function onUpdate() {
   const rules = state.search.rules;
   if (rules.length) performSearch(scripts, rules);
   sortScripts(scripts);
-  filteredScripts.value = rules.length ? scripts.filter(({ $cache }) => $cache.show) : scripts;
+  filteredScripts.value = rules.length ? scripts.filter(s => s.$cache.show) : scripts;
   selectScript(state.focusedIndex);
   renderScripts();
 }
@@ -531,6 +533,11 @@ function scheduleSearch() {
   }
   const ids = searchNeedsCodeIds.value;
   if (ids?.length) getCodeFromStorage(ids);
+  if (!state.search.rules.length) {
+    for (const { $cache } of /**@type{UIScript[]}*/store.scripts) {
+      $cache.mark = $cache.show = null;
+    }
+  }
   onUpdate();
 }
 async function getCodeFromStorage(ids) {
