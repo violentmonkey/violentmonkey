@@ -408,7 +408,7 @@ function sortScripts(scripts) {
 function onUpdate() {
   const scripts = [...getCurrentList()];
   const rules = state.search.rules;
-  if (rules.length) performSearch(scripts, rules);
+  performSearch(scripts);
   sortScripts(scripts);
   filteredScripts.value = rules.length ? scripts.filter(s => s.$cache.show) : scripts;
   selectScript(state.focusedIndex);

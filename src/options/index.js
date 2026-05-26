@@ -131,11 +131,10 @@ Object.assign(handlers, {
     const removed = update.config?.removed;
     const oldTags = oldScript ? getUniqTags(oldScript) : '';
     const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
-    const { search } = store;
     Object.assign(script, update);
     if (script.error && !update.error) script.error = null;
     initScript(script, sizes, code);
-    if (search) performSearch([script], search.rules);
+    performSearch([script]);
     if (removed != null) {
       if (removed) {
         // Note that we don't update store.scripts even if a script is removed,

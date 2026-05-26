@@ -1,5 +1,6 @@
 import { reactive, ref } from 'vue';
 import { getScriptsTags, i18n, sendCmdDirectly } from '@/common';
+import { kTag } from '@/common/consts';
 import { route } from '@/common/router';
 
 export * from './search';
@@ -69,6 +70,26 @@ export function markRemove(script, removed) {
     id: script.props.id,
     removed,
   });
+}
+
+/**
+ * @param {UIScript[]} scripts
+ */
+export function performSearch(scripts) {
+  const rules = store.rules;
+  if (!rules?.length) return;
+  for (const { $cache } of scripts) {
+    let show = 0;
+    for (const { re, negative, scope } of rules) {
+      const res = scope === kTag ? $cache[kTag].some(re.test, re) && 3 :
+        (!scope || scope === 'name') && ($cache.mark = re.exec($cache.name)) && 4 ||
+        (!scope || scope === 'desc') && re.test($cache.desc) && 2 ||
+        (!scope || scope === 'code') && re.test($cache.code) && 1;
+      if (negative ? res : !res) break;
+      if (res > show) show = res;
+    }
+    $cache.show = show;
+  }
 }
 
 export async function runInBatch(fn, ...args) {

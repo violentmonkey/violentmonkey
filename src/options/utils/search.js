@@ -83,22 +83,3 @@ export function createSearchRules(search) {
     rules,
   };
 }
-
-/**
- * @param {UIScript[]} scripts
- * @param {VMSearchRule[]} rules
- */
-export function performSearch(scripts, rules) {
-  for (const { $cache } of scripts) {
-    let show = 0;
-    for (const { re, negative, scope } of rules) {
-      const res = scope === kTag ? $cache[kTag].some(re.test, re) && 3 :
-        (!scope || scope === 'name') && ($cache.mark = re.exec($cache.name)) && 4 ||
-        (!scope || scope === 'desc') && re.test($cache.desc) && 2 ||
-        (!scope || scope === 'code') && re.test($cache.code) && 1;
-      if (negative ? res : !res) break;
-      if (res > show) show = res;
-    }
-    $cache.show = show;
-  }
-}
