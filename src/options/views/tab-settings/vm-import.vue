@@ -87,11 +87,11 @@ async function doImportBackup(buf, zipName) {
   const kStorageJson = '.storage.json';
   try {
     files = unzipSync(new Uint8Array(buf), {
-      filter: ({ name, time, originalSize }) => originalSize < 100e6 && (
-        name.toLowerCase() === vmZipEntryName && (vm = name) ||
-        name.endsWith(kOptionsJson) && optionsNames.push(name.slice(0, -kOptionsJson.length)) ||
-        name.endsWith(kStorageJson) && storageNames.push(name.slice(0, -kStorageJson.length)) ||
-        name.endsWith(kUserJs) && (scriptTimes[name.slice(0, -kUserJs.length)] = time, ++total)
+      filter: ({ name: filename, time, originalSize }) => originalSize < 100e6 && (
+        filename.toLowerCase() === vmZipEntryName && (vm = filename) ||
+        filename.endsWith(kOptionsJson) && optionsNames.push(filename) ||
+        filename.endsWith(kStorageJson) && storageNames.push(filename) ||
+        filename.endsWith(kUserJs) && (scriptTimes[filename] = time, ++total)
       ),
     });
   } catch (err) {
@@ -126,12 +126,14 @@ async function doImportBackup(buf, zipName) {
     undoPort = chrome.runtime.connect({ name: 'undoImport' });
     await new Promise(resolveOnUndoMessage);
   }
-  for (const name in files) {
+  for (const filename in files) {
     try {
-      const text = strFromU8(files[name]);
-      files[name] = name.endsWith(kUserJs) ? text : JSON.parse(text, name);
+      const text = strFromU8(files[filename]);
+      files[filename] = filename.endsWith(kUserJs)
+        ? text
+        : JSON.parse(text, filename);
     } catch (e) {
-      report(e, name, null);
+      report(e, filename, null);
     }
   }
   if (vm && (vm = files[vm])) {
@@ -143,8 +145,8 @@ async function doImportBackup(buf, zipName) {
     }
   }
   optionsNames.forEach(readScriptOptions);
-  for (const name in scriptTimes) {
-    await readScript(name, scriptTimes[name]);
+  for (const filename in scriptTimes) {
+    await readScript(filename, scriptTimes[filename]);
   }
   if (importScriptData) {
     storageNames.forEach(readScriptStorage);
@@ -154,9 +156,9 @@ async function doImportBackup(buf, zipName) {
   reportProgress();
   if (now) undoTime.value = now;
 
-  async function readScript(name, time) {
+  async function readScript(filename, time) {
     let decodedTime;
-    const filename = name + kUserJs;
+    const name = filename.slice(0, -kUserJs.length);
     const more = scripts[name];
     const data = {
       code: files[filename],
@@ -189,9 +191,10 @@ async function doImportBackup(buf, zipName) {
       report(e, filename, 'script');
     }
   }
-  function readScriptOptions(name) {
-    const { meta, settings = {}, options: opts } = files[name];
-    files[name] = '';
+  function readScriptOptions(filename) {
+    const name = filename.slice(0, -kOptionsJson.length);
+    const { meta, settings = {}, options: opts } = files[filename];
+    files[filename] = '';
     if (!meta || !opts) return;
     const ovr = opts.override || {};
     const tags = opts.tags;
@@ -225,9 +228,10 @@ async function doImportBackup(buf, zipName) {
       },
     };
   }
-  function readScriptStorage(name) {
+  function readScriptStorage(filename) {
+    const name = filename.slice(0, -kStorageJson.length);
     reports[0].text = TM;
-    values[uriMap[name]] = files[name].data;
+    values[uriMap[name]] = files[filename].data;
   }
   function report(text, name, type = 'critical') {
     reports.push({ text, name, type });
