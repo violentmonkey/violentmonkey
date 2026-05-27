@@ -43,6 +43,9 @@ hookOptions(data => sendCmd('UpdateOptions', data));
 export function initOptions(data, lastVersion, versionChanged) {
   data = data[kOptions] || {};
   Object.assign(options, data);
+  if (!options.modified) {
+    options.modified = buildModified();
+  }
   if (process.env.DEBUG) console.info('options:', options);
   if (!options[kVersion]) {
     setOption(kVersion, 1);
@@ -118,11 +121,104 @@ export function setOption(key, value, silent) {
     if (process.env.DEBUG) console.info('Option unchanged:', key, value, options);
     return;
   }
-  options[mainKey] = subKey ? objectSet(mainVal, subKey, value) : value;
+  const now = Date.now();
+  if (subKey) {
+    options[mainKey] = objectSet(mainVal, subKey, value);
+    options.modified[key] = now;
+  } else {
+    options[mainKey] = value;
+    Object.assign(options.modified,
+      collectChanges(mainKey, mainVal, value, now));
+  }
   omitDefaultValue(mainKey);
   writeOptionsLater();
   addChange(key, value, silent);
   if (process.env.DEBUG) console.info('Options updated:', key, value, options);
+}
+
+function buildModified() {
+  const modified = {};
+  const now = Date.now();
+  Object.keys(options).forEach((key) => {
+    const newVal = options[key];
+    const oldVal = hasOwnProperty(defaults, key)
+      ? defaults[key] : undefined;
+    if (deepEqual(oldVal, newVal))
+      return;
+    Object.assign(modified,
+      collectChanges(key, oldVal, newVal, now));
+  });
+  return modified;
+}
+
+export function buildOptionsDiff() {
+  const ignoredKeys = [
+    'version',
+    'lastModified',
+    'lastUpdate',
+    'sync',
+  ];
+  const diff = {};
+  const map = options.modified;
+  for (const key in map) {
+    const [first] = key.split('.');
+    if (ignoredKeys.includes(first))
+      continue;
+    const modified = map[key];
+    const value = getOption(key);
+    if (value === undefined)
+      continue;
+    diff[key] = { value, modified };
+  }
+  return diff;
+}
+
+export function applyOptionsDiff(diff) {
+  if (!diff)
+    return;
+  for (const key in diff) {
+    const entry = diff[key];
+    const { value, modified } = entry;
+    const current = getOption(key);
+    if (!deepEqual(current, value))
+      setOption(key, value, true);
+    // always sync timestamps, even if values were equal so that
+    // future merges won't treat them as conflicts again.
+    options.modified[key] = modified;
+  }
+  callHooks();
+}
+
+export function mergeOptionsDiff(a, b) {
+  const merged = {};
+  const left = a || {};
+  const right = b || {};
+  const keys = Object.keys(
+    {...left,...right }
+  );
+  for (const key of keys) {
+    const l = left[key];
+    const r = right[key];
+    if (l && !r) {
+      merged[key] = l;
+      continue;
+    }
+    if (r && !l) {
+      merged[key] = r;
+      continue;
+    }
+    const lm = l.modified;
+    const rm = r.modified;
+    if (lm > rm) {
+      merged[key] = l;
+    } else if (rm > lm) {
+      merged[key] = r;
+    } else {
+      // take right side, if timestamps are equal.
+      merged[key] = r;
+    }
+  }
+  return merged;
 }
 
 function writeOptions() {
@@ -132,4 +228,32 @@ function writeOptions() {
 function omitDefaultValue(key) {
   return deepEqual(options[key], defaults[key])
     && delete options[key];
+}
+
+function collectChanges(prefix, oldVal, newVal, now) {
+  const diff = {};
+  if (!oldVal || typeof oldVal !== 'object' ||
+      !newVal || typeof newVal !== 'object') {
+    diff[prefix] = now;
+    return diff;
+  }
+  const keys = Object.keys(oldVal);
+  Object.keys(newVal).forEach((key) => {
+    if (!keys.includes(key)) keys.push(key);
+  });
+  keys.forEach((key) => {
+    const oldItem = oldVal[key];
+    const newItem = newVal[key];
+    if (deepEqual(oldItem, newItem))
+      return;
+    const path = `${prefix}.${key}`;
+    if (oldItem && typeof oldItem === 'object' &&
+        newItem && typeof newItem === 'object') {
+      Object.assign(diff,
+        collectChanges(path, oldItem, newItem, now));
+    } else {
+      diff[path] = now;
+    }
+  });
+  return diff;
 }

@@ -157,6 +157,10 @@
         name="syncScriptStatus"
         :label="i18n('labelSyncScriptStatus')"
       />
+      <setting-check
+        name="syncSettings"
+        :label="i18n('labelSyncSettings')"
+      />
     </div>
   </section>
 </template>
