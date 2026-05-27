@@ -51,7 +51,7 @@ async function vacuum() {
   await runInBatch(async () => {
     labelVacuum.value = i18n('buttonVacuuming');
     const { fixes, errors } = await sendCmdDirectly('Vacuum');
-    const errorText = errors?.join('\n');
+    const errorText = errors.join('\n');
     labelVacuum.value = i18n('buttonVacuumed') + (fixes ? ` (${fixes})` : '');
     if (errorText) {
       showConfirmation(i18n('msgErrorFetchingResource') + '\n\n' + errorText, { cancel: false });

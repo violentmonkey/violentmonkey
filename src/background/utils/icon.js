@@ -265,13 +265,14 @@ export function handleHotkeyOrMenu(id, tab) {
 async function loadIcon(url) {
   const img = new Image();
   const isOwn = url.startsWith(ICON_PREFIX);
-  img.src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
+  const src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
     : url.startsWith('data:') ? url
       : makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url));
-  if (!img.src) {
+  if (!src) {
     // not saving to iconCache[url] because it may be a temporary network problem
     return;
   }
+  img.src = src;
   if (!await new Promise((resolve) => {
     img.onload = resolve;
     img.onerror = () => resolve();
@@ -307,5 +308,5 @@ async function loadIcon(url) {
 
 async function loadStorageCache(url) {
   return await storage[S_CACHE].getOne(url)
-    ?? await storage[S_CACHE].fetch(url, 'res').catch(console.warn);
+    ?? await storage[S_CACHE].fetch(url).catch(console.warn);
 }

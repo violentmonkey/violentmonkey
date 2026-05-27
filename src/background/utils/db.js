@@ -834,6 +834,7 @@ export async function vacuum(data) {
   const sizes = {};
   const result = {};
   const toFetch = [];
+  const errors = result.errors = [];
   const keysToRemove = [];
   /** -1=untouched, 1=touched, 2(+scriptId)=missing */
   const status = {};
@@ -910,17 +911,17 @@ export async function vacuum(data) {
         noFetch.push(url || +id && getScriptPrettyUrl(getScriptById(id)) || key);
       } else if (url && area.fetch) {
         keysToRemove.push(S_MOD_PRE + url);
-        toFetch.push(area.fetch(url).catch(err => `${
+        toFetch.push(area.fetch(url).catch(err => errors.push(`${
           getScriptName(getScriptById(+id || value - 2))
         }: ${
           formatHttpError(err)
-        }`));
+        }`)));
       }
     }
   });
   if (keysToRemove.length) {
     await storage.api.remove(keysToRemove); // Removing `mod` before fetching
-    result.errors = (await Promise.all(toFetch)).filter(Boolean);
+    await Promise.all(toFetch);
   }
   if (noFetch && noFetch.length) {
     console.warn('Missing required resources. ' + kTryVacuuming, noFetch);

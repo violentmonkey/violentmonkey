@@ -427,9 +427,8 @@ declare type VMSearchOptions = {
 /** Throws on error */
 declare type VMStorageFetch = (
   url: string,
-  /** 'res' makes the function resolve with the result */
-  options?: VMReq.Options | 'res',
-) => Promise<void>
+  options?: VMReq.Options,
+) => Promise<string>
 
 /** Augmented by handleCommandMessage in messages from the content script */
 declare interface VMMessageSender extends chrome.runtime.MessageSender {
