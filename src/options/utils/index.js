@@ -77,7 +77,7 @@ export function markRemove(script, removed) {
  * @param {UIScript[]} scripts
  */
 export function performSearch(scripts) {
-  const rules = store.rules;
+  const rules = store.search.rules;
   if (!rules?.length) return;
   for (const { $cache } of scripts) {
     let show = 0;
