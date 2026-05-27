@@ -49,14 +49,10 @@ function runCommand(command, args) {
   });
 }
 
-/**
- * manifest is already handled in ListBackgroundScriptsPlugin
- *
- * This task is only used to tweak dist/manifest.json without rebuilding
- */
 async function manifest() {
   const base = JSON.parse(await fs.readFile(`${DIST}/manifest.json`, 'utf8'));
-  const data = await buildManifest(base);
+  const data = await buildManifest();
+  data.background.scripts = base.background.scripts; // preserving ListBackgroundScriptsPlugin
   await fs.mkdir(DIST).catch(() => {});
   await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
 }
