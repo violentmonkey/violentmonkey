@@ -41,6 +41,7 @@ export const kStorageSize = 'storageSize';
 export const kUpdateURL = 'updateURL';
 export const TOGGLE_ON = 'toggle-on';
 export const TOGGLE_OFF = 'toggle-off';
+export const vmZipEntryName = VIOLENTMONKEY.toLowerCase();
 
 // Same order as getSizes and sizesPrefixRe
 export const SIZE_TITLES = [

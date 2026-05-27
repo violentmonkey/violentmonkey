@@ -111,14 +111,7 @@ export function blob2base64(blob, offset = 0, length = 1e99) {
   if (U8_fromBase64) {
     return blob.arrayBuffer().then(buf => new Uint8Array(buf).toBase64());
   }
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onload = () => {
-      const res = reader.result;
-      resolve(res.slice(res.indexOf(',') + 1));
-    };
-  });
+  return readBlob(blob).then(res => res.slice(res.indexOf(',') + 1));
 }
 
 export function dataUri2text(url) {
@@ -402,4 +395,19 @@ export function normalizeTag(tag) {
 
 export function escapeStringForRegExp(str) {
   return str.replace(/[\\.?+[\]{}()|^$]/g, '\\$&');
+}
+
+/**
+ * @param {Blob} blob
+ * @param {boolean} [asBuffer]
+ * @return {Promise<string|ArrayBuffer>}
+ */
+export function readBlob(blob, asBuffer) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    if (asBuffer) reader.readAsArrayBuffer(blob);
+    else reader.readAsDataURL(blob);
+  });
 }

@@ -19,19 +19,17 @@
   </div>
 </template>
 
-<script>
-import { ensureArray, getUniqId, i18n, sendCmdDirectly } from '@/common';
+<script setup>
+import { strFromU8, unzipSync } from 'fflate';
+import { ensureArray, getUniqId, i18n, readBlob, sendCmdDirectly } from '@/common';
 import { listenOnce } from '@/common/browser';
 import { kOrigTag, kTag, RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
-import loadZipLibrary from '@/common/zip';
 import { showConfirmation } from '@/common/ui';
 import {
   kComment, kDownloadURL, kExclude, kInclude, kMatch, kOrigExclude, kOrigInclude, kOrigMatch, runInBatch, store,
+  vmZipEntryName,
 } from '../../utils';
-</script>
-
-<script setup>
 import { onActivated, onMounted, reactive, ref } from 'vue';
 import SettingCheck from '@/common/ui/setting-check';
 
@@ -41,6 +39,7 @@ const undoTime = ref('');
 const i18nConfirmUndoImport = i18n('confirmUndoImport');
 const labelImportScriptData = i18n('labelImportScriptData');
 const labelImportSettings = i18n('labelImportSettings');
+const TM = 'Tampermonkey';
 
 let depsPortId;
 let undoPort;
@@ -69,26 +68,41 @@ function pickBackup() {
 }
 
 async function importBackup(file) {
-  if (!store.batch) runInBatch(doImportBackup, file);
+  if (file && !store.batch) {
+    runInBatch(doImportBackup, await readBlob(file, true), file.name);
+  }
 }
 
-async function doImportBackup(file) {
-  if (!file) return;
+async function doImportBackup(buf, zipName) {
   reports.length = 0;
+  let vm;
+  let files;
+  let total = 0;
   const importScriptData = options.get('importScriptData');
-  const zip = await loadZipLibrary();
-  const reader = new zip.ZipReader(new zip.BlobReader(file));
-  const entries = await reader.getEntries().catch(report) || [];
-  if (reports.length) return;
-  report('', file.name, 'info');
+  const optionsNames = [];
+  const scriptTimes = {};
+  const storageNames = [];
+  const kUserJs = '.user.js';
+  const kOptionsJson = '.options.json';
+  const kStorageJson = '.storage.json';
+  try {
+    files = unzipSync(new Uint8Array(buf), {
+      filter: ({ name, time, originalSize }) => originalSize < 100e6 && (
+        name.toLowerCase() === vmZipEntryName && (vm = name) ||
+        name.endsWith(kOptionsJson) && optionsNames.push(name.slice(0, -kOptionsJson.length)) ||
+        name.endsWith(kStorageJson) && storageNames.push(name.slice(0, -kStorageJson.length)) ||
+        name.endsWith(kUserJs) && (scriptTimes[name.slice(0, -kUserJs.length)] = time, ++total)
+      ),
+    });
+  } catch (err) {
+    report(err.message || err);
+    return;
+  }
+  report('', zipName, 'info');
   report('', '', 'info'); // deps
   const uriMap = {};
-  const total = entries.reduce((n, entry) => n + entry.filename?.endsWith('.user.js'), 0);
-  const vmEntry = entries.find(entry => entry.filename?.toLowerCase() === 'violentmonkey');
-  const vm = vmEntry && await readContents(vmEntry) || {};
-  const importSettings = options.get('importSettings') && vm.settings;
-  const scripts = vm.scripts || {};
-  const values = vm.values || {};
+  let scripts = {};
+  let values = {};
   let now;
   let depsDone = 0;
   let depsTotal = 0;
@@ -112,46 +126,40 @@ async function doImportBackup(file) {
     undoPort = chrome.runtime.connect({ name: 'undoImport' });
     await new Promise(resolveOnUndoMessage);
   }
-  await processAll(readScriptOptions, '.options.json');
-  await processAll(readScript, '.user.js');
+  for (const name in files) {
+    try {
+      const text = strFromU8(files[name]);
+      files[name] = name.endsWith(kUserJs) ? text : JSON.parse(text, name);
+    } catch (e) {
+      report(e, name, null);
+    }
+  }
+  if (vm && (vm = files[vm])) {
+    scripts = vm.scripts || scripts;
+    values = vm.values || values;
+    if (options.get('importSettings') && isObject(vm = vm.settings)) {
+      delete vm.sync;
+      sendCmdDirectly('SetOptions', vm);
+    }
+  }
+  optionsNames.forEach(readScriptOptions);
+  for (const name in scriptTimes) {
+    await readScript(name, scriptTimes[name]);
+  }
   if (importScriptData) {
-    await processAll(readScriptStorage, '.storage.json');
+    storageNames.forEach(readScriptStorage);
     sendCmdDirectly('SetValueStores', values);
   }
-  if (isObject(importSettings)) {
-    delete importSettings.sync;
-    sendCmdDirectly('SetOptions', importSettings);
-  }
   sendCmdDirectly('CheckPosition');
-  await reader.close();
   reportProgress();
   if (now) undoTime.value = now;
 
-  function parseJson(text, entry) {
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      report(e, entry.filename, null);
-    }
-  }
-  function processAll(transform, suffix) {
-    return Promise.all(entries.map(async entry => {
-      const { filename } = entry;
-      if (filename?.endsWith(suffix)) {
-        const contents = await readContents(entry);
-        return contents && transform(entry, contents, filename.slice(0, -suffix.length));
-      }
-    }));
-  }
-  async function readContents(entry) {
-    const text = await entry.getData(new zip.TextWriter());
-    return entry.filename.endsWith('.js') ? text : parseJson(text, entry);
-  }
-  async function readScript(entry, code, name) {
-    const { filename } = entry;
+  async function readScript(name, time) {
+    let decodedTime;
+    const filename = name + kUserJs;
     const more = scripts[name];
     const data = {
-      code,
+      code: files[filename],
       portId: depsPortId,
       ...more && {
         custom: more.custom,
@@ -164,13 +172,16 @@ async function doImportBackup(file) {
         props: {
           lastModified: more.lastModified
             || more.props?.lastModified // Import data from Tampermonkey
-            || +entry.lastModDate,
+            || (decodedTime = +zipTimeToDate(time) || now),
           lastUpdated: more.lastUpdated
             || more.props?.lastUpdated // Import data from Tampermonkey
-            || +entry.lastModDate,
+            || decodedTime
+            || +zipTimeToDate(time)
+            || now,
         },
       },
     };
+    files[filename] = '';
     try {
       uriMap[name] = (await sendCmdDirectly('ParseScript', data)).update.props.uri;
       reportProgress(filename);
@@ -178,14 +189,15 @@ async function doImportBackup(file) {
       report(e, filename, 'script');
     }
   }
-  async function readScriptOptions(entry, json, name) {
-    const { meta, settings = {}, options: opts } = json;
+  function readScriptOptions(name) {
+    const { meta, settings = {}, options: opts } = files[name];
+    files[name] = '';
     if (!meta || !opts) return;
     const ovr = opts.override || {};
     const tags = opts.tags;
     const origTags = ovr.orig_tags;
     const hasOrigTags = !origTags?.length || tags?.length && origTags.every(t => tags.includes(t));
-    reports[0].text = 'Tampermonkey';
+    reports[0].text = TM;
     /** @type {VMScript} */
     scripts[name] = {
       config: {
@@ -213,9 +225,9 @@ async function doImportBackup(file) {
       },
     };
   }
-  async function readScriptStorage(entry, json, name) {
-    reports[0].text = 'Tampermonkey';
-    values[uriMap[name]] = json.data;
+  function readScriptStorage(name) {
+    reports[0].text = TM;
+    values[uriMap[name]] = files[name].data;
   }
   function report(text, name, type = 'critical') {
     reports.push({ text, name, type });
@@ -229,6 +241,16 @@ async function doImportBackup(file) {
   }
   function toStringArray(data) {
     return ensureArray(data).filter(item => typeof item === 'string');
+  }
+  function zipTimeToDate(time) {
+    return new Date(
+      /*Y*/((time >> 25) & 0x7f) + 1980,
+      /*M*/(time >> 21) & 0x0f - 1,
+      /*D*/(time >> 16) & 0x1f,
+      /*h*/(time >> 11) & 0x1f,
+      /*m*/(time >> 5) & 0x3f,
+      /*s*/(time & 0x1f) * 2,
+    );
   }
 }
 

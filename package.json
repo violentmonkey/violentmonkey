@@ -37,7 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
     "@violentmonkey/types": "^0.3.1",
-    "@vue/compiler-sfc": "^3.5.33",
+    "@vue/compiler-sfc": "^3.5.35",
     "@vue/eslint-config-typescript": "^13.0.0",
     "amo-upload": "^0.5.5",
     "autoprefixer": "^10.4.15",
@@ -56,9 +56,9 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-vue": "^9.27.0",
     "fancy-log": "^2.0.0",
-    "gulp": "^4.0.2",
-    "gulp-plumber": "^1.1.0",
-    "html-webpack-plugin": "^5.6.0",
+    "gulp": "^5.0.1",
+    "gulp-plumber": "^1.2.1",
+    "html-webpack-plugin": "^5.6.7",
     "husky": "^8.0.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
@@ -76,6 +76,7 @@
     "postcss-simple-vars": "^6.0.3",
     "prettier": "^3.0.2",
     "sharp": "^0.32.6",
+    "string-replace-loader": "^3.3.0",
     "style-loader": "^3.3.3",
     "svg-sprite-loader": "^6.0.11",
     "terser-webpack-plugin": "^5.3.9",
@@ -85,9 +86,9 @@
     "vinyl": "^2.2.1",
     "vue-loader": "^17.4.2",
     "vue-tsc": "^2.0.29",
-    "webpack": "^5.95.0",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4"
+    "webpack": "^5.107.2",
+    "webpack-bundle-analyzer": "^5.3.0",
+    "webpack-cli": "^7.0.2"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
@@ -101,10 +102,10 @@
   "license": "MIT",
   "dependencies": {
     "@violentmonkey/shortcut": "^1.4.4",
-    "@zip.js/zip.js": "2.4.4",
     "codemirror": "^5.65.20",
-    "tldts": "^7.0.19",
-    "vue": "^3.5.33",
+    "fflate": "^0.8.3",
+    "tldts": "^7.4.0",
+    "vue": "^3.5.35",
     "vueleton": "^2.0.2"
   },
   "engines": {

@@ -28,14 +28,14 @@
 <script setup>
 import { computed, ref } from 'vue';
 import Modal from 'vueleton/lib/modal';
-import { getScriptName, sendCmdDirectly } from '@/common';
+import { strToU8, zipSync } from 'fflate';
+import { getScriptName, readBlob, sendCmdDirectly } from '@/common';
 import { formatDate } from '@/common/date';
-import { objectGet } from '@/common/object';
 import options from '@/common/options';
 import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
 import { downloadBlob } from '@/common/download';
-import loadZip from '@/common/zip';
+import { vmZipEntryName } from '@/options/utils';
 import VmDateInfo from './vm-date-info';
 
 /** @type {VMScriptGMInfoPlatform} */
@@ -68,14 +68,12 @@ function download(blob) {
   const FF = IS_FIREFOX && parseFloat(ua.browserVersion);
   const name = fileName.value;
   if (FF && (ua.os === 'win' ? FF < 56 : ua.os === 'mac' ? FF < 61 : FF < 63)) {
-    const reader = new FileReader();
-    reader.onload = () => {
+    readBlob(blob).then(url => {
       ffDownload.value = {
         name,
-        url: reader.result,
+        url,
       };
-    };
-    reader.readAsDataURL(blob);
+    });
   } else {
     downloadBlob(blob, name);
   }
@@ -87,55 +85,48 @@ function normalizeFilename(name) {
 
 async function exportData() {
   const withValues = options.get('exportValues');
-  const data = await sendCmdDirectly('ExportZip', {
+  const { items, values } = await sendCmdDirectly('ExportZip', {
     values: withValues,
   });
   const names = {};
+  const vmScripts = {};
+  const vmValues = {};
   const vm = {
-    scripts: {},
+    scripts: vmScripts,
     settings: options.get(),
   };
+  const files = {};
   delete vm.settings.sync;
-  if (withValues) vm.values = {};
-  const files = (objectGet(data, 'items') || []).map(({ script, code }) => {
+  if (withValues) vm.values = vmValues;
+  for (const { /**@type{VMScript}*/script, code } of items) {
     let name = normalizeFilename(getScriptName(script));
     if (names[name]) {
       names[name] += 1;
       name = `${name}_${names[name]}`;
     } else names[name] = 1;
-    const { lastModified, lastUpdated } = script.props;
+    const { id, position, uri, lastModified, lastUpdated } = script.props;
+    const modDate = lastUpdated || lastModified;
     const info = {
       custom: script.custom,
       config: script.config,
-      position: script.props.position,
+      position,
       lastModified,
       lastUpdated,
     };
-    if (withValues) {
+    const v = withValues && values[id];
+    if (v) {
       // `values` are related to scripts by `props.id` in Violentmonkey,
       // but by the global `props.uri` when exported.
-      const values = data.values[script.props.id];
-      if (values) vm.values[script.props.uri] = values;
+      vmValues[uri] = v;
     }
-    vm.scripts[name] = info;
-    return {
-      name: `${name}.user.js`,
-      content: code,
-      lastModDate: new Date(lastUpdated || lastModified),
-    };
-  });
-  files.push({
-    name: 'violentmonkey',
-    content: JSON.stringify(vm, null, 2), // prettify to help users diff or view it
-  });
-  const zip = await loadZip();
-  const blobWriter = new zip.BlobWriter('application/zip');
-  const writer = new zip.ZipWriter(blobWriter, { bufferedWrite: true, keepOrder: false });
-  await Promise.all(files.map(file => writer.add(file.name, new zip.TextReader(file.content), {
-    lastModDate: file.lastModDate,
-  })));
-  const blob = await writer.close();
-  return blob;
+    vmScripts[name] = info;
+    files[`${name}.user.js`] = [
+      strToU8(code),
+      modDate && { mtime: new Date(modDate) },
+    ];
+  }
+  files[vmZipEntryName] = [strToU8(JSON.stringify(vm, null, 2))]; // prettify to help users diff or view it
+  return new Blob([zipSync(files)], { type: 'application/zip' });
 }
 </script>
 

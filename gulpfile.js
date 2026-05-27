@@ -164,15 +164,7 @@ function logError(err) {
   return this.emit('end');
 }
 
-function copyZip() {
-  return gulp.src([
-    'node_modules/@zip.js/zip.js/dist/zip-no-worker.min.js',
-    'node_modules/@zip.js/zip.js/dist/z-worker.js',
-  ])
-  .pipe(gulp.dest(`${DIST}/public/lib`));
-}
-
-const pack = gulp.parallel(createIcons, copyI18n, copyZip);
+const pack = gulp.parallel(createIcons, copyI18n);
 
 exports.clean = clean;
 exports.manifest = manifest;
