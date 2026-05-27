@@ -134,7 +134,6 @@ Object.assign(handlers, {
     Object.assign(script, update);
     if (script.error && !update.error) script.error = null;
     initScript(script, sizes, code);
-    performSearch([script]);
     if (removed != null) {
       if (removed) {
         // Note that we don't update store.scripts even if a script is removed,
@@ -149,11 +148,13 @@ Object.assign(handlers, {
     }
     // Update the new list
     const i = script.config.removed ? i2 : i1;
+    const area = script.config.removed ? 'removedScripts' : SCRIPTS;
+    const list = [...store[area]];
     if (i < 0) {
       script.message = '';
-      const list = script.config.removed ? 'removedScripts' : SCRIPTS;
-      store[list] = [...store[list], script];
+      list.push(script);
     }
+    store[area] = list;
     if (store.tags && (removed != null ? oldTags : oldTags !== getUniqTags(script))) {
       updateTags();
     }
