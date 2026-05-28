@@ -10,8 +10,7 @@ import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
 import {
-  formatSizesStr, kComment, kDescription, kName, kStorageSize, performSearch, SIZE_TITLES, store,
-  updateTags,
+  formatSizesStr, kComment, kDescription, kName, kStorageSize, SIZE_TITLES, store, updateTags,
 } from './utils';
 import App from './views/app';
 
