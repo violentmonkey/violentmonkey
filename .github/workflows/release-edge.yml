@@ -17,8 +17,6 @@ jobs:
           # persist-credentials: false # not implemented in v1
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: 10
 
       - uses: actions/setup-node@v6
         with:
