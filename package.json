@@ -14,7 +14,7 @@
     "lint": "run-s lint:js lint:yml",
     "lint:js": "eslint --ext .js,.vue . --cache",
     "lint:yml": "gulp check",
-    "test": "cross-env BABEL_ENV=test TEST=test jest test",
+    "test": "cross-env BABEL_ENV=test TEST=test jest test --maxWorkers=50%",
     "ci": "run-p lint test",
     "bumpVersion": "gulp bump",
     "bump": "run-s ci \"bumpVersion --commit\"",

@@ -30,7 +30,7 @@ exports.restrictedSyntax = (
   message: 'Spreading via Symbol.iterator may be spoofed/broken in an unsafe environment',
   code: 'open([...[]])',
 }, {
-  selector: '[callee.object.name="Object"], MemberExpression[object.name="Object"]',
+  selector: 'MemberExpression[object.name="Object"]',
   message: 'Using potentially spoofed methods in an unsafe environment',
   code: 'Object.assign()',
   // TODO: auto-generate the rule using GLOBALS
