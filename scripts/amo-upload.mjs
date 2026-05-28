@@ -41,7 +41,7 @@ async function handleAddon() {
           sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
           approvalNotes: `\
 # please use nodejs 20 or 24 because nodejs 22 is known to fail
-pnpm i && pnpm run ci && pnpm build
+corepack enable pnpm && pnpm i && pnpm run ci && pnpm build
 `,
           releaseNotes: {
             'en-US': `\

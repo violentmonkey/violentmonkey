@@ -34,6 +34,12 @@ $ pnpm dev
 
 Then load the extension from 'dist/'.
 
+### Test + lint
+
+``` sh
+$ pnpm run ci
+```
+
 ### Build
 
 To release a new version, we must build the assets and upload them to web stores.
