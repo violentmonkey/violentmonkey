@@ -277,7 +277,7 @@ async function batchHandle(handle, allowedLangs) {
   for (const lang of langs) {
     await mkdir(`src/_locales/${lang}`, { recursive: true });
   }
-  spawn.sync('yarn', ['i18n'], { stdio: 'inherit' });
+  spawn.sync('pnpm', ['i18n'], { stdio: 'inherit' });
   if (allowedLangs) langs = langs.filter(lang => allowedLangs.includes(lang));
   let finished = 0;
   const showProgress = () => {

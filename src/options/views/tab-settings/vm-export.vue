@@ -32,10 +32,10 @@ import { strToU8, zipSync } from 'fflate';
 import { getScriptName, readBlob, sendCmdDirectly } from '@/common';
 import { formatDate } from '@/common/date';
 import options from '@/common/options';
-import SettingCheck from '@/common/ui/setting-check';
-import SettingText from '@/common/ui/setting-text';
 import { downloadBlob } from '@/common/download';
 import { vmZipEntryName } from '@/options/utils';
+import SettingCheck from '@/common/ui/setting-check';
+import SettingText from '@/common/ui/setting-text';
 import VmDateInfo from './vm-date-info';
 
 /** @type {VMScriptGMInfoPlatform} */
