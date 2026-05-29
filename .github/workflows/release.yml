@@ -69,11 +69,19 @@ jobs:
           mkdir -p $TEMP_DIR/updates
           if [ "$PRERELEASE" != "true" ]; then
             echo Publish listed version
-            node scripts/amo-upload.mjs
+            if ! node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
+              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+              ERROR="${ERROR:-AMO publish failed}"
+            fi
           else
             echo Publish unlisted version
-            DEBUG=amo-upload BETA=1 node scripts/amo-upload.mjs
+            if ! DEBUG=amo-upload BETA=1 node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
+              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+              ERROR="${ERROR:-AMO publish failed}"
+            fi
           fi
+          export TARGET=AMO
+          node scripts/notify-release.mjs
         env:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
@@ -87,11 +95,19 @@ jobs:
           set -x
           if [ "$PRERELEASE" != "true" ]; then
             echo Publish release
-            npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_RELEASE --source $ASSETS_DIR/$ASSET_ZIP --auto-publish
+            if ! npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_RELEASE --source $ASSETS_DIR/$ASSET_ZIP --auto-publish 2>"$TEMP_DIR/stderr.log"; then
+              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+              ERROR="${ERROR:-CWS publish failed}"
+            fi
           else
             echo Publish prerelease
-            npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $TEMP_DIR/$ASSET_CWS_BETA_ZIP --auto-publish
+            if ! npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $TEMP_DIR/$ASSET_CWS_BETA_ZIP --auto-publish 2>"$TEMP_DIR/stderr.log"; then
+              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+              ERROR="${ERROR:-CWS publish failed}"
+            fi
           fi
+          export TARGET=CWS
+          node scripts/notify-release.mjs
         env:
           EXTENSION_ID_BETA: opokoaglpekkimldnlggpoagmjegichg
           EXTENSION_ID_RELEASE: jinjaccalgkegednnccohejagnlnfdag

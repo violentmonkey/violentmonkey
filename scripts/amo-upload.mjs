@@ -2,7 +2,7 @@ import { signAddon } from 'amo-upload';
 import { mkdir, rename, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { buildUpdatesList, readManifest } from './manifest-helper.js';
-import { hasAsset, notifyReleaseStatus } from './release-helper.mjs';
+import { hasAsset } from './release-helper.mjs';
 import { getVersion, isBeta } from './version-helper.js';
 
 const version = getVersion();
@@ -83,29 +83,7 @@ async function main() {
   if (error) throw error;
 }
 
-main().then(
-  () => {
-    notifyReleaseStatus({
-      title: `AMO Release Success: ${process.env.RELEASE_NAME}`,
-      description: `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${process.env.VERSION}.`,
-    });
-  },
-  (err) => {
-    // if (err instanceof FatalError) {
-    notifyReleaseStatus({
-      title: `AMO Release Failure: ${process.env.RELEASE_NAME}`,
-      description: [
-        'An error occurred:',
-        '',
-        `> ${err}`,
-        ...(process.env.ACTION_BUILD_URL
-          ? ['', `See ${process.env.ACTION_BUILD_URL} for more details.`]
-          : []),
-      ].join('\n'),
-      success: false,
-    });
-    // }
-    console.error(err);
-    process.exitCode = 1;
-  },
-);
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});
