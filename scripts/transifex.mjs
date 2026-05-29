@@ -4,7 +4,7 @@ import yaml from 'js-yaml';
 
 const PROJECT_ID = 'o:violentmonkey:p:violentmonkey-nex';
 const RESOURCE_ID = `${PROJECT_ID}:r:messagesjson`;
-const RESOURCE_FILE = 'src/_locales/en/messages.yml';
+const RESOURCE_FILE = '_locales/en/messages.yml';
 const request = limitConcurrency(doRequest, 5);
 
 function delay(time) {
@@ -209,7 +209,7 @@ async function updateTranslations(updates) {
 
 const loadData = memoize(async function loadData(lang) {
   const remote = await loadRemote(lang);
-  const filePath = `src/_locales/${lang}/messages.yml`;
+  const filePath = `_locales/${lang}/messages.yml`;
   const local = yaml.load(await readFile(filePath, 'utf8'));
   return { local, remote, filePath };
 });
@@ -220,10 +220,10 @@ async function loadUpdatedLocales() {
   const res = await fetch(diffUrl);
   const result = await res.text();
   // Example:
-  // diff --git a/src/_locales/ko/messages.yml b/src/_locales/ko/messages.yml
+  // diff --git a/_locales/ko/messages.yml b/_locales/ko/messages.yml
   const langs = result.split('\n')
     .map(line => {
-      const matches = line.match(/^diff --git a\/src\/_locales\/([^/]+)\/messages.yml b\/src\/_locales\/([^/]+)\/messages.yml$/);
+      const matches = line.match(/^diff --git a\/_locales\/([^/]+)\/messages.yml b\/_locales\/([^/]+)\/messages.yml$/);
       const [, code1, code2] = matches || [];
       return code1 === code2 && code1;
     })
@@ -275,7 +275,7 @@ async function batchHandle(handle, allowedLangs) {
   process.stdout.write('OK\n');
   process.stdout.write(`Got ${langs.length} language codes\n`);
   for (const lang of langs) {
-    await mkdir(`src/_locales/${lang}`, { recursive: true });
+    await mkdir(`_locales/${lang}`, { recursive: true });
   }
   spawn.sync('pnpm', ['i18n'], { stdio: 'inherit' });
   if (allowedLangs) langs = langs.filter(lang => allowedLangs.includes(lang));

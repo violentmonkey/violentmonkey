@@ -14,7 +14,7 @@ const DIST = 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
   locales: [
-    'src/_locales/**',
+    '_locales/**',
   ],
   templates: [
     'src/**/*.@(js|html|json|yml|vue)',
@@ -120,14 +120,14 @@ async function bump() {
 
 function checkI18n() {
   return i18n.read({
-    base: 'src/_locales',
+    base: '_locales',
     extension: '.json',
   });
 }
 
 function copyI18n() {
   return i18n.read({
-    base: 'src/_locales',
+    base: '_locales',
     touchedOnly: true,
     useDefaultLang: true,
     markUntouched: false,
@@ -138,21 +138,21 @@ function copyI18n() {
 }
 
 /**
- * Load locale files (src/_locales/<lang>/message.[json|yml]), and
+ * Load locale files (_locales/<lang>/message.[json|yml]), and
  * update them with keys in template files, then store in `message.yml`.
  */
 function updateI18n() {
   return gulp.src(paths.templates)
   .pipe(plumber(logError))
   .pipe(i18n.extract({
-    base: 'src/_locales',
+    base: '_locales',
     manifest: 'src/manifest.yml',
     touchedOnly: false,
     useDefaultLang: false,
     markUntouched: true,
     extension: '.yml',
   }))
-  .pipe(gulp.dest('src/_locales'));
+  .pipe(gulp.dest('_locales'));
 }
 
 function logError(err) {
