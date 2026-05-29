@@ -3,9 +3,9 @@
   "description": "Violentmonkey",
   "version": "2.40.0",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "prepare": "husky install",
     "dev": "gulp dev",
-    "prebuild": "yarn ci",
     "build": "cross-env NODE_ENV=production gulp build",
     "build:selfHosted": "cross-env TARGET=selfHosted BETA=1 run-s build",
     "analyze": "cross-env RUN_ENV=analyze run-s build",
@@ -21,12 +21,13 @@
     "preversion": "run-s ci \"bumpVersion --reset\""
   },
   "devDependencies": {
-    "@actions/core": "^1.9.0",
-    "@actions/github": "^5.0.3",
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^9.1.1",
     "@babel/core": "^7.22.10",
     "@babel/eslint-parser": "^7.22.15",
     "@babel/helper-plugin-utils": "^7.18.6",
     "@babel/plugin-syntax-function-bind": "^7.18.6",
+    "@babel/plugin-transform-for-of": "^7.29.7",
     "@babel/plugin-transform-runtime": "^7.22.10",
     "@babel/preset-env": "^7.22.10",
     "@babel/preset-typescript": "^7.22.5",
@@ -75,7 +76,8 @@
     "postcss-scss": "^4.0.4",
     "postcss-simple-vars": "^6.0.3",
     "prettier": "^3.0.2",
-    "sharp": "^0.32.6",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "sharp": "^0.34.5",
     "string-replace-loader": "^3.3.0",
     "style-loader": "^3.3.3",
     "svg-sprite-loader": "^6.0.11",
@@ -109,8 +111,9 @@
     "vueleton": "^2.0.2"
   },
   "engines": {
-    "node": ">=20 <22 || >= 24"
+    "node": ">= 24"
   },
+  "packageManager": "pnpm@10.34.1+sha512.b58fbde6dca66a929538021581f648b4570b6ca19b18e7cbd7f2c07a7b24454155388dacdf08f2af3678e88a6d1fe04f9d609df24bf51735a060ea041b374ab7",
   "jest": {
     "setupFilesAfterEnv": [
       "./test/mock/index.js"

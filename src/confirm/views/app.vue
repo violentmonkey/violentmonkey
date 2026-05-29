@@ -116,19 +116,19 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import Icon from '@/common/ui/icon';
 import {
   debounce, getFullUrl, getLocaleString, getScriptHome, i18n, isRemote, makePause, sendCmdDirectly,
   trueJoin,
 } from '@/common';
 import { keyboardService, modifiers } from '@/common/keyboard';
 import initCache from '@/common/cache';
-import VmExternals from '@/common/ui/externals';
-import SettingCheck from '@/common/ui/setting-check';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { deepEqual, objectPick } from '@/common/object';
 import { route } from '@/common/router';
 import { externalEditorInfoUrl } from '@/common/ui';
+import Icon from '@/common/ui/icon';
+import SettingCheck from '@/common/ui/setting-check';
+import VmExternals from '@/common/ui/externals';
 
 const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;

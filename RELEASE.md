@@ -6,7 +6,7 @@ Create a tag and push, GitHub Actions will build the assets and upload them to d
 
 ```bash
 $ git checkout master
-$ yarn bump
+$ pnpm bump
 $ git push origin master --follow-tags
 ```
 
@@ -17,7 +17,7 @@ Merge everything that is ready to release to the `release` branch and bump versi
 ```bash
 $ git checkout release
 $ git merge master # or git merge v2.13.2
-$ yarn version --minor
+$ pnpm version minor
 $ git push origin release --follow-tags
 ```
 

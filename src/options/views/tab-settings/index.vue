@@ -142,8 +142,8 @@ const items = {
 <script setup>
 import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import SettingCheck from '@/common/ui/setting-check';
 import LocaleGroup from '@/common/ui/locale-group';
+import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import VmImport from './vm-import';

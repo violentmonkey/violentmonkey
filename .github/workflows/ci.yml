@@ -23,17 +23,24 @@ jobs:
         uses: actions/checkout@v1 # v1 keeps tags
         with:
           fetch-depth: 100 # for revision index in version and the `has-changed-path` action
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
 
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: 'package.json'
+
+      - name: Install
+        run: pnpm i
+      - name: Test
+        run: pnpm run ci
       - name: Build
         env:
           SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
           SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
           SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
           SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
-        run: yarn && yarn build
+        run: pnpm build
 
       - name: Get version and SHA
         run: node scripts/action-helper.js ci

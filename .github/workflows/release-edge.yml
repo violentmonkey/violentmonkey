@@ -16,15 +16,20 @@ jobs:
           fetch-depth: 250 # for `action-helper`
           # persist-credentials: false # not implemented in v1
 
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version-file: 'package.json'
 
       - name: Prepare
-        run: yarn && node scripts/action-helper.js
+        run: pnpm i && node scripts/action-helper.js
         env:
           ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
+
+      - name: Test
+        run: pnpm run ci
 
       - name: Build
         env:
@@ -34,7 +39,7 @@ jobs:
           SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
         run: |
           mkdir -p $ASSETS_DIR
-          yarn build
+          pnpm build
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
 
       - uses: denoland/setup-deno@v2

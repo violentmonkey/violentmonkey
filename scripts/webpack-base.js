@@ -1,5 +1,6 @@
 const { resolve } = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
+const progressBarPlugin = require('progress-bar-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -69,7 +70,7 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
 
 const splitVendor = prefix => ({
   [prefix]: {
-    test: new RegExp(prefix),
+    test: new RegExp('[\\\\/]' + prefix),
     name: `public/lib/${prefix}`,
     chunks: 'all',
     priority: 100,
@@ -208,8 +209,8 @@ const getBaseConfig = () => ({
             /\bsvg/,
             // don't extract CSS as it'll change the relative order of rules which breaks appearance
             'src/common/(?!zip|.*\\.css$)',
-            'node_modules/@violentmonkey/shortcut',
-            'node_modules/@?vue',
+            '@violentmonkey/shortcut',
+            '/@?vue',
           ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
           chunks: c => ![
             'background/index', // only 4kB of common code
@@ -227,13 +228,17 @@ const getBaseConfig = () => ({
     ] : [],
   },
   plugins: [
+    !process.env.GITHUB_ACTIONS && new progressBarPlugin({
+      format: '[:bar] :percent (:elapsed seconds), :msg',
+      summary: false,
+    }),
     new VueLoaderPlugin(),
     new GroupAssetsPlugin(),
     ...styleOptions.extract ? [new MiniCssExtractPlugin({
       filename: '[name].css',
     })] : [],
     require('unplugin-icons/webpack')(),
-  ],
+  ].filter(Boolean),
 });
 
 const getPageConfig = () => {

@@ -14,14 +14,14 @@ jobs:
     if: ${{ github.event.client_payload.version || github.event.inputs.version }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version-file: 'package.json'
 
       - name: Prepare
-        run: yarn && node scripts/action-helper.js
+        run: pnpm i && node scripts/action-helper.js
         env:
           ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}

@@ -14,15 +14,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version-file: 'package.json'
 
       - name: Install deps
-        run: yarn
+        run: pnpm i
 
       - name: Update translations
         run: node scripts/transifex.mjs pull

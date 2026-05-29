@@ -172,10 +172,10 @@ let visitedRecentlyInterval;
 </script>
 
 <script setup>
+import { computed, ref, watch } from 'vue';
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
-import { computed, ref, watch } from 'vue';
 
 const props = defineProps([
   'script',
