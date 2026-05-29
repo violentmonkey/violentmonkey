@@ -75,7 +75,7 @@ jobs:
             fi
           else
             echo Publish unlisted version
-            if ! DEBUG=amo-upload BETA=1 node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
+            if ! BETA=1 node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
               export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
               ERROR="${ERROR:-AMO publish failed}"
             fi

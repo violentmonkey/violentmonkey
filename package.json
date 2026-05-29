@@ -40,7 +40,7 @@
     "@violentmonkey/types": "^0.3.1",
     "@vue/compiler-sfc": "^3.5.35",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "amo-upload": "^0.5.5",
+    "amo-upload": "^1.1.0",
     "autoprefixer": "^10.4.15",
     "babel-jest": "^29.6.2",
     "babel-loader": "^9.1.3",
