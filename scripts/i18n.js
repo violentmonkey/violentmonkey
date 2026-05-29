@@ -2,7 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const Vinyl = require('vinyl');
 const PluginError = require('plugin-error');
-const through = require('through2');
+const through = require('through2').default;
 const yaml = require('js-yaml');
 
 const transformers = {

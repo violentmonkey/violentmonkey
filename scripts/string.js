@@ -1,5 +1,5 @@
 const PluginError = require('plugin-error');
-const through = require('through2');
+const through = require('through2').default;
 
 module.exports = function (handle) {
   return through.obj(function (file, enc, cb) {

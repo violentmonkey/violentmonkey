@@ -1,5 +1,7 @@
 allowBuilds:
   sharp: false
+  unrs-resolver: false
+  vueleton: false
 
 overrides:
   '@babel/helpers@<7.26.10': '>=7.26.10'
