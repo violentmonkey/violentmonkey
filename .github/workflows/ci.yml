@@ -45,7 +45,7 @@ jobs:
       - name: Get version and SHA
         run: node scripts/action-helper.js ci
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         continue-on-error: true
         with:
           name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
