@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const gulp = require('gulp');
-const del = require('del');
+const del = require('del').deleteAsync;
 const log = require('fancy-log');
 const plumber = require('gulp-plumber');
 const Sharp = require('sharp');
