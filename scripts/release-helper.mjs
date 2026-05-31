@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
-import github from '@actions/github';
+import * as github from '@actions/github';
 import { exec } from './common.js';
 
 const { VERSION, ASSETS_DIR, GITHUB_TOKEN } = process.env;
