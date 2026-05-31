@@ -59,7 +59,7 @@
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
         <div class="flex-auto"></div>
-        <span class="ml-1">
+        <span class="ml-1 flex">
           <span v-text="i18n('sortOrder')" class="hidden-m"/>
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
@@ -96,7 +96,7 @@
         </Dropdown>
         <!-- form and id are required for the built-in autocomplete using entered values -->
         <form class="filter-search hidden-xs" @submit.prevent
-              :style="{ 'min-width': '10em', 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
+              :style="{ 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
           <label>
             <input
               type="search"
@@ -954,7 +954,7 @@ $iconSize: 2rem; // from .icon in ui/style.css
   }
 }
 .filter-search {
-  flex-grow: 10;
+  min-width: 10em;
   label {
     position: relative;
   }
