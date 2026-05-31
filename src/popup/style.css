@@ -252,7 +252,7 @@ footer {
     .touch & {
       display: flex !important;
     }
-    &:not([data-show]) > :not(a) {
+    html:not(.touch) &:not([data-show]) > :not(a) {
       display: none;
     }
   }
