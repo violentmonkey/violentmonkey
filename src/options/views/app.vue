@@ -1,10 +1,11 @@
 <template>
   <div class="page-options">
     <aside v-if="canRenderAside">
-      <div class="aside-content">
+      <header>
         <img src="/public/images/icon128.png">
         <h1 class="hidden-sm" v-text="i18n('extName')"/>
-        <hr />
+      </header>
+      <div class="aside-content">
         <div class="aside-menu-item" v-for="tab in tabs" :key="tab.name">
           <a
             :href="`#${tab.name}`"

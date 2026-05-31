@@ -59,7 +59,8 @@
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
         <div class="flex-auto"></div>
-        <span class="ml-1">{{ i18n('sortOrder') }}
+        <span class="ml-1">
+          <span v-text="i18n('sortOrder')" class="hidden-m"/>
           <select :value="filters.sort" @change="handleOrderChange" class="h-100">
             <option
               v-for="({text, title}, name) in sortModes"
@@ -561,7 +562,7 @@ function adjustNarrowWidth(val) {
   if (narrowMediaRules) {
     for (const r of narrowMediaRules) {
       const orig = r._orig;
-      r.media.mediaText = val ? orig.replace(/\d+/g, s => +s + 90 / devicePixelRatio) : orig;
+  r.media.mediaText = val ? orig.replace(/\d+/g, s => +s + 90 / devicePixelRatio) : orig;
     }
   }
 }
