@@ -1,5 +1,7 @@
 import bridge, { addHandlers, grantless } from './bridge';
-import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
+import {
+  elemByTag, getAttribute, makeElem, nextTask, onElement, querySelector, sendCmd,
+} from './util';
 import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util';
 import { Run } from './cmd-run';
 
@@ -16,8 +18,6 @@ let frameEventWnd;
 let injectedRoot;
 let invokeContent;
 let nonce;
-let getAttribute;
-let querySelector;
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[INIT_FUNC_NAME];
@@ -157,10 +157,6 @@ export async function injectScripts(data, info, isXml) {
   const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
   const wasInjectableFF = IS_FIREFOX && !nonce && pageInjectable;
   const pageBodyScripts = pageLists?.[BODY];
-  if (wasInjectableFF) {
-    getAttribute = Element[PROTO].getAttribute;
-    querySelector = document.querySelector;
-  }
   tardyQueue = createNullObj();
   // Using a callback to avoid a microtask tick when the root element exists or appears.
   await onElement('*', injectAll, 'start');

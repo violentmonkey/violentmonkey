@@ -119,20 +119,11 @@ addHandlers({
     const obj = window[key];
     (isObject(obj) ? obj : (window[key] = {}))[VIOLENTMONKEY] = {
       version: process.env.VM_VER,
-      isInstalled: (name, namespace) => {
-        const meta = { name, namespace };
-        if (window.location.hostname === 'greasyfork.org') {
-          const installLink = window.document.querySelector('a.install-link');
-          const ds = installLink?.dataset;
-          if (ds?.scriptName === meta.name && ds.scriptNamespace === meta.namespace) {
-            meta.publishVersion = ds.scriptVersion;
-            meta.publishDownloadURL = installLink.href;
-          }
-        }
-        return allowGetScriptVer
-          ? bridge.promise('GetScriptVer', {meta})
-          : promiseResolve();
-      },
+      isInstalled: (name, namespace) => (
+        allowGetScriptVer
+          ? bridge.promise('GetScriptVer', { meta: { name, namespace } })
+          : promiseResolve()
+      ),
     };
   },
 });
