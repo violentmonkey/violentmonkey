@@ -67,18 +67,15 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p $TEMP_DIR/updates
-          if [ "$PRERELEASE" != "true" ]; then
-            echo Publish listed version
-            if ! node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
-              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-              ERROR="${ERROR:-AMO publish failed}"
-            fi
-          else
+          if [ "$PRERELEASE" = "true" ]; then
             echo Publish unlisted version
-            if ! BETA=1 node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
-              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-              ERROR="${ERROR:-AMO publish failed}"
-            fi
+            export BETA=1
+          else
+            echo Publish listed version
+          fi
+          if ! node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
+            export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+            ERROR="${ERROR:-AMO publish failed}"
           fi
           export TARGET=AMO
           node scripts/notify-release.mjs
@@ -95,15 +92,21 @@ jobs:
           set -x
           if [ "$PRERELEASE" != "true" ]; then
             echo Publish release
-            if ! npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_RELEASE --source $ASSETS_DIR/$ASSET_ZIP --auto-publish 2>"$TEMP_DIR/stderr.log"; then
-              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-              ERROR="${ERROR:-CWS publish failed}"
-            fi
+            CWS_EXT_ID=$EXTENSION_ID_RELEASE
+            CWS_SOURCE=$ASSETS_DIR/$ASSET_ZIP
           else
             echo Publish prerelease
-            if ! npx chrome-webstore-upload-cli@1 upload --extension-id $EXTENSION_ID_BETA --source $TEMP_DIR/$ASSET_CWS_BETA_ZIP --auto-publish 2>"$TEMP_DIR/stderr.log"; then
-              export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-              ERROR="${ERROR:-CWS publish failed}"
+            CWS_EXT_ID=$EXTENSION_ID_BETA
+            CWS_SOURCE=$TEMP_DIR/$ASSET_CWS_BETA_ZIP
+          fi
+          if ! npx chrome-webstore-upload-cli@4 --extension-id $CWS_EXT_ID --source $CWS_SOURCE 2>"$TEMP_DIR/stderr.log"; then
+            export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+            ERROR="${ERROR:-CWS publish failed}"
+
+            # Ignore pending review error: "❌ You may not edit or publish an item that is in review."
+            if [[ "$ERROR" == *"is in review"* ]]; then
+              echo "::warning::PENDING_REVIEW: skipping CWS publish notification"
+              exit 0
             fi
           fi
           export TARGET=CWS
@@ -111,6 +114,7 @@ jobs:
         env:
           EXTENSION_ID_BETA: opokoaglpekkimldnlggpoagmjegichg
           EXTENSION_ID_RELEASE: jinjaccalgkegednnccohejagnlnfdag
+          PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
