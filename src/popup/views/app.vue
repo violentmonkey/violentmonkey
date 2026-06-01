@@ -123,7 +123,7 @@
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>
           <div class="submenu-buttons"
-               :data-show="showButtons(item)">
+               v-show="showButtons(item)">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
@@ -136,10 +136,6 @@
               @click="showExtras">
               <icon name="more"/>
             </div>
-            <a v-if="item.c" class="submenu-button"
-               :href="VM_DOCS_INJECT_INTO"
-               :data-message="INJECT_LEARN"
-               v-bind="EXTERNAL_LINK_PROPS">C</a>
           </div>
           <div v-if="item.excludes" class="excludes-menu mb-1c mr-1c">
             <button v-for="(val, key) in item.excludes[1]" :key
@@ -205,6 +201,9 @@
            because iframes may run scripts even in non-injectable pages */"/>
     </div>
     <div v-if="extras" ref="$extras" class="extras-menu">
+      <code v-if="extras.c">
+        <a :href="VM_DOCS_INJECT_INTO" :data-message="INJECT_LEARN" v-bind="EXTERNAL_LINK_PROPS">content</a>
+      </code>
       <a v-for="[url, text] in activeLinks"
          :key="url" :href="url" :data-message="url" tabindex="0" v-text="text"
          v-bind="EXTERNAL_LINK_PROPS"/>

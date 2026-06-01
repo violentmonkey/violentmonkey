@@ -252,9 +252,6 @@ footer {
     .touch & {
       display: flex !important;
     }
-    html:not(.touch) &:not([data-show]) > :not(a) {
-      display: none;
-    }
   }
   &-button {
     padding: .5rem;
@@ -350,6 +347,10 @@ footer {
       color: var(--bg);
       background: cornflowerblue;
     }
+  }
+  > code {
+    padding: .5rem 1rem;
+    border-bottom: 1px solid var(--fill-3);
   }
 }
 
