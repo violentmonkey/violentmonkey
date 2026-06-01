@@ -5,6 +5,7 @@ import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
 const CHUNKS = 'chunks';
 const LOAD = 'load';
 const LOADEND = 'loadend';
+const READYSTATECHANGE = 'readystatechange';
 const isBlobXhr = req => req[kXhrType] === 'blob';
 /** @type {GMReq.Content} */
 const requests = createNullObj();
@@ -150,7 +151,7 @@ addBackgroundHandlers({
 async function requestVirtualUrl(msg, url, isDataUri, realm) {
   const { id, [kFileName]: fileName } = msg;
   const events = msg.events[0];
-  const wantsResult = events[LOAD] > 0 || events[LOADEND] > 0;
+  const wantsResult = events[LOAD] || events[LOADEND] || events[READYSTATECHANGE];
   const wantsBlob = !wantsResult || isBlobXhr(msg);
   const data = !isDataUri ? await importBlob(url, wantsBlob)
     : wantsResult || url.length > 100e3
@@ -166,8 +167,9 @@ async function requestVirtualUrl(msg, url, isDataUri, realm) {
       fileName,
     ]);
   }
-  let type = events[LOAD] ? LOAD : LOADEND;
-  do {
+  for (const type of [READYSTATECHANGE, LOAD, LOADEND]) {
+    if (!events[type])
+      continue;
     sendHttpRequested({
       id,
       type,
@@ -179,7 +181,7 @@ async function requestVirtualUrl(msg, url, isDataUri, realm) {
         [kResponseHeaders]: '',
       },
     }, realm);
-  } while (type !== LOADEND && (type = LOADEND));
+  }
 }
 
 function sendHttpRequested(msg, realm) {

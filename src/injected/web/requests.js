@@ -215,14 +215,14 @@ export function onRequestCreate(opts, context, fileName) {
     for (key of EVENTS_TO_NOTIFY) {
       if ((val = obj[`on${key}`]) && isFunction(val)) {
         cb[i][key] = val;
-        events[i][key] = 1;
+        events[i][key] = true;
       }
     }
   }
   if (context.async) res = new SafePromise((resolve, reject) => {
     const { [LOAD]: onload, [ERROR]: onerror } = cb[0];
-    cb[0][LOAD] = onload ? v => { resolve(v); onload(v); } : (events[0][LOAD] = -1, resolve);
-    cb[0][ERROR] = onerror ? v => { reject(v); onerror(v); } : (events[0][ERROR] = -1, reject);
+    cb[0][LOAD] = onload ? v => { resolve(v); onload(v); } : (events[0][LOAD] = true, resolve);
+    cb[0][ERROR] = onerror ? v => { reject(v); onerror(v); } : (events[0][ERROR] = true, reject);
   });
   idMap[id] = req;
   data = data == null && []
