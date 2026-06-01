@@ -131,7 +131,7 @@ confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
     ¡La actualización automática está deshabilitada para este script!
-    Haz clic en Aceptar para actualizarlo de todos modos.
+    Haz clic en OK para actualizarlo de todos modos.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
@@ -355,7 +355,7 @@ hintInputURL:
   message: 'Introduce la URL:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Los scripts eliminados se enumeran aquí y se mantendrán durante 7 días.
+  message: Los scripts eliminados se muestran aquí y se conservarán durante 7 días.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Usar @downloadURL
@@ -517,7 +517,7 @@ labelHttpOnlyCookieHint:
   message: >-
     Cuando está habilitado, los scripts pueden leer y escribir cookies con el
     atributo HTTP-only. Esto permite que los scripts accedan a cookies a las que
-    normalmente no se puede acceder mediante JavaScript. Úselo con precaución,
+    normalmente no se puede acceder mediante JavaScript. Úsalo con precaución,
     ya que puede representar riesgos de seguridad.
 labelIconURL:
   description: Label for the input.
@@ -544,7 +544,7 @@ labelKeepOriginal:
   message: Mantener el original
 labelLastUpdatedAt:
   description: Label shown on last updated time.
-  message: Última actualización en $1
+  message: Última actualización el $1
 labelLineNumber:
   description: Label for line number jumper.
   message: 'Número de línea: '
@@ -591,7 +591,7 @@ labelRelated:
   message: 'Enlaces relacionados:'
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: Eliminado en $1
+  message: Eliminado el $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Remplazar con:'
@@ -679,7 +679,7 @@ labelSyncServerUrl:
   message: 'URL del servidor:'
 labelSyncService:
   description: Label for sync service select.
-  message: Sincronizar a
+  message: Sincronizar con
 labelSyncUsername:
   description: Label for input to hold username.
   message: 'Nombre de usuario:'
@@ -728,7 +728,7 @@ labelXhrInjectNote:
   message: (excepto en modo incógnito y en sitios con cookies deshabilitadas)
 lastSync:
   description: Label for last sync timestamp.
-  message: Última sincronización en $1
+  message: Última sincronización el $1
 learnBlacklist:
   description: Refers to a link to introduce blacklist patterns.
   message: Aprende más sobre los patrones de la lista negra.
@@ -864,8 +864,8 @@ msgNamespaceConflict:
   message: >-
     Un script como este ya está instalado.
 
-    Por favor, utilice un @name y @namespace diferente aquí o, en su lugar,
-    edite ese script.
+    Por favor, utiliza un @name y @namespace diferente aquí o, en su lugar,
+    edita ese script.
 msgNamespaceConflictRestore:
   description: >-
     Message shown when namespace of the script to restore from recycle bin
@@ -886,7 +886,7 @@ msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when
     running such scripts.
-  message: 'Por favor, vuelva a guardar o reinstalar esto(s) script(s):'
+  message: 'Por favor, vuelve a guardar o reinstalar estos scripts:'
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (el código es el mismo)
