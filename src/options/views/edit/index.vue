@@ -33,9 +33,6 @@
         <button v-if="!isNaN(greasyForkId)"
                 v-text="i18n(greasyForkId ? 'buttonPushUpdate' : 'buttonGreasyForkPublish')"
                 @click="greasyForkPublish"/>
-        <form style="display:none" method="post" ref="greasyForkForm" target="_blank">
-          <textarea name="script_version[code]" ref="greasyForkTextarea"></textarea>
-        </form>
         <button v-text="i18n('buttonSave')" @click="save"
                 v-show="canSave || !frozen" :disabled="!canSave"
                 :class="{'has-error': $fe = fatal || errors}" :title="$fe"/>
@@ -246,8 +243,6 @@ const hashPattern = computed(() => { // eslint-disable-line vue/return-in-comput
 const fatal = ref();
 const frozen = ref(false);
 const frozenNote = ref(false);
-const greasyForkForm = ref();
-const greasyForkTextarea = ref();
 
 const navItems = computed(() => {
   const { meta, props: { id }, $cache = {} } = script.value;
@@ -523,12 +518,24 @@ const greasyForkId = computed(() => {
 });
 
 function greasyForkPublish() {
-  const id = greasyForkId.value;
-  const form = greasyForkForm.value;
   // API: https://github.com/greasyfork-org/greasyfork/commit/5b973bf68ffb9c4d684c357770680dcfa6b2bd4a
-  form.action = `https://greasyfork.org/en/script${id ? `s/${id}/` : '_'}versions/prefill`;
-  greasyForkTextarea.value.value = $codeComp.getRealContent();
-  form.submit();
+  const id = greasyForkId.value;
+  const url = `https://greasyfork.org/en/script${id ? `s/${id}/` : '_'}versions/prefill`;
+
+  const doc = window.open('', '', `width=${screen.width / 2},height=${screen.height / 2}`).document;
+  doc.body.style.display = process.env.DEBUG ? 'block' : 'none';
+
+  const form = doc.createElement('form');
+  form.method = 'post';
+  form.action = url;
+  doc.body.appendChild(form);
+
+  const textarea = doc.createElement('textarea');
+  textarea.name = 'script_version[code]';
+  textarea.value = $codeComp.getRealContent();
+  form.appendChild(textarea);
+
+  setTimeout(() => form.submit(), process.env.DEBUG ? 3000 : 0);
   sendCmdDirectly('ListenForPublish', { id: script.value.props.id });
   if (!id) {
     // Like the (Re)install button, the editor must be closed and reopened after finishing the Publish
