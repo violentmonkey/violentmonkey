@@ -405,7 +405,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: Backup și mentenanță
@@ -1047,6 +1046,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Scripturi instalate
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Setări

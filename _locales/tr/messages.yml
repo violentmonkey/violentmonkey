@@ -400,7 +400,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Yedekle
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: Yedekleme ve Bakım
@@ -1041,6 +1040,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Yüklenmiş betikler
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Ayarlar

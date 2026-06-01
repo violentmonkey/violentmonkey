@@ -374,7 +374,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: 백업
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: 백업 및 유지보수
@@ -991,6 +990,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: 설치된 스크립트
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 설정

@@ -1,18 +1,18 @@
 <template>
   <div class="page-options">
-    <aside v-if="canRenderAside">
+    <aside v-if="canRenderAside" :data-recycled="numbers[TAB_RECYCLE] ? '' : null">
       <header>
         <img src="/public/images/icon128.png">
         <h1 class="hidden-sm" v-text="i18n('extName')"/>
       </header>
       <div class="aside-content">
-        <div class="aside-menu-item" v-for="tab in tabs" :key="tab.name">
+        <div class="aside-menu-item" v-for="{name, label: [label, short]} in tabs" :key="name" :data-name="name">
           <a
-            :href="`#${tab.name}`"
-            :class="{active: tab === current}"
-            :data-num-scripts="numbers[tab.name]"
-            v-text="tab.label"
-          />
+            :href="`#${name}`"
+            :class="{active: name === current.name}"
+            :data-num-scripts="numbers[name]"
+            :data-short="short"
+          ><span v-text="label"/></a>
         </div>
       </div>
     </aside>
@@ -26,23 +26,30 @@
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { i18n } from '@/common';
 import { keyboardService } from '@/common/keyboard';
+import { TAB_RECYCLE } from '@/common/safe-globals'; // explicit import for the template
 import { setLocationHash, store } from '../utils';
 import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
 
+const i18nSettings = i18n('sideMenuSettings');
 const tabs = [
-  { name: SCRIPTS, comp: Installed, label: i18n('sideMenuInstalled') },
+  {
+    name: SCRIPTS, comp: Installed,
+    label: [
+      i18n('sideMenuInstalled'),
+      i18n('sideMenuScripts'),
+    ],
+  },
   {
     name: TAB_SETTINGS, comp: Settings,
     label: [
-      i18n('sideMenuSettings'),
-      i18n('optionUpdate'),
-      i18n('labelSync'),
-    ].join('\xA0| '),
+      i18nSettings + ' | ' + i18n('labelBackup'),
+      i18nSettings,
+    ],
   },
-  { name: TAB_ABOUT, comp: About, label: i18n('sideMenuAbout') },
-  { name: TAB_RECYCLE, comp: Installed, label: i18n('buttonRecycleBin') },
+  { name: TAB_ABOUT, comp: About, label: [i18n('sideMenuAbout')] },
+  { name: TAB_RECYCLE, comp: Installed, label: [i18n('buttonRecycleBin')] },
 ];
 const extName = i18n('extName');
 const conditionNotEdit = '!editScript';

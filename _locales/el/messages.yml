@@ -420,7 +420,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: ''
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: Αντίγραφα ασφαλείας και συντήρηση
@@ -1086,6 +1085,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Εγκατεστημένα script
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Ρυθμίσεις

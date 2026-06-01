@@ -411,7 +411,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Respaldo
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: Copia de seguridad y mantenimiento
@@ -1053,6 +1052,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Scripts instalados
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Configuración

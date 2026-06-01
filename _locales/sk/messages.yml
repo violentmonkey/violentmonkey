@@ -404,7 +404,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: Záloha
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: Zálohovanie a údržba
@@ -1046,6 +1045,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: Nainštalované skripty
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Nastavenia

@@ -2,7 +2,7 @@
   <div class="tab-installed" ref="scroller">
     <div v-if="store.canRenderScripts">
       <header class="flex">
-        <template v-if="!showRecycle">
+        <div v-if="!showRecycle">
           <div class="btn-group">
             <Dropdown
               v-model="state.menuNew"
@@ -27,7 +27,7 @@
               </a>
             </Tooltip>
           </div>
-          <div v-if="filteredScripts.length" class="btn-group">
+          <div v-if="filteredScripts.length" class="btn-group filtered">
             <a
               v-for="({ icon, num }, key) in batchActions" :key
               class="btn-ghost"
@@ -54,72 +54,73 @@
               </a>
             </Tooltip>
           </div>
-        </template>
+        </div>
         <Tooltip v-else :content="state.sizes" :disabled="!state.sizes" placement="bottom">
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
-        <div class="flex-auto"></div>
-        <span class="ml-1 flex">
-          <span v-text="i18n('sortOrder')" class="hidden-m"/>
-          <select :value="filters.sort" @change="handleOrderChange" class="h-100">
-            <option
-              v-for="({text, title}, name) in sortModes"
-              v-text="text"
-              :title
-              :key="name"
-              :value="name">
-            </option>
-          </select>
-        </span>
-        <Dropdown align="right" class="filter-sort">
-          <Tooltip :content="i18n('labelSettings')" placement="bottom">
-            <a class="btn-ghost" tabindex="0">
-              <Icon name="cog" />
+        <div>
+          <span class="flex center-items" style="padding-left: .75rem">
+            <span v-text="i18n('sortOrder')" class="hidden-sm"/>
+            <select :value="filters.sort" @change="handleOrderChange" class="h-100">
+              <option
+                v-for="({text, title}, name) in sortModes"
+                v-text="text"
+                :title
+                :key="name"
+                :value="name">
+              </option>
+            </select>
+          </span>
+          <Dropdown align="right" class="filter-sort">
+            <Tooltip :content="i18n('labelSettings')" placement="bottom">
+              <a class="btn-ghost" tabindex="0">
+                <Icon name="cog" />
+              </a>
+            </Tooltip>
+            <template #content>
+              <div v-show="currentSort">
+                <SettingCheck name="filters.showEnabledFirst"
+                  :label="i18n('optionShowEnabledFirst')" />
+              </div>
+              <div>
+                <SettingCheck name="filters.showOrder" :label="i18n('labelShowOrder')" />
+              </div>
+              <div>
+                <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
+              </div>
+              <div class="mr-2c">
+                <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
+                <SettingCheck name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
+              </div>
+            </template>
+          </Dropdown>
+          <!-- form and id are required for the built-in autocomplete using entered values -->
+          <form class="filter-search hidden-xs" @submit.prevent
+                :style="{ 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
+            <label>
+              <input
+                type="search"
+                :class="{'has-error': state.search.error}"
+                :title="state.search.error"
+                :placeholder="i18n('labelSearchScript')"
+                v-model="state.search.value"
+                ref="refSearch"
+                id="installed-search">
+              <Icon name="search" />
+            </label>
+          </form>
+          <Dropdown align="right">
+            <a class="btn-ghost" tabindex="0" :class="{'has-error': state.search.error}">
+              <Icon name="question"></Icon>
             </a>
-          </Tooltip>
-          <template #content>
-            <div v-show="currentSort">
-              <SettingCheck name="filters.showEnabledFirst"
-                :label="i18n('optionShowEnabledFirst')" />
-            </div>
-            <div>
-              <SettingCheck name="filters.showOrder" :label="i18n('labelShowOrder')" />
-            </div>
-            <div>
-              <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
-            </div>
-            <div class="mr-2c">
-              <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
-              <SettingCheck name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
-            </div>
-          </template>
-        </Dropdown>
-        <!-- form and id are required for the built-in autocomplete using entered values -->
-        <form class="filter-search hidden-xs" @submit.prevent
-              :style="{ 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
-          <label>
-            <input
-              type="search"
-              :class="{'has-error': state.search.error}"
-              :title="state.search.error"
-              :placeholder="i18n('labelSearchScript')"
-              v-model="state.search.value"
-              ref="refSearch"
-              id="installed-search">
-            <Icon name="search" />
-          </label>
-        </form>
-        <Dropdown align="right">
-          <a class="btn-ghost" tabindex="0" :class="{'has-error': state.search.error}">
-            <Icon name="question"></Icon>
-          </a>
-          <template #content>
-            <div class="filter-search-tooltip">
-              <div class="has-error" v-if="state.search.error" v-text="state.search.error" />
-              <div v-html="i18n('titleSearchHintV2')" />
-            </div>
-          </template>
-        </Dropdown>
+            <template #content>
+              <div class="filter-search-tooltip">
+                <div class="has-error" v-if="state.search.error" v-text="state.search.error" />
+                <div v-html="i18n('titleSearchHintV2')" />
+              </div>
+            </template>
+          </Dropdown>
+        </div>
       </header>
       <div v-if="showRecycle" class="hint mx-1 my-1 flex flex-col">
         <span v-text="i18n('hintRecycleBin')"/>
@@ -562,7 +563,7 @@ function adjustNarrowWidth(val) {
   if (narrowMediaRules) {
     for (const r of narrowMediaRules) {
       const orig = r._orig;
-  r.media.mediaText = val ? orig.replace(/\d+/g, s => +s + 90 / devicePixelRatio) : orig;
+      r.media.mediaText = val ? orig.replace(/\b76\d+/g, s => +s + 90 / devicePixelRatio) : orig;
     }
   }
 }
@@ -883,6 +884,7 @@ onBeforeUnmount(() => {
 
 <style>
 $iconSize: 2rem; // from .icon in ui/style.css
+$headerBorder: 1px solid var(--fill-5);
 .tab.tab-installed {
   height: 100vh;
   padding: 0;
@@ -895,25 +897,43 @@ $iconSize: 2rem; // from .icon in ui/style.css
     height: 4rem;
     align-items: center;
     line-height: 1;
-    border-bottom: 1px solid var(--fill-5);
+    border-bottom: $headerBorder;
+    justify-content: space-between;
     .btn-ghost, select {
       height: $iconSize;
     }
+    > * {
+      align-items: center;
+      display: flex;
+    }
+    .vl-dropdown-menu {
+      white-space: nowrap;
+    }
   }
-  .vl-dropdown-menu {
-    white-space: nowrap;
-  }
-  @media (max-width: 550px) { // same size as `hidden-sm` in @/common/ui/style/style.css
-    /* The header bar must be set to scrollable and the dropdown fixed simultaneously. */
+  @media (max-width: 640px) {
     header {
-      overflow-x: auto;
-      overflow-y: hidden;
+      height: 6rem;
+      display: block;
+      > * {
+        height: 3rem;
+      }
+      > :first-child {
+        border-bottom: $headerBorder;
+      }
+    }
+    .filtered {
+      border-right: none;
     }
     .vl-dropdown-menu {
       position: fixed;
       top: auto;
       left: 0;
       right: auto;
+    }
+  }
+  @media (min-width: 640px) and (max-width: 767px) {
+    .filtered .hidden-sm {
+      display: none;
     }
   }
   @media (max-width: 767px) {

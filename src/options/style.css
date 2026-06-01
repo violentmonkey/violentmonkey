@@ -157,6 +157,17 @@ textarea:not([rows="1"]):not(.h100) {
   }
 }
 
+@media (max-width: 640px) {
+  [data-short] > *,
+  aside[data-recycled] [data-name="about"],
+  aside:not([data-recycled]) [data-name="recycleBin"] {
+    display: none;
+  }
+  [data-short]::after {
+    content: attr(data-short);
+  }
+}
+
 @media (max-width: 767px) {
   .page-options {
     flex-direction: column;
@@ -178,22 +189,22 @@ textarea:not([rows="1"]):not(.h100) {
     > * {
       align-items: center;
     }
+    &:not([data-recycled]) [data-name="recycleBin"],
+    &[data-recycled] h1 {
+      display: none;
+    }
   }
   h1 {
     margin: 0; /* centering */
   }
   $itemGap: 1rem;
   .aside-content {
-    flex-wrap: wrap;
     padding-right: $itemGap;
     place-content: center space-evenly;
   }
   .aside-menu-item a {
     line-height: 1.5;
     margin-left: $itemGap;
-  }
-  [href="#recycleBin"][data-num-scripts="0"] {
-    display: none;
   }
 }
 

@@ -370,7 +370,6 @@ labelAutoUpdate:
 labelBackup:
   description: Label of the import/export section in settings.
   message: バックアップ
-  touched: false
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: バックアップと管理
@@ -985,6 +984,9 @@ sideMenuAbout:
 sideMenuInstalled:
   description: 'Side menu: Installed scripts'
   message: インストール済み
+sideMenuScripts:
+  description: 'Side menu: Scripts'
+  message: ''
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 設定
