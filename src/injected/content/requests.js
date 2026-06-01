@@ -168,7 +168,7 @@ async function requestVirtualUrl(msg, url, isDataUri, realm) {
     ]);
   }
   for (const type of [READYSTATECHANGE, LOAD, LOADEND]) {
-    if (!events[type])
+    if (!(type === LOADEND/*to delete the request*/ || events[type]))
       continue;
     sendHttpRequested({
       id,
