@@ -620,7 +620,7 @@ function setupSavePosition({ id: curWndId, tabs }) {
   min-height: calc(100vh + 1px);
 }
 
-@media (max-width: 767px) {
+html.narrow {
   .edit-hint {
     display: none;
   }

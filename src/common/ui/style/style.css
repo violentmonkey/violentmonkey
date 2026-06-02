@@ -136,6 +136,7 @@ input[type=password] {
 }
 select {
   field-sizing: content;
+  background-color: var(--bg); /* override Firefox's darker bg */
 }
 textarea {
   display: block;
@@ -218,6 +219,7 @@ button,
   border: 1px solid transparent;
   cursor: pointer;
   &:focus,
+  &:focus-within,
   &:hover {
     border-color: var(--fill-5);
     background: var(--bg);
@@ -509,7 +511,7 @@ input[type].has-error {
   }
 }
 
-@media (min-width: 768px) {
+html:not(.narrow) {
   .visible-sm {
     display: none;
   }

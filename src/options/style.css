@@ -46,7 +46,7 @@ aside > * {
     }
   }
 }
-@media (min-width: 768px) {
+html:not(.narrow) {
   aside {
     position: fixed;
     left: 0;
@@ -168,7 +168,7 @@ textarea:not([rows="1"]):not(.h100) {
   }
 }
 
-@media (max-width: 767px) {
+html.narrow {
   .page-options {
     flex-direction: column;
   }

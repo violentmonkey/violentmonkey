@@ -32,6 +32,8 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
     "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/tabler": "^1.2.35",
+    "@iconify-json/tdesign": "^1.2.14",
     "@types/chrome": "^0.1.42",
     "@types/firefox-webext-browser": "143.0.0",
     "@types/jest": "^30.0.0",

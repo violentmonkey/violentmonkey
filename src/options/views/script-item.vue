@@ -284,7 +284,7 @@ function formatDynamicTime({ id }, time) {
       visitedRecentlyInterval = clearInterval(refreshVisited);
     }
   }
-  return formatTime(time);
+  return formatTime(Math.max(0, time));
 }
 
 watch(() => props.visible, visible => {

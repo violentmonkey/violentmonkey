@@ -153,6 +153,7 @@ import VmSync from './vm-sync';
 import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
 import VmDateInfo from './vm-date-info';
+import { kbdTypable } from '@/common/keyboard';
 
 const $el = ref();
 const settings = reactive({});
@@ -163,7 +164,7 @@ let revokers;
 onActivated(() => {
   focusMe($el.value);
   revokers = [
-    keyboardService.register('ctrlcmd-s', ctrlS, { condition: 'inputFocus' }),
+    keyboardService.register('ctrlcmd-s', ctrlS, { condition: kbdTypable }),
     ...hookSettingsForUI(items, settings, watch, 50),
   ];
   expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);

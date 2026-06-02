@@ -4,23 +4,30 @@ import { getActiveElement } from '@/common/ui';
 export * from '@violentmonkey/shortcut';
 
 export const keyboardService = new KeyboardService();
+export const kbdEnterable = 'canEnter';
+export const kbdTypable = 'canType';
+export const kbdNavigatable = 'canNav';
 
 bindKeys();
 
 export function isInput({ localName: n } = {}) {
-  return n === 'input' || n === 'button' || n === 'select' || n === 'textarea';
+  return n === 'button' ? 1
+    : n === 'input' ? 1 + 2
+      : n === 'select' || n === 'textarea' ? 1 + 2 + 4
+        : 0;
 }
 
-function handleFocus(e) {
-  if (isInput(e.target)) {
-    keyboardService.setContext('inputFocus', true);
+function handleFocus(e, state = true) {
+  if ((e = isInput(e.target))) {
+    if (e & 1) keyboardService.setContext(kbdEnterable, state);
+    if (e & 2) keyboardService.setContext(kbdTypable, state);
+    if (e & 4) keyboardService.setContext(kbdNavigatable, state);
+    return true;
   }
 }
 
 function handleBlur(e) {
-  if (isInput(e.target)) {
-    keyboardService.setContext('inputFocus', false);
-  } else {
+  if (!handleFocus(e, false)) {
     const event = new CustomEvent('tiphide', {
       bubbles: true,
     });
@@ -41,7 +48,7 @@ function bindKeys() {
   keyboardService.register('enter', () => {
     getActiveElement().click();
   }, {
-    condition: '!inputFocus',
+    condition: '!' + kbdEnterable,
   });
 }
 

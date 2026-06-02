@@ -59,8 +59,12 @@
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
         <div>
-          <span class="flex center-items" style="padding-left: .75rem">
-            <span v-text="i18n('sortOrder')" class="hidden-sm"/>
+          <div class="sorter flex center-items mx-1"
+               :class="{ 'btn-ghost': collapseSorter }">
+            <Tooltip align="start"
+                     :content="i18n('sortOrder').trim() + (collapseSorter ? ' ' + (currentSort.text || '') : '')">
+              <component :is="currentSort.icon || IconSort"/>
+            </Tooltip>
             <select :value="filters.sort" @change="handleOrderChange" class="h-100">
               <option
                 v-for="({text, title}, name) in sortModes"
@@ -70,33 +74,9 @@
                 :value="name">
               </option>
             </select>
-          </span>
-          <Dropdown align="right" class="filter-sort">
-            <Tooltip :content="i18n('labelSettings')" placement="bottom">
-              <a class="btn-ghost" tabindex="0">
-                <Icon name="cog" />
-              </a>
-            </Tooltip>
-            <template #content>
-              <div v-show="currentSort">
-                <SettingCheck name="filters.showEnabledFirst"
-                  :label="i18n('optionShowEnabledFirst')" />
-              </div>
-              <div>
-                <SettingCheck name="filters.showOrder" :label="i18n('labelShowOrder')" />
-              </div>
-              <div>
-                <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
-              </div>
-              <div class="mr-2c">
-                <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
-                <SettingCheck name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
-              </div>
-            </template>
-          </Dropdown>
+          </div>
           <!-- form and id are required for the built-in autocomplete using entered values -->
-          <form class="filter-search hidden-xs" @submit.prevent
-                :style="{ 'max-width': 5 + Math.max(20, state.search.value.length) + 'ex' }">
+          <form class="filter-search hidden-xs" @submit.prevent>
             <label>
               <input
                 type="search"
@@ -117,6 +97,29 @@
               <div class="filter-search-tooltip">
                 <div class="has-error" v-if="state.search.error" v-text="state.search.error" />
                 <div v-html="i18n('titleSearchHintV2')" />
+              </div>
+            </template>
+          </Dropdown>
+          <Dropdown align="right" class="settings">
+            <Tooltip :content="i18n('labelSettings')" placement="bottom" align="end">
+              <a class="btn-ghost" tabindex="0">
+                <Icon name="cog" />
+              </a>
+            </Tooltip>
+            <template #content>
+              <div v-show="currentSort">
+                <SettingCheck name="filters.showEnabledFirst"
+                  :label="i18n('optionShowEnabledFirst')" />
+              </div>
+              <div>
+                <SettingCheck name="filters.showOrder" :label="i18n('labelShowOrder')" />
+              </div>
+              <div>
+                <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
+              </div>
+              <div class="mr-2c">
+                <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
+                <SettingCheck name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
               </div>
             </template>
           </Dropdown>
@@ -183,12 +186,24 @@ import options from '@/common/options';
 import hookSetting from '@/common/hook-setting';
 import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
-import { keyboardService, handleTabNavigation } from '@/common/keyboard';
+import { keyboardService, handleTabNavigation, kbdTypable, kbdNavigatable } from '@/common/keyboard';
 import { loadData } from '@/options';
 import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import Icon from '@/common/ui/icon';
+import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';
+import IconAlphaDown from '~icons/mdi/sort-alphabetical-descending';
+import IconCalendar from '~icons/mdi/sort-calendar-ascending';
+import IconCalendarDown from '~icons/mdi/sort-calendar-descending';
+import IconClock from '~icons/mdi/sort-clock-ascending-outline';
+import IconClockDown from '~icons/mdi/sort-clock-descending-outline';
+import IconSmallBig from '~icons/tabler/sort-ascending-small-big';
+import IconBigSmall from '~icons/tabler/sort-descending-small-big';
+import IconSort from '~icons/mdi/sort-ascending';
+import IconSortDown from '~icons/mdi/sort-descending';
+import IconUser from '~icons/tdesign/user-arrow-up';
+import IconUserDown from '~icons/tdesign/user-arrow-down';
 import SettingCheck from '@/common/ui/setting-check';
-import { customCssElem, findStyleSheetRules } from '@/common/ui/style';
+import { customCssElem, onMediaWidth, NARROW_WIDTH } from '@/common/ui/style';
 import { getSortCollator } from '@/common/ui/util';
 import {
   createSearchRules, filteredScripts, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
@@ -218,26 +233,33 @@ const collator = getSortCollator();
 const cmpName = (a, b) => collator.compare(a.$cache.lowerName, b.$cache.lowerName);
 /** @type {{ [key:string]: SortMode }} */
 const sortModes = [
-  ['exec', i18n('filterExecutionOrder')],
-  ['alpha', i18n('filterAlphabeticalOrder'), '', cmpName],
-  ['author', i18n('labelAuthor').replace(/\W+/, '').toLowerCase(), '',
+  ['exec', i18n('filterExecutionOrder'), IconSort, IconSortDown],
+  ['alpha', i18n('filterAlphabeticalOrder'), IconAlpha, IconAlphaDown, cmpName],
+  ['author', i18n('labelAuthor').replace(/\W+/, '').toLowerCase(), IconUser, IconUserDown,
     (a, b) => collator.compare(a.meta.author || '', b.meta.author || '') || cmpName(a, b)],
-  [UPDATE, i18n('filterLastUpdateOrder'), '',
+  [UPDATE, i18n('filterLastUpdateOrder'), IconClock, IconClockDown,
     (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
-  ['visit', i18n('filterLastVisitOrder'), i18n('filterLastVisitOrderTooltip'),
-    (a, b) => (b[INFERRED].visit || 0) - (a[INFERRED].visit || 0)],
-  ['size', i18n('filterSize'), '',
+  ['visit', i18n('filterLastVisitOrder'), IconCalendar, IconCalendarDown,
+    (a, b) => (b[INFERRED].visit || 0) - (a[INFERRED].visit || 0),
+    i18n('filterLastVisitOrderTooltip')],
+  ['size', i18n('filterSize'), IconSmallBig, IconBigSmall,
     (a, b) => a.$cache.sizeNum - b.$cache.sizeNum],
-].reduce((res, [key, text, title, compare]) => (
-  (res[key] = {text, title, compare}),
-  (res[key + '-'] = /**@namespace SortMode*/{
-    text: text + ' ⯆',
+].reduce((res, [key, text, icon, iconRev, compare, title]) => {
+  res[key] = {
+    text,
+    title,
+    icon,
+    compare,
+  };
+  res[key + '-'] = /**@namespace SortMode*/{
+    text: text + ' \u25BC', // ▼
     title: title,
+    icon: iconRev,
     reversed: true,
     compare: compare || ((a, b) => a.props.position - b.props.position),
-  }),
-  res
-), {});
+  };
+  return res;
+}, {});
 const filters = reactive({
   /** @type {Boolean} */ showEnabledFirst: null,
   /** @type {Boolean} */ showOrder: null,
@@ -255,8 +277,9 @@ filters::forEachKey(key => {
 });
 
 const conditionAll = 'tabScripts';
-const conditionSearch = `${conditionAll} && inputFocus`;
-const conditionNotSearch = `${conditionAll} && !inputFocus`;
+const conditionSearch = `${conditionAll} && ${kbdTypable}`;
+const conditionNotSearch = `${conditionAll} && !${kbdTypable}`;
+const conditionNotNavigatable = `${conditionAll} && !${kbdNavigatable}`;
 const conditionScriptFocused = `${conditionNotSearch} && selectedScript && !showRecycle`;
 const conditionScriptFocusedRecycle = `${conditionNotSearch} && selectedScript && showRecycle`;
 const conditionScriptFocusedWithoutButton = `${conditionNotSearch} && !buttonFocus`;
@@ -278,12 +301,11 @@ let step = 0;
 
 let columnsForTableMode = [];
 let columnsForCardsMode = [];
-/** @type {CSSMediaRule} */
-let narrowMediaRules;
 let scrollTop1, scrollTop2;
 
 const $menuNew = ref();
 const isEmpty = ref();
+const collapseSorter = ref();
 const refSearch = ref();
 const refList = ref();
 const scroller = ref();
@@ -315,7 +337,7 @@ const state = reactive({
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
 const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith('exec'));
 const draggable = computed(() => isTouch && draggableRaw.value);
-const currentSort = computed(() => sortModes[filters.sort]);
+const currentSort = computed(() => sortModes[filters.sort] || false/* to avoid ?. for invalid mode */);
 const selectedScript = computed(() => filteredScripts.value[state.focusedIndex]);
 const message = computed(() => {
   if (!store.loaded) {
@@ -375,7 +397,9 @@ const batchActions = computed(() => {
   return res;
 });
 
+const disposables = [];
 const debouncedSearch = debounce(scheduleSearch, 100);
+const lazyOrderUpdate = debounce(onUpdate, 50);
 
 function resetList() {
   if (!showRecycle.value && store.needRefresh) {
@@ -393,7 +417,7 @@ async function refreshUI() {
   onHashChange();
 }
 function sortScripts(scripts) {
-  const { compare, reversed } = currentSort.value || {};
+  const { compare, reversed } = currentSort.value;
   if (compare) {
     const searching = state.search.rules.length;
     const enabledFirst = filters.showEnabledFirst;
@@ -406,12 +430,14 @@ function sortScripts(scripts) {
   }
   sortedScripts.value = scripts;
 }
-function onUpdate() {
+/** @param onlyReorder - only set when invoked from watch() for options that reorder the list */
+function onUpdate(onlyReorder) {
   const scripts = [...getCurrentList()];
-  const rules = state.search.rules;
-  performSearch(scripts);
+  if (!onlyReorder) performSearch(scripts);
   sortScripts(scripts);
-  filteredScripts.value = rules.length ? scripts.filter(s => s.$cache.show) : scripts;
+  filteredScripts.value = !onlyReorder && state.search.rules.length
+    ? scripts.filter(s => s.$cache.show)
+    : scripts;
   selectScript(state.focusedIndex);
   renderScripts();
 }
@@ -448,7 +474,9 @@ async function moveScript(from, to) {
   }
 }
 function handleOrderChange(e) {
-  options.set('filters.sort', e.target.value);
+  options.set('filters.sort',
+    // Not waiting for debounced options hook to ensure UI always matches <select>
+    filters.sort = e.target.value);
 }
 function handleEditScript(id) {
   const pathname = [showRecycle.value ? TAB_RECYCLE : SCRIPTS, id]::trueJoin('/');
@@ -554,18 +582,9 @@ async function handleEmptyRecycleBin() {
     store.removedScripts = [];
   }
 }
-function adjustNarrowWidth(val) {
+function adjustNarrowWidth(isTable) {
   adjustScriptWidth();
-  if (val && !narrowMediaRules) {
-    narrowMediaRules = findStyleSheetRules('-width: 76'); // max-width: 767px, min-width: 768px
-    for (const r of narrowMediaRules) r._orig = r.conditionText;
-  }
-  if (narrowMediaRules) {
-    for (const r of narrowMediaRules) {
-      const orig = r._orig;
-      r.media.mediaText = val ? orig.replace(/\b76\d+/g, s => +s + 90 / devicePixelRatio) : orig;
-    }
-  }
+  onMediaWidth(NARROW_WIDTH + (isTable ? 90 / devicePixelRatio : 0), true);
 }
 function adjustScriptWidth() {
   const widths = filters.viewTable ? columnsForTableMode : columnsForCardsMode;
@@ -667,7 +686,7 @@ function bindKeys() {
     keyboardService.setContext('buttonFocus', getActiveElement()?.tabIndex >= 0);
   };
   addEventListener('focus', handleFocus, true);
-  const disposeList = [
+  disposables.push(
     () => removeEventListener('focus', handleFocus, true),
     ...IS_FIREFOX ? [
       keyboardService.register('tab', () => {
@@ -686,7 +705,7 @@ function bindKeys() {
     ...registerHotkey(() => {
       refSearch.value?.blur();
     }, [
-        ['enter', conditionSearch],
+        ['enter', `${conditionSearch} && !${kbdNavigatable}`],
       ]),
     ...registerHotkey(() => {
       state.showHotkeys = false;
@@ -703,7 +722,7 @@ function bindKeys() {
       }
     }, [
         ['ctrlcmd-down', conditionAll],
-        ['down', conditionAll],
+        ['down', conditionNotNavigatable],
         ['j', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
@@ -713,7 +732,7 @@ function bindKeys() {
       }
     }, [
         ['ctrlcmd-up', conditionAll],
-        ['up', conditionAll],
+        ['up', conditionNotNavigatable],
         ['k', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
@@ -775,11 +794,7 @@ function bindKeys() {
     }, [
         ['?', conditionNotSearch, true],
       ]),
-  ];
-
-  return () => disposeList.forEach(dispose => {
-    dispose();
-  });
+  );
 }
 
 function handleCancelBatchAction(e) {
@@ -793,11 +808,14 @@ watch(showRecycle, resetList);
 watch(() => store.canRenderScripts && refList.value && draggableRaw.value,
   dr => toggleDragging(refList.value, moveScript, dr));
 watch(() => state.search.value, debouncedSearch);
-watch(() => [filters.sort, filters.showEnabledFirst], scheduleSearch);
-if (screen.availWidth > 767) {
-  watch(() => filters.viewSingleColumn, adjustScriptWidth);
-  watch(() => filters.viewTable, adjustNarrowWidth);
-}
+watch(() => [filters.sort, filters.showEnabledFirst], lazyOrderUpdate);
+disposables.push(
+  watch(() => filters.viewSingleColumn, adjustScriptWidth),
+  watch(() => filters.viewTable, adjustNarrowWidth, { immediate: true }),
+);
+onMediaWidth(700, false, val => {
+  collapseSorter.value = val;
+});
 watch(getCurrentList, refreshUI);
 watch(() => store.route.paths[1], onHashChange);
 watch(() => store.scripts, val => {
@@ -829,8 +847,6 @@ watch(filteredScripts, value => {
   state.size = sum ? formatByteLength(sum).replace(' ', '') : null;
   state.sizes = sum ? formatSizesStr(str) : '';
 });
-
-const disposables = [];
 
 Object.assign(handlers, {
   Visited(data) {
@@ -871,7 +887,7 @@ onMounted(() => {
     addEventListener('resize', adjustScriptWidth);
   }
   adjustScriptWidth();
-  disposables.push(bindKeys());
+  bindKeys();
 
   document.addEventListener('mousedown', handleCancelBatchAction);
   disposables.push(() => document.removeEventListener('mousedown', handleCancelBatchAction));
@@ -884,6 +900,7 @@ onBeforeUnmount(() => {
 
 <style>
 $iconSize: 2rem; // from .icon in ui/style.css
+$headerH: 4rem;
 $headerBorder: 1px solid var(--fill-5);
 .tab.tab-installed {
   height: 100vh;
@@ -894,17 +911,18 @@ $headerBorder: 1px solid var(--fill-5);
     top: 0;
     z-index: 1000;
     background: var(--fill-0-5);
-    height: 4rem;
-    align-items: center;
-    line-height: 1;
     border-bottom: $headerBorder;
     justify-content: space-between;
     .btn-ghost, select {
       height: $iconSize;
     }
     > * {
+      height: $headerH;
       align-items: center;
-      display: flex;
+      display: inline-flex;
+    }
+    .vl-dropdown-toggle .icon {
+      width: 1.25rem;
     }
     .vl-dropdown-menu {
       white-space: nowrap;
@@ -912,33 +930,60 @@ $headerBorder: 1px solid var(--fill-5);
   }
   @media (max-width: 640px) {
     header {
-      height: 6rem;
-      display: block;
+      flex-wrap: wrap;
+      border-bottom: none;
       > * {
-        height: 3rem;
-      }
-      > :first-child {
+        flex: 1;
         border-bottom: $headerBorder;
       }
     }
     .filtered {
       border-right: none;
     }
-    .vl-dropdown-menu {
-      position: fixed;
-      top: auto;
-      left: 0;
-      right: auto;
+  }
+  .sorter {
+    padding: 0; /* undo the dynamically assigned btn-ghost class in narrow mode */
+    svg {
+      width: $iconSize;
+      height: $iconSize;
+      padding: 2px;
+      pointer-events: none;
+    }
+    &.btn-ghost {
+      position: relative;
+      > select {
+        width: $iconSize;
+        opacity: 0;
+      }
+      svg {
+        z-index: 2;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
     }
   }
-  @media (min-width: 640px) and (max-width: 767px) {
-    .filtered .hidden-sm {
-      display: none;
-    }
-  }
-  @media (max-width: 767px) {
+  .narrow & {
     height: auto;
     overflow: visible;
+    header {
+      .hidden-sm {
+        display: none;
+      }
+      > :last-child,
+      .filter-search {
+        flex: 1;
+      }
+    }
+  }
+  html:not(.narrow) & {
+    header {
+      .sorter {
+        border: 1px solid transparent; /* to match btn-ghost class in narrow mode */
+      }
+    }
   }
 }
 .backdrop {
@@ -974,7 +1019,8 @@ $headerBorder: 1px solid var(--fill-5);
   }
 }
 .filter-search {
-  min-width: 10em;
+  min-width: 5em;
+  flex-basis: 10em;
   label {
     position: relative;
   }
@@ -986,9 +1032,9 @@ $headerBorder: 1px solid var(--fill-5);
   }
   input {
     width: 100%;
-    height: 2rem;
+    height: $iconSize;
     padding-left: .5rem;
-    padding-right: 2rem;
+    padding-right: $iconSize;
   }
   &-tooltip {
     width: 24rem;
@@ -998,7 +1044,7 @@ $headerBorder: 1px solid var(--fill-5);
     white-space: pre-wrap;
   }
 }
-.filter-sort {
+.settings {
   .vl-dropdown-menu {
     padding: 1rem;
     > :nth-last-child(n + 2) {
@@ -1025,6 +1071,7 @@ $headerBorder: 1px solid var(--fill-5);
 .btn-hint {
   margin: 0 0.5rem;
   cursor: default;
+  min-width: 7em;
 }
 
 .hint {

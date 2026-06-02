@@ -227,8 +227,8 @@ import optionsDefaults, {
   kFiltersPopup, kPopupWidth, kUpdateEnabledScriptsOnly,
 } from '@/common/options-defaults';
 import {
-  getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl,
-  i18n, makePause, sendCmdDirectly, sendTabCmd,
+  getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl, i18n, makePause,
+  sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
@@ -236,7 +236,7 @@ import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { getSortCollator } from '@/common/ui/util';
-import { keyboardService, isInput, handleTabNavigation } from '@/common/keyboard';
+import { handleTabNavigation, isInput, kbdTypable, keyboardService } from '@/common/keyboard';
 import { isFullscreenPopup, store } from '../utils';
 
 let mousedownElement;
@@ -590,16 +590,15 @@ onMounted(() => {
     keyboardService.register('tab', () => handleTabNavigation(1));
     keyboardService.register('s-tab', () => handleTabNavigation(-1));
   }
+  const opts = { condition: '!' + kbdTypable };
   for (const key of ['up', 'down', 'left', 'right']) {
     keyboardService.register(key,
       navigate.bind(null, key[0]),
-      { condition: '!inputFocus' });
+      opts);
   }
   keyboardService.register('e', () => {
     onEditScript(focusedItem.value);
-  }, {
-    condition: '!inputFocus',
-  });
+  }, opts);
 });
 
 onActivated(() => {
