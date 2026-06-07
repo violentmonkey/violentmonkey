@@ -11,7 +11,7 @@ import {
   setConfig,
   setSyncOnceMode,
   sync,
-} from './base';
+} from './sync-engine';
 import './dropbox';
 import './googledrive';
 import './onedrive';
@@ -49,7 +49,7 @@ function reconfigure() {
   }
 }
 
-function dbSentry({ keys }) {
+function dbSentry(keys) {
   for (const k of keys) {
     if (keysToSyncRe.test(k)) {
       autoSync();
