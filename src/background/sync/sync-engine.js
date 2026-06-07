@@ -265,10 +265,9 @@ export function createSyncService({
   authProvider,
   metaFile = VIOLENTMONKEY,
   config: providerConfig,
-  getUserConfig: getUserConfigFn,
-  setUserConfig: setUserConfigFn,
   metaError: metaErrorFn,
   mapPasswordAuth,
+  defaultUserConfig = {},
   properties: extraProperties,
 }) {
   let authorizer;
@@ -290,23 +289,18 @@ export function createSyncService({
       try {
         authorizer.getAccessToken();
       } catch (err) {
-        if (err.code === OAUTH2_UNAUTHORIZED) {
-          setSyncState({ status: SYNC_AUTHORIZING });
-          const url = await authorizer.buildAuthUrl();
-          const redirectUrl = await openAuthPage(
-            url,
-            providerConfig.redirect_uri,
-          );
-          if (!redirectUrl) throw new Error('Authorization timed out');
-          await authorizer.finishAuth(new URL(redirectUrl));
-        } else if (err.code === OAUTH2_NEED_REFRESH) {
+        if (err.code === OAUTH2_NEED_REFRESH) {
           await authorizer.refreshToken();
         } else {
           throw err;
         }
       }
     } catch (err) {
-      setSyncState({ status: SYNC_ERROR_INIT });
+      if (err.code === OAUTH2_UNAUTHORIZED) {
+        setSyncState({ status: SYNC_UNAUTHORIZED });
+      } else {
+        setSyncState({ status: SYNC_ERROR_INIT });
+      }
       logError(err);
       throw err;
     }
@@ -329,25 +323,28 @@ export function createSyncService({
   // --- Prepare / authorize / revoke ---
 
   async function prepare() {
-    if (drive) {
-      if (authProvider !== 'password') return refresh();
-      // Test connection for password-based services
-      setSyncState({ status: SYNC_INITIALIZING });
-      try {
-        // Use list() to verify credentials work
-        const batches = drive.list('');
-        // eslint-disable-next-line no-unused-vars
-        for await (const batch of batches) {
-          break; // Just need first batch to verify connection
-        }
-        setSyncState({ status: SYNC_AUTHORIZED });
-      } catch (err) {
-        logError(err);
-        setSyncState({ status: SYNC_UNAUTHORIZED });
-      }
+    if (authProvider !== 'password') {
+      if (drive) return refresh();
+      setSyncState({ status: SYNC_UNAUTHORIZED });
       return;
     }
-    setSyncState({ status: SYNC_UNAUTHORIZED });
+    // Reinitialize password drive to pick up credential changes
+    if (!initPassword()) {
+      setSyncState({ status: SYNC_UNAUTHORIZED });
+      return;
+    }
+    setSyncState({ status: SYNC_INITIALIZING });
+    try {
+      const batches = drive.list('');
+      // eslint-disable-next-line no-unused-vars
+      for await (const batch of batches) {
+        break;
+      }
+      setSyncState({ status: SYNC_AUTHORIZED });
+    } catch (err) {
+      logError(err);
+      setSyncState({ status: SYNC_UNAUTHORIZED });
+    }
   }
 
   async function doAuthorize() {
@@ -411,18 +408,27 @@ export function createSyncService({
       if (file.name === metaFile) metaFileItem = file;
       else if (isScriptFile(file.name)) scripts.push(normalize(file));
     }
-    const metaItem = metaFileItem ? { path: metaFileItem.name } : {};
-    const gotMeta = drive
-      .get(metaItem)
-      .then((blob) => blob.text())
-      .then((data) => JSON.parse(data))
-      .catch((err) => (metaErrorFn || defaultMetaError)(err))
-      .then((data) => ({ name: metaFile, uri: null, data }));
-    return Promise.all([gotMeta, scripts, pluginScript.list()]);
-  }
-
-  function defaultMetaError(res) {
-    if (res?.status !== 409) throw res;
+    let metadata;
+    try {
+      if (metaFileItem) {
+        const blob = await drive.get({ path: metaFileItem.name });
+        const text = await blob.text();
+        metadata = JSON.parse(text);
+      } else {
+        throw new Error('No meta file');
+      }
+    } catch (err) {
+      metadata = (metaErrorFn || noop)(err);
+    }
+    return [
+      {
+        name: metaFile,
+        uri: null,
+        data: metadata,
+      },
+      scripts,
+      await pluginScript.list(),
+    ];
   }
 
   // --- Sync algorithm ---
@@ -701,11 +707,10 @@ export function createSyncService({
 
   // --- User config (for WebDAV/S3) ---
 
-  const defaultUserConfig = {};
   let userConfigCache;
 
   function getUserConfig() {
-    if (getUserConfigFn) {
+    if (mapPasswordAuth) {
       return (userConfigCache ||= {
         ...defaultUserConfig,
         ...serviceConfig.get(USER_CONFIG),
@@ -715,7 +720,7 @@ export function createSyncService({
   }
 
   function setUserConfig(cfg) {
-    if (setUserConfigFn) {
+    if (mapPasswordAuth) {
       Object.assign(userConfigCache || {}, cfg);
       serviceConfig.set(USER_CONFIG, userConfigCache);
     }
@@ -786,7 +791,8 @@ export function initialize() {
     });
   }
   resetSyncState();
-  return autoSync();
+  autoSync();
+  return !!getService();
 }
 
 export function sync() {
@@ -795,13 +801,11 @@ export function sync() {
 }
 
 export function autoSync() {
-  if (!getOption('syncAutomatically')) {
-    console.info('[sync] auto-sync disabled, check later');
-    const service = getService();
-    service?.prepare();
-    return syncLater();
-  }
-  sync();
+  if (getOption('syncAutomatically')) return sync();
+  const service = getService();
+  service?.prepare();
+  console.info('[sync] auto-sync disabled, check later');
+  syncLater();
 }
 
 export function authorize() {

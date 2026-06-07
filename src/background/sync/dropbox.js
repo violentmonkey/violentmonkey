@@ -13,5 +13,8 @@ if (config.client_id) {
     driveProvider: 'dropbox',
     authProvider: 'dropbox',
     config,
+    metaError(res) {
+      if (res.status !== 409) throw res;
+    },
   }));
 }

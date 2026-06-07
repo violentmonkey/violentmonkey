@@ -3,7 +3,6 @@ import {
   ANONYMOUS,
   PASSWORD,
   SERVER_URL,
-  USER_CONFIG,
   USERNAME,
 } from '@/common/consts-sync';
 import { createSyncService, register } from './sync-engine';
@@ -20,22 +19,19 @@ register(createSyncService({
   displayName: 'WebDAV',
   driveProvider: 'webdav',
   authProvider: 'password',
+  defaultUserConfig: DEFAULT_CONFIG,
   properties: {
     authType: PASSWORD,
     [SERVER_URL]: null,
   },
   metaError(res) {
-    if (![404, 409].includes(res.status)) throw res;
-  },
-  getUserConfig() {
-    return (this[USER_CONFIG] ||= {
-      ...DEFAULT_CONFIG,
-      ...this.config.get(USER_CONFIG),
-    });
-  },
-  setUserConfig(cfg) {
-    Object.assign(this[USER_CONFIG], cfg);
-    this.config.set(USER_CONFIG, this[USER_CONFIG]);
+    if (
+      ![
+        404, // File not exists
+        409, // Directory not exists
+      ].includes(res.status)
+    )
+      throw res;
   },
   mapPasswordAuth(uc) {
     let url = uc[SERVER_URL]?.trim() || '';

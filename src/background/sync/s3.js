@@ -6,7 +6,6 @@ import {
   S3_ENDPOINT,
   S3_PREFIX,
   SECRET_ACCESS_KEY,
-  USER_CONFIG,
 } from '@/common/consts-sync';
 import { createSyncService, register } from './sync-engine';
 
@@ -24,18 +23,9 @@ register(createSyncService({
   displayName: 'S3 Compatible',
   driveProvider: 's3',
   authProvider: 'password',
+  defaultUserConfig: DEFAULT_CONFIG,
   properties: {
     authType: S3_AUTH,
-  },
-  getUserConfig() {
-    return (this[USER_CONFIG] ||= {
-      ...DEFAULT_CONFIG,
-      ...this.config.get(USER_CONFIG),
-    });
-  },
-  setUserConfig(cfg) {
-    Object.assign(this[USER_CONFIG], cfg);
-    this.config.set(USER_CONFIG, this[USER_CONFIG]);
   },
   mapPasswordAuth(uc) {
     const bucket = uc[BUCKET]?.trim();
@@ -55,5 +45,8 @@ register(createSyncService({
         region,
       },
     };
+  },
+  metaError(res) {
+    if (res.status !== 404) throw res;
   },
 }));
