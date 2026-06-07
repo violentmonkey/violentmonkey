@@ -1,9 +1,4 @@
-import {
-  debounce,
-  normalizeKeys,
-  noop,
-  sendCmd,
-} from '@/common';
+import { debounce, normalizeKeys, noop, sendCmd } from '@/common';
 import { TIMEOUT_HOUR } from '@/common/consts';
 import {
   SYNC_MERGE,
@@ -11,11 +6,7 @@ import {
   SYNC_PUSH,
   USER_CONFIG,
 } from '@/common/consts-sync';
-import {
-  forEachEntry,
-  objectSet,
-  objectPick,
-} from '@/common/object';
+import { forEachEntry, objectSet, objectPick } from '@/common/object';
 import { getOption, setOption } from '../utils';
 import { sortScripts, updateScriptInfo } from '../utils/db';
 import { script as pluginScript } from '../plugin';
@@ -35,7 +26,11 @@ import {
 } from './state-machine';
 import { formatDate } from '@/common/date';
 import { getSyncActions } from '@usync/sync';
-import { OAuth2Authorizers, OAUTH2_UNAUTHORIZED, OAUTH2_NEED_REFRESH } from '@usync/oauth2';
+import {
+  OAuth2Authorizers,
+  OAUTH2_UNAUTHORIZED,
+  OAUTH2_NEED_REFRESH,
+} from '@usync/oauth2';
 import { DriveProviders } from '@usync/drive';
 
 // --- Module-level state ---
@@ -158,26 +153,13 @@ export function getStates() {
 
 // --- Script data serialization ---
 
-function getScriptData(script, syncVersion, extra) {
-  let data;
-  if (syncVersion === 2) {
-    data = {
-      version: syncVersion,
-      custom: script.custom,
-      config: script.config,
-      props: objectPick(script.props, ['lastUpdated']),
-    };
-  } else if (syncVersion === 1) {
-    data = {
-      version: syncVersion,
-      more: {
-        custom: script.custom,
-        enabled: script.config.enabled,
-        update: script.config.shouldUpdate,
-        lastUpdated: script.props.lastUpdated,
-      },
-    };
-  }
+function getScriptData(script, extra) {
+  const data = {
+    version: 2,
+    custom: script.custom,
+    config: script.config,
+    props: objectPick(script.props, ['lastUpdated']),
+  };
   return Object.assign(data, extra);
 }
 
@@ -311,7 +293,10 @@ export function createSyncService({
         if (err.code === OAUTH2_UNAUTHORIZED) {
           setSyncState({ status: SYNC_AUTHORIZING });
           const url = await authorizer.buildAuthUrl();
-          const redirectUrl = await openAuthPage(url, providerConfig.redirect_uri);
+          const redirectUrl = await openAuthPage(
+            url,
+            providerConfig.redirect_uri,
+          );
           if (!redirectUrl) throw new Error('Authorization timed out');
           await authorizer.finishAuth(new URL(redirectUrl));
         } else if (err.code === OAUTH2_NEED_REFRESH) {
@@ -337,10 +322,7 @@ export function createSyncService({
     const auth = mapPasswordAuth(uc);
     if (!auth) return false;
     const Drive = DriveProviders[driveProvider];
-    drive = new Drive(
-      { authProvider: 'password', ...auth },
-      {},
-    );
+    drive = new Drive({ authProvider: 'password', ...auth }, {});
     return true;
   }
 
@@ -395,7 +377,7 @@ export function createSyncService({
   // --- Drive operations ---
 
   function get(item) {
-    return drive.get({ id: item.id, path: item.name }).then(b => b.text());
+    return drive.get({ id: item.id, path: item.name }).then((b) => b.text());
   }
 
   function put(item, data) {
@@ -430,11 +412,12 @@ export function createSyncService({
       else if (isScriptFile(file.name)) scripts.push(normalize(file));
     }
     const metaItem = metaFileItem ? { path: metaFileItem.name } : {};
-    const gotMeta = drive.get(metaItem)
-      .then(blob => blob.text())
-      .then(data => JSON.parse(data))
-      .catch(err => (metaErrorFn || defaultMetaError)(err))
-      .then(data => ({ name: metaFile, uri: null, data }));
+    const gotMeta = drive
+      .get(metaItem)
+      .then((blob) => blob.text())
+      .then((data) => JSON.parse(data))
+      .catch((err) => (metaErrorFn || defaultMetaError)(err))
+      .then((data) => ({ name: metaFile, uri: null, data }));
     return Promise.all([gotMeta, scripts, pluginScript.list()]);
   }
 
@@ -485,8 +468,12 @@ export function createSyncService({
     });
 
     // Content sync via @usync/sync
-    const modeName = currentSyncMode === SYNC_PUSH ? 'push'
-      : currentSyncMode === SYNC_PULL ? 'pull' : 'merge';
+    const modeName =
+      currentSyncMode === SYNC_PUSH
+        ? 'push'
+        : currentSyncMode === SYNC_PULL
+          ? 'pull'
+          : 'merge';
     const syncActions = getSyncActions(localSnapshot, remoteSnapshot, modeName);
 
     // Map actions to execution queues
@@ -511,40 +498,56 @@ export function createSyncService({
         }
       } else {
         if (type === 'put') {
-          putLocal.push({ remote: remoteItemMap[key], info: remoteMetaInfo[key] || {} });
+          putLocal.push({
+            remote: remoteItemMap[key],
+            info: remoteMetaInfo[key] || {},
+          });
         } else {
           delLocal.push({ local: localData.find((i) => i.props.uri === key) });
         }
       }
     }
 
-    // Position post-processing
+    // Position and enabled post-processing
     const updateLocal = [];
     localData.forEach((item) => {
       const info = remoteMetaInfo[item.props.uri];
-      if (
-        info &&
-        info.position !== item.props.position &&
-        info.modified === item.props.lastModified
-      ) {
-        if (globalLastModified <= remoteTimestamp) {
-          updateLocal.push({ local: item, info });
-        } else {
-          info.position = item.props.position;
-          remoteChanged = true;
+      if (info && info.modified === item.props.lastModified) {
+        const updates = {};
+        if (info.position !== item.props.position) {
+          if (globalLastModified <= remoteTimestamp) {
+            updates.props = { position: info.position };
+          } else {
+            info.position = item.props.position;
+            remoteChanged = true;
+          }
+        }
+        if (updates.props) {
+          updateLocal.push({ local: item, updates });
         }
       }
     });
 
+    const enableSync = getOption('syncScriptStatus');
+
     // Ensure all remote items have metadata
     remoteData.forEach((item) => {
-      if (!remoteMetaInfo[item.uri]) {
-        remoteMetaInfo[item.uri] = {};
+      let info = remoteMetaInfo[item.uri];
+      if (!info) {
+        info = {};
+        remoteMetaInfo[item.uri] = info;
+      }
+      if (!info.modified) {
+        info.modified = now;
         remoteChanged = true;
       }
-      if (!remoteMetaInfo[item.uri].modified) {
-        remoteMetaInfo[item.uri].modified = now;
-        remoteChanged = true;
+      if (enableSync) {
+        const local = localData.find((i) => i.props.uri === item.uri);
+        const localEnabled = local?.config.enabled ?? 1;
+        if (localEnabled !== info.enabled) {
+          info.enabled = localEnabled;
+          remoteChanged = true;
+        }
       }
     });
 
@@ -558,8 +561,9 @@ export function createSyncService({
             objectSet(data, 'props.lastModified', info.modified);
           const position = +info.position;
           if (position) data.position = position;
-          if (!getOption('syncScriptStatus') && data.config) {
-            delete data.config.enabled;
+          if (enableSync) {
+            if (info.enabled != null)
+              objectSet(data, 'config.enabled', info.enabled);
           }
           return pluginScript.update(data);
         });
@@ -567,10 +571,13 @@ export function createSyncService({
       ...putRemote.map(({ local, remote }) => {
         logInfo('Upload script:', local.props.uri);
         return pluginScript.get(local.props.id).then((code) => {
-          const data = getScriptData(local, 1, { code });
+          const data = getScriptData(local, { code });
           remoteMetaData.info[local.props.uri] = {
             modified: local.props.lastModified,
             position: local.props.position,
+            ...(enableSync && {
+              enabled: local.config.enabled,
+            }),
           };
           remoteChanged = true;
           return put(
@@ -592,11 +599,7 @@ export function createSyncService({
         logInfo('Remove local script:', local.props.uri);
         return pluginScript.remove(local.props.id);
       }),
-      ...updateLocal.map(({ local, info }) => {
-        const updates = {};
-        if (info.position) {
-          updates.props = { position: info.position };
-        }
+      ...updateLocal.map(({ local, updates }) => {
         return updateScriptInfo(local.props.id, updates);
       }),
     ];
@@ -688,10 +691,7 @@ export function createSyncService({
         },
       );
       const Drive = DriveProviders[driveProvider];
-      drive = new Drive(
-        { authProvider, user: '' },
-        { authorizer },
-      );
+      drive = new Drive({ authProvider, user: '' }, { authorizer });
     } else {
       initPassword();
     }
