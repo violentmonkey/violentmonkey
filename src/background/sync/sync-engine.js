@@ -373,17 +373,27 @@ export function createSyncService({
 
   // --- Drive operations ---
 
+  function createQueue() {
+    let chain = Promise.resolve();
+    return (fn) => {
+      const result = chain.then(fn);
+      chain = result.then(noop, noop);
+      return result;
+    };
+  }
+  const enqueue = createQueue();
+
   function get(item) {
-    return drive.get({ id: item.id, path: item.name }).then((b) => b.text());
+    return enqueue(() => drive.get({ id: item.id, path: item.name }).then((b) => b.text()));
   }
 
   function put(item, data) {
     const blob = new Blob([data], { type: 'text/plain' });
-    return drive.put({ id: item.id, path: item.name }, blob).then(normalize);
+    return enqueue(() => drive.put({ id: item.id, path: item.name }, blob).then(normalize));
   }
 
   function remove(item) {
-    return drive.remove({ id: item.id, path: item.name });
+    return enqueue(() => drive.remove({ id: item.id, path: item.name }));
   }
 
   function normalize(item) {
