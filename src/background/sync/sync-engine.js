@@ -334,6 +334,7 @@ export function createSyncService({
       return;
     }
     setSyncState({ status: SYNC_INITIALIZING });
+    progress.total += 1;
     try {
       const batches = drive.list('');
       // eslint-disable-next-line no-unused-vars
@@ -345,6 +346,7 @@ export function createSyncService({
       logError(err);
       setSyncState({ status: SYNC_UNAUTHORIZED });
     }
+    progress.finished += 1;
   }
 
   async function doAuthorize() {
@@ -376,20 +378,29 @@ export function createSyncService({
   function createQueue() {
     let chain = Promise.resolve();
     return (fn) => {
+      progress.total += 1;
+      onStateChange();
       const result = chain.then(fn);
-      chain = result.then(noop, noop);
+      chain = result.catch(noop).then(() => {
+        progress.finished += 1;
+        onStateChange();
+      });
       return result;
     };
   }
   const enqueue = createQueue();
 
   function get(item) {
-    return enqueue(() => drive.get({ id: item.id, path: item.name }).then((b) => b.text()));
+    return enqueue(() =>
+      drive.get({ id: item.id, path: item.name }).then((b) => b.text()),
+    );
   }
 
   function put(item, data) {
     const blob = new Blob([data], { type: 'text/plain' });
-    return enqueue(() => drive.put({ id: item.id, path: item.name }, blob).then(normalize));
+    return enqueue(() =>
+      drive.put({ id: item.id, path: item.name }, blob).then(normalize),
+    );
   }
 
   function remove(item) {
@@ -409,9 +420,11 @@ export function createSyncService({
 
   async function getSyncData() {
     const files = [];
+    progress.total += 1;
     for await (const batch of drive.list()) {
       files.push(...batch);
     }
+    progress.finished += 1;
     let metaFileItem;
     const scripts = [];
     for (const file of files) {
@@ -421,7 +434,9 @@ export function createSyncService({
     let metadata;
     try {
       if (metaFileItem) {
-        const blob = await drive.get({ path: metaFileItem.name });
+        const blob = await enqueue(() =>
+          drive.get({ path: metaFileItem.name }),
+        );
         const text = await blob.text();
         metadata = JSON.parse(text);
       } else {
