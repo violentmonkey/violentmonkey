@@ -1044,7 +1044,7 @@ sideMenuInstalled:
   message: Установлено
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: Скрипты
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Настройки

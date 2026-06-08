@@ -395,7 +395,7 @@ labelAutoUpdate:
   message: التحقق من تحديثات السكربتات كل $1 يوم/أيام، استخدم 0 لتعطيل الميزة
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: النسخ الاحتياطي
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: النسخ الاحتياطي والصيانة
@@ -1037,7 +1037,7 @@ sideMenuInstalled:
   message: السكربتات المثبّتة
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: النصوص
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: الإعدادات
