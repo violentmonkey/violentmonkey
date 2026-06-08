@@ -1042,7 +1042,7 @@ sideMenuInstalled:
   message: Yüklenmiş betikler
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: Betikler
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Ayarlar

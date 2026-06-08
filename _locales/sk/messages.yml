@@ -1047,7 +1047,7 @@ sideMenuInstalled:
   message: Nainštalované skripty
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: Skripty
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Nastavenia

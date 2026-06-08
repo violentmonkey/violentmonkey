@@ -1061,7 +1061,7 @@ sideMenuInstalled:
   message: Installierte Skripte
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: Skripte
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Einstellungen
