@@ -445,6 +445,21 @@ export function createSyncService({
     } catch (err) {
       metadata = (metaErrorFn || noop)(err);
     }
+    // Convert VM file format to snapshot format and mark stale entries as tombstones
+    const info = metadata?.info || {};
+    const scriptSet = new Set(scripts.map((s) => s.uri));
+    for (const [uri, item] of Object.entries(info)) {
+      item.lastModified = item.modified || 0;
+      delete item.modified;
+      if (!item.deleted && !scriptSet.has(uri)) {
+        item.deleted = true;
+        item.lastModified = Date.now();
+      }
+    }
+    metadata = {
+      metadata: { lastModified: metadata?.timestamp || 0 },
+      items: info,
+    };
     return [
       {
         name: metaFile,
@@ -465,11 +480,10 @@ export function createSyncService({
 
     const [remoteMeta, remoteData, localData] = await getSyncData();
     const remoteMetaData = remoteMeta.data || {};
-    const remoteMetaInfo = remoteMetaData.info || {};
-    const remoteTimestamp = remoteMetaData.timestamp || 0;
-    let remoteChanged =
-      !remoteTimestamp ||
-      Object.keys(remoteMetaInfo).length !== remoteData.length;
+    const items = remoteMetaData.items || {};
+    const remoteLastModified = remoteMetaData.metadata?.lastModified || 0;
+    const activeCount = Object.values(items).filter((i) => !i.deleted).length;
+    let remoteChanged = !remoteLastModified || activeCount !== remoteData.length;
     const now = Date.now();
     const globalLastModified = getOption('lastModified');
     const remoteItemMap = {};
@@ -481,7 +495,7 @@ export function createSyncService({
       items: {},
     };
     const remoteSnapshot = {
-      metadata: { lastModified: remoteTimestamp },
+      metadata: { lastModified: remoteLastModified },
       items: {},
     };
 
@@ -490,13 +504,32 @@ export function createSyncService({
         lastModified: item.props.lastModified || 0,
       };
     });
-    remoteData.forEach((item) => {
+    // Add tombstones for locally deleted scripts
+    for (const uri of Object.keys(items)) {
+      if (!localSnapshot.items[uri]) {
+        localSnapshot.items[uri] = {
+          lastModified: localMeta.timestamp || 0,
+          deleted: true,
+        };
+      }
+    }
+    // Include active items from remoteData with metadata
+    for (const item of remoteData) {
       remoteItemMap[item.uri] = item;
-      const info = remoteMetaInfo[item.uri] || {};
+      const info = items[item.uri] || {};
       remoteSnapshot.items[item.uri] = {
-        lastModified: info.modified || now,
+        lastModified: info.lastModified || now,
       };
-    });
+    }
+    // Include tombstones (no corresponding file)
+    for (const [uri, info] of Object.entries(items)) {
+      if (info.deleted && !remoteItemMap[uri]) {
+        remoteSnapshot.items[uri] = {
+          lastModified: info.lastModified || 0,
+          deleted: true,
+        };
+      }
+    }
 
     // Content sync via @usync/sync
     const modeName =
@@ -517,21 +550,21 @@ export function createSyncService({
         if (type === 'put') {
           const local = localData.find((i) => i.props.uri === key);
           putRemote.push({ local, remote: remoteItemMap[key] });
-          remoteMetaInfo[key] = {
-            ...(remoteMetaInfo[key] || {}),
-            modified: local?.props.lastModified,
+          items[key] = {
+            ...(items[key] || {}),
+            lastModified: local?.props.lastModified,
           };
           remoteChanged = true;
         } else {
           delRemote.push({ remote: remoteItemMap[key] });
-          delete remoteMetaInfo[key];
+          items[key] = { deleted: true, lastModified: now };
           remoteChanged = true;
         }
       } else {
         if (type === 'put') {
           putLocal.push({
             remote: remoteItemMap[key],
-            info: remoteMetaInfo[key] || {},
+            info: items[key] || {},
           });
         } else {
           delLocal.push({ local: localData.find((i) => i.props.uri === key) });
@@ -542,11 +575,11 @@ export function createSyncService({
     // Position and enabled post-processing
     const updateLocal = [];
     localData.forEach((item) => {
-      const info = remoteMetaInfo[item.props.uri];
-      if (info && info.modified === item.props.lastModified) {
+      const info = items[item.props.uri];
+      if (info && info.lastModified === item.props.lastModified) {
         const updates = {};
         if (info.position !== item.props.position) {
-          if (globalLastModified <= remoteTimestamp) {
+          if (globalLastModified <= remoteLastModified) {
             updates.props = { position: info.position };
           } else {
             info.position = item.props.position;
@@ -563,13 +596,13 @@ export function createSyncService({
 
     // Ensure all remote items have metadata
     remoteData.forEach((item) => {
-      let info = remoteMetaInfo[item.uri];
+      let info = items[item.uri];
       if (!info) {
         info = {};
-        remoteMetaInfo[item.uri] = info;
+        items[item.uri] = info;
       }
-      if (!info.modified) {
-        info.modified = now;
+      if (!info.lastModified) {
+        info.lastModified = now;
         remoteChanged = true;
       }
       if (enableSync) {
@@ -588,8 +621,8 @@ export function createSyncService({
         return get(remote).then((raw) => {
           const data = parseScriptData(raw);
           if (!data.code) return;
-          if (info.modified)
-            objectSet(data, 'props.lastModified', info.modified);
+          if (info.lastModified)
+            objectSet(data, 'props.lastModified', info.lastModified);
           const position = +info.position;
           if (position) data.position = position;
           if (enableSync) {
@@ -603,8 +636,8 @@ export function createSyncService({
         logInfo('Upload script:', local.props.uri);
         return pluginScript.get(local.props.id).then((code) => {
           const data = getScriptData(local, { code });
-          remoteMetaData.info[local.props.uri] = {
-            modified: local.props.lastModified,
+          items[local.props.uri] = {
+            lastModified: local.props.lastModified,
             position: local.props.position,
             ...(enableSync && {
               enabled: local.config.enabled,
@@ -622,7 +655,7 @@ export function createSyncService({
       }),
       ...delRemote.map(({ remote }) => {
         logInfo('Remove remote script:', remote.uri);
-        delete remoteMetaData.info[remote.uri];
+        items[remote.uri] = { deleted: true, lastModified: now };
         remoteChanged = true;
         return remove(remote);
       }),
@@ -642,7 +675,7 @@ export function createSyncService({
           remoteChanged = true;
           return pluginScript.list().then((scripts) => {
             scripts.forEach((script) => {
-              const remoteInfo = remoteMetaData.info[script.props.uri];
+              const remoteInfo = items[script.props.uri];
               if (remoteInfo) remoteInfo.position = script.props.position;
             });
           });
@@ -651,11 +684,25 @@ export function createSyncService({
     promiseQueue.push(
       Promise.all(promiseQueue).then(() => {
         const promises = [];
-        if (remoteChanged) {
-          remoteMetaData.timestamp = Date.now();
-          promises.push(put(remoteMeta, JSON.stringify(remoteMetaData)));
+        // Clean up old tombstones
+        const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
+        for (const [uri, info] of Object.entries(items)) {
+          if (info.deleted && info.lastModified && now - info.lastModified > ONE_YEAR) {
+            delete items[uri];
+            remoteChanged = true;
+          }
         }
-        localMeta.timestamp = remoteMetaData.timestamp;
+        if (remoteChanged) {
+          const timestamp = Date.now();
+          remoteMetaData.metadata.lastModified = timestamp;
+          // Convert back to VM file format
+          const fileData = { timestamp, info: {} };
+          for (const [uri, item] of Object.entries(items)) {
+            fileData.info[uri] = { modified: item.lastModified, ...item, lastModified: undefined };
+          }
+          promises.push(put(remoteMeta, JSON.stringify(fileData)));
+        }
+        localMeta.timestamp = remoteMetaData.metadata.lastModified;
         localMeta.lastSync = Date.now();
         serviceConfig.set('meta', localMeta);
         return Promise.all(promises);
