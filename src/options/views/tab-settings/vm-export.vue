@@ -28,7 +28,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import Modal from 'vueleton/lib/modal';
-import { strToU8, zipSync } from 'fflate';
+import { ZipWriter, TimestampMode } from 'web-jszipp/browser-legacy/cr61ff58';
 import { getScriptName, readBlob, sendCmdDirectly } from '@/common';
 import { formatDate } from '@/common/date';
 import options from '@/common/options';
@@ -95,7 +95,7 @@ async function exportData() {
     scripts: vmScripts,
     settings: options.get(),
   };
-  const files = {};
+  const writer = new ZipWriter({ outputAs: "blob", timestamps: TimestampMode.Dos | TimestampMode.Unix | TimestampMode.Dos });
   delete vm.settings.sync;
   if (withValues) vm.values = vmValues;
   for (const { /**@type{VMScript}*/script, code } of items) {
@@ -120,13 +120,10 @@ async function exportData() {
       vmValues[uri] = v;
     }
     vmScripts[name] = info;
-    files[`${name}.user.js`] = [
-      strToU8(code),
-      modDate && { mtime: new Date(modDate) },
-    ];
+    await writer.add({ path: `${name}.user.js`, data: `${code}`, meta: { modifiedAt: new Date(modDate) } });
   }
-  files[vmZipEntryName] = [strToU8(JSON.stringify(vm, null, 2))]; // prettify to help users diff or view it
-  return new Blob([zipSync(files)], { type: 'application/zip' });
+  await writer.add({ path: `${vmZipEntryName}`, data: `${JSON.stringify(vm, null, 2)}` }); // prettify to help users diff or view it
+  return writer.close();
 }
 </script>
 

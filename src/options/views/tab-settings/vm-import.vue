@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { strFromU8, unzipSync } from 'fflate';
+import { openZip } from 'web-jszipp/browser-legacy/cr61ff58';
 import { ensureArray, getUniqId, i18n, readBlob, sendCmdDirectly } from '@/common';
 import { listenOnce } from '@/common/browser';
 import { kOrigTag, kTag, RUN_AT_RE } from '@/common/consts';
@@ -76,7 +76,9 @@ async function importBackup(file) {
 async function doImportBackup(buf, zipName) {
   reports.length = 0;
   let vm;
-  let files;
+  let reader;
+  let zipEntries = [];
+  let files = {};
   let total = 0;
   const importScriptData = options.get('importScriptData');
   const optionsNames = [];
@@ -86,16 +88,20 @@ async function doImportBackup(buf, zipName) {
   const kOptionsJson = '.options.json';
   const kStorageJson = '.storage.json';
   try {
-    files = unzipSync(new Uint8Array(buf), {
-      filter: ({ name: filename, time, originalSize }) => originalSize < 100e6 && (
+    reader = await openZip(new Uint8Array(buf), { pathMode: "strict-package" });
+    zipEntries = reader.entries.filter((entry)=>{
+      const j = entry.path.lastIndexOf("/") + 1;
+      const filename =  entry.path.substring(j);
+      return entry.size < 100e6 && (
         filename.toLowerCase() === vmZipEntryName && (vm = filename) ||
         filename.endsWith(kOptionsJson) && optionsNames.push(filename) ||
         filename.endsWith(kStorageJson) && storageNames.push(filename) ||
-        filename.endsWith(kUserJs) && (scriptTimes[filename] = time, ++total)
-      ),
+        filename.endsWith(kUserJs) && (scriptTimes[filename] = entry.modifiedAt, ++total)
+      );
     });
   } catch (err) {
     report(err.message || err);
+    if (reader) reader.close();
     return;
   }
   report('', zipName, 'info');
@@ -126,9 +132,11 @@ async function doImportBackup(buf, zipName) {
     undoPort = chrome.runtime.connect({ name: 'undoImport' });
     await new Promise(resolveOnUndoMessage);
   }
-  for (const filename in files) {
+  for (const zipEntry of zipEntries) {
+    const j = zipEntry.path.lastIndexOf("/") + 1;
+    const filename =  zipEntry.path.substring(j);
     try {
-      const text = strFromU8(files[filename]);
+      const text = await zipEntry.text();
       files[filename] = filename.endsWith(kUserJs)
         ? text
         : JSON.parse(text, filename);
@@ -174,11 +182,11 @@ async function doImportBackup(buf, zipName) {
         props: {
           lastModified: more.lastModified
             || more.props?.lastModified // Import data from Tampermonkey
-            || (decodedTime = +zipTimeToDate(time) || now),
+            || (decodedTime = +time || now),
           lastUpdated: more.lastUpdated
             || more.props?.lastUpdated // Import data from Tampermonkey
             || decodedTime
-            || +zipTimeToDate(time)
+            || +time
             || now,
         },
       },
@@ -245,16 +253,6 @@ async function doImportBackup(buf, zipName) {
   }
   function toStringArray(data) {
     return ensureArray(data).filter(item => typeof item === 'string');
-  }
-  function zipTimeToDate(time) {
-    return new Date(
-      /*Y*/((time >> 25) & 0x7f) + 1980,
-      /*M*/(time >> 21) & 0x0f - 1,
-      /*D*/(time >> 16) & 0x1f,
-      /*h*/(time >> 11) & 0x1f,
-      /*m*/(time >> 5) & 0x3f,
-      /*s*/(time & 0x1f) * 2,
-    );
   }
 }
 

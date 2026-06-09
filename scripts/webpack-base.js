@@ -187,16 +187,6 @@ const getBaseConfig = () => ({
           },
         },
       },
-      // Patch fflate to expose file timestamp
-      {
-        test: /fflate/,
-        loader: 'string-replace-loader',
-        options: {
-          search: / size: sc,/g,
-          replace: '$& time: b4(data,o+12),',
-          strict: true,
-        }
-      },
     ],
   },
   optimization: {
