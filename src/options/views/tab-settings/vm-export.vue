@@ -95,7 +95,7 @@ async function exportData() {
     scripts: vmScripts,
     settings: options.get(),
   };
-  const writer = new ZipWriter({ outputAs: "blob", timestamps: TimestampMode.Dos | TimestampMode.Unix | TimestampMode.Dos });
+  const writer = new ZipWriter({ outputAs: "blob", timestamps: TimestampMode.Dos | TimestampMode.Unix | TimestampMode.Ntfs });
   delete vm.settings.sync;
   if (withValues) vm.values = vmValues;
   for (const { /**@type{VMScript}*/script, code } of items) {
