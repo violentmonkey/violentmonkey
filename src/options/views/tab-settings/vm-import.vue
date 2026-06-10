@@ -165,7 +165,6 @@ async function doImportBackup(buf, zipName) {
   if (now) undoTime.value = now;
 
   async function readScript(filename, time) {
-    let decodedTime;
     const name = filename.slice(0, -kUserJs.length);
     const more = scripts[name];
     const data = {
@@ -182,12 +181,10 @@ async function doImportBackup(buf, zipName) {
         props: {
           lastModified: more.lastModified
             || more.props?.lastModified // Import data from Tampermonkey
-            || (decodedTime = +time || now),
+            || +time || now,
           lastUpdated: more.lastUpdated
             || more.props?.lastUpdated // Import data from Tampermonkey
-            || decodedTime
-            || +time
-            || now,
+            || +time || now,
         },
       },
     };
