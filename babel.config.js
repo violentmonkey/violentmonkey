@@ -1,15 +1,10 @@
 const { alias, extensions } = require('./scripts/common');
-const fs = require('node:fs');
-const yaml = require('js-yaml');
+const { getBrowserTargets } = require('./scripts/manifest-helper');
 
-const manifest = yaml.load(fs.readFileSync('src/manifest.yml', 'utf8'));
 const isTest = process.env.BABEL_ENV === 'test';
 
 module.exports = {
-  targets: [
-    `Chrome >= ${parseInt(manifest.minimum_chrome_version)}`,
-    `Firefox >= ${parseInt(manifest.browser_specific_settings.gecko.strict_min_version)}`,
-  ].join(','),
+  targets: getBrowserTargets(),
   presets: [
     ['@babel/preset-env', {
       ...!isTest && {
