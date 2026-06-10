@@ -116,7 +116,7 @@ browser.tabs.onCreated.addListener((tab) => {
   const isUserJS = /\.user\.js([?#]|$)/.test(url);
   /* Determining if this tab can be auto-closed (replaced, actually).
      FF>=68 allows reading file: URL only in the tab's content script so the tab must stay open. */
-  if (isUserJS && (!isFile || FIREFOX < 68)) {
+  if (isUserJS && !isFile) {
     cache.put(`autoclose:${id}`, true, 10e3);
   }
   if (virtualUrlRe && url === 'about:blank') {

@@ -3,7 +3,7 @@ import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { testScript } from './tester';
-import { CHROME, FIREFOX } from './ua';
+import { CHROME } from './ua';
 import { vetUrl } from './url';
 
 const openers = {};
@@ -127,10 +127,7 @@ addPublicCommands({
     if (isInternal
         && url.startsWith(EDITOR_ROUTE)
         && browserWindows
-        && getOption('editorWindow')
-        /* cookieStoreId in windows.create() is supported since FF64 https://bugzil.la/1393570
-         * and a workaround is too convoluted to add it for such an ancient version */
-        && (!storeId || FIREFOX >= 64)) {
+        && getOption('editorWindow')) {
       const wndOpts = {
         url,
         incognito: canOpenIncognito && incognito,
@@ -197,7 +194,7 @@ tabsOnRemoved.addListener((id) => {
   // FF68+ can't fetch file:// from extension context but it runs content scripts in file:// tabs
   const fileScheme = IS_FIREFOX
     || await new Promise(r => chrome.extension.isAllowedFileSchemeAccess(r));
-  fileSchemeRequestable = FIREFOX < 68 || !IS_FIREFOX && fileScheme;
+  fileSchemeRequestable = !IS_FIREFOX && fileScheme;
   // Since users in FF can override UA we detect FF 90 via feature
   if (IS_FIREFOX && [].at || CHROME >= 88) {
     injectableRe = fileScheme ? /^(https?|file):/ : /^https?:/;

@@ -8,7 +8,7 @@ import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify, kCookie, kSetCookie,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
-import { FIREFOX, navUA, navUAD } from './ua';
+import { navUA, navUAD } from './ua';
 import { vetUrl } from './url';
 
 addPublicCommands({
@@ -264,7 +264,7 @@ async function httpRequest(opts, events, src, cb) {
     const cookies = (await browser.cookies.getAll({
       url,
       storeId: req.storeId,
-      ...FIREFOX >= 59 && { firstPartyDomain: null },
+      firstPartyDomain: null,
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
       pushWebRequestHeader(vmHeaders, kCookie,

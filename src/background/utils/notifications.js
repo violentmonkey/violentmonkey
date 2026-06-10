@@ -1,6 +1,5 @@
 import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
 import { addPublicCommands, commands } from './init';
-import { CHROME } from './ua';
 import { vetUrl } from './url';
 
 /** @type {{ [nid: string]: browser.runtime.MessageSender | function | number }} */
@@ -30,9 +29,7 @@ addPublicCommands({
       ...!IS_FIREFOX && {
         requireInteraction: !!onclick,
       },
-      ...CHROME >= 70 && {
-        silent,
-      }
+      silent,
     });
     if (isFunction(onclick)) {
       openers[notificationId] = onclick;

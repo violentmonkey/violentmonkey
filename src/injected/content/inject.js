@@ -60,7 +60,7 @@ export function injectPageSandbox(data) {
   } else {
     setOwnProp(global, VAULT_WRITER, tellBridgeToWriteVault, false);
   }
-  if (useOpener(opener) || useOpener(window !== top && parent)) {
+  if (useOpener(opener) || useOpener(window !== top && parent, true)) {
     startHandshake();
   } else {
     /* Sites can do window.open(sameOriginUrl,'iframeNameOrNewWindowName').opener=null, spoof JS
@@ -76,16 +76,10 @@ export function injectPageSandbox(data) {
   }
   return pageInjectable;
 
-  function useOpener(opener) {
-    let ok;
-    try {
-      ok = opener && describeProperty(opener.location, 'href').get;
-    } catch (e) {
-      // Old Chrome throws in sandboxed frames, TODO: remove `try` when minimum_chrome_version >= 86
-    }
+  function useOpener(opener, isFrame) {
+    let ok = opener && (isFrame ? frameElement : describeProperty(opener.location, 'href').get);
     if (ok) {
       ok = false;
-      // TODO: Use a single PointerEvent with `pointerType: vaultId` when strict_min_version >= 59
       if (IS_FIREFOX) {
         const setOk = evt => { ok = evt::getDetail(); };
         window::on(VAULT_WRITER_ACK, setOk, true);
@@ -105,7 +99,7 @@ export function injectPageSandbox(data) {
    * Directly preventing it would require redefining ~20 DOM methods in the parent.
    * Instead, we'll send the ids via a temporary handshakeId event, to which the web-bridge
    * will listen only during its initial phase using vault-protected DOM methods.
-   * TODO: simplify this when strict_min_version >= 63 (attachShadow in FF) */
+   */
   function startHandshake() {
     /* With `once` the listener is removed before DOMNodeInserted is dispatched by appendChild,
      * otherwise a same-origin parent page could use it to spoof the handshake. */
@@ -280,11 +274,7 @@ function inject(item, iframeCb) {
   });
   const div = makeElem('div');
   // Hiding the script's code from mutation events like DOMNodeInserted or DOMNodeRemoved
-  const divRoot = injectedRoot || (
-    attachShadow
-      ? div::attachShadow({ mode: 'closed' })
-      : div
-  );
+  const divRoot = injectedRoot || div::attachShadow({ mode: 'closed' });
   if (isCodeArray) {
     safeApply(append, script, code);
   }
