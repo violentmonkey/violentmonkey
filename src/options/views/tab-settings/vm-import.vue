@@ -89,9 +89,9 @@ async function doImportBackup(buf, zipName) {
   const kStorageJson = '.storage.json';
   try {
     reader = await openZip(new Uint8Array(buf), { pathMode: "strict-package" });
-    zipEntries = reader.entries.filter((entry)=>{
+    zipEntries = reader.entries.filter((entry) => {
       const j = entry.path.lastIndexOf("/") + 1;
-      const filename =  entry.path.substring(j);
+      const filename = entry.path.substring(j);
       return entry.size < 100e6 && (
         filename.toLowerCase() === vmZipEntryName && (vm = filename) ||
         filename.endsWith(kOptionsJson) && optionsNames.push(filename) ||
