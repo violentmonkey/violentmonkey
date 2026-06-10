@@ -265,7 +265,6 @@ export function createSyncService({
   authProvider,
   metaFile = VIOLENTMONKEY,
   config: providerConfig,
-  metaError: metaErrorFn,
   mapPasswordAuth,
   defaultUserConfig = {},
   properties: extraProperties,
@@ -336,7 +335,7 @@ export function createSyncService({
     setSyncState({ status: SYNC_INITIALIZING });
     progress.total += 1;
     try {
-      const batches = drive.list('');
+      const batches = drive.list();
       // eslint-disable-next-line no-unused-vars
       for await (const batch of batches) {
         break;
@@ -399,7 +398,9 @@ export function createSyncService({
   function put(item, data) {
     const blob = new Blob([data], { type: 'text/plain' });
     return enqueue(() =>
-      drive.put({ id: item.id, path: item.name }, blob).then(normalize),
+      drive
+        .put({ id: item.id, path: getItemFilename(item) }, blob)
+        .then(normalize),
     );
   }
 
@@ -439,11 +440,9 @@ export function createSyncService({
         );
         const text = await blob.text();
         metadata = JSON.parse(text);
-      } else {
-        throw new Error('No meta file');
       }
     } catch (err) {
-      metadata = (metaErrorFn || noop)(err);
+      // Ignore meta error
     }
     // Convert VM file format to snapshot format and mark stale entries as tombstones
     const info = metadata?.info || {};
@@ -483,7 +482,8 @@ export function createSyncService({
     const items = remoteMetaData.items || {};
     const remoteLastModified = remoteMetaData.metadata?.lastModified || 0;
     const activeCount = Object.values(items).filter((i) => !i.deleted).length;
-    let remoteChanged = !remoteLastModified || activeCount !== remoteData.length;
+    let remoteChanged =
+      !remoteLastModified || activeCount !== remoteData.length;
     const now = Date.now();
     const globalLastModified = getOption('lastModified');
     const remoteItemMap = {};
@@ -687,7 +687,11 @@ export function createSyncService({
         // Clean up old tombstones
         const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
         for (const [uri, info] of Object.entries(items)) {
-          if (info.deleted && info.lastModified && now - info.lastModified > ONE_YEAR) {
+          if (
+            info.deleted &&
+            info.lastModified &&
+            now - info.lastModified > ONE_YEAR
+          ) {
             delete items[uri];
             remoteChanged = true;
           }
@@ -698,7 +702,11 @@ export function createSyncService({
           // Convert back to VM file format
           const fileData = { timestamp, info: {} };
           for (const [uri, item] of Object.entries(items)) {
-            fileData.info[uri] = { modified: item.lastModified, ...item, lastModified: undefined };
+            fileData.info[uri] = {
+              modified: item.lastModified,
+              ...item,
+              lastModified: undefined,
+            };
           }
           promises.push(put(remoteMeta, JSON.stringify(fileData)));
         }
@@ -752,7 +760,7 @@ export function createSyncService({
       authorizer = new Authorizer(
         {
           clientId: providerConfig.client_id,
-          clientSecret: providerConfig.client_secret || '',
+          clientSecret: providerConfig.client_secret,
           redirectUrl: providerConfig.redirect_uri,
           scope: providerConfig.scope,
           provider: providerConfig.provider,
