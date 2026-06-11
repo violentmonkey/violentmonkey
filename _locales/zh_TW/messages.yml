@@ -685,6 +685,9 @@ learnBlacklist:
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: 了解更多插入模式。
+linkManageRemoteFiles:
+  description: Label for link to manage remote files.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: 腳本命令

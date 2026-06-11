@@ -58,6 +58,14 @@
           </button>
         </tooltip>
       </div>
+      <div v-if="rService" class="flex">
+        <a
+          href="https://vm.bananatree.dev"
+          target="_blank"
+          class="mr-1"
+          v-text="i18n('linkManageRemoteFiles')"
+        />
+      </div>
     </div>
     <p v-if="rMessage">
       <span v-text="rMessage" :class="{ 'text-red': rError }" class="mr-1" />
