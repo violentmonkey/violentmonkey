@@ -4,7 +4,7 @@
   "version": "2.41.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "prepare": "husky install",
+    "prepare": "husky",
     "dev": "gulp dev",
     "build": "cross-env NODE_ENV=production gulp build",
     "build:selfHosted": "cross-env TARGET=selfHosted BETA=1 run-s build",
