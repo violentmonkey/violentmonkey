@@ -74,7 +74,8 @@ html:not(.narrow) {
   }
   .aside-menu-item {
     a {
-      line-height: 2.5;
+      padding: 8px 0;
+      line-height: 1.2;
     }
     &:nth-last-child(2) {
       flex: 1;
