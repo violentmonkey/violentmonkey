@@ -740,6 +740,9 @@ learnBlacklist:
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: En savoir plus sur les modes d’injection
+linkManageRemoteFiles:
+  description: Label for link to manage remote files.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Commandes de script

@@ -51,6 +51,15 @@ importers:
 
   .:
     dependencies:
+      '@usync/drive':
+        specifier: ^0.1.7
+        version: 0.1.7
+      '@usync/oauth2':
+        specifier: ^0.1.4
+        version: 0.1.4
+      '@usync/sync':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@violentmonkey/shortcut':
         specifier: ^1.4.4
         version: 1.4.4
@@ -2004,6 +2013,15 @@ packages:
     resolution: {integrity: sha512-nAB74NfSNKknqQ1RrYj6uz8FcXEomu/MATJZxh/x+BArzN2U3JbOYC0APYzUIGhVY3m5hRxA8VPNdPBoG8txlA==}
     cpu: [x64]
     os: [win32]
+
+  '@usync/drive@0.1.7':
+    resolution: {integrity: sha512-mLtHc+0o2HFTB648GSXuLJDNF3Xd783N/mjV931zAXA8K6OhPN9/Nx6THJRmIjt3RCYqSzKDVovgQnf1CHCa4g==}
+
+  '@usync/oauth2@0.1.4':
+    resolution: {integrity: sha512-XVDOL2SM1jUtn2dEmhvwXbMETk7EkRHW/kC8J6uRruh9wYHgARHqgVr3t9muaEyBdsC9zHVFm0/wHqLX+Qsl7Q==}
+
+  '@usync/sync@0.1.1':
+    resolution: {integrity: sha512-tlMEj9AUTfEzkvRprPLrGaC82l2PUheAEMFDs0izUO5zPCo/IUVHCsQySp2sBskroqRYyAIXxEdTtoVA4YLNbg==}
 
   '@violentmonkey/shortcut@1.4.4':
     resolution: {integrity: sha512-rS+qi/WhYQEKpoH/l8c+lBHppVIZDnbQxxSATE6zeKkKv4rbsV7aD9YAkJvSD1Jq6N96UT9grjhmA8huDGC+uA==}
@@ -4132,6 +4150,11 @@ packages:
   nanoid@3.3.12:
     resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@5.1.11:
+    resolution: {integrity: sha512-v+KEsUv2ps74PaSKv0gHTxTCgMXOIfBEbaqa6w6ISIGC7ZsvHN4N9oJ8d4cmf0n5oTzQz2SLmThbQWhjd/8eKg==}
+    engines: {node: ^18 || >=20}
     hasBin: true
 
   napi-postinstall@0.3.4:
@@ -7819,6 +7842,16 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
+  '@usync/drive@0.1.7':
+    dependencies:
+      '@usync/oauth2': 0.1.4
+
+  '@usync/oauth2@0.1.4':
+    dependencies:
+      nanoid: 5.1.11
+
+  '@usync/sync@0.1.1': {}
+
   '@violentmonkey/shortcut@1.4.4':
     dependencies:
       '@babel/runtime': 7.28.4
@@ -10249,6 +10282,8 @@ snapshots:
   mute-stdout@2.0.0: {}
 
   nanoid@3.3.12: {}
+
+  nanoid@5.1.11: {}
 
   napi-postinstall@0.3.4: {}
 
