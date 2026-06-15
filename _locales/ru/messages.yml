@@ -722,7 +722,7 @@ learnInjectionMode:
   message: Подробнее о режимах внедрения.
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: Управление внешними файлами
 menuCommands:
   description: Menu item to list script commands.
   message: Команды скриптов

@@ -728,7 +728,7 @@ learnInjectionMode:
   message: Viac informácií o režimoch injektovania.
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: Správa vzdialených súborov
 menuCommands:
   description: Menu item to list script commands.
   message: Príkazy skriptu

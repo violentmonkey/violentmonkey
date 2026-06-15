@@ -736,7 +736,7 @@ learnInjectionMode:
   message: Aprende más sobre los modos de inyección.
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: Administrar archivos remotos
 menuCommands:
   description: Menu item to list script commands.
   message: ''
@@ -1061,7 +1061,7 @@ sideMenuInstalled:
   message: Scripts instalados
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: Scripts
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Configuración

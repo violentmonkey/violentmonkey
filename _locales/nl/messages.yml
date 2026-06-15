@@ -719,7 +719,7 @@ learnInjectionMode:
   message: Meer informatie over injectiemodi.
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: Externe bestanden beheren
 menuCommands:
   description: Menu item to list script commands.
   message: ''
@@ -1043,7 +1043,7 @@ sideMenuInstalled:
   message: Geïnstalleerde scripts
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: Scripts
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Instellingen
