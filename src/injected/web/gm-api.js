@@ -69,8 +69,7 @@ export const GM_API_CTX_GM4ASYNC = {
       onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
       return;
     }
-    const useModeBrowser = opts.downloadModeBrowser != null ? opts.downloadModeBrowser : bridge.gmDownloadModeBrowser;
-    delete opts.downloadModeBrowser;
+    const useModeBrowser = bridge.gmDownloadModeBrowser;
     if (useModeBrowser) {
       const doDownload = () => new SafePromise((resolve, reject) => {
         bridge.call('DownloadModeBrowser', {
