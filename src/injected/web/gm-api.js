@@ -82,11 +82,17 @@ export const GM_API_CTX_GM4ASYNC = {
           method: opts.method,
           body: opts.body,
         }, null, (res, err) => {
-          if (err) reject(err); else resolve(res);
+          if (err) {
+            if (opts.onerror) opts.onerror(err);
+            reject(err);
+          } else {
+            if (opts.onload) opts.onload(res);
+            resolve(res);
+          }
         });
       });
       if (this.async) return doDownload();
-      doDownload().then(() => {}, err => void (opts.onerror ? opts.onerror(err) : logging.error(err)));
+      doDownload().catch(err => logging.error(err));
       return;
     }
     assign(opts, {
