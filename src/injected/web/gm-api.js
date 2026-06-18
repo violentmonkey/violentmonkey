@@ -69,26 +69,24 @@ export const GM_API_CTX_GM4ASYNC = {
       onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
       return;
     }
-    const useBrowser = opts.downloadBrowser != null ? opts.downloadBrowser : bridge.gmDownloadBrowser;
-    delete opts.downloadBrowser;
-    if (useBrowser) {
-      const doBrowser = () => new SafePromise((resolve, reject) => {
-        const browserOpts = { url: opts.url, filename: name };
-        if (opts.headers) {
-          browserOpts.headers = Object.entries(opts.headers).map(
-            ([n, v]) => ({ name: n, value: v }),
-          );
-        }
-        if (opts.conflictAction) browserOpts.conflictAction = opts.conflictAction;
-        if (opts.saveAs != null) browserOpts.saveAs = opts.saveAs;
-        if (opts.method) browserOpts.method = opts.method;
-        if (opts.body) browserOpts.body = opts.body;
-        bridge.call('BrowserDownload', browserOpts, null, (res, err) => {
+    const useModeBrowser = opts.downloadModeBrowser != null ? opts.downloadModeBrowser : bridge.gmDownloadModeBrowser;
+    delete opts.downloadModeBrowser;
+    if (useModeBrowser) {
+      const doDownload = () => new SafePromise((resolve, reject) => {
+        bridge.call('DownloadModeBrowser', {
+          url: opts.url,
+          filename: name,
+          headers: opts.headers,
+          saveAs: opts.saveAs,
+          conflictAction: opts.conflictAction,
+          method: opts.method,
+          body: opts.body,
+        }, null, (res, err) => {
           if (err) reject(err); else resolve(res);
         });
       });
-      if (this.async) return doBrowser();
-      doBrowser().then(() => {}, err => void (opts.onerror ? opts.onerror(err) : logging.error(err)));
+      if (this.async) return doDownload();
+      doDownload().then(() => {}, err => void (opts.onerror ? opts.onerror(err) : logging.error(err)));
       return;
     }
     assign(opts, {

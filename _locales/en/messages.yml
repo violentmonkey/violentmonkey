@@ -701,10 +701,10 @@ labelXhrInjectHint:
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
   message: (except incognito and sites with disabled cookies)
-labelGmDownloadBrowser:
+labelGmDownloadModeBrowser:
   description: Option in Advanced settings to use the browser download API for GM_download.
   message: Use browser download API
-labelGmDownloadBrowserHint:
+labelGmDownloadModeBrowserHint:
   description: Tooltip for the browser download option in Advanced settings.
   message: Allows scripts to save files into subfolders inside your downloads
     directory and shows download progress in the browser's download bar.

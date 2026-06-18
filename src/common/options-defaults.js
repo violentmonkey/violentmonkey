@@ -67,7 +67,7 @@ export default {
   defaultInjectInto: AUTO,
   ffInject: true,
   xhrInject: false,
-  gmDownloadBrowser: false,
+  gmDownloadModeBrowser: false,
   filters: {
     /** @type {boolean} */
     showOrder: false,

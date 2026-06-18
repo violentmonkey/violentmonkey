@@ -7,8 +7,18 @@ addPublicCommands({
   DownloadBlob(args) {
     downloadBlob(...args);
   },
-  async BrowserDownload(args) {
-    return browser.downloads.download(args);
+  async DownloadModeBrowser(args) {
+    const browserOpts = { url: args.url, filename: args.filename };
+    if (args.headers) {
+      browserOpts.headers = Object.entries(args.headers).map(
+        ([n, v]) => ({ name: n, value: v }),
+      );
+    }
+    if (args.conflictAction) browserOpts.conflictAction = args.conflictAction;
+    if (args.saveAs != null) browserOpts.saveAs = args.saveAs;
+    if (args.method) browserOpts.method = args.method;
+    if (args.body) browserOpts.body = args.body;
+    return browser.downloads.download(browserOpts);
   },
 });
 

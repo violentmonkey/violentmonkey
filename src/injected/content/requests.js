@@ -82,7 +82,7 @@ addHandlers({
     return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
-  BrowserDownload: REIFY,
+  DownloadModeBrowser: REIFY,
   ParseHTML(args, realm, nodeRet) {
     nodeRet[0] = safeApply(parseFromString, new SafeDOMParser(), args);
   },

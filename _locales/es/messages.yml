@@ -725,10 +725,10 @@ labelXhrInjectHint:
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
   message: (excepto en modo incógnito y en sitios con cookies deshabilitadas)
-labelGmDownloadBrowser:
+labelGmDownloadModeBrowser:
   description: Opción en configuración avanzada para usar la API de descargas del navegador para GM_download.
   message: Usar API de descargas del navegador
-labelGmDownloadBrowserHint:
+labelGmDownloadModeBrowserHint:
   description: Información sobre la opción de descargas del navegador en configuración avanzada.
   message: Permite a los scripts guardar archivos en subcarpetas dentro del
     directorio de descargas y muestra el progreso en la barra de descargas
