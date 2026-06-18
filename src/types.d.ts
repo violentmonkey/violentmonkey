@@ -359,7 +359,7 @@ declare namespace VMInjection {
     };
     ua: VMScriptGMInfoPlatform;
     uad?: true;
-    gmDownloadNative?: boolean;
+    gmDownloadBrowser?: boolean;
   }
   /**
    * Script prepared for injection

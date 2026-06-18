@@ -441,7 +441,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     [MORE]: moreKey,
     [kSessionId]: sessionId,
     [IDS]: allIds,
-    info: { ua, gmDownloadNative: getOption('gmDownloadNative') },
+    info: { ua, gmDownloadBrowser: getOption('gmDownloadBrowser') },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   }, objectPick(env, [
     S_CACHE,
@@ -585,6 +585,7 @@ function prepareScript(script, env) {
     gmi: {
       scriptWillUpdate: shouldUpdate,
       uuid: props.uuid,
+      downloadMode: getOption('gmDownloadBrowser') ? 'browser' : 'native',
     },
     id,
     key: plantKey,

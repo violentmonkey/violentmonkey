@@ -83,9 +83,9 @@
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
         <div class="ml-2c">
-          <tooltip :content="i18n('labelGmDownloadNativeHint')">
-            <setting-check name="gmDownloadNative"
-                           :label="i18n('labelGmDownloadNative')" />
+          <tooltip :content="i18n('labelGmDownloadBrowserHint')">
+            <setting-check name="gmDownloadBrowser"
+                           :label="i18n('labelGmDownloadBrowser')" />
           </tooltip>
         </div>
       </section>
@@ -142,7 +142,7 @@ const items = {
     light: i18n('optionUiThemeLight'),
   },
   xhrInject: value => value,
-  gmDownloadNative: value => value,
+  gmDownloadBrowser: value => value,
 };
 </script>
 

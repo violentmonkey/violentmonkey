@@ -69,26 +69,26 @@ export const GM_API_CTX_GM4ASYNC = {
       onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
       return;
     }
-    const useNative = opts.nativeDownload != null ? opts.nativeDownload : bridge.gmDownloadNative;
-    delete opts.nativeDownload;
-    if (useNative) {
-      const doNative = () => new SafePromise((resolve, reject) => {
-        const nativeOpts = { url: opts.url, filename: name };
+    const useBrowser = opts.downloadBrowser != null ? opts.downloadBrowser : bridge.gmDownloadBrowser;
+    delete opts.downloadBrowser;
+    if (useBrowser) {
+      const doBrowser = () => new SafePromise((resolve, reject) => {
+        const browserOpts = { url: opts.url, filename: name };
         if (opts.headers) {
-          nativeOpts.headers = Object.entries(opts.headers).map(
+          browserOpts.headers = Object.entries(opts.headers).map(
             ([n, v]) => ({ name: n, value: v }),
           );
         }
-        if (opts.conflictAction) nativeOpts.conflictAction = opts.conflictAction;
-        if (opts.saveAs != null) nativeOpts.saveAs = opts.saveAs;
-        if (opts.method) nativeOpts.method = opts.method;
-        if (opts.body) nativeOpts.body = opts.body;
-        bridge.call('NativeDownload', nativeOpts, null, (res, err) => {
+        if (opts.conflictAction) browserOpts.conflictAction = opts.conflictAction;
+        if (opts.saveAs != null) browserOpts.saveAs = opts.saveAs;
+        if (opts.method) browserOpts.method = opts.method;
+        if (opts.body) browserOpts.body = opts.body;
+        bridge.call('BrowserDownload', browserOpts, null, (res, err) => {
           if (err) reject(err); else resolve(res);
         });
       });
-      if (this.async) return doNative();
-      doNative().then(() => {}, err => void (opts.onerror ? opts.onerror(err) : logging.error(err)));
+      if (this.async) return doBrowser();
+      doBrowser().then(() => {}, err => void (opts.onerror ? opts.onerror(err) : logging.error(err)));
       return;
     }
     assign(opts, {

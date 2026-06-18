@@ -7,7 +7,7 @@ addPublicCommands({
   DownloadBlob(args) {
     downloadBlob(...args);
   },
-  async NativeDownload(args) {
+  async BrowserDownload(args) {
     return browser.downloads.download(args);
   },
 });
