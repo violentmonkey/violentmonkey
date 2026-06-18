@@ -18,6 +18,9 @@ addPublicCommands({
     if (args.saveAs != null) browserOpts.saveAs = args.saveAs;
     if (args.method) browserOpts.method = args.method;
     if (args.body) browserOpts.body = args.body;
+    if (!await browser.permissions.contains({ permissions: ['downloads'] })) {
+      throw new Error('Requires the "downloads" permission.');
+    }
     const downloadId = await browser.downloads.download(browserOpts);
     return new Promise((resolve, reject) => {
       const listener = delta => {
