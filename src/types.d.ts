@@ -364,6 +364,7 @@ declare namespace VMInjection {
     };
     ua: VMScriptGMInfoPlatform;
     uad?: true;
+    gmDownloadModeBrowser?: boolean;
   }
   /**
    * Script prepared for injection
@@ -448,23 +449,35 @@ declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string
 declare type VMTopRenderMode = 0 | 1 | 2 | 3 | 4;
 
 declare var __: {
-  CODEMIRROR_THEMES: string;
-  DEBUG: boolean,
-  DEV: boolean,
-  /** An extension context with full access to chrome API i.e. not offscreen, content */
-  EXT: boolean,
-  MV3: boolean;
-  INIT_FUNC_NAME: string;
-  INJECTED: string | false;
-  SW: boolean;
-  SW_CLIENT: boolean;
-  SYNC_DROPBOX_CLIENT_ID: string,
-  SYNC_GOOGLE_DESKTOP_ID: string,
-  SYNC_GOOGLE_DESKTOP_SECRET: string,
-  SYNC_ONEDRIVE_ACCOUNT_TYPE: string,
-  SYNC_ONEDRIVE_CLIENT_ID: string,
-  TEST: boolean,
-  VM_VER: string,
+ CODEMIRROR_THEMES: string;
+ DEBUG: boolean,
+ DEV: boolean,
+ /** An extension context with full access to chrome API i.e. not offscreen, content */
+ EXT: boolean,
+ MV3: boolean;
+ INIT_FUNC_NAME: string;
+ INJECTED: string | false;
+ SW: boolean;
+ SW_CLIENT: boolean;
+ SYNC_DROPBOX_CLIENT_ID: string,
+ SYNC_GOOGLE_DESKTOP_ID: string,
+ SYNC_GOOGLE_DESKTOP_SECRET: string,
+ SYNC_ONEDRIVE_ACCOUNT_TYPE: string,
+ SYNC_ONEDRIVE_CLIENT_ID: string,
+ TEST: boolean,
+ VM_VER: string,
 };
+
+/**
+ * The download mode for the current script: `"native"` or `"browser"`.
+ *
+ * - `"native"` — downloads use XMLHttpRequest.
+ * - `"browser"` — downloads are delegated to the browser's native download manager
+ *   (`browser.downloads.download`), controlled by the "Use browser download API"
+ *   setting in Violentmonkey's Advanced settings.
+ */
+declare interface VMScriptGMInfoObject {
+  downloadMode: 'native' | 'browser';
+}
 
 //#endregion Generic

@@ -190,6 +190,8 @@ function setBaggedScriptValues(bag, id, val) {
   }
 }
 
+
+
 function clearFrameData(tabId, frameId, tabRemoved) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
