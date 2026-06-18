@@ -82,6 +82,12 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
+        <div class="ml-2c">
+          <tooltip :content="i18n('labelGmDownloadNativeHint')">
+            <setting-check name="gmDownloadNative"
+                           :label="i18n('labelGmDownloadNative')" />
+          </tooltip>
+        </div>
       </section>
 
       <section>
@@ -136,6 +142,7 @@ const items = {
     light: i18n('optionUiThemeLight'),
   },
   xhrInject: value => value,
+  gmDownloadNative: value => value,
 };
 </script>
 

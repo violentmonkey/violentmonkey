@@ -43,6 +43,7 @@ permissions:
   - clipboardWrite
   - contextMenus
   - cookies
+  - downloads
 commands:
   _execute_browser_action: {}
   toggleInjection:

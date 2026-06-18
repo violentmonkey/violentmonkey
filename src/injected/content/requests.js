@@ -82,6 +82,7 @@ addHandlers({
     return sendCmd('HttpRequest', msg);
   },
   AbortRequest: true,
+  NativeDownload: true,
   ParseHTML(args, realm, nodeRet) {
     nodeRet[0] = safeApply(parseFromString, new SafeDOMParser(), args);
   },

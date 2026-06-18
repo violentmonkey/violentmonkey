@@ -69,6 +69,28 @@ export const GM_API_CTX_GM4ASYNC = {
       onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
       return;
     }
+    const useNative = opts.nativeDownload != null ? opts.nativeDownload : bridge.gmDownloadNative;
+    delete opts.nativeDownload;
+    if (useNative) {
+      const doNative = () => new SafePromise((resolve, reject) => {
+        const nativeOpts = { url: opts.url, filename: name };
+        if (opts.headers) {
+          nativeOpts.headers = Object.entries(opts.headers).map(
+            ([n, v]) => ({ name: n, value: v }),
+          );
+        }
+        if (opts.conflictAction) nativeOpts.conflictAction = opts.conflictAction;
+        if (opts.saveAs != null) nativeOpts.saveAs = opts.saveAs;
+        if (opts.method) nativeOpts.method = opts.method;
+        if (opts.body) nativeOpts.body = opts.body;
+        bridge.call('NativeDownload', nativeOpts, null, (res, err) => {
+          if (err) reject(err); else resolve(res);
+        });
+      });
+      if (this.async) return doNative();
+      doNative().then(() => {}, err => void (opts.onerror ? opts.onerror(err) : logging.error(err)));
+      return;
+    }
     assign(opts, {
       [kResponseType]: 'blob',
       data: null,
