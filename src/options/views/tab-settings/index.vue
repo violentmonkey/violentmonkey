@@ -172,7 +172,7 @@ const permGranted = ref(false);
 async function requestDlPerm() {
   try {
     permGranted.value = await browser.permissions.request({ permissions: ['downloads'] });
-  } catch {}
+  } catch {} // eslint-disable-line no-empty
 }
 
 const $el = ref();
