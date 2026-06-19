@@ -69,37 +69,12 @@ export const GM_API_CTX_GM4ASYNC = {
       onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
       return;
     }
-    const useModeBrowser = bridge.gmDownloadModeBrowser;
-    if (useModeBrowser) {
-      const doDownload = () => new SafePromise((resolve, reject) => {
-        bridge.call('DownloadModeBrowser', {
-          url: opts.url,
-          filename: name,
-          headers: opts.headers,
-          saveAs: opts.saveAs,
-          conflictAction: opts.conflictAction,
-          method: opts.method,
-          body: opts.body,
-        }, null, (res, err) => {
-          if (err) {
-            if (opts.onerror) opts.onerror(err);
-            reject(err);
-          } else {
-            if (opts.onload) opts.onload(res);
-            resolve(res);
-          }
-        });
-      });
-      if (this.async) return doDownload();
-      doDownload().catch(err => logging.error(err));
-      return;
-    }
     assign(opts, {
       [kResponseType]: 'blob',
-      data: null,
-      method: 'GET',
       overrideMimeType: 'application/octet-stream',
     });
+    if (opts.data == null) opts.data = null;
+    if (opts.method == null) opts.method = 'GET';
     return onRequestCreate(opts, this, name);
   },
 };
