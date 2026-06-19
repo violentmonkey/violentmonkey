@@ -170,9 +170,7 @@ import browser from '@/common/browser';
 const permGranted = ref(false);
 
 async function requestDlPerm() {
-  try {
-    permGranted.value = await browser.permissions.request({ permissions: ['downloads'] });
-  } catch {} // eslint-disable-line no-empty
+  permGranted.value = await browser.permissions.request({ permissions: ['downloads'] });
 }
 
 const $el = ref();
