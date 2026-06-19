@@ -7,35 +7,6 @@ addPublicCommands({
   DownloadBlob(args) {
     downloadBlob(...args);
   },
-  async DownloadModeBrowser(args) {
-    const browserOpts = { url: args.url, filename: args.filename };
-    if (args.headers) {
-      browserOpts.headers = Object.entries(args.headers).map(
-        ([n, v]) => ({ name: n, value: v }),
-      );
-    }
-    if (args.conflictAction) browserOpts.conflictAction = args.conflictAction;
-    if (args.saveAs != null) browserOpts.saveAs = args.saveAs;
-    if (args.method) browserOpts.method = args.method;
-    if (args.body) browserOpts.body = args.body;
-    if (!await browser.permissions.contains({ permissions: ['downloads'] })) {
-      throw new Error('Requires the "downloads" permission.');
-    }
-    const downloadId = await browser.downloads.download(browserOpts);
-    return new Promise((resolve, reject) => {
-      const listener = delta => {
-        if (delta.id !== downloadId) return;
-        if (delta.state && delta.state.current === 'complete') {
-          browser.downloads.onChanged.removeListener(listener);
-          resolve(downloadId);
-        } else if (delta.state && delta.state.current === 'interrupted') {
-          browser.downloads.onChanged.removeListener(listener);
-          reject(new Error(delta.error ? delta.error.current : 'Download interrupted'));
-        }
-      };
-      browser.downloads.onChanged.addListener(listener);
-    });
-  },
 });
 
 /**
