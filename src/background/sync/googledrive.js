@@ -11,6 +11,12 @@ const config = {
   // The URL will be intercepted and blocked so the port doesn't matter.
   redirect_uri: 'http://127.0.0.1:45678/',
   scope: 'https://www.googleapis.com/auth/drive.appdata',
+  provider: {
+    google: {
+      accessType: 'offline',
+      prompt: 'consent',
+    },
+  },
 };
 
 if (config.client_id && config.client_secret) {

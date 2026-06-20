@@ -55,8 +55,8 @@ importers:
         specifier: ^0.1.7
         version: 0.1.7
       '@usync/oauth2':
-        specifier: ^0.1.4
-        version: 0.1.4
+        specifier: ^0.1.6
+        version: 0.1.6
       '@usync/sync':
         specifier: ^0.1.1
         version: 0.1.1
@@ -2017,8 +2017,8 @@ packages:
   '@usync/drive@0.1.7':
     resolution: {integrity: sha512-mLtHc+0o2HFTB648GSXuLJDNF3Xd783N/mjV931zAXA8K6OhPN9/Nx6THJRmIjt3RCYqSzKDVovgQnf1CHCa4g==}
 
-  '@usync/oauth2@0.1.4':
-    resolution: {integrity: sha512-XVDOL2SM1jUtn2dEmhvwXbMETk7EkRHW/kC8J6uRruh9wYHgARHqgVr3t9muaEyBdsC9zHVFm0/wHqLX+Qsl7Q==}
+  '@usync/oauth2@0.1.6':
+    resolution: {integrity: sha512-n7GmXTn2yvapSVrqIvObdUbtyZl/ZIKQKhlzFjfw36F6Eax1lRSDYyZEzV2hsN4XbBZ0DjGjosS1gTfI9wXY8Q==}
 
   '@usync/sync@0.1.1':
     resolution: {integrity: sha512-tlMEj9AUTfEzkvRprPLrGaC82l2PUheAEMFDs0izUO5zPCo/IUVHCsQySp2sBskroqRYyAIXxEdTtoVA4YLNbg==}
@@ -7844,9 +7844,9 @@ snapshots:
 
   '@usync/drive@0.1.7':
     dependencies:
-      '@usync/oauth2': 0.1.4
+      '@usync/oauth2': 0.1.6
 
-  '@usync/oauth2@0.1.4':
+  '@usync/oauth2@0.1.6':
     dependencies:
       nanoid: 5.1.11
 
