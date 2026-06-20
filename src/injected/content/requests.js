@@ -16,10 +16,8 @@ let U8_set;
 let safeFetch;
 let navigator, getUAData, getUAProps, getHighEntropyValues;
 let SafeDOMParser, parseFromString;
-let gmDownloadModeBrowser;
 
 onScripts.push(data => {
-  gmDownloadModeBrowser = data.info?.gmDownloadModeBrowser;
   safeFetch = fetch;
   BlobProto = SafeBlob[PROTO];
   SafeFileReader = FileReader;
@@ -68,11 +66,7 @@ addHandlers({
     const sch = url::slice(0, 5);
     const isDataUri = sch === 'data:';
     if (isDataUri || sch === 'blob:') {
-      // Route data URL downloads through the background when browser download mode is on.
-      // blob URLs do not go through the browser download API regardless of settings due to possible scoping issues.
-      if (!(isDataUri && msg[kFileName] && gmDownloadModeBrowser)) {
-        return requestVirtualUrl(msg, url, isDataUri, realm);
-      }
+      return requestVirtualUrl(msg, url, isDataUri, realm);
     }
     requests[msg.id] = {
       __proto__: null,
