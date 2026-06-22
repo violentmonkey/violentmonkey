@@ -441,7 +441,7 @@ labelBlacklist:
   message: Liste noire
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: How
 labelContributors:
   description: Label for link to contributors.
   message: Contributors
@@ -521,7 +521,11 @@ labelHttpOnlyCookie:
   message: ''
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    Quand cette option est activée, les scripts peuvent lire et écrire dans les
+    cookies avec la mention HTTP-only. Cela permet aux scripts d'accéder aux
+    cookies qui n'ont pas été rendus accessibles. via Javascript. À utiliser
+    avec précaution, car cette option peut causer des risques de sécurité.
 labelIconURL:
   description: Label for the input.
   message: 'URL de l''icône :'
@@ -582,7 +586,7 @@ labelNotifyUpdatesGlobal:
     l'éditeur)
 labelPageMenuCommands:
   description: Checkbox item in page context menu and option to enable script commands.
-  message: ''
+  message: Montrer les commandes de script dans la page de menu
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: Politique de confidentialité
@@ -672,7 +676,7 @@ labelSyncS3Prefix:
   message: ''
 labelSyncS3Region:
   description: Label for S3 region input.
-  message: ''
+  message: 'Région :'
 labelSyncS3SecretAccessKey:
   description: Label for S3 secret access key input.
   message: ''
@@ -742,7 +746,7 @@ learnInjectionMode:
   message: En savoir plus sur les modes d’injection
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: Gérer les fichiers distants
 menuCommands:
   description: Menu item to list script commands.
   message: Commandes de script
