@@ -735,7 +735,7 @@ learnInjectionMode:
   message: Mehr Informationen zu den Injektionsmodi
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: Remote-Dateien verwalten
 menuCommands:
   description: Menu item to list script commands.
   message: Skriptbefehle

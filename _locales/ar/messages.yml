@@ -719,7 +719,7 @@ learnInjectionMode:
   message: معرفة المزيد عن أنماط الحقن.
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: إدارة الملفات عن بعد
 menuCommands:
   description: Menu item to list script commands.
   message: ''
