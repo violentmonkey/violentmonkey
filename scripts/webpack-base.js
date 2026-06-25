@@ -221,11 +221,7 @@ const getBaseConfig = () => ({
         ...splitVendor('codemirror'),
       },
     },
-    minimizer: isProd ? [
-      new CssMinimizerPlugin(),
-      new TerserPlugin(MIN_OPTS_PUBLIC),
-      new TerserPlugin(MIN_OPTS_MAIN),
-    ] : [],
+    minimizer: [],
   },
   plugins: [
     !process.env.GITHUB_ACTIONS && new progressBarPlugin({
