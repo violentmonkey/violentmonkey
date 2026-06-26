@@ -5,9 +5,9 @@ on:
   push:
     branches: [master]
     tags-ignore:
-      - 'v*' # version-tagged commits are releases which have their own workflow
+      - 'v*'
     paths-ignore:
-      - '.github/**' # this ci.yml is also excluded so you need to re-run it explicitly if necessary
+      - '.github/**'
       - src/types.d.ts
       - LICENSE
       - README.md
@@ -20,9 +20,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1 # v1 keeps tags
+        uses: actions/checkout@v1
         with:
-          fetch-depth: 100 # for revision index in version and the `has-changed-path` action
+          fetch-depth: 100
 
       - name: Apply patches
         run: python3 apply_patches_addmatch.py
@@ -32,9 +32,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
-          
-      - uses: pnpm/action-setup@v6
-      
+
       - name: Install
         run: pnpm i
       - name: Test
@@ -49,13 +47,52 @@ jobs:
 
       - name: Get version and SHA
         run: node scripts/action-helper.js ci
+
+      - name: Resolve artifact name
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          IS_BETA=$(node -p "Boolean(require('./package.json').beta)")
+          echo "PKG_VERSION=${VERSION}" >> $GITHUB_ENV
+          if [ "$IS_BETA" = "true" ]; then
+            echo "ARTIFACT_NAME=ViolentMonkey_AddDomain-V${VERSION}-beta" >> $GITHUB_ENV
+            echo "RELEASE_TAG=V${VERSION}-beta"                            >> $GITHUB_ENV
+            echo "RELEASE_NAME=ViolentMonkey AddDomain V${VERSION} (Beta)" >> $GITHUB_ENV
+            echo "IS_BETA=true"                                            >> $GITHUB_ENV
+          else
+            echo "ARTIFACT_NAME=ViolentMonkey_AddDomain-V${VERSION}"       >> $GITHUB_ENV
+            echo "RELEASE_TAG=V${VERSION}"                                 >> $GITHUB_ENV
+            echo "RELEASE_NAME=ViolentMonkey AddDomain V${VERSION}"        >> $GITHUB_ENV
+            echo "IS_BETA=false"                                           >> $GITHUB_ENV
+          fi
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         continue-on-error: true
         with:
-          name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
+          name: '${{ env.ARTIFACT_NAME }}'
           path: 'dist/*'
           if-no-files-found: error
+
+      - name: Create / Update Release
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: '${{ env.RELEASE_TAG }}'
+          name: '${{ env.RELEASE_NAME }}'
+          prerelease: ${{ env.IS_BETA == 'true' }}
+          body: |
+            Patched Violentmonkey build — **Add domain to @match** feature.
+
+            Based on upstream Violentmonkey v${{ env.PKG_VERSION }}${{ env.IS_BETA == 'true' && ' (beta)' || '' }}.
+
+            ### What's included
+            - Popup "+" button to add current tab domain to a script's `@match`
+            - Dashboard domain-add panel with "Current tab" pre-fill
+            - Shorthand expansion on save (`example.com,xyz.*` → full `@match` lines)
+            - `anyTld` wildcard TLD support
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload to Transifex - check src
         if: github.event_name == 'push' || github.event.pull_request.merged == true
