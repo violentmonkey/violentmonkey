@@ -77,7 +77,7 @@ jobs:
 
       - name: Package dist as ZIP
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        run: zip -r "$ARTIFACT_NAME.zip" dist/
+        run: cd dist && zip -r "../$ARTIFACT_NAME.zip" . && cd ..
 
       - name: Create / Update Release
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
