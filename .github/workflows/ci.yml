@@ -75,30 +75,49 @@ jobs:
           path: 'dist/*'
           if-no-files-found: error
 
-      - name: Package dist as ZIP for release
+      - name: Package dist as ZIP
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: zip -r "${{ env.ARTIFACT_NAME }}.zip" dist/
 
-      - name: Create / Update Release
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      - name: Release (stable)
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.IS_BETA == 'false'
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: '${{ env.RELEASE_TAG }}'
-          name: '${{ env.RELEASE_NAME }}'
-          prerelease: ${{ env.IS_BETA == 'true' }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_NAME }}
+          prerelease: false
+          files: ${{ env.ARTIFACT_NAME }}.zip
           body: |
             Patched Violentmonkey build — **Add domain to @match** feature.
+            Based on upstream Violentmonkey v${{ env.PKG_VERSION }}.
 
-            Based on upstream Violentmonkey v${{ env.PKG_VERSION }}${{ env.IS_BETA == 'true' && ' (beta)' || '' }}.
-
-            ### What's included
-            - Popup "+" button to add current tab domain to a script's `@match`
+            **What's included**
+            - Popup "+" button — add current tab domain to any script's `@match`
             - Dashboard domain-add panel with "Current tab" pre-fill
             - Shorthand expansion on save (`example.com,xyz.*` → full `@match` lines)
             - `anyTld` wildcard TLD support
-          files: '${{ env.ARTIFACT_NAME }}.zip'
+
+      - name: Release (beta)
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && env.IS_BETA == 'true'
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_NAME }}
+          prerelease: true
+          files: ${{ env.ARTIFACT_NAME }}.zip
+          body: |
+            Beta patched Violentmonkey build — **Add domain to @match** feature.
+            Based on upstream Violentmonkey v${{ env.PKG_VERSION }} (beta).
+
+            **What's included**
+            - Popup "+" button — add current tab domain to any script's `@match`
+            - Dashboard domain-add panel with "Current tab" pre-fill
+            - Shorthand expansion on save (`example.com,xyz.*` → full `@match` lines)
+            - `anyTld` wildcard TLD support
 
       - name: Upload to Transifex - check src
         if: github.event_name == 'push' || github.event.pull_request.merged == true
