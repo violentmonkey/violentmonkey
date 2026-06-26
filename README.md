@@ -43,6 +43,12 @@ You no longer need to write out full `@match` boilerplate. Type shorthand — it
 
 ---
 
+ScreenShots
+<img width="702" height="1560" alt="Screenshot_20260626-151626_Spark Launcher" src="https://github.com/user-attachments/assets/d62fff25-34c4-43f9-ad6a-747c1446253e" />
+<img width="702" height="1560" alt="Screenshot_20260626-153758_Spark Launcher" src="https://github.com/user-attachments/assets/43a6e2f1-449d-401c-8e6a-c4f11b890cb2" />
+<img width="702" height="1560" alt="Screenshot_20260626-153833_Spark Launcher" src="https://github.com/user-attachments/assets/053938d8-c11f-4fd8-adcd-f7b83ae78d6c" />
+<img width="702" height="1560" alt="Screenshot_20260626-153840_Spark Launcher" src="https://github.com/user-attachments/assets/8f332b42-0ec3-4bf7-b4c9-c652060130cd" />
+
 ## Installation
 
 ### Download a pre-built build
