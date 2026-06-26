@@ -24,12 +24,17 @@ jobs:
         with:
           fetch-depth: 100 # for revision index in version and the `has-changed-path` action
 
+      - name: Apply patches
+        run: python3 apply_patches_addmatch.py
+
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
-
+          
+      - uses: pnpm/action-setup@v6
+      
       - name: Install
         run: pnpm i
       - name: Test
