@@ -1,0 +1,119 @@
+name: Build ViolentMonkey Fork
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    tags-ignore:
+      - 'v*'
+    paths-ignore:
+      - '.github/**'
+      - src/types.d.ts
+      - LICENSE
+      - README.md
+  pull_request:
+    branches: [master]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 100
+
+      - name: Apply patches
+        run: python3 apply_patches_addmatch.py
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: 'package.json'
+
+      - name: Install
+        run: pnpm i
+      - name: Test
+        run: pnpm run ci
+      - name: Build
+        env:
+          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
+          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
+          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+        run: pnpm build
+
+      - name: Get version and SHA
+        run: node scripts/action-helper.js ci
+
+      - name: Resolve artifact name
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          IS_BETA=$(node -p "Boolean(require('./package.json').beta)")
+          echo "PKG_VERSION=${VERSION}" >> $GITHUB_ENV
+          if [ "$IS_BETA" = "true" ]; then
+            echo "ARTIFACT_NAME=ViolentMonkey_AddDomain-V${VERSION}-beta" >> $GITHUB_ENV
+            echo "RELEASE_TAG=V${VERSION}-beta"                            >> $GITHUB_ENV
+            echo "RELEASE_NAME=ViolentMonkey AddDomain V${VERSION} (Beta)" >> $GITHUB_ENV
+            echo "IS_BETA=true"                                            >> $GITHUB_ENV
+          else
+            echo "ARTIFACT_NAME=ViolentMonkey_AddDomain-V${VERSION}"       >> $GITHUB_ENV
+            echo "RELEASE_TAG=V${VERSION}"                                 >> $GITHUB_ENV
+            echo "RELEASE_NAME=ViolentMonkey AddDomain V${VERSION}"        >> $GITHUB_ENV
+            echo "IS_BETA=false"                                           >> $GITHUB_ENV
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        continue-on-error: true
+        with:
+          name: '${{ env.ARTIFACT_NAME }}'
+          path: 'dist/*'
+          if-no-files-found: error
+
+      - name: Package dist as ZIP
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: zip -r "$ARTIFACT_NAME.zip" dist/
+
+      - name: Create / Update Release
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PRERELEASE_FLAG=""
+          [ "$IS_BETA" = "true" ] && PRERELEASE_FLAG="--prerelease"
+
+          NOTES="Patched Violentmonkey build — Add domain to @match feature.
+          Based on upstream Violentmonkey v${PKG_VERSION}.
+
+          What's included:
+          - Popup + button to add current tab domain to a script's @match
+          - Dashboard domain-add panel with Current tab pre-fill
+          - Shorthand expansion on save (example.com,xyz.* to full @match lines)
+          - anyTld wildcard TLD support"
+
+          # Remove stale release+tag if they exist
+          gh release delete "$RELEASE_TAG" --cleanup-tag --yes 2>/dev/null || true
+
+          # Create fresh release with ZIP asset
+          gh release create "$RELEASE_TAG" \
+            --title "$RELEASE_NAME" \
+            --notes "$NOTES" \
+            $PRERELEASE_FLAG \
+            "$ARTIFACT_NAME.zip"
+
+      - name: Upload to Transifex - check src
+        if: github.event_name == 'push' || github.event.pull_request.merged == true
+        uses: marceloprado/has-changed-path@v1.0.1
+        id: changed-path-src
+        with:
+          paths: src
+      - name: Upload to Transifex
+        if: steps.changed-path-src.outputs.changed == 'true'
+        run: node scripts/transifex.mjs update
+        env:
+          TRANSIFEX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
