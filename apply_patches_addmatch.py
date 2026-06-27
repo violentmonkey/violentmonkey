@@ -16,6 +16,32 @@ from pathlib import Path
 # Each patch: (file, old, new). `old` must appear EXACTLY once in `file`.
 PATCHES = [
     (
+        'src/common/ui/index.js',
+        r"""import { createApp, h } from 'vue';""",
+        r"""import { createApp, h, reactive } from 'vue';""",
+    ),
+    (
+        'src/common/ui/index.js',
+        r"""export function showMessage(message) {
+  const modal = Modal.show(() => h(Message, {""",
+        r"""export function showMessage(message) {
+  message = reactive(message);
+  const modal = Modal.show(() => h(Message, {""",
+    ),
+    (
+        'src/common/ui/message.vue',
+        r"""    const onButtonClick = onClick => {
+      if (onClick) {
+        if (onClick(props.message.input) !== false) dismiss();
+      }
+    };""",
+        r"""    const onButtonClick = async onClick => {
+      if (onClick) {
+        if ((await onClick(props.message.input)) !== false) dismiss();
+      }
+    };""",
+    ),
+    (
         'src/background/utils/script.js',
         r"""function checkMetaItemErrors(parts, index, errors) {""",
         r"""/** Standard alignment used by our default script template, e.g. `// @match       `. */
@@ -434,6 +460,16 @@ async function onAddMatchSave(item, btn) {
     ),
     (
         'src/options/views/script-item.vue',
+        r"""import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';""",
+        r"""import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation, showMessage } from '@/common/ui';""",
+    ),
+    (
+        'src/options/views/script-item.vue',
+        r"""import { computed, ref, watch } from 'vue';""",
+        r"""import { computed, reactive, ref, watch } from 'vue';""",
+    ),
+    (
+        'src/options/views/script-item.vue',
         r"""const onToggle = () => emitScript('toggle');
 const onUpdate = async evt => {""",
         r"""const onToggle = () => emitScript('toggle');
@@ -442,6 +478,10 @@ const matchInput = ref('');
 const matchNote = ref('');
 const tabInfo = ref({});
 async function onAddMatchToggle() {
+  if (props.viewTable) {
+    onAddMatchModal();
+    return;
+  }
   addMatchOpen.value = !addMatchOpen.value;
   if (addMatchOpen.value) {
     matchInput.value = '';
@@ -452,6 +492,46 @@ async function onAddMatchToggle() {
       chips: { domain: res.domain, sub: `*.${res.domain}`, tld: res.anyTld },
     } : {};
   }
+}
+async function onAddMatchModal() {
+  const id = props.script.props.id;
+  const initial = await sendCmdDirectly('GetLastPopupDomain');
+  const message = reactive({
+    text: `${cache.value.name}\n\n${i18n('menuAddMatchModal')}`,
+    input: initial?.domain || '',
+    buttons: [
+      {
+        text: i18n('buttonCurrentTab'),
+        async onClick() {
+          const res = await sendCmdDirectly('GetLastPopupDomain');
+          message.input = res?.domain || '';
+          return false;
+        },
+      },
+      {
+        text: i18n('buttonOK'),
+        async onClick(val) {
+          const pattern = (val || '').trim();
+          if (!pattern) return false;
+          const res = await sendCmdDirectly('AddScriptMatch', { id, pattern });
+          if (res.duplicate) {
+            showMessage({ text: i18n('msgMatchExists') });
+            return false;
+          }
+          return true;
+        },
+      },
+      {
+        text: i18n('buttonClear'),
+        onClick() {
+          message.input = '';
+          return false;
+        },
+      },
+      { text: i18n('buttonCancel'), onClick: () => true },
+    ],
+  });
+  showMessage(message);
 }
 const onAddMatchCurrentTab = () => {
   if (tabInfo.value.domain) matchInput.value = tabInfo.value.domain;
@@ -590,6 +670,20 @@ menuAddMatchHint:
 menuCommands:
   description: Menu item to list script commands.
   message: Script commands""",
+    ),
+    (
+        '_locales/en/messages.yml',
+        r"""menuAddMatch:
+  description: Button/tooltip to add a domain to a script's @match lines.
+  message: Add domain to @match
+menuAddMatchHint:""",
+        r"""menuAddMatch:
+  description: Button/tooltip to add a domain to a script's @match lines.
+  message: Add domain to @match
+menuAddMatchModal:
+  description: Description line shown in the table-view "add domain" modal, under the script name.
+  message: Add a domain to @match...
+menuAddMatchHint:""",
     ),
     (
         '_locales/en/messages.yml',
