@@ -87,14 +87,17 @@ jobs:
           PRERELEASE_FLAG=""
           [ "$IS_BETA" = "true" ] && PRERELEASE_FLAG="--prerelease"
 
-          NOTES="Patched Violentmonkey build — Add domain to @match feature.
+          NOTES="Patched Violentmonkey build — Add domain to \`@match\` feature.
           Based on upstream Violentmonkey v${PKG_VERSION}.
 
           What's included:
-          - Popup + button to add current tab domain to a script's @match
+          - Popup + button to add current tab domain to a script's \`@match\`
           - Dashboard domain-add panel with Current tab pre-fill
-          - Shorthand expansion on save (example.com,xyz.* to full @match lines)
-          - anyTld wildcard TLD support"
+          - Shorthand expansion on save (example.com,xyz.* to full \`@match\` lines)
+          - anyTld wildcard TLD support
+          - No Code Minification
+
+          By @BlazeFTL"
 
           # Remove stale release+tag if they exist
           gh release delete "$RELEASE_TAG" --cleanup-tag --yes 2>/dev/null || true
