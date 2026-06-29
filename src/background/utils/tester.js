@@ -2,7 +2,11 @@
 import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
 import { ERR_BAD_PATTERN, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
-import { getPublicSuffix } from '@/common/tld';
+// #!if MV3
+import * as tldMV3 from '@/common/tld-mv3';
+// #!else
+import * as tld from '@/common/tld';
+// #!endif
 import { hookOptionsInit } from './options';
 import storage from './storage';
 
@@ -283,7 +287,7 @@ function matchTld(tstr) {
   const matches = tstr.match(this);
   const suffix = matches?.[1]?.slice(1).toLowerCase();
   // Must return a proper boolean
-  return !!suffix && getPublicSuffix(suffix) === suffix;
+  return !!suffix && (__.MV3 ? tldMV3 : tld).getPublicSuffix(suffix) === suffix;
 }
 
 function hostMatcher(rule) {
@@ -329,7 +333,7 @@ function CreateBlacklist() {
   function reset(value) {
     const errors = [];
     testerBatch(true);
-    if (process.env.DEBUG) {
+    if (__.DEBUG) {
       console.info('Reset blacklist:', value);
     }
     // XXX compatible with {Array} list in v2.6.1-

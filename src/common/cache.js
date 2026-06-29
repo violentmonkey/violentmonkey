@@ -19,7 +19,7 @@ export default function initCache({
   const exports = {
     batch, get, some, pop, put, del, has, hit, destroy,
   };
-  if (process.env.DEV) Object.defineProperty(exports, 'data', { get: () => cache });
+  if (__.DEV) Object.defineProperty(exports, 'data', { get: () => cache });
   return exports;
   function batch(enable) {
     batchStarted = enable;

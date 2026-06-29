@@ -30,7 +30,7 @@ export const bindEvents = (srcId, destId, bridge) => {
   let incomingNodeEvent;
   window::on(srcId, e => {
     e::stopImmediatePropagation();
-    if (process.env.DEBUG) {
+    if (__.DEBUG) {
       console.info(`[bridge.${bridge[IDS] ? 'host' : 'guest.web'}] received`,
         incomingNodeEvent ? e::getRelatedTarget() : e::getDetail());
     }

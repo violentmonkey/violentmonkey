@@ -445,4 +445,21 @@ declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string
  */
 declare type VMTopRenderMode = 0 | 1 | 2 | 3 | 4;
 
+declare var __: {
+  CODEMIRROR_THEMES: string;
+  DEBUG: boolean,
+  DEV: boolean,
+  MV3: boolean;
+  INIT_FUNC_NAME: string;
+  INJECTED: string | false;
+  SW: boolean;
+  SYNC_DROPBOX_CLIENT_ID: string,
+  SYNC_GOOGLE_DESKTOP_ID: string,
+  SYNC_GOOGLE_DESKTOP_SECRET: string,
+  SYNC_ONEDRIVE_ACCOUNT_TYPE: string,
+  SYNC_ONEDRIVE_CLIENT_ID: string,
+  TEST: boolean,
+  VM_VER: string,
+};
+
 //#endregion Generic

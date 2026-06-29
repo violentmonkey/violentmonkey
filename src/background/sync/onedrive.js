@@ -6,12 +6,12 @@ import { createSyncService, register } from './sync-engine';
 // - Browser extensions cannot use the native app authorization flow due to Microsoft's restrictions.
 
 const config = {
-  client_id: process.env.SYNC_ONEDRIVE_CLIENT_ID,
+  client_id: __.SYNC_ONEDRIVE_CLIENT_ID,
   redirect_uri: VM_HOME + 'auth_onedrive.html',
   scope: 'openid profile Files.ReadWrite.AppFolder offline_access',
   provider: {
     microsoft: {
-      accountType: process.env.SYNC_ONEDRIVE_ACCOUNT_TYPE || 'consumers',
+      accountType: __.SYNC_ONEDRIVE_ACCOUNT_TYPE || 'consumers',
     },
   },
 };

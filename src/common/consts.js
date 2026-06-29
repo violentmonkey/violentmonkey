@@ -26,7 +26,7 @@ export const NEWLINE_END_RE = /\n((?!\n)\s)*$/;
 export const WATCH_STORAGE = 'watchStorage';
 // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*
 // to prevent exposing them to userscripts with `@inject-into content`
-export const browser = process.env.IS_INJECTED !== 'injected-web' && global.browser;
+export const browser = __.INJECTED !== 'injected-web' && global.browser;
 
 // setTimeout truncates the delay to a 32-bit signed integer so the max delay is ~24 days
 export const TIMEOUT_MAX = 0x7FFF_FFFF;
@@ -58,7 +58,7 @@ export const GLOB_ALL = '*://*/*';
 export const FILE_GLOB_ALL = 'file://*/*';
 export const XHR_COOKIE_RE = /:\W+([-\w]+)/; // extracts ://id in Chrome, ://{id} in Firefox
 /** @type {(str: string, opts?: {}) => Uint8Array} */
-export const U8_fromBase64 = process.env.IS_INJECTED !== 'injected-web' && Uint8Array.fromBase64;
+export const U8_fromBase64 = __.INJECTED !== 'injected-web' && Uint8Array.fromBase64;
 export const UPLOAD = 'upload';
 export const GM_API_NAMES = [
   'GM',

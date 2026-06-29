@@ -108,7 +108,7 @@ addBackgroundHandlers({
     const { id, data } = msg;
     const req = requests[id];
     if (!req) {
-      if (process.env.DEV) console.warn('[HttpRequested][content]: no request for id', id);
+      if (__.DEV) console.warn('[HttpRequested][content]: no request for id', id);
       return;
     }
     if (hasOwnProperty(msg, 'chunk')) {

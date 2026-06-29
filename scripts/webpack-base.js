@@ -7,7 +7,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const deepmerge = require('deepmerge');
 const GroupAssetsPlugin = require('./webpack-group-assets-plugin');
-const { alias, extensions, isProd } = require('./common');
+const { alias, extensions, isProd, MV3 } = require('./common');
 
 const defaultHtmlOptions = {
   minify: isProd && {
@@ -53,11 +53,11 @@ const MIN_OPTS_MAIN = isProd && deepmerge.all([{}, MIN_OPTS, {
 const nodeModules = resolve('node_modules');
 
 const pages = [
-  'background',
+  !MV3 && 'background',
   'confirm',
   'options',
   'popup',
-];
+].filter(Boolean);
 const createHtmlPage = key => new HtmlWebpackPlugin({
   ...defaultHtmlOptions,
   filename: `${key}/index.html`,
@@ -113,16 +113,22 @@ const styleOptions = {
 const postcssLoader = {
   loader: 'postcss-loader',
 };
-
-const getBaseConfig = () => ({
+const getBaseConfig = (page, bare, vars) => ({
   mode: isProd ? 'production' : 'development',
   target: 'web', // required by live reloading
-  devtool: isProd ? false : 'inline-source-map',
+  devtool: isProd ? false : page.startsWith('injected') ? 'inline-source-map' : 'source-map',
+  experiments: bare ? {
+    outputModule: true,
+  } : {},
   output: {
     path: resolve('dist'),
     publicPath: '/',
     filename: '[name].js',
     hashFunction: 'xxhash64',
+    ...bare && {
+      module: true,
+      library: { type: 'modern-module' },
+    }
   },
   node: {
     global: false,
@@ -140,9 +146,11 @@ const getBaseConfig = () => ({
       // JS/TS
       {
         test: /\.m?[jt]sx?$/,
-        use: 'babel-loader',
-        exclude: file => /node_modules/.test(file)
-          && !/vueleton|@vue[/\\]shared|@usync/.test(file),
+        use: [
+          'babel-loader',
+          { loader: 'webpack-preprocessor-loader', options: { directives: vars, params: vars } },
+        ],
+        exclude: file => /node_modules/.test(file) && !/vueleton|@vue[/\\]shared|@usync/.test(file),
       },
       // CSS
       {
@@ -202,7 +210,7 @@ const getBaseConfig = () => ({
   },
   optimization: {
     runtimeChunk: false,
-    splitChunks: {
+    splitChunks: !bare && !page && {
       cacheGroups: {
         'common-ui': {
           name: 'common-ui',
@@ -215,35 +223,33 @@ const getBaseConfig = () => ({
           ].map(re => re.source || re).join('|').replace(/\\?\//g, '[/\\\\]')),
           chunks: c => ![
             'background/index', // only 4kB of common code
-            'injected',
-            'injected-web',
           ].includes(c.name),
         },
         ...splitVendor('codemirror'),
       },
     },
     minimizer: isProd ? [
-      new CssMinimizerPlugin(),
+      !page && new CssMinimizerPlugin(),
       new TerserPlugin(MIN_OPTS_PUBLIC),
       new TerserPlugin(MIN_OPTS_MAIN),
-    ] : [],
+    ].filter(Boolean) : [],
   },
   plugins: [
     !process.env.GITHUB_ACTIONS && new progressBarPlugin({
       format: '[:bar] :percent (:elapsed seconds), :msg',
       summary: false,
     }),
-    new VueLoaderPlugin(),
-    new GroupAssetsPlugin(),
-    ...styleOptions.extract ? [new MiniCssExtractPlugin({
+    !page && new VueLoaderPlugin(),
+    !page && new GroupAssetsPlugin(),
+    !page && styleOptions.extract && new MiniCssExtractPlugin({
       filename: '[name].css',
-    })] : [],
-    require('unplugin-icons/webpack')(),
+    }),
+    !page && require('unplugin-icons/webpack')(),
   ].filter(Boolean),
 });
 
-const getPageConfig = () => {
-  const config = getBaseConfig();
+const getPageConfig = (...args) => {
+  const config = getBaseConfig(...args);
   config.entry = Object.fromEntries(pages.map(name => [`${name}/index`, `./src/${name}`]));
   config.plugins = [
     ...config.plugins,

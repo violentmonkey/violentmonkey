@@ -2,7 +2,7 @@ import { VM_HOME } from '@/common/consts';
 import { createSyncService, register } from './sync-engine';
 
 const config = {
-  client_id: process.env.SYNC_DROPBOX_CLIENT_ID,
+  client_id: __.SYNC_DROPBOX_CLIENT_ID,
   redirect_uri: VM_HOME + 'auth_dropbox.html',
 };
 

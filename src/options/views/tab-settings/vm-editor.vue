@@ -32,7 +32,7 @@
 <script>
 const keyThemeCSS = 'editorTheme';
 const keyThemeNAME = 'editorThemeName';
-const THEMES = process.env.CODEMIRROR_THEMES;
+const THEMES = __.CODEMIRROR_THEMES;
 const gh = 'github.com';
 const ghREPO = 'codemirror/CodeMirror';
 const ghBRANCH = 'master';

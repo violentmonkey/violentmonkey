@@ -96,7 +96,7 @@ const resolveDataCodeStr = `(${(global, key, data) => {
   // Using `global` and `key` as parameters because global consts aren't accessible here
   if (typeof global[key] === 'function') {
     global[key](data);
-  } else if (global[process.env.INIT_FUNC_NAME] !== 1) { // eslint-disable-line no-undef
+  } else if (global[__.INIT_FUNC_NAME] !== 1) { // eslint-disable-line no-undef
     // Ran earlier than the main content script so let's just drop the payload
     global[key] = data;
   }
@@ -195,6 +195,7 @@ addPublicCommands({
       if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
         updateVisitedTime(scripts);
       }
+      inject.info.gmi = { isIncognito: tab.incognito };
     }
     if (popupTabs[tabId]) {
       sendPopupShown(tabId, frameDoc);
@@ -640,11 +641,19 @@ function injectContentRealm(toContent, tabId, frameId) {
   for (const [id, dataKey] of toContent) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
-    browser.tabs.executeScript(tabId, {
-      code: scr[__CODE].join(''),
-      [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
-      [kFrameId]: frameId,
-    }).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
+    const code = scr[__CODE].join('');
+    (__.MV3
+      ? chrome.userScripts.execute({
+        js: [{code}],
+        target: {tabId, frameIds: [frameId]},
+        injectImmediately: /body|start/.test(scr[RUN_AT]),
+      })
+      : browser.tabs.executeScript(tabId, {
+        code,
+        [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
+        [kFrameId]: frameId,
+      })
+    ).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
   }
 }
 

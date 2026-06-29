@@ -22,19 +22,19 @@ export const { apply: safeApply } = Reflect;
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const safeCall = Object.call.bind(Object.call);
 export const IS_APPLIED = 'isApplied';
-export const IS_FIREFOX = 'contextualIdentities' in chrome || 'activityLog' in chrome;
+export const IS_FIREFOX = !__.MV3 && ('contextualIdentities' in chrome || 'activityLog' in chrome);
 export const ROUTE_SCRIPTS = '#' + SCRIPTS;
 export const extensionRoot = chrome.runtime.getURL('/');
 export const extensionOrigin = extensionRoot.slice(0, -1);
 export const extensionManifest = chrome.runtime.getManifest();
 // Using getURL because in Firefox manifest contains resolved (full) URLs
-export const extensionOptionsPage = process.env.TEST ? ''
+export const extensionOptionsPage = __.TEST ? ''
   : chrome.runtime.getURL(extensionManifest.options_ui.page).split('#', 1)[0];
 export const ICON_PREFIX = chrome.runtime.getURL(extensionManifest.icons[16].replace("16.png", ""));
 export const TAB_SETTINGS = 'settings';
 export const TAB_ABOUT = 'about';
 export const TAB_RECYCLE = 'recycleBin';
-export const BROWSER_ACTION = 'browser_action';
+export const BROWSER_ACTION = __.MV3 ? 'action' : 'browser_action';
 export const kDocumentId = 'documentId';
 export const kFrameId = 'frameId';
 export const INJECT = 'inject';

@@ -9,6 +9,7 @@ const i18n = require('./scripts/i18n');
 const { getVersion, isBeta } = require('./scripts/version-helper');
 const { buildManifest } = require('./scripts/manifest-helper');
 const pkg = require('./package.json');
+const { MV3 } = require('./scripts/common');
 
 const DIST = 'dist';
 const paths = {
@@ -50,11 +51,13 @@ function runCommand(command, args) {
 }
 
 async function manifest() {
-  const base = JSON.parse(await fs.readFile(`${DIST}/manifest.json`, 'utf8'));
   const data = await buildManifest();
-  data.background.scripts = base.background.scripts; // preserving ListBackgroundScriptsPlugin
+  if (!MV3) {
+    const base = JSON.parse(await fs.readFile(`${DIST}/manifest.json`, 'utf8'));
+    data.background.scripts = base.background.scripts; // preserving ListBackgroundScriptsPlugin
+  }
   await fs.mkdir(DIST).catch(() => {});
-  await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data), 'utf8');
+  await fs.writeFile(`${DIST}/manifest.json`, JSON.stringify(data, null, 2), 'utf8');
 }
 
 async function createIcons() {
@@ -160,7 +163,7 @@ function logError(err) {
   return this.emit('end');
 }
 
-const pack = gulp.parallel(createIcons, copyI18n);
+const pack = gulp.parallel(createIcons, copyI18n, ...MV3 ? [manifest] : []);
 
 exports.clean = clean;
 exports.manifest = manifest;

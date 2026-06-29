@@ -131,9 +131,6 @@ export async function injectScripts(data, info, isXml) {
   if (errors) {
     logging.warn(errors);
   }
-  info.gmi = {
-    isIncognito: chrome.extension.inIncognitoContext,
-  };
   bridgeInfo = createNullObj();
   bridgeInfo[PAGE] = info;
   bridgeInfo[CONTENT] = info;

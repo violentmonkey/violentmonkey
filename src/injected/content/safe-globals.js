@@ -48,7 +48,9 @@ export const { stopImmediatePropagation } = Event[PROTO];
 export const getDetail = describeProperty(SafeCustomEvent[PROTO], 'detail').get;
 export const getRelatedTarget = describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get;
 export const logging = nullObjFrom(console);
-export const VM_UUID = chrome.runtime.getURL('');
+export const VM_UUID = __.MV3
+  ? `chrome-extension://${chrome.runtime.id}/`
+  : chrome.runtime.getURL('');
 /** Unlike the built-in `instanceof` operator this doesn't call @@hasInstance which may be spoofed */
 export const isInstance = (instance, safeOriginalProto) => {
   for (let obj = instance; isObject(obj) && (obj = getPrototypeOf(obj));) {

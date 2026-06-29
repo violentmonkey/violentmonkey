@@ -114,7 +114,7 @@ export const GM_API_CTX = {
   GM_removeValueChangeListener(listenerId) {
     const keyHooks = changeHooks[this.id];
     if (!keyHooks) return;
-    if (process.env.DEBUG) throwIfProtoPresent(keyHooks);
+    if (__.DEBUG) throwIfProtoPresent(keyHooks);
     for (const key in keyHooks) { /* proto is null */// eslint-disable-line guard-for-in
       const hooks = keyHooks[key];
       if (listenerId in hooks) {

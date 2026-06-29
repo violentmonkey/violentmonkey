@@ -1,5 +1,9 @@
 import { browserWindows, getActiveTab, makePause, noop, sendTabCmd } from '@/common';
-import { getDomain } from '@/common/tld';
+// #!if MV3
+import * as tldMV3 from '@/common/tld-mv3';
+// #!else
+import * as tld from '@/common/tld';
+// #!endif
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { testScript } from './tester';
@@ -7,8 +11,8 @@ import { CHROME } from './ua';
 import { vetUrl } from './url';
 
 const openers = {};
-const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
-  || !!(window.AbortSignal && browserWindows); // and FF57+ except mobile
+const openerTabIdSupported = __.MV3 || !IS_FIREFOX // supported in Chrome
+  || !!(global.AbortSignal && browserWindows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
 export const NEWTAB_URL_RE = re`/
 ^(
@@ -61,7 +65,7 @@ addOwnCommands({
     const host = url && new URL(url).hostname;
     return {
       host,
-      domain: host && getDomain(host) || host,
+      domain: host && (__.MV3 ? tldMV3 : tld).getDomain(host) || host,
     };
   },
   /**

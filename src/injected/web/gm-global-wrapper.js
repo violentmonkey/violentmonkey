@@ -19,7 +19,7 @@ const globalKeys = (function makeGlobalKeys() {
   for (const key of names) {
     if (+key >= 0 && key < numFrames
       || isContentMode && (
-        key === process.env.INIT_FUNC_NAME || key === 'browser' || key === 'chrome'
+        key === __.INIT_FUNC_NAME || key === 'browser' || key === 'chrome'
       )
     ) {
       ok = false;
@@ -76,7 +76,7 @@ const updateGlobalDesc = name => {
     && describeProperty(src = src > 0 ? window : global, name);
   if (!desc) return;
   if (!descFn) setPrototypeOf(desc, null);
-  else if (process.env.DEV && getPrototypeOf(desc)) throw 'proto must be null';
+  else if (__.DEV && getPrototypeOf(desc)) throw 'proto must be null';
   /* ~45 enumerable action functions belong to `window` and need to be bound to it,
    * the non-enum ~10 can be unbound, and `eval` MUST be unbound to run in scope. */
   if (descFn) {

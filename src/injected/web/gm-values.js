@@ -66,7 +66,7 @@ export function decodeValue(raw) {
   try {
     if (handle) val = handle(val);
   } catch (e) {
-    if (process.env.DEBUG) log('warn', ['GM_getValue'], e);
+    if (__.DEBUG) log('warn', ['GM_getValue'], e);
   }
   return val;
 }

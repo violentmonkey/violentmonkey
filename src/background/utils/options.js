@@ -43,7 +43,7 @@ hookOptions(data => sendCmd('UpdateOptions', data));
 export function initOptions(data, lastVersion, versionChanged) {
   data = data[kOptions] || {};
   Object.assign(options, data);
-  if (process.env.DEBUG) console.info('options:', options);
+  if (__.DEBUG) console.info('options:', options);
   if (!options[kVersion]) {
     setOption(kVersion, 1);
   }
@@ -109,20 +109,20 @@ export function setOption(key, value, silent) {
   const mainKey = keys[0];
   key = keys.join('.'); // must be a string for addChange()
   if (!hasOwnProperty(defaults, mainKey)) {
-    if (process.env.DEBUG) console.info('Unknown option:', key, value, options);
+    if (__.DEBUG) console.info('Unknown option:', key, value, options);
     return;
   }
   const subKey = keys.length > 1 && keys.slice(1);
   const mainVal = getOption([mainKey]);
   if (deepEqual(value, subKey ? objectGet(mainVal, subKey) : mainVal)) {
-    if (process.env.DEBUG) console.info('Option unchanged:', key, value, options);
+    if (__.DEBUG) console.info('Option unchanged:', key, value, options);
     return;
   }
   options[mainKey] = subKey ? objectSet(mainVal, subKey, value) : value;
   omitDefaultValue(mainKey);
   writeOptionsLater();
   addChange(key, value, silent);
-  if (process.env.DEBUG) console.info('Options updated:', key, value, options);
+  if (__.DEBUG) console.info('Options updated:', key, value, options);
 }
 
 function writeOptions() {

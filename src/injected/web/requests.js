@@ -173,7 +173,7 @@ function parseRaw(req, msg, propName) {
  * @return {VMScriptXHRControl | Promise<VMScriptXHRControl>}
  */
 export function onRequestCreate(opts, context, fileName) {
-  if (process.env.DEBUG) throwIfProtoPresent(opts);
+  if (__.DEBUG) throwIfProtoPresent(opts);
   let { data, url, [kResponseType]: type = '' } = opts;
   let err, res;
   // XHR spec requires `url` but allows ''/null/non-string

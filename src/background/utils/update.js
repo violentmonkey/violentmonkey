@@ -20,7 +20,7 @@ const FAST_CHECK = {
 const kChecking = 'checking';
 
 init.then(autoUpdate);
-hookOptions(changes => 'autoUpdate' in changes && autoUpdate());
+hookOptions(changes => (changes = changes.autoUpdate) != null && autoUpdate(changes));
 
 addOwnCommands({
   /**
@@ -94,7 +94,7 @@ async function doCheckUpdate(id, script, urls, opts) {
   } catch (update) {
     msgErr = update.error
       || !update[kChecking] && await fetchResources(script, opts);
-    if (process.env.DEBUG) console.error(update);
+    if (__.DEBUG) console.error(update);
   } finally {
     if (canNotify(script) && (msgOk || msgErr)) {
       res = {
@@ -137,7 +137,7 @@ async function downloadUpdate(script, urls, opts) {
         : (await requestNewer(downloadURL, opts)).data;
     }
   } catch (error) {
-    if (process.env.DEBUG) console.error(error);
+    if (__.DEBUG) console.error(error);
     announce(errorMessage || i18n('msgErrorFetchingUpdateInfo'), { error });
   }
   throw update;
@@ -163,8 +163,12 @@ function canNotify(script) {
     : script.config.notifyUpdates ?? allowed;
 }
 
-function autoUpdate() {
-  const interval = getUpdateInterval();
+async function autoUpdate(val) {
+  const interval = getUpdateInterval(val);
+  if (val != null) {
+    await chrome.alarms.clear('update');
+    if (val) await chrome.alarms.create('update', { periodInMinutes: interval / 60e3 });
+  }
   if (!interval) return;
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
@@ -172,10 +176,12 @@ function autoUpdate() {
     setTimeout(commands.CheckUpdate, 20e3, { [AUTO]: true });
     elapsed = 0;
   }
-  clearTimeout(autoUpdate.timer);
-  autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
+  if (!__.MV3) {
+    clearTimeout(autoUpdate.timer);
+    autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
+  }
 }
 
-export function getUpdateInterval() {
-  return (+getOption('autoUpdate') || 0) * TIMEOUT_24HOURS;
+export function getUpdateInterval(val = getOption('autoUpdate')) {
+  return (+val || 0) * TIMEOUT_24HOURS;
 }

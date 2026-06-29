@@ -15,7 +15,7 @@ import {
 } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
-import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
+import { addOwnCommands, addPublicCommands, commands, resolveInit, sessionData } from './init';
 import patchDB from './patch-db';
 import { initOptions, kVersion, setOption } from './options';
 import storage, {
@@ -25,6 +25,7 @@ import storage, {
 } from './storage';
 import { storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
+import { getUpdateInterval } from './update';
 import { vetUrl } from './url';
 
 let maxScriptId = 0;
@@ -33,6 +34,7 @@ let maxScriptPosition = 0;
 export let dbKeys = new Map(); // 1: exists, 0: known to be absent
 /** @type {{ [url:string]: number }} */
 export let scriptSizes = {};
+export let lastInstalledVersion;
 /** Ensuring slow icons don't prevent installation/update */
 const ICON_TIMEOUT = 1000;
 export const kTryVacuuming = 'Try vacuuming database in options.';
@@ -117,21 +119,59 @@ addOwnCommands({
   Vacuum: vacuum,
 });
 
+if (__.MV3) chrome.alarms.onAlarm.addListener(a => {
+  if (a.name === 'remove') checkRemove();
+});
+
+chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
+  if (reason === 'update' || reason === 'install') try {
+    lastInstalledVersion = previousVersion || '';
+    if (__.MV3) await Promise.all([
+      chrome.alarms.clearAll().then(() => [
+        chrome.alarms.create('remove', { periodInMinutes: 24 * 60 }),
+        chrome.alarms.create('update', { periodInMinutes: getUpdateInterval() / 60e3 }),
+      ]),
+      chrome.userScripts.configureWorld({
+        csp: "script-src 'self' 'unsafe-inline' 'unsafe-eval';" +
+          "style-src * 'unsafe-inline' data: blob:",
+        messaging: true,
+      }),
+      chrome.userScripts.register([{
+        id: '1',
+        runAt: 'document_start',
+        allFrames: true,
+        matches: ['<all_urls>'],
+        js: [{file: 'injected-web.js'}, {file: 'injected.js'}],
+      }]),
+    ].flat());
+  } catch (err) {
+    if (__.MV3) {
+      chrome.tabs.create({
+        url: 'data:text/plain,' + err.message.replaceAll('#', '%23') +
+          '\nMake sure to enable "Allow User Scripts" for Violentmonkey in chrome://extensions',
+      });
+    }
+  }
+});
+
 (async () => {
   /** @type {string[]} */
-  let allKeys, keys;
-  if (getStorageKeys) {
-    allKeys = await getStorageKeys();
+  let keys;
+  const [allKeys] = await Promise.all([
+    getStorageKeys?.(),
+    sessionData,
+  ]);
+  if (allKeys) {
     // Filtering and creating Map in atomic native code operations instead of js loop
     keys = allKeys.join('\n').replace(/^(?:(options|version|(?:scr|mod):\d+)|\S+)$/gm, '$1').trim();
     dbKeys = new Map(JSON.parse(`[${keys.replace(/\S+/g, '["$&",1],').slice(0, -1)}]`));
     keys = keys.split(/\n+/);
   }
-  const lastVersion = (!getStorageKeys || dbKeys.has(kVersion))
-    && await storage.base.getOne(kVersion);
-  const version = process.env.VM_VER;
-  const versionChanged = version !== lastVersion;
-  if (!lastVersion) await patchDB();
+  const lastVersion = __.MV3 ? lastInstalledVersion
+    : (!getStorageKeys || dbKeys.has(kVersion)) && await storage.base.getOne(kVersion);
+  const version = __.VM_VER;
+  const versionChanged = (lastInstalledVersion != null) && version !== lastVersion;
+  if (__.MV3 ? lastVersion === '' : !lastVersion) await patchDB();
   if (versionChanged) storage.api.set({ [kVersion]: version });
   const data = await storage.api.get(keys);
   const uriMap = {};
@@ -183,22 +223,26 @@ addOwnCommands({
     }
   });
   initOptions(data, lastVersion, versionChanged);
-  if (process.env.DEBUG) {
+  if (__.DEBUG) {
     console.info('store:', {
       aliveScripts, removedScripts, maxScriptId, maxScriptPosition, scriptMap, scriptSizes,
     });
   }
   sortScripts();
-  setTimeout(async () => {
-    if (allKeys?.length) {
-      const set = new Set(keys); // much faster lookup
-      const data2 = await storage.api.get(allKeys.filter(k => !set.has(k)));
-      Object.assign(data, data2);
-    }
-    vacuum(data);
-  }, 100);
-  checkRemove();
-  setInterval(checkRemove, TIMEOUT_24HOURS);
+  if (!__.MV3 || !sessionData.init && chrome.storage.session.set({ init: 1 })) {
+    setTimeout(async () => {
+      if (allKeys?.length) {
+        const set = new Set(keys); // much faster lookup
+        const data2 = await storage.api.get(allKeys.filter(k => !set.has(k)));
+        Object.assign(data, data2);
+      }
+      vacuum(data);
+    }, 100);
+    checkRemove();
+  }
+  if (!__.MV3) {
+    setInterval(checkRemove, TIMEOUT_24HOURS);
+  }
   resolveInit();
 })();
 
@@ -564,9 +608,9 @@ export function checkRemove({ force } = {}) {
 }
 
 /** @return {string} */
-const getUUID = crypto.randomUUID ? crypto.randomUUID.bind(crypto) : () => {
+const getUUID = __.MV3 || crypto.randomUUID ? crypto.randomUUID.bind(crypto) : () => {
   const rnd = new Uint16Array(8);
-  window.crypto.getRandomValues(rnd);
+  crypto.getRandomValues(rnd);
   // xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
   // We're using UUIDv4 variant 1 so N=4 and M=8
   // See format_uuid_v3or5 in https://tools.ietf.org/rfc/rfc4122.txt

@@ -25,7 +25,7 @@ onScripts.push(({ clipFF }) => {
     setClipboard = async params => {
       await bridge[REIFY];
       clipboardData = params;
-      if (!document::execCommand('copy') && process.env.DEBUG) {
+      if (!document::execCommand('copy') && __.DEBUG) {
         log('warn', null, 'GM_setClipboard failed!');
       }
       clipboardData = null;

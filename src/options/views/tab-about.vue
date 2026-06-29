@@ -27,7 +27,7 @@ import { VM_HOME } from '@/common/consts';
 import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 
 const name = extensionManifest.name;
-const version = process.env.VM_VER;
+const version = __.VM_VER;
 const language = browser.i18n.getUILanguage();
 const GITHUB = 'https://github.com/violentmonkey/violentmonkey/';
 const LINKS = {

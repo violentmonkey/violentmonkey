@@ -1,18 +1,37 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 const { getVersion, isBeta } = require('./version-helper');
+const { MV3, isProd } = require('./common');
 
 function getBrowserTargets() {
   const manifest = readManifest();
+  const CH = parseInt(manifest.minimum_chrome_version);
+  const FF = parseInt(manifest.browser_specific_settings?.gecko.strict_min_version);
   return [
-    `Chrome >= ${parseInt(manifest.minimum_chrome_version)}`,
-    `Firefox >= ${parseInt(manifest.browser_specific_settings.gecko.strict_min_version)}`,
-  ].join(',');
+    CH && `Chrome >= ${CH}`,
+    FF && `Firefox >= ${FF}`,
+  ].filter(Boolean).join(',');
 }
 
 function readManifest() {
   const input = fs.readFileSync('src/manifest.yml', 'utf8');
-  const data = yaml.load(input);
+  const data = yaml.load(MV3 ? input.replaceAll('browser_action', 'action') : input);
+  if (MV3) {
+    data.manifest_version = 3;
+    data.background = { service_worker: 'sw.js' };
+    data.host_permissions = ['<all_urls>'];
+    data.minimum_chrome_version = '135.0'; // chrome.userScripts.execute
+    data.permissions.splice(data.permissions.indexOf('<all_urls>'), 1, ...[
+      !isProd && 'declarativeNetRequestFeedback',
+      'alarms',
+      'declarativeNetRequestWithHostAccess',
+      'offscreen',
+      'scripting',
+      'userScripts',
+    ].filter(Boolean));
+    delete data.browser_specific_settings;
+    delete data.content_scripts;
+  }
   return data;
 }
 
@@ -26,7 +45,7 @@ function buildManifest(base) {
     // Do not support i18n in beta version
     const name = 'Violentmonkey BETA';
     data.name = name;
-    data.browser_action.default_title = name;
+    data[MV3 ? 'action' : 'browser_action'].default_title = name;
   }
   return data;
 }

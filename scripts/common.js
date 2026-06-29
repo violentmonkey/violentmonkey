@@ -19,3 +19,4 @@ exports.extensions = [
   '.ts', '.tsx', '.mjs', '.js', '.jsx', '.vue',
 ];
 exports.exec = exec;
+exports.MV3 = process.env.MV3 === '1';

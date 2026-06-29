@@ -15,7 +15,7 @@ export function memoize(func) {
       ? res
       : (cacheMap[key] = safeApply(func, this, args));
   }
-  return process.env.DEV
+  return __.DEV
     ? Object.defineProperty(memoized, 'name', { value: func.name + ':memoized' })
     : memoized;
 }

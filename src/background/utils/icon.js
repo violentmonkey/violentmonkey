@@ -1,5 +1,6 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
+import loadIconData from '@/common/load-icon-data';
 import { nest, objectPick } from '@/common/object';
 import { addOwnCommands, commands, init } from './init';
 import { getOption, hookOptions, setOption } from './options';
@@ -263,45 +264,13 @@ export function handleHotkeyOrMenu(id, tab) {
 }
 
 async function loadIcon(url) {
-  const img = new Image();
   const isOwn = url.startsWith(ICON_PREFIX);
-  const src = isOwn ? url.slice(extensionOrigin.length) // must be a relative path in Firefox Android
-    : url.startsWith('data:') ? url
-      : makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url));
-  if (!src) {
+  if (!isOwn && !(url = makeDataUri(url[0] === 'i' ? url : await loadStorageCache(url)))) {
     // not saving to iconCache[url] because it may be a temporary network problem
     return;
   }
-  img.src = src;
-  if (!await new Promise((resolve) => {
-    img.onload = resolve;
-    img.onerror = () => resolve();
-  })) {
-    return;
-  }
-  let res;
-  let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
-  let { width, height } = img;
-  if (!width || !height) { // FF reports 0 for SVG
-    iconCache[url] = url;
-    return url;
-  }
-  if (maxSize && (width > maxSize || height > maxSize)) {
-    maxSize /= width > height ? width : height;
-    width = Math.round(width * maxSize);
-    height = Math.round(height * maxSize);
-  }
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = width;
-  canvas.height = height;
-  ctx.drawImage(img, 0, 0, width, height);
-  try {
-    res = canvas.toDataURL();
-    if (isOwn) iconDataCache[url] = ctx.getImageData(0, 0, width, height);
-  } catch (err) {
-    res = url;
-  }
+  const [res, imageData] = await loadIconData(url, isOwn);
+  if (isOwn) iconDataCache[url] = imageData;
   iconCache[url] = res;
   return res;
 }

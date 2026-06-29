@@ -3,13 +3,16 @@
 import { browser } from './consts';
 import { deepCopy } from './object';
 import { noop } from './util';
+// #!if MV3 && !SW
+import { sendCmdToSW } from './sw-messaging';
+// #!endif
 
 export { normalizeKeys } from './object';
 export * from './script';
 export * from './string';
 export * from './util';
 
-if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
+if (__.DEV && __.INJECTED !== 'injected-web') {
   const get = () => {
     throw 'Do not use `for-of` with Map/Set. Use forEach or for-of with a [...copy]'
     + '\n(not supported due to our config of @babel/plugin-transform-for-of).';
@@ -20,8 +23,8 @@ if (process.env.DEV && process.env.IS_INJECTED !== 'injected-web') {
 }
 
 export const ignoreChromeErrors = () => chrome.runtime.lastError;
-export const browserWindows = !process.env.IS_INJECTED && browser.windows;
-export const defaultImage = !process.env.IS_INJECTED && `${ICON_PREFIX}128.png`;
+export const browserWindows = !__.INJECTED && browser.windows;
+export const defaultImage = !__.INJECTED && `${ICON_PREFIX}128.png`;
 /** @return {'0' | '1' | ''} treating source as abstract truthy/falsy to ensure consistent result */
 const PORT_ERROR_RE = /(Receiving end does not exist)|The message port closed before|moved into back\/forward cache|$/;
 
@@ -47,7 +50,7 @@ export function initHooks() {
  */
 export function sendCmd(cmd, data, options) {
   // Firefox+Vue3 bug workaround for "Proxy object could not be cloned"
-  if (!process.env.IS_INJECTED && IS_FIREFOX && window._bg !== 1 && isObject(data)) {
+  if (!__.MV3 && !__.INJECTED && IS_FIREFOX && global._bg !== 1 && isObject(data)) {
     data = deepCopy(data);
   }
   return sendMessage({ cmd, data }, options);
@@ -77,6 +80,11 @@ export const getBgPage = () => browser.extension.getBackgroundPage?.();
  * WARNING! Make sure `cmd` handler doesn't use `src` or `cmd` is listed in COMMANDS_WITH_SRC.
  */
 export function sendCmdDirectly(cmd, data, options, fakeSrc) {
+  if (__.MV3) {
+    return COMMANDS_WITH_SRC.includes(cmd)
+      ? sendCmd(cmd, data, options)
+      : sendCmdToSW(cmd, data, fakeSrc && {...fakeSrc, fake: true});
+  }
   const bg = !COMMANDS_WITH_SRC.includes(cmd) && getBgPage();
   const bgCopy = bg && bg !== window && bg.deepCopy;
   if (!bgCopy) {
@@ -105,7 +113,7 @@ export function sendMessage(payload, { retry } = {}) {
   if (retry) return sendMessageRetry(payload);
   let promise = browser.runtime.sendMessage(payload);
   // Ignoring errors when sending from the extension script because it's a broadcast
-  if (!process.env.IS_INJECTED) {
+  if (!__.INJECTED) {
     promise = promise.catch(ignoreNoReceiver);
   }
   return promise;
@@ -130,7 +138,7 @@ export async function sendMessageRetry(payload, maxDuration = 10e3) {
       }
     }
     // Not using setTimeout which may be cleared by the web page
-    await browser.storage.local.get(VIOLENTMONKEY);
+    if (!__.MV3) await browser.storage.local.get(VIOLENTMONKEY);
   }
   throw new Error(VIOLENTMONKEY + ' cannot connect to the background page.');
 }
@@ -156,7 +164,16 @@ export async function getActiveTab(windowId = -2 /*chrome.windows.WINDOW_ID_CURR
   return res;
 }
 
+let keepAliveChain, keepAliveTimer;
+export function keepAlive(promise) {
+  keepAliveChain = keepAliveChain ? keepAliveChain.finally(promise) : promise;
+  keepAliveChain.finally(() => (keepAliveTimer = clearInterval(keepAliveTimer)));
+  keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 1000);
+  return promise;
+}
+
 export function makePause(ms) {
+  if (__.MV3) return keepAlive(global.scheduler.postTask(noop, { delay: ms > 0 ? ms : 0 }));
   return ms < 0
     ? Promise.resolve()
     : new Promise(resolve => setTimeout(resolve, ms));

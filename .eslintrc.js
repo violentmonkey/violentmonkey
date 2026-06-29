@@ -81,6 +81,9 @@ module.exports = {
       ],
     },
   }, {
+    files: ['src/background/sw.js', 'src/background/utils/offscreen.js'],
+    env: { serviceworker: true, webextensions: true },
+  }, {
     // build scripts
     files: [
       '*.js',
@@ -116,6 +119,7 @@ function makeOverrides() {
     PAGE_MODE_HANDSHAKE: false,
     VAULT_ID: false,
   };
+  GLOBALS_SHARED.__ = GLOBALS_INJECTED.__ = false;
   function getGlobals(path) {
     const res = {};
     const { ast } = readGlobalsFile(path, { ast: true });

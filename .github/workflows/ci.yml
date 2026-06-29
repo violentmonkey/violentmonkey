@@ -52,6 +52,21 @@ jobs:
           path: 'dist/*'
           if-no-files-found: error
 
+      - name: Build MV3
+        env:
+          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
+          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
+          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+        run: pnpm build-mv3
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        continue-on-error: true
+        with:
+          name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}-mv3'
+          path: 'dist/*'
+          if-no-files-found: error
+
       - name: Upload to Transifex - check src
         if: github.event_name == 'push' || github.event.pull_request.merged == true
         uses: marceloprado/has-changed-path@v1.0.1

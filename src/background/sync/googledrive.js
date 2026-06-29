@@ -5,8 +5,8 @@ import { createSyncService, register } from './sync-engine';
 // - Web app refresh tokens have short expiration and require frequent user reauthorization.
 
 const config = {
-  client_id: process.env.SYNC_GOOGLE_DESKTOP_ID,
-  client_secret: process.env.SYNC_GOOGLE_DESKTOP_SECRET,
+  client_id: __.SYNC_GOOGLE_DESKTOP_ID,
+  client_secret: __.SYNC_GOOGLE_DESKTOP_SECRET,
   // Google OAuth for native app only allows loopback IP address for callback URL.
   // The URL will be intercepted and blocked so the port doesn't matter.
   redirect_uri: 'http://127.0.0.1:45678/',

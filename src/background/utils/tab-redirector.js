@@ -94,9 +94,18 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
-      browser.tabs.executeScript(tabId, {
-        code: `console.warn(${JSON.stringify(error)})`,
-      });
+      if (__.MV3) {
+        chrome.scripting.executeScript({
+          target: {tabId},
+          func: err => console.warn(err),
+          args: error,
+          injectImmediately: true,
+        });
+      } else {
+        browser.tabs.executeScript(tabId, {
+          code: `console.warn(${JSON.stringify(error)})`,
+        });
+      }
       browser.tabs.update(tabId, { url });
     }
   }

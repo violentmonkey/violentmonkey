@@ -64,7 +64,7 @@ class VMStorageArea {
    * @return {Promise<Object>} same object
    */
   async set(data) {
-    if (process.env.DEV && !isObject(data)) {
+    if (__.DEV && !isObject(data)) {
       throw 'VMStorageArea.set: data is not an object';
     }
     await api.set(this.prefix
@@ -76,7 +76,7 @@ class VMStorageArea {
 
 // TODO: add Firefox version to the comment when https://bugzil.la/1910669 is fixed
 /** @type {() => Promise<string[]>} Chromium 130+ */
-export const getStorageKeys = api.getKeys;
+export const getStorageKeys = api.getKeys?.bind(api);
 export const S_CACHE = 'cache';
 export const S_CACHE_PRE = 'cac:';
 export const S_CODE = 'code';

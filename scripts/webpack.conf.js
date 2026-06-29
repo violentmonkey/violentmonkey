@@ -1,9 +1,11 @@
+const fs = require('node:fs');
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const { getVersion } = require('./version-helper');
+const { MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
 const { getBaseConfig, getPageConfig, isProd } = require('./webpack-base');
 
@@ -31,7 +33,7 @@ configLoader
 
 const pickEnvs = (items) => {
   return Object.assign({}, ...items.map(key => ({
-    [`process.env.${key}`]: JSON.stringify(configLoader.get(key)),
+    [`__.${key}`]: JSON.stringify(configLoader.get(key)),
   })));
 };
 
@@ -45,40 +47,45 @@ const defsObj = {
     'SYNC_ONEDRIVE_ACCOUNT_TYPE',
     'SYNC_DROPBOX_CLIENT_ID',
   ]),
-  'process.env.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
-  'process.env.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
-  'process.env.DEV': JSON.stringify(!isProd),
-  'process.env.TEST': JSON.stringify(process.env.BABEL_ENV === 'test'),
+  '__.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
+  '__.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
+  '__.DEV': !isProd,
+  '__.TEST': process.env.BABEL_ENV === 'test',
+  '__.MV3': MV3,
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
 const skipReinjectionHeader = `{
   const INIT_FUNC_NAME = '${INIT_FUNC_NAME}';
   if (window[INIT_FUNC_NAME] !== 1)`;
+const ownWrappers = (getGlobals) => ({
+  header: () => `'use strict'; { ${getGlobals()}`,
+  footer: '}',
+  test: /^(?!injected|public).*\.js$/,
+});
 
-const buildConfig = (page, entry, init) => {
-  const config = entry ? getBaseConfig() : getPageConfig();
-  config.plugins.push(new webpack.DefinePlugin({
+const buildConfig = (page, entry, globalsScope, wrap, init) => {
+  const SW = page === 'sw' ? 1 : 0;
+  const vars = {
     ...defsObj,
-    // Conditional compilation to remove unsafe and unused stuff from `injected`
-    'process.env.IS_INJECTED': JSON.stringify(/injected/.test(page) && page),
-  }));
-  if (typeof entry === 'string') {
-    config.entry = { [page]: entry };
-  }
-  if (!entry) init = page;
+    '__.INJECTED': JSON.stringify(/injected/.test(page) && page),
+    '__.SW': SW,
+  };
+  const config = (entry ? getBaseConfig : getPageConfig)(
+    page,
+    SW || page === 'offscreen',
+    Object.fromEntries(Object.entries(vars).map(([k, v]) => [k.replace('__.', ''), v])),
+  );
+  config.plugins.push(new webpack.DefinePlugin(vars));
+  if (entry) config.entry = { [page]: entry };
   if (init) init(config);
+  if (wrap) addWrapperWithGlobals(globalsScope, config, vars, wrap);
   return config;
 };
 
 module.exports = [
-  buildConfig((config) => {
-    addWrapperWithGlobals('common', config, defsObj, getGlobals => ({
-      header: () => `{ ${getGlobals()}`,
-      footer: '}',
-      test: /^(?!injected|public).*\.js$/,
-    }));
-    config.plugins.push(new ListBackgroundScriptsPlugin({
+  buildConfig('', '', 'common', ownWrappers, (config) => {
+    if (!MV3) config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
     config.resolve.alias = {
@@ -91,26 +98,40 @@ module.exports = [
     });
   }),
 
-  buildConfig('injected', './src/injected', (config) => {
-    config.plugins.push(new ProtectWebpackBootstrapPlugin());
-    addWrapperWithGlobals('injected/content', config, defsObj, getGlobals => ({
-      header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
-      footer: '}}',
-    }));
+  MV3 && buildConfig('sw', './src/background/sw', 'common', ownWrappers),
+
+  MV3 && buildConfig('offscreen', './src/offscreen', 'common', ownWrappers, (config) => {
+    const dir = `${config.output.path}/offscreen`;
+    config.output.filename = 'offscreen/index.js';
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    fs.writeFileSync(`${dir}/index.html`, '<script src=index.js></script>', 'utf8');
   }),
 
-  buildConfig('injected-web', './src/injected/web', (config) => {
+  MV3 && buildConfig('tld', 'tldts', '', null, (config) => {
+    config.output.library = {
+      type: 'global',
+      name: 'tld',
+    };
+  }),
+
+  buildConfig('injected', './src/injected', 'injected/content', (getGlobals) => ({
+    header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
+    footer: '}}',
+  }), (config) => {
+    config.plugins.push(new ProtectWebpackBootstrapPlugin());
+  }),
+
+  buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
+    header: () => `${skipReinjectionHeader}
+      window[INIT_FUNC_NAME] = function (IS_FIREFOX,${PAGE_MODE_HANDSHAKE},${VAULT_ID}) {
+        const module = { __proto__: null };
+        ${getGlobals()}`,
+    footer: `
+        const { exports } = module;
+        return exports.__esModule ? exports.default : exports;
+      }};0;`,
+  }), (config) => {
     config.output.libraryTarget = 'commonjs2';
     config.plugins.push(new ProtectWebpackBootstrapPlugin());
-    addWrapperWithGlobals('injected/web', config, defsObj, getGlobals => ({
-      header: () => `${skipReinjectionHeader}
-        window[INIT_FUNC_NAME] = function (IS_FIREFOX,${PAGE_MODE_HANDSHAKE},${VAULT_ID}) {
-          const module = { __proto__: null };
-          ${getGlobals()}`,
-      footer: `
-          const { exports } = module;
-          return exports.__esModule ? exports.default : exports;
-        }};0;`,
-    }));
   }),
-];
+].filter(Boolean);
