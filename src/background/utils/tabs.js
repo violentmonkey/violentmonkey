@@ -1,9 +1,5 @@
 import { browserWindows, getActiveTab, makePause, noop, sendTabCmd } from '@/common';
-// #!if MV3
-import * as tldMV3 from '@/common/tld-mv3';
-// #!else
-import * as tld from '@/common/tld';
-// #!endif
+import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { getOption } from './options';
 import { testScript } from './tester';
@@ -65,7 +61,7 @@ addOwnCommands({
     const host = url && new URL(url).hostname;
     return {
       host,
-      domain: host && (__.MV3 ? tldMV3 : tld).getDomain(host) || host,
+      domain: host && getDomain(host) || host,
     };
   },
   /**

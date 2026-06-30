@@ -1,4 +1,5 @@
 import { browserWindows, request, noop, i18n, getUniqId, getTab } from '@/common';
+import { executeScript } from '@/common/browser-scripts-api';
 import { FILE_GLOB_ALL } from '@/common/consts';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
@@ -94,18 +95,7 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
-      if (__.MV3) {
-        chrome.scripting.executeScript({
-          target: {tabId},
-          func: err => console.warn(err),
-          args: error,
-          injectImmediately: true,
-        });
-      } else {
-        browser.tabs.executeScript(tabId, {
-          code: `console.warn(${JSON.stringify(error)})`,
-        });
-      }
+      executeScript(tabId, `console.warn(${JSON.stringify(error)})`, true);
       browser.tabs.update(tabId, { url });
     }
   }

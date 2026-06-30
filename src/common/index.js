@@ -3,9 +3,7 @@
 import { browser } from './consts';
 import { deepCopy } from './object';
 import { noop } from './util';
-// #!if MV3 && !SW
 import { sendCmdToSW } from './sw-messaging';
-// #!endif
 
 export { normalizeKeys } from './object';
 export * from './script';

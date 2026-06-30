@@ -2,11 +2,7 @@
 import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
 import { ERR_BAD_PATTERN, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
-// #!if MV3
-import * as tldMV3 from '@/common/tld-mv3';
-// #!else
-import * as tld from '@/common/tld';
-// #!endif
+import { getPublicSuffix } from '@/common/tld';
 import { hookOptionsInit } from './options';
 import storage from './storage';
 
@@ -287,7 +283,7 @@ function matchTld(tstr) {
   const matches = tstr.match(this);
   const suffix = matches?.[1]?.slice(1).toLowerCase();
   // Must return a proper boolean
-  return !!suffix && (__.MV3 ? tldMV3 : tld).getPublicSuffix(suffix) === suffix;
+  return !!suffix && getPublicSuffix(suffix) === suffix;
 }
 
 function hostMatcher(rule) {

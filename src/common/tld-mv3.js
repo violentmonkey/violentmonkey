@@ -1,3 +1,4 @@
+// TODO: make a webpack plugin to convert the static import into an on-demand importScripts()
 export let getDomain = url => load(url, true);
 export let getPublicSuffix = url => load(url);
 let getDomain_, getPublicSuffix_;

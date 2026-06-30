@@ -450,6 +450,8 @@ declare var __: {
   DEBUG: boolean,
   DEV: boolean,
   MV3: boolean;
+  /** MV3 html page of the extension i.e. not SW, not injected */
+  MV3PAGE: boolean;
   INIT_FUNC_NAME: string;
   INJECTED: string | false;
   SW: boolean;

@@ -32,39 +32,29 @@ jobs:
 
       - name: Install
         run: pnpm i
-      - name: Test
-        run: pnpm run ci
-      - name: Build
+      - name: Test & Build
+        run: run-p ci build build-mv3
         env:
           SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
           SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
           SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
           SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
-        run: pnpm build
 
       - name: Get version and SHA
         run: node scripts/action-helper.js ci
-      - name: Upload Artifact
+      - name: Upload MV2 zip
         uses: actions/upload-artifact@v7
         continue-on-error: true
         with:
           name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}'
           path: 'dist/*'
           if-no-files-found: error
-
-      - name: Build MV3
-        env:
-          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
-          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
-          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
-          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
-        run: pnpm build-mv3
-      - name: Upload Artifact
+      - name: Upload MV3 zip
         uses: actions/upload-artifact@v7
         continue-on-error: true
         with:
-          name: 'Violentmonkey-test-webext-${{ env.GIT_DESCRIBE }}-mv3'
-          path: 'dist/*'
+          name: 'Violentmonkey-test-mv3-${{ env.GIT_DESCRIBE }}'
+          path: 'dist-mv3/*'
           if-no-files-found: error
 
       - name: Upload to Transifex - check src

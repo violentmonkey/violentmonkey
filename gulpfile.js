@@ -9,9 +9,8 @@ const i18n = require('./scripts/i18n');
 const { getVersion, isBeta } = require('./scripts/version-helper');
 const { buildManifest } = require('./scripts/manifest-helper');
 const pkg = require('./package.json');
-const { MV3 } = require('./scripts/common');
+const { MV3, DIST } = require('./scripts/common');
 
-const DIST = 'dist';
 const paths = {
   manifest: 'src/manifest.yml',
   locales: [

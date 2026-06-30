@@ -69,6 +69,7 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
   const vars = {
     ...defsObj,
     '__.INJECTED': JSON.stringify(/injected/.test(page) && page),
+    '__.MV3PAGE': MV3 && !page,
     '__.SW': SW,
   };
   const config = (entry ? getBaseConfig : getPageConfig)(

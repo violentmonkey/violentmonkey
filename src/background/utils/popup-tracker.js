@@ -1,4 +1,5 @@
-import { getActiveTab, i18n, sendTabCmd } from '@/common';
+import { getActiveTab, i18n, noop, sendTabCmd } from '@/common';
+import { executeScript } from '@/common/browser-scripts-api';
 import cache from './cache';
 import { getData, getScriptsByURL } from './db';
 import { badges, getFailureReason } from './icon';
@@ -71,19 +72,8 @@ async function augmentSetPopup(data, src, key) {
 }
 
 async function isInjectable(tabId, badgeData) {
-  try {
-    return badgeData[INJECT] && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 }) || (
-      __.MV3 ? (
-        await chrome.scripting.executeScript({
-          target: {tabId},
-          func: () => 1,
-          injectImmediately: true,
-        })
-      )[0].result : (
-        await browser.tabs.executeScript(tabId, { code: '1', [RUN_AT]: 'document_start' })
-      )[0]
-    );
-  } catch {/*ignore*/}
+  return badgeData[INJECT] && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
+    || executeScript(tabId, '1', true).catch(noop);
 }
 
 function onPopupOpened(port) {

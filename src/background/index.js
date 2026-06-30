@@ -1,6 +1,7 @@
 import '@/common/browser';
 import { getActiveTab, makePause } from '@/common';
 import { deepCopy } from '@/common/object';
+import setClipboard from '@/common/clipboard';
 import { handleHotkeyOrMenu } from './utils/icon';
 import { addPublicCommands, commands, init } from './utils';
 import './sync';
@@ -12,12 +13,11 @@ import './utils/storage-fetch';
 import './utils/tab-redirector';
 import './utils/tester';
 import './utils/update';
-// #!if SW
 import callOffscreen from './utils/offscreen';
-// #!else
-import './utils/clipboard';
-// #!endif
 
+if (!__.MV3) addPublicCommands({
+  SetClipboard: setClipboard,
+});
 addPublicCommands({
   /**
    * Timers in content scripts are shared with the web page so it can clear them.

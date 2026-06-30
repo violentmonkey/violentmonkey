@@ -85,6 +85,9 @@ importers:
       '@actions/github':
         specifier: ^9.1.1
         version: 9.1.1
+      '@automattic/webpack-inline-constant-exports-plugin':
+        specifier: ^1.0.0
+        version: 1.0.0(webpack@5.107.2)
       '@babel/core':
         specifier: ^7.29.7
         version: 7.29.7
@@ -304,9 +307,6 @@ importers:
       webpack-cli:
         specifier: ^7.0.3
         version: 7.0.3(webpack-bundle-analyzer@5.3.0)(webpack@5.107.2)
-      webpack-preprocessor-loader:
-        specifier: ^1.3.0
-        version: 1.3.0
 
 packages:
 
@@ -337,6 +337,11 @@ packages:
 
   '@asamuzakjp/css-color@3.2.0':
     resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
+
+  '@automattic/webpack-inline-constant-exports-plugin@1.0.0':
+    resolution: {integrity: sha512-gbGYpRToZY5kqgWHqQxtNBIkytBODOB+n/mjWu5FxK2rhrJSRFX8JT4mDtaMJM2uhiH+qRLzeBizNEzrZ5S/Vw==}
+    peerDependencies:
+      webpack: ^5.7.0
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
@@ -5808,10 +5813,6 @@ packages:
     resolution: {integrity: sha512-hXXvrjtx2PLYx4qruKl+kyRSLc52V+cCvMxRjmKwoA+CBbbF5GfIBtR6kCvl0fYGqTUPKB+1ktVmTHqMOzgCBg==}
     engines: {node: '>=18.0.0'}
 
-  webpack-preprocessor-loader@1.3.0:
-    resolution: {integrity: sha512-wvHkDvgU9lhKQ1OWIJsawPBT/0wr+J7dwC7DHy0KtmXR/thGOAWbKEErGeJ2aXGSpwgqQTolIRoETlwMzocK1g==}
-    engines: {node: '>=6.11.5'}
-
   webpack-sources@3.5.0:
     resolution: {integrity: sha512-HPuy+uuoTCaaoEoI1LQ3JN9+vrPBvEesnnX1jADHy728cHSMlq4wUc4afYqahq2B1mhQVZxCXOkNTnXltr+2vQ==}
     engines: {node: '>=10.13.0'}
@@ -5985,6 +5986,10 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
+
+  '@automattic/webpack-inline-constant-exports-plugin@1.0.0(webpack@5.107.2)':
+    dependencies:
+      webpack: 5.107.2(postcss@8.5.15)(webpack-cli@7.0.3)
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -12106,8 +12111,6 @@ snapshots:
       clone-deep: 4.0.1
       flat: 5.0.2
       wildcard: 2.0.1
-
-  webpack-preprocessor-loader@1.3.0: {}
 
   webpack-sources@3.5.0: {}
 

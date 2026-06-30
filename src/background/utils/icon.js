@@ -1,8 +1,9 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import loadIconData from '@/common/load-icon-data';
-import { nest, objectPick } from '@/common/object';
-import { addOwnCommands, commands, init } from './init';
+import { nest } from '@/common/object';
+import { addOwnCommands, commands, init, isNewSession } from './init';
+import { installedOver } from './on-installed';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import storage, { S_CACHE } from './storage';
@@ -24,26 +25,7 @@ const iconDataCache = {};
 /** @return {string | Promise<string>} */
 export const getImageData = url => iconCache[url] || (iconCache[url] = loadIcon(url));
 // Firefox Android does not support such APIs, use noop
-const browserAction = (() => {
-  // Using `chrome` namespace in order to skip our browser.js polyfill in Chrome
-  const api = chrome.browserAction;
-  // Some methods like setBadgeText added callbacks only in Chrome 67+.
-  const makeMethod = fn => (...args) => {
-    try {
-      // Suppress the "no tab id" error when setting an icon/badge as it cannot be reliably prevented
-      api::fn(...args, ignoreChromeErrors);
-    } catch (e) {
-      api::fn(...args);
-    }
-  };
-  return objectPick(api, [
-    'setIcon',
-    'setBadgeText',
-    'setBadgeBackgroundColor',
-    'setTitle',
-  ], fn => (fn ? makeMethod(fn) : noop));
-})();
-
+const browserAction = browser[__.MV3 ? 'action' : 'browserAction'];
 /** @type {{ [tabId: string]: VMBadgeData }}*/
 export const badges = {};
 const KEY_SHOW_BADGE = 'showBadge';
@@ -95,9 +77,11 @@ init.then(async () => {
   showBadge = getOption(KEY_SHOW_BADGE);
   badgeColor = getOption(KEY_BADGE_COLOR);
   badgeColorBlocked = getOption(KEY_BADGE_COLOR_BLOCKED);
-  forEachTab(updateState);
-  if (!isApplied) setIcon(); // sets the dimmed icon as default
-  if (contextMenus) {
+  if (isNewSession) {
+    forEachTab(updateState);
+    if (!isApplied) setIcon(); // sets the dimmed icon as default
+  }
+  if (contextMenus && (!__.MV3 || installedOver)) {
     const addToIcon = (id, title, opts) => (
       new Promise(resolve => (
         contextMenus.create({
@@ -187,7 +171,7 @@ function updateBadge({ id: tabId }, data = badges[tabId]) {
     browserAction.setBadgeText({
       text: `${data[showBadge] || ''}`,
       tabId,
-    });
+    }).catch(noop);
   }
 }
 
@@ -196,7 +180,7 @@ function updateBadgeColor({ id: tabId }, data = badges[tabId]) {
     browserAction.setBadgeBackgroundColor({
       color: data[INJECT] ? badgeColor : badgeColorBlocked,
       tabId,
-    });
+    }).catch(noop);
   }
 }
 
@@ -204,7 +188,7 @@ function updateState(tab, data, title) {
   const tabId = tab.id;
   if (!data) data = badges[tabId] || resetBadgeData(tabId);
   if (!title) [title] = getFailureReason(getTabUrl(tab), data);
-  browserAction.setTitle({ tabId, title });
+  browserAction.setTitle({ tabId, title }).catch(noop);
   setIcon(tab, data);
   updateBadge(tab, data);
 }
@@ -228,7 +212,7 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
     tabId,
     path: pathData,
     imageData: iconData,
-  });
+  }).catch(noop);
 }
 
 /** Omitting `data` = check whether injection is allowed for `url` */

@@ -1,6 +1,7 @@
 import {
   getActiveTab, getScriptName, getScriptPrettyUrl, getUniqId, sendTabCmd,
 } from '@/common';
+import { executeScript } from '@/common/browser-scripts-api';
 import {
   __CODE, BLACKLIST, GLOB_ALL, HOMEPAGE_URL, KNOWN_INJECT_INTO, kOrigTag, kTag, META_STR,
   METABLOCK_RE, NEWLINE_END_RE, TL_AWAIT, UNWRAP, XHR_COOKIE_RE,
@@ -61,7 +62,7 @@ const UNSAFE_INLINE = "'unsafe-inline'";
 const BAG_NOOP = { [INJECT]: {}, [CACHE_KEYS]: [] };
 const BAG_NOOP_EXPOSE = { ...BAG_NOOP, [INJECT]: { [EXPOSE]: true, [kSessionId]: sessionId } };
 const CSAPI_REG = 'csReg';
-const contentScriptsAPI = browser.contentScripts;
+const contentScriptsAPI = !__.MV3 && browser.contentScripts;
 const cache = initCache({
   lifetime: 5 * 60e3,
   onDispose(val) {
@@ -642,18 +643,8 @@ function injectContentRealm(toContent, tabId, frameId) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
     const code = scr[__CODE].join('');
-    (__.MV3
-      ? chrome.userScripts.execute({
-        js: [{code}],
-        target: {tabId, frameIds: [frameId]},
-        injectImmediately: /body|start/.test(scr[RUN_AT]),
-      })
-      : browser.tabs.executeScript(tabId, {
-        code,
-        [RUN_AT]: `document_${scr[RUN_AT]}`.replace('body', 'start'),
-        [kFrameId]: frameId,
-      })
-    ).then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
+    executeScript(tabId, code, scr[RUN_AT], frameId)
+      .then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
   }
 }
 

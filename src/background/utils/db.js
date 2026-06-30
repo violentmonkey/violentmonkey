@@ -15,7 +15,8 @@ import {
 } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
-import { addOwnCommands, addPublicCommands, commands, resolveInit, sessionData } from './init';
+import { addOwnCommands, addPublicCommands, commands, resolveInit, isNewSession } from './init';
+import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
 import { initOptions, kVersion, setOption } from './options';
 import storage, {
@@ -25,7 +26,6 @@ import storage, {
 } from './storage';
 import { storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
-import { getUpdateInterval } from './update';
 import { vetUrl } from './url';
 
 let maxScriptId = 0;
@@ -34,7 +34,6 @@ let maxScriptPosition = 0;
 export let dbKeys = new Map(); // 1: exists, 0: known to be absent
 /** @type {{ [url:string]: number }} */
 export let scriptSizes = {};
-export let lastInstalledVersion;
 /** Ensuring slow icons don't prevent installation/update */
 const ICON_TIMEOUT = 1000;
 export const kTryVacuuming = 'Try vacuuming database in options.';
@@ -123,57 +122,23 @@ if (__.MV3) chrome.alarms.onAlarm.addListener(a => {
   if (a.name === 'remove') checkRemove();
 });
 
-chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
-  if (reason === 'update' || reason === 'install') try {
-    lastInstalledVersion = previousVersion || '';
-    if (__.MV3) await Promise.all([
-      chrome.alarms.clearAll().then(() => [
-        chrome.alarms.create('remove', { periodInMinutes: 24 * 60 }),
-        chrome.alarms.create('update', { periodInMinutes: getUpdateInterval() / 60e3 }),
-      ]),
-      chrome.userScripts.configureWorld({
-        csp: "script-src 'self' 'unsafe-inline' 'unsafe-eval';" +
-          "style-src * 'unsafe-inline' data: blob:",
-        messaging: true,
-      }),
-      chrome.userScripts.register([{
-        id: '1',
-        runAt: 'document_start',
-        allFrames: true,
-        matches: ['<all_urls>'],
-        js: [{file: 'injected-web.js'}, {file: 'injected.js'}],
-      }]),
-    ].flat());
-  } catch (err) {
-    if (__.MV3) {
-      chrome.tabs.create({
-        url: 'data:text/plain,' + err.message.replaceAll('#', '%23') +
-          '\nMake sure to enable "Allow User Scripts" for Violentmonkey in chrome://extensions',
-      });
-    }
-  }
-});
-
 (async () => {
   /** @type {string[]} */
   let keys;
-  const [allKeys] = await Promise.all([
+  let [allKeys, data] = await Promise.all([
     getStorageKeys?.(),
-    sessionData,
+    !getStorageKeys && storage.api.get(),
+    isNewSession,
   ]);
   if (allKeys) {
     // Filtering and creating Map in atomic native code operations instead of js loop
     keys = allKeys.join('\n').replace(/^(?:(options|version|(?:scr|mod):\d+)|\S+)$/gm, '$1').trim();
     dbKeys = new Map(JSON.parse(`[${keys.replace(/\S+/g, '["$&",1],').slice(0, -1)}]`));
     keys = keys.split(/\n+/);
+    data = await storage.api.get(keys);
   }
-  const lastVersion = __.MV3 ? lastInstalledVersion
-    : (!getStorageKeys || dbKeys.has(kVersion)) && await storage.base.getOne(kVersion);
-  const version = __.VM_VER;
-  const versionChanged = (lastInstalledVersion != null) && version !== lastVersion;
-  if (__.MV3 ? lastVersion === '' : !lastVersion) await patchDB();
-  if (versionChanged) storage.api.set({ [kVersion]: version });
-  const data = await storage.api.get(keys);
+  if (installedOver === NEW_INSTALL) await patchDB();
+  if (installedOver) storage.api.set({ [kVersion]: __.VM_VER });
   const uriMap = {};
   const defaultCustom = getDefaultCustom();
   data::forEachEntry(([key, script]) => {
@@ -222,14 +187,14 @@ chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
     }
   });
-  initOptions(data, lastVersion, versionChanged);
+  initOptions(data, installedOver, installedOver !== NEW_INSTALL);
   if (__.DEBUG) {
     console.info('store:', {
       aliveScripts, removedScripts, maxScriptId, maxScriptPosition, scriptMap, scriptSizes,
     });
   }
   sortScripts();
-  if (!__.MV3 || !sessionData.init && chrome.storage.session.set({ init: 1 })) {
+  if (!__.MV3 || isNewSession && chrome.storage.session.set({ init: 1 })) {
     setTimeout(async () => {
       if (allKeys?.length) {
         const set = new Set(keys); // much faster lookup

@@ -1,13 +1,16 @@
 const { resolve } = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
+const webpack = require('webpack');
 const progressBarPlugin = require('progress-bar-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const InlineConstantExportsPlugin = require('@automattic/webpack-inline-constant-exports-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const deepmerge = require('deepmerge');
+const escapeStringRegexp = require('escape-string-regexp').default;
 const GroupAssetsPlugin = require('./webpack-group-assets-plugin');
-const { alias, extensions, isProd, MV3 } = require('./common');
+const { alias, extensions, isProd, MV3, DIST } = require('./common');
 
 const defaultHtmlOptions = {
   minify: isProd && {
@@ -113,7 +116,7 @@ const styleOptions = {
 const postcssLoader = {
   loader: 'postcss-loader',
 };
-const getBaseConfig = (page, bare, vars) => ({
+const getBaseConfig = (page, bare) => ({
   mode: isProd ? 'production' : 'development',
   target: 'web', // required by live reloading
   devtool: isProd ? false : page.startsWith('injected') ? 'inline-source-map' : 'source-map',
@@ -121,7 +124,7 @@ const getBaseConfig = (page, bare, vars) => ({
     outputModule: true,
   } : {},
   output: {
-    path: resolve('dist'),
+    path: resolve(DIST),
     publicPath: '/',
     filename: '[name].js',
     hashFunction: 'xxhash64',
@@ -146,11 +149,9 @@ const getBaseConfig = (page, bare, vars) => ({
       // JS/TS
       {
         test: /\.m?[jt]sx?$/,
-        use: [
-          'babel-loader',
-          { loader: 'webpack-preprocessor-loader', options: { directives: vars, params: vars } },
-        ],
-        exclude: file => /node_modules/.test(file) && !/vueleton|@vue[/\\]shared|@usync/.test(file),
+        loader: 'babel-loader',
+        exclude: file => /node_modules/.test(file) &&
+          !/vueleton|@vue[/\\]shared|@usync/.test(file),
       },
       // CSS
       {
@@ -235,6 +236,9 @@ const getBaseConfig = (page, bare, vars) => ({
     ].filter(Boolean) : [],
   },
   plugins: [
+    MV3 && new webpack.NormalModuleReplacementPlugin(/\/common\/tld$/, (r) => {
+      r.request += '-mv3';
+    }),
     !process.env.GITHUB_ACTIONS && new progressBarPlugin({
       format: '[:bar] :percent (:elapsed seconds), :msg',
       summary: false,
@@ -245,6 +249,15 @@ const getBaseConfig = (page, bare, vars) => ({
       filename: '[name].css',
     }),
     !page && require('unplugin-icons/webpack')(),
+    new InlineConstantExportsPlugin([
+      RegExp(`/(${[
+        'consts.js',
+        'consts-sync.js',
+        'utils/on-installed.js',
+        'utils/storage.js',
+      ].map(escapeStringRegexp).join('|')
+      })$`.replaceAll('/', String.raw`[/\\]`)),
+    ])
   ].filter(Boolean),
 });
 
