@@ -112,7 +112,7 @@
     "@usync/sync": "^0.1.1",
     "@violentmonkey/shortcut": "^1.4.4",
     "codemirror": "^5.65.20",
-    "fflate": "^0.8.3",
+    "web-jszipp": "^1.0.8",
     "tldts": "^7.4.0",
     "vue": "^3.5.35",
     "vueleton": "^2.0.2"
