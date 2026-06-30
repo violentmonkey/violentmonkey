@@ -1,4 +1,4 @@
-const escapeStringRegexp = require('escape-string-regexp');
+const escapeStringRegexp = require('escape-string-regexp').default;
 const webpack = require('webpack');
 
 const G = webpack.RuntimeGlobals;

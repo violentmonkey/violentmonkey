@@ -26,7 +26,6 @@ html {
 }
 body {
   width: 320px;
-  max-width: 100%;
   /* Latest Chrome renders an extra blank for a nonexistent scrollbar */
   overflow: hidden;
   background: var(--fill-0-5);
