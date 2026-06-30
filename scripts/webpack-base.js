@@ -141,7 +141,8 @@ const getBaseConfig = () => ({
       {
         test: /\.m?[jt]sx?$/,
         use: 'babel-loader',
-        exclude: file => /node_modules/.test(file) && !/vueleton|@vue[/\\]shared/.test(file),
+        exclude: file => /node_modules/.test(file)
+          && !/vueleton|@vue[/\\]shared|@usync/.test(file),
       },
       // CSS
       {
