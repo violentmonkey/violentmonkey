@@ -750,6 +750,9 @@ learnInjectionMode:
   message: >-
     Μάθετε περισσότερα για της λειτουργίες εκτέλεσης των script (injection
     modes)
+linkManageRemoteFiles:
+  description: Label for link to manage remote files.
+  message: ''
 menuCommands:
   description: Menu item to list script commands.
   message: Εντολές σεναρίου

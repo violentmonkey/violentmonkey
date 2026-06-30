@@ -110,7 +110,7 @@ buttonSyncPushOnce:
   message: Uzağa bir kez "push"
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Geri al
+  message: Geri Al
 buttonUpdate:
   description: Button to update a script.
   message: Güncelle
@@ -130,13 +130,15 @@ buttonVacuuming:
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
   message: |-
-    Bu betik için otomatik güncelleme devre dışı!
-    Yine de güncellemek isterseniz Tamam'a tıklayın.
+    Bu betik için otomatik güncelleme devre dışı bırakılmıştır!
+    Yine de güncellemek için Tamam’a tıklayın.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: |-
+  message: >-
     Değişiklikler kaydedilmedi!
-    Göz ardı etmek için Tamam'a, düzenlemeye devam etmek için İptal'e tıklayın.
+
+    Değişiklikleri silmek için Tamam’a, mevcut durumu korumak için İptal’e
+    tıklayın.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
@@ -146,47 +148,48 @@ confirmUndoImport:
     düzenleme, özelleştirme)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Enjeksiyon kara listesi (Eşleşen sitelerdeki betikler çalışmayacaktır)
+  message: Enjeksiyon kara listesi (eşleşen sitelerde betikler çalıştırılmaz)
 descBlacklistNet:
   description: Description for the global network blacklist.
   message: >-
-    Ağ kara listesi (Betikler eşleşen sitelere ve o sitelerin çerezlerine
-    bağlanmayacaktır)
+    Ağ kara listesi (betikler, bu listede yer alan sitelere ve bu sitelerin
+    çerezlerine bağlanamaz)
 descCustomCSS:
   description: Description of custom CSS section.
   message: >-
-    Seçenekler sayfası ve betik yükleme sayfası için özelleştirilmiş CSS. Ne işe
-    yaradığını bilmiyorsanız lütfen burayı düzenlemeyin.
+    Seçenekler sayfası ve betik yükleme sayfası için özel CSS. Bunun ne işe
+    yaradığından emin değilseniz, lütfen düzenlemeyin.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
-    CodeMirror için ve JSON eklentileri için <code>{"indentUnit":2,
-    "smartIndent":true}</code> gibi özelleştirilmiş ayarlar. Bazılarının
-    Violentmonkey'de çalışmayabileceğini unutmayın. Tüm listeyi görmek için <a
-    href="https://codemirror.net/doc/manual.html#config" target="_blank"
-    rel="noopener noreferrer">tıklayın</a>.
+    CodeMirror ve eklentiler için <code>{"indentUnit":2,
+    "smartIndent":true}</code> gibi JSON nesnesi biçiminde özel seçenekler
+    mevcuttur; ancak bunların bazılarının Violentmonkey'de çalışmayabileceğini
+    unutmayın. <a href="https://codemirror.net/doc/manual.html#config"
+    target="_blank" rel="noopener noreferrer">Tam listeye</a> bakın.
 descEditorOptionsGeneric:
   description: Description of editor options in VM settings.
   message: >-
-    Boolean operatörlerini değelerine çift tıklayarak değiştirebilirsiniz:
-    <code>true</code> = etkin, <code>false</code> = devre dışı.
-    <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
-    <code>Time</code> ile biten sayısal seçeneklerin değerleri milisaniye
-    cinsindendir.
+    Boole seçenekleri, değere çift tıklanarak etkinleştirilebilir veya devre
+    dışı bırakılabilir: <code>true</code> = etkin, <code>false</code> = devre
+    dışı. <code>Delay</code>, <code>Interval</code>, <code>Rate</code>,
+    <code>Time</code> ile biten sayısal seçenekler milisaniye cinsindendir.
 descEditorOptionsVM:
   description: Description of nonstandard editor options in VM settings.
   message: >-
-    Standart dışı seçenekler: <code>autocompleteOnTyping</code>, yazmaya
-    başladığınızda otomatik tamamlama ipuçlarının gösterileceği milisaniye
-    cinsinden gecikme süresidir (<code>0</code> = devre dışı).
-    <code>killTrailingSpaceOnSave</code> kayıt sırasında satır sonlarındaki
-    boşlukları otomatik olarak kaldırır. <code>showTrailingSpace</code> satır
-    sonlarındaki boşlukları nokta şeklinde gösterir.
+    Standart dışı seçenekler: <code>autocompleteOnTyping</code>, yazma
+    işleminden sonra otomatik tamamlama önerilerinin görüntülenmesi için
+    milisaniye cinsinden bir gecikme süresidir (<code>0</code> = devre dışı),
+    <code>killTrailingSpaceOnSave</code>, kaydetme sırasında her satırın
+    sonundaki boşlukları otomatik olarak kaldırır,
+    <code>showTrailingSpace</code> ise satır sonundaki boşlukları nokta olarak
+    gösterir.
 descScriptTemplate:
   description: Description of script template section.
   message: >-
-    Desteklenen değerler: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
-    MomentJS uyumlu biçimde <{{date:format}}> (örn. <{{date:YYYY-AA-GG}}>).
+    Desteklenen değişkenler: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
+    <{{date:format}}> (MomentJS ile uyumlu biçimlerde; örneğin
+    <{{date:YYYY-MM-DD}}>).
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: grupla
@@ -207,7 +210,7 @@ editHelpKeyboard:
   message: 'Klavye kısayolları:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: Başka düzenleyici kullan?
+  message: Başka bir düzenleyici kullanmak ister misiniz?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Özel meta veriler
@@ -220,10 +223,10 @@ editLongLine:
 editLongLineTooltip:
   description: Tooltip shown in the editor in lines that were cut due to being too long
   message: >-
-    Bu satır çok uzun olduğundan dolayı düzenleme yaparken yaşanabilecek
-    gecikmeleri önlemek için daraltıldı.
+    Bu satır çok uzun olduğu için, düzenleme sırasında gecikmeleri önlemek
+    amacıyla metni kısaltılmıştır.
 
-    Gelişmiş ayarlar bölümünden bu limiti değiştirebilirsiniz. Örneğin:
+    Gelişmiş ayarlardan bu sınırı değiştirebilirsiniz, örneğin:
 
     "maxDisplayLength": 20000
 editNavCode:
@@ -241,44 +244,41 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: Betiğin tüm değerler deposunu göster/düzenle
+  message: Tüm betiğin değer depolama alanını göster/düzenle
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: >-
-    Birçok tarayıcıyı destekleyen açık kaynak kodlu bir kullanıcı betiği
-    yöneticisi
+  message: Birçok tarayıcıyı destekleyen açık kaynaklı bir kullanıcı betiği yöneticisi
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: Violentmonkey ayarlarında kara listede
+  message: Violentmonkey ayarlarında kara listeye alındı
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
   message: >-
-    Violentmonkey bu sayfada kullanıcı betiklerini çalıştıramıyor
+    Violentmonkey bu sayfada kullanıcı betiklerini çalıştıramaz
 
-    (olağan şüpheliler: tarayıcı arayüzü, uzantı sayfası, ilkeler aracılığıyla
-    engelleme, Opera'da arama motoru sayfası)
+    (yaygın örnekler: tarayıcı arayüzü, bir uzantı, ilkeler yoluyla engellenmiş
+    sayfalar, Opera’daki bir arama motoru sitesi)
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
     Violentmonkey yeniden başlatıldı. Kullanıcı betiklerini çalıştırmak için
-    lütfen sekmeyi yenileyin.
+    lütfen sekmeyi yeniden yükleyin.
 fileInstallBlocked:
   description: Text in the installer when a local file is dropped into the browser window.
   message: >-
-    Yerel bir dosyayı yüklemenin ve düzenlemeleri izlemenin birkaç yöntem
-    vardır: 
-
-    <1>Dosyayı sürükleyip açık bir Violentmonkey sayfasına veya açılır
-    penceresine bırakabilirsiniz (bu sayfa dahil). <2>Dosya için yerel bir HTTP
-    sunucusu kurup http://localhost üzerinden açabilirsiniz.
-    <3>chrome://extensions sayfasındaki Violentmonkey ayrıntılarında "Dosya
-    URL'lerine erişime izin ver" seçeneğini etkinleştirebilirsiniz. Ancak bu
-    tehlikelidir çünkü tüm kullanıcı betikleri tüm yerel dosyaları okuyabilir.
+    Yerel bir dosyayı yüklemek veya üzerinde yapılan düzenlemeleri takip etmek
+    için birkaç yöntem vardır: <1> Dosyayı, bu sayfa da dahil olmak üzere açık
+    bir Violentmonkey sayfasına veya açılır penceresine sürükleyip bırakın. <2>
+    Bu dosya için yerel bir HTTP sunucusu kurun ve http://localhost adresinden
+    açın. <3> chrome://extensions sayfasındaki Violentmonkey ayrıntılarında
+    “Dosya URL’lerine erişime izin ver” seçeneğini etkinleştirin. Bu, herhangi
+    bir kullanıcı betiğinin herhangi bir yerel dosyayı okuyabilmesi nedeniyle
+    tehlikelidir.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetik
@@ -287,15 +287,15 @@ filterExecutionOrder:
   message: çalıştırma sırası
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: son güncelleme zamanına göre
+  message: son güncelleme zamanı
 filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: son ziyaret
+  message: son ziyaret zamanı
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: Bu betiğin hedeflediği herhangi bir siteyi ziyaret ettiğiniz son tarih.
+  message: Bu betiğin hedef aldığı herhangi bir siteyi en son ziyaret ettiğiniz zaman.
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: Tümü
@@ -310,7 +310,7 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: boyuta göre
+  message: boyut
 genericError:
   description: Label for generic error.
   message: Hata
@@ -322,41 +322,46 @@ genericOn:
   message: açık
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: global ayarı kullan
+  message: genel ayarı kullan
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
   message: >-
-    "#" şablonları yalnızca siteyi ilk açtığınızda veya sekmeyi yenilediğinizde
-    çalışır: $1
+    "#" desenleri yalnızca site ilk kez açıldığında veya sekme yeniden
+    yüklendiğinde çalışır: $1
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
   message: Geri Dönüşüm Kutusu
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Sürüklenip bırakılan yerel betikler için talimatları göster
+  message: Sürükle ve bırak yöntemiyle eklenen yerel betikler için talimatları göster
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: eşleşen $1 betik
+  message: $1 adet eşleşen betik için
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: '`@grant none` tüm diğer `@grant` anahtarlarını devre dışı bırakır.'
+  message: '`@grant none` komutu, diğer tüm `@grant` anahtarlarını devre dışı bırakır.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: >-
+    Sandbox'a alınmış bir betiğin şu genel özellikleri değiştiremez: $1. Bu
+    sorunu gidermek için ya `@grant none` ekleyerek sandbox'ı devre dışı
+    bırakın, ya da `window` yerine `unsafeWindow` kullanın.
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL''yi girin:'
 hintRecycleBin:
   description: Hint for recycle bin.
-  message: Kaldırılan betikler 7 gün boyunca burada listelenecek ve tutulacaktır.
+  message: Kaldırdığınız betikler burada listelenir ve 7 gün boyunca tutulur.
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: '@downloadURL kullan'
 hintVacuum:
   description: Hint for vacuuming data.
-  message: Fazlalıkları at ve eksik kaynakları önbelleğe geri yüklemeyi dene.
+  message: >-
+    Gereksiz verileri silin ve eksik kaynakları önbellekten yeniden yüklemeyi
+    deneyin.
 install:
   description: Label for button to install a script.
   message: Yükle
@@ -384,10 +389,12 @@ labelAllowUpdate:
   message: Güncellemeye izin ver
 labelAuthor:
   description: Label of author shown in the details of a script.
-  message: 'Geliştiren: '
+  message: 'Yazar: '
 labelAutoReloadCurrentTab:
   description: Option to reload current tab after a script is switched on or off from menu.
-  message: Bir betiği menüden kapattığımda/açtığımda geçerli sekmeyi yenile
+  message: >-
+    Menüden bir betiği etkinleştirip/devre dışı bıraktıktan sonra mevcut sekmeyi
+    yeniden yükle
 labelAutoReloadCurrentTabDisabled:
   description: >-
     Tooltip in menu after Violentmonkey is switched off if auto-reload is
@@ -396,7 +403,9 @@ labelAutoReloadCurrentTabDisabled:
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Betik güncellemelerini $1 günde bir kontrol et. Kapatmak isterseniz 0 yazın
+  message: >-
+    Her $1 günde bir betik güncellemelerini kontrol edin; devre dışı bırakmak
+    için 0 değerini kullanın
 labelBackup:
   description: Label of the import/export section in settings.
   message: Yedekle
@@ -411,7 +420,7 @@ labelBadgeColors:
   message: 'Rozet renkleri: '
 labelBadgeNone:
   description: Option to display nothing on badge.
-  message: hiçbir şey
+  message: yok
 labelBadgeTotal:
   description: Option to display total number of running scripts on badge.
   message: çalışan betik sayısı
@@ -429,7 +438,7 @@ labelContributors:
   message: Katkıda bulunanlar
 labelCurrentLang:
   description: Label of current language.
-  message: 'Geçerli dil: '
+  message: 'Geçerli Dil: '
 labelCustomCSS:
   description: Label for custom CSS section.
   message: Özel Stil
@@ -468,10 +477,10 @@ labelExcludeMatch:
   message: '@exclude-match kuralları'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Betik verilerini dışarı aktar
+  message: Betik verilerini dışa aktar
 labelExposeStatus:
   description: Option in advanced settings.
-  message: 'Yüklü sürümü kullanıcı betiği katalog sitelerine bildir: $1'
+  message: 'Kullanıcı betik kataloğu sitelerinde yüklü sürümü göster: $1'
 labelFastFirefoxInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
   message: Firefox'ta alternatif $1 modu
@@ -500,19 +509,23 @@ labelHomepageURL:
   message: 'Ana sayfa URL''si:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: GM_cookie'nin yalnızca HTTP çerezlerine erişmesine izin ver
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    Etkinleştirildiğinde, betikler “HTTP-only” bayrağına sahip çerezleri
+    okuyabilir ve yazabilir. Bu, betiklerin JavaScript aracılığıyla erişilemeyen
+    çerezlere erişmesine olanak tanır. Güvenlik riskleri oluşturabileceğinden
+    dikkatli kullanınız.
 labelIconURL:
   description: Label for the input.
   message: 'Simge URL''si:'
 labelImportScriptData:
   description: Option to import script data along with scripts.
-  message: Betik verilerini içeri aktar
+  message: Betik verilerini içe aktar
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Ayarları içeri aktar
+  message: Ayarları içe aktar
 labelInclude:
   description: Label of @include rules.
   message: '@include kuralları'
@@ -532,7 +545,7 @@ labelLastUpdatedAt:
   message: 'Son güncelleme: $1 '
 labelLineNumber:
   description: Label for line number jumper.
-  message: 'Satır no: '
+  message: 'Satır numarası: '
 labelMatch:
   description: Label of @match rules.
   message: '@match kuralları'
@@ -559,9 +572,7 @@ labelNotifyUpdates:
   message: Betik güncellemelerini bildir
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: >-
-    betiklerin özel bildirim ayarlarını görmezden gel (düzenleyicideki "ayarlar"
-    sekmesindeki)
+  message: betik başına bildirimleri yok say (düzenleyicideki “ayarlar” sekmesi)
 labelPageMenuCommands:
   description: Checkbox item in page context menu and option to enable script commands.
   message: Sayfa menüsünde betik komutlarını göster
@@ -590,10 +601,10 @@ labelRunAtDefault:
   message: (Varsayılan)
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: (yalnızca ayarlarında bu seçeneğin etkinleştirildiği betikler için)
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: (bu seçeneğin genel ayarlarda da etkinleştirilmesi gerekir)
 labelScriptTemplate:
   description: Label for custom script template.
   message: Özel Betik Şablonu
@@ -642,22 +653,22 @@ labelSyncRevoke:
   message: İptal et
 labelSyncS3AccessKeyId:
   description: Label for S3 access key ID input.
-  message: ''
+  message: 'Erişim Anahtarı Kimliği: '
 labelSyncS3Bucket:
   description: Label for S3 bucket name input.
-  message: ''
+  message: 'Depo: '
 labelSyncS3Endpoint:
   description: Label for custom S3-compatible endpoint URL input (leave blank for AWS).
-  message: ''
+  message: 'Özel Uç Nokta: '
 labelSyncS3Prefix:
   description: Label for S3 key prefix input (folder within the bucket).
-  message: ''
+  message: 'Anahtar Öneki: '
 labelSyncS3Region:
   description: Label for S3 region input.
-  message: ''
+  message: 'Bölge: '
 labelSyncS3SecretAccessKey:
   description: Label for S3 secret access key input.
-  message: ''
+  message: 'Gizli Erişim Anahtarı: '
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Betik durumunu eşitle
@@ -702,16 +713,17 @@ labelXhrInject:
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
   message: >-
-    Sayfa yüklenmeden önce çalışması gereken bir betiğiniz varsa ve şu anda bu
-    betik çok geç çalışıyorsa bu seçeneği etkinleştirin. Tampermonkey'deki
-    "anında enjeksiyon" moduna benzer şekilde, bu seçenek de artık kullanılmayan
-    eş zamanlı XHR teknolojisini kullanmaktadır. Bu sebeple Chrome/Chromium
-    geliştirici araçları konsolunda uyarılar görebilirsiniz. Ancak yan etkiler
-    bu durumda önemsiz olduğu için bu hataları görmezden gelebilirsiniz.
-    Uyarılarıdan birine sağ tıklayarak bu uyarıları tamamen gizleyebilirsiniz.
+    Yalnızca sayfanın yüklenmeye başlamadan önce çalıştırılması gereken bir
+    betiğiniz varsa ve şu anda bu betik çok geç çalışıyorsa bu seçeneği
+    etkinleştirin. Tampermonkey’deki anında enjeksiyon modu gibi, bu seçenek de
+    artık kullanılmayan senkron XHR’yi kullanmaktadır; bu nedenle
+    Chrome/Chromium’da geliştirici araçları konsolunda uyarılar göreceksiniz,
+    ancak bu durumda olumsuz etkiler ihmal edilebilir düzeyde olduğundan bu
+    uyarıları güvenle göz ardı edebilirsiniz. Uyarıların birine sağ tıklayarak
+    bunları kalıcı olarak gizleyebilirsiniz.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
-  message: (gizli pencereler ve çerezleri devre dışı bırakılmış siteler hariç)
+  message: (gizli pencereler ve çerezlerin devre dışı bırakıldığı siteler hariç)
 lastSync:
   description: Label for last sync timestamp.
   message: 'Son eşitleme: $1'
@@ -721,6 +733,9 @@ learnBlacklist:
 learnInjectionMode:
   description: Refers to a link to introduce injection modes.
   message: Enjeksiyon modları hakkında bilgi alın.
+linkManageRemoteFiles:
+  description: Label for link to manage remote files.
+  message: Uzak dosyaları yönet
 menuCommands:
   description: Menu item to list script commands.
   message: Script komutları
@@ -736,14 +751,13 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    Genel ayarlardan bu seçeneği açarsanız geçerli sekme otomatik olarak
-    yenilenecektir.
+    Genel ayarlarda bu seçeneği etkinleştirdiyseniz, mevcut sekme otomatik
+    olarak yeniden yüklenecektir.
 
-    Değişiklikleri diğer sekmelere de uygulamak için onları manuel olarak
-    yenilemelisiniz.
+    Değişiklikleri diğer tüm sekmelere uygulamak için lütfen sekmeleri manuel
+    olarak yeniden yükleyin.
 
-    Daha esnek ayarlar için düzenleyicinin "Ayarlar" sekmesini
-    kullanabilirsiniz.
+    Daha fazla esneklik için düzenleyicinin "Ayarlar" sekmesini kullanın.
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
@@ -784,8 +798,8 @@ msgCheckingForUpdate:
 msgDateFormatInfo:
   description: Help text of the info icon in VM settings for the export file name.
   message: >-
-    MomentJS dokümantasyonunu açmak için tıklayın. Kabul edilen token'lar: $1.
-    Metinleri korumak için [köşeli parantez] kullanabilirsiniz.
+    MomentJS belgelerini açmak için tıklayın. İzin verilen token'lar: $1. Sabit
+    metinleri korumak için [köşeli parantez] kullanın.
 msgErrorFetchingResource:
   description: >-
     Message shown when Violentmonkey fails fetching a resource/require/icon of
@@ -814,7 +828,7 @@ msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
     window.
-  message: Gizli modda yaptığınız değişiklikler de ana profilinize etki eder.
+  message: Gizli modda yaptığınız değişiklikler, ana profilinize de etki eder.
 msgInstalled:
   description: Message shown when a script is installed.
   message: Betik yüklendi.
@@ -920,12 +934,12 @@ msgSyntaxError:
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
   message: >-
-    Sayfa yüklendiğinde bu betik mevcut değildi veya URL ile eşleşmedi. Sahte
-    navigasyon kullanan Facebook ve Instagram gibi tek sayfa uygulamasında bu
-    sorun yaşanabilir. Betiği çalıştırmak içn sekmeyi yenileyebilirsiniz. Betiği
-    düzeltmek isterseniz sitenin tamamı için @match kullanabilir, ardından
-    değişiklikleri MutationObserver veya window.navigation API ile tespit
-    edebilirsiniz.
+    Sayfa yüklendiğinde betik mevcut değildi ya da URL ile eşleşmiyordu; bu
+    durum, Facebook veya Instagram gibi sahte gezinme kullanan Tek Sayfalı
+    Uygulama (SPA) sitelerinde sıklıkla görülür. Betikleri çalıştırmak için
+    sekmeyi yeniden yükleyebilirsiniz. Bu sorunu gidermek için site genelinde
+    @match kullanın ve ardından MutationObserver veya window.navigation API’sini
+    kullanarak değişiklikleri algılayın.
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Betik güncellendi.
@@ -1116,7 +1130,9 @@ updateScript:
   message: Güncelle
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: >-
+    Bağımlılıklar da dahil olmak üzere güncellemeye zorlamak için sağ tıklayın
+    veya uzun basılı tutun
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: Tüm betikleri güncelle

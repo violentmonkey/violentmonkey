@@ -1,15 +1,23 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const yaml = require('js-yaml');
 const { getVersion, isBeta } = require('./version-helper');
 
-async function readManifest() {
-  const input = await fs.readFile('src/manifest.yml', 'utf8');
+function getBrowserTargets() {
+  const manifest = readManifest();
+  return [
+    `Chrome >= ${parseInt(manifest.minimum_chrome_version)}`,
+    `Firefox >= ${parseInt(manifest.browser_specific_settings.gecko.strict_min_version)}`,
+  ].join(',');
+}
+
+function readManifest() {
+  const input = fs.readFileSync('src/manifest.yml', 'utf8');
   const data = yaml.load(input);
   return data;
 }
 
-async function buildManifest(base) {
-  const data = base ? { ...base } : await readManifest();
+function buildManifest(base) {
+  const data = base ? { ...base } : readManifest();
   data.version = getVersion();
   if (process.env.TARGET === 'selfHosted') {
     data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/updates/updates.json';
@@ -23,8 +31,8 @@ async function buildManifest(base) {
   return data;
 }
 
-async function buildUpdatesList(version, url) {
-  const manifest = await readManifest();
+function buildUpdatesList(version, url) {
+  const manifest = readManifest();
   const data = {
     addons: {
       [manifest.browser_specific_settings.gecko.id]: {
@@ -46,16 +54,16 @@ class ListBackgroundScriptsPlugin {
   }
 
   apply(compiler) {
-    compiler.hooks.afterEmit.tap(this.constructor.name, async compilation => {
+    compiler.hooks.afterEmit.tap(this.constructor.name, compilation => {
       const dist = compilation.outputOptions.path;
       const path = `${dist}/manifest.json`;
-      const manifest = await buildManifest();
+      const manifest = buildManifest();
       const bgId = 'background/index';
       const bgEntry = compilation.entrypoints.get(bgId);
       const scripts = bgEntry.chunks.flatMap(c => [...c.files]);
       if (`${manifest.background.scripts}` !== `${scripts}`) {
         manifest.background.scripts = scripts;
-        await fs.writeFile(path,
+        fs.writeFileSync(path,
           JSON.stringify(manifest, null, this.minify ? 0 : 2),
           { encoding: 'utf8' });
       }
@@ -63,6 +71,7 @@ class ListBackgroundScriptsPlugin {
   }
 }
 
+exports.getBrowserTargets = getBrowserTargets;
 exports.readManifest = readManifest;
 exports.buildManifest = buildManifest;
 exports.buildUpdatesList = buildUpdatesList;

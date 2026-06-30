@@ -1,8 +1,10 @@
 const { alias, extensions } = require('./scripts/common');
+const { getBrowserTargets } = require('./scripts/manifest-helper');
 
 const isTest = process.env.BABEL_ENV === 'test';
 
 module.exports = {
+  targets: getBrowserTargets(),
   presets: [
     ['@babel/preset-env', {
       ...!isTest && {

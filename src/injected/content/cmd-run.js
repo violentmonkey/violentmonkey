@@ -5,12 +5,11 @@ import { nextTask, sendCmd } from './util';
 const getPersisted = describeProperty(PageTransitionEvent[PROTO], 'persisted').get;
 let pending = topRenderMode === 2; // wait until reified if pre-rendered
 let resolveOnReify;
-let runningIds;
+let runningIds = [];
 let sent;
 
 onScripts.push(() => {
   addHandlers({ Run });
-  runningIds = [];
 });
 on('pageshow', onShown);
 if (pending) {

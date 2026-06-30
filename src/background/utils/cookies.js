@@ -3,11 +3,9 @@ import { addPublicCommands } from './init';
 import { getOption } from './options';
 import { scriptMap } from './script';
 import { testScript } from './tester';
-import { FIREFOX } from './ua';
 import { vetUrl } from './url';
 
 const MUST_MATCH = `Script must match/include `;
-const FIRST_PARTY = FIREFOX >= 59;
 
 addPublicCommands({
   /**
@@ -16,7 +14,7 @@ addPublicCommands({
    * @return {Promise<browser.cookies.Cookie[]>}
    */
   async CookieList(data, src) {
-    const httpOnlyEnabled = checkCookieOpts(data, src, FIRST_PARTY);
+    const httpOnlyEnabled = checkCookieOpts(data, src, true);
     const res = await browser.cookies.getAll(data);
     return httpOnlyEnabled
       ? res
@@ -45,7 +43,7 @@ addPublicCommands({
    * @param {VMMessageSender} src
    */
   async CookieDelete(data, src) {
-    checkCookieOpts(data, src, FIRST_PARTY);
+    checkCookieOpts(data, src, true);
     await browser.cookies.remove(data);
   },
 });

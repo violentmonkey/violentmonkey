@@ -230,8 +230,8 @@ export function onRequestCreate(opts, context, fileName) {
     || (opts.binary || !isObject(data)) && [`${data}`]
     // No browser can send FormData/URLSearchParams directly across worlds
     || getFormData(data)
-    // FF56+ can send any cloneable data directly, FF52-55 can't due to https://bugzil.la/1371246
-    || IS_FIREFOX >= 56 && [data]
+    // FF56+ can send any cloneable data directly
+    || IS_FIREFOX && [data]
     || [data, 'bin'];
   /** @type {GMReq.Message.Web} */
   bridge.call('HttpRequest', safePickInto({

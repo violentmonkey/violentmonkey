@@ -4,7 +4,7 @@
   "version": "2.41.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "prepare": "husky install",
+    "prepare": "husky",
     "dev": "gulp dev",
     "build": "cross-env NODE_ENV=production gulp build",
     "build:selfHosted": "cross-env TARGET=selfHosted BETA=1 run-s build",
@@ -75,6 +75,7 @@
     "postcss-import": "^16.1.1",
     "postcss-loader": "^8.2.1",
     "postcss-nested": "^7.0.2",
+    "postcss-preset-env": "^11.3.0",
     "postcss-scss": "^4.0.9",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.8.3",
@@ -105,6 +106,9 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
+    "@usync/drive": "^0.1.7",
+    "@usync/oauth2": "^0.1.6",
+    "@usync/sync": "^0.1.1",
     "@violentmonkey/shortcut": "^1.4.4",
     "codemirror": "^5.65.20",
     "web-jszipp": "^1.0.8",
