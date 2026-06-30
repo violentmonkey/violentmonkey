@@ -15,7 +15,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { ZipWriter, TimestampMode } from 'web-jszipp/browser-legacy/cr61ff58';
+import { ZipWriter, TimestampMode } from 'web-jszipp/browser-legacy/cr86ff68';
 import { getScriptName, sendCmdDirectly } from '@/common';
 import { formatDate } from '@/common/date';
 import options from '@/common/options';

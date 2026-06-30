@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { openZip } from 'web-jszipp/browser-legacy/cr61ff58';
+import { openZip } from 'web-jszipp/browser-legacy/cr86ff68';
 import { ensureArray, getUniqId, i18n, readBlob, sendCmdDirectly } from '@/common';
 import { listenOnce } from '@/common/browser';
 import { kOrigTag, kTag, RUN_AT_RE } from '@/common/consts';
