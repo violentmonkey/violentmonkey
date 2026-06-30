@@ -8,6 +8,7 @@ import {
   FORBIDDEN_HEADER_RE, VM_VERIFY, requests, toggleHeaderInjector, verify, kCookie, kSetCookie,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
+import { getOption } from './options';
 import { navUA, navUAD } from './ua';
 import { vetUrl } from './url';
 
@@ -32,6 +33,27 @@ addPublicCommands({
     const cb = res => requests[id] && (
       sendTabCmd(tabId, 'HttpRequested', res, req.frame)
     );
+    if (getOption('gmDownloadModeBrowser') && opts[kFileName]) {
+      const downloadOpts = { url: opts.url, filename: opts[kFileName] };
+      if (opts.headers) {
+        downloadOpts.headers = Object.entries(opts.headers).map(
+          ([n, v]) => ({ name: n, value: v }),
+        );
+      }
+      if (opts.saveAs != null) downloadOpts.saveAs = opts.saveAs;
+      if (opts.conflictAction) downloadOpts.conflictAction = opts.conflictAction;
+      if (opts.method) downloadOpts.method = opts.method;
+      browser.downloads.download(downloadOpts)
+        .then(() => {
+          cb({ id, type: 'load', data: { finalUrl: opts.url, readyState: 4, status: 200, response: null, responseHeaders: null } });
+          cb({ id, type: 'loadend', data: null });
+        })
+        .catch(err => {
+          cb({ id, [ERROR]: [err.message || `${err}`, 'DownloadError'], data: null });
+          cb({ id, type: 'loadend', data: null });
+        });
+      return;
+    }
     return httpRequest(opts, events, src, cb)
     .catch(err => cb({
       id,

@@ -359,6 +359,7 @@ declare namespace VMInjection {
     };
     ua: VMScriptGMInfoPlatform;
     uad?: true;
+    gmDownloadModeBrowser?: boolean;
   }
   /**
    * Script prepared for injection
@@ -444,5 +445,17 @@ declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string
  * 4 = pre-rendered top-page post-reification
  */
 declare type VMTopRenderMode = 0 | 1 | 2 | 3 | 4;
+
+/**
+ * The download mode for the current script: `"native"` or `"browser"`.
+ *
+ * - `"native"` — downloads use XMLHttpRequest.
+ * - `"browser"` — downloads are delegated to the browser's native download manager
+ *   (`browser.downloads.download`), controlled by the "Use browser download API"
+ *   setting in Violentmonkey's Advanced settings.
+ */
+declare interface VMScriptGMInfoObject {
+  downloadMode: 'native' | 'browser';
+}
 
 //#endregion Generic

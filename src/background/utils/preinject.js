@@ -14,7 +14,7 @@ import { CACHE_KEYS, getScriptsByURL, kTryVacuuming, PROMISE, REQ_KEYS, VALUE_ID
 import { setBadge } from './icon';
 import { addOwnCommands, addPublicCommands } from './init';
 import { clearNotifications } from './notifications';
-import { hookOptionsInit } from './options';
+import { getOption, hookOptionsInit } from './options';
 import { addMenuConfig, setMenus } from './page-menu-commands';
 import { popupTabs } from './popup-tracker';
 import { clearRequestsByTabId, reifyRequests } from './requests';
@@ -441,7 +441,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     [MORE]: moreKey,
     [kSessionId]: sessionId,
     [IDS]: allIds,
-    info: { ua },
+    info: { ua, gmDownloadModeBrowser: getOption('gmDownloadModeBrowser') },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   }, objectPick(env, [
     S_CACHE,
@@ -585,6 +585,7 @@ function prepareScript(script, env) {
     gmi: {
       scriptWillUpdate: shouldUpdate,
       uuid: props.uuid,
+      downloadMode: getOption('gmDownloadModeBrowser') ? 'browser' : 'native',
     },
     id,
     key: plantKey,

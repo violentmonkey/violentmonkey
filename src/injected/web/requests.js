@@ -29,6 +29,8 @@ const OPTS_TO_PASS = [
   'method',
   'overrideMimeType',
   'password',
+  'saveAs',
+  'conflictAction',
   'timeout',
   'user',
 ];
