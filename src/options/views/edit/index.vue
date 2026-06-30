@@ -30,6 +30,9 @@
         <a class="btn-ghost" @click="clipboardPaste" tabindex="0" v-if="!frozen"><IconPaste/></a>
       </div>
       <div class="mr-1">
+        <button v-if="!isNaN(greasyForkId)"
+                v-text="i18n(greasyForkId ? 'buttonPushUpdate' : 'buttonGreasyForkPublish')"
+                @click="greasyForkPublish"/>
         <button v-text="i18n('buttonSave')" @click="save"
                 v-show="canSave || !frozen" :disabled="!canSave"
                 :class="{'has-error': $fe = fatal || errors}" :title="$fe"/>
@@ -118,7 +121,7 @@ import { getUnloadSentry } from '@/common/router';
 import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude, kOrigExcludeMatch,
-  kOrigInclude, kOrigMatch, kUpdateURL, kComment,
+  kOrigInclude, kOrigMatch, kUpdateURL, kComment, kPublishedByMe
 } from '../../utils';
 
 const EXTERNALS = 'externals';
@@ -129,6 +132,7 @@ const CUSTOM_PROPS = {
   [kUpdateURL]: '',
   [kDownloadURL]: '',
   [kIcon]: '',
+  [kPublishedByMe]: null,
   [kOrigInclude]: true,
   [kOrigExclude]: true,
   [kOrigMatch]: true,
@@ -497,6 +501,46 @@ function setupSavePosition({ id: curWndId, tabs }) {
       addEventListener('resize', debounce(savePosition.bind(null, null), 100));
       shouldSavePositionOnSave = true;
     }
+  }
+}
+
+const greasyForkId = computed(() => {
+  const { custom, meta, props } = script.value;
+  if (canSave.value || frozen.value || !props.id || custom[kDownloadURL] || custom[kUpdateURL]) return NaN;
+  const url = meta[kDownloadURL];
+  if (!url) {
+    if (custom.lastInstallURL) return NaN;
+    return 0; // Yet unpublished
+  }
+  if (!custom[kPublishedByMe]) return NaN; // Don't suggest updating others' scripts
+  const match = /^https:\/\/update\.greasyfork\.org\/scripts\/(\d+)\/.+\.user\.js$/.exec(url) || [];
+  return +match[1]; // Potentially updateable when type is integral. Not Greasy Fork when NaN
+});
+
+function greasyForkPublish() {
+  // API: https://github.com/greasyfork-org/greasyfork/commit/5b973bf68ffb9c4d684c357770680dcfa6b2bd4a
+  const id = greasyForkId.value;
+  const url = `https://greasyfork.org/en/script${id ? `s/${id}/` : '_'}versions/prefill`;
+
+  const doc = window.open('', '', `width=${screen.width / 2},height=${screen.height / 2}`).document;
+  doc.body.style.display = process.env.DEBUG ? 'block' : 'none';
+
+  const form = doc.createElement('form');
+  form.method = 'post';
+  form.action = url;
+  doc.body.appendChild(form);
+
+  const textarea = doc.createElement('textarea');
+  textarea.name = 'script_version[code]';
+  textarea.value = $codeComp.getRealContent();
+  form.appendChild(textarea);
+
+  setTimeout(() => form.submit(), process.env.DEBUG ? 3000 : 0);
+  sendCmdDirectly('ListenForPublish', { id: script.value.props.id });
+  if (!id) {
+    // Like the (Re)install button, the editor must be closed and reopened after finishing the Publish
+    // to refresh `code` and `updateURL`
+    close(true);
   }
 }
 </script>
