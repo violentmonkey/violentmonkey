@@ -116,22 +116,15 @@ const styleOptions = {
 const postcssLoader = {
   loader: 'postcss-loader',
 };
-const getBaseConfig = (page, bare) => ({
+const getBaseConfig = (page) => ({
   mode: isProd ? 'production' : 'development',
   target: 'web', // required by live reloading
   devtool: isProd ? false : page.startsWith('injected') ? 'inline-source-map' : 'source-map',
-  experiments: bare ? {
-    outputModule: true,
-  } : {},
   output: {
     path: resolve(DIST),
     publicPath: '/',
     filename: '[name].js',
     hashFunction: 'xxhash64',
-    ...bare && {
-      module: true,
-      library: { type: 'modern-module' },
-    }
   },
   node: {
     global: false,
@@ -211,7 +204,7 @@ const getBaseConfig = (page, bare) => ({
   },
   optimization: {
     runtimeChunk: false,
-    splitChunks: !bare && !page && {
+    splitChunks: !page && {
       cacheGroups: {
         'common-ui': {
           name: 'common-ui',

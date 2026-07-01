@@ -73,11 +73,7 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
     '__.SW': SW,
     '__.SW_CLIENT': MV3 && (!page || page === 'offscreen'),
   };
-  const config = (entry ? getBaseConfig : getPageConfig)(
-    page,
-    SW || page === 'offscreen',
-    Object.fromEntries(Object.entries(vars).map(([k, v]) => [k.replace('__.', ''), v])),
-  );
+  const config = (entry ? getBaseConfig : getPageConfig)(page);
   config.plugins.push(new webpack.DefinePlugin(vars));
   if (entry) config.entry = { [page]: entry };
   if (init) init(config);

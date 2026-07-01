@@ -28,8 +28,8 @@ chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
         matches: ['<all_urls>'],
         js: [{file: 'injected-web.js'}, {file: 'injected.js'}],
       }])),
-      DNR.updateDynamicRules({
-        removeRuleIds: [DNR_ID_INSTALL],
+      DNR.getDynamicRules().then(rules => DNR.updateDynamicRules({
+        removeRuleIds: rules.map(r => r.id),
         addRules: [{
           id: DNR_ID_INSTALL,
           condition: {
@@ -43,14 +43,15 @@ chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
             responseHeaders: [{ header: kContentType, value: 'text/html', operation: 'set' }],
           },
         }],
-      })
+      }))
     ].flat());
   } catch (err) {
     if (__.MV3) {
       chrome.tabs.create({
-        url: 'data:text/plain,' + (userScriptsAPI ? '' :
-          'Make sure to enable "Allow User Scripts" for Violentmonkey in chrome://extensions\n\n') +
-          err.stack.replaceAll('#', '%23'),
+        url: `data:text/plain,${
+          userScriptsAPI ? err.stack.replaceAll('#', '%23') :
+            'Make sure to enable "Allow User Scripts" for Violentmonkey in chrome://extensions'
+        }`,
       });
     }
   }

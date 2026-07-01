@@ -214,7 +214,7 @@ onMounted(async () => {
   Object.defineProperty(window, FSH, { set: loadNewFileHandle });
   infoVal = info.value = fileHandle
     ? { url: fileHandle._url || DROP_PREFIX + fileHandle.name }
-    : await sendCmdDirectly('CacheLoad', key);
+    : await sendCmdDirectly('CacheLoad', key) || false/* for `info.XXX` in the template */;
   if (!infoVal) {
     closeTab();
     return;
@@ -386,8 +386,8 @@ async function loadDeps() {
   }
 }
 function closeTab() {
-  if (__.MV3 && history.length > 1) {
-    history.go(-2);
+  if (__.MV3 && history.length) {
+    chrome.tabs.goBack();
   } else {
     sendCmdDirectly('TabClose');
   }
