@@ -17,8 +17,8 @@ import { forEachTab, tabsOnActivated, tabsOnRemoved } from './tabs';
 
 /** Promisified explicitly on demand because it returns an id in Firefox and not a Promise */
 export const contextMenus = chrome.contextMenus;
+export const CMD_PREFIX = 'cmd:';
 const ROOT_ID = 'cmdRoot';
-const CMD_PREFIX = 'cmd:';
 const MAX_TITLE_LEN = 250;
 const SHORT_ID = Symbol('_id');
 /** @type {chrome.contextMenus.CreateProperties} */
@@ -108,7 +108,7 @@ export function addMenuConfig(data) {
  * @returns {boolean?} true if handled
  */
 export function handlePageMenuCommand(id, { id: tabId }, frameId) {
-  if (!tabData || typeof id !== 'string' || !id.startsWith(CMD_PREFIX)) {
+  if (!tabData) {
     return;
   }
   const [/*prefix*/, sTabId, sScriptId, _id] = id.split(':');

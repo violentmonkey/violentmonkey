@@ -1,4 +1,5 @@
 import { getActiveTab, i18n, noop, sendTabCmd } from '@/common';
+import { kMainFrame } from '@/common/consts';
 import { executeScript } from '@/common/browser-scripts-api';
 import cache from './cache';
 import { getData, getScriptsByURL } from './db';
@@ -57,7 +58,7 @@ addPublicCommands({
 browser.runtime.onConnect.addListener(onPopupOpened);
 browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
   urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
-  types: ['main_frame'],
+  types: [kMainFrame],
 });
 
 async function augmentSetPopup(data, src, key) {

@@ -170,9 +170,9 @@ export function keepAlive(promise) {
   return promise;
 }
 
-export function makePause(ms) {
+export function makePause(ms, arg) {
   if (__.MV3) return keepAlive(global.scheduler.postTask(noop, { delay: ms > 0 ? ms : 0 }));
   return ms < 0
-    ? Promise.resolve()
-    : new Promise(resolve => setTimeout(resolve, ms));
+    ? Promise.resolve(arg)
+    : new Promise(resolve => setTimeout(resolve, ms, arg));
 }

@@ -1,6 +1,7 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { NO_CACHE, U8_fromBase64 } from '@/common/consts';
+import { BLOB_LIFE, NO_CACHE, U8_fromBase64 } from '@/common/consts';
+import { makePause } from '.';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
@@ -395,6 +396,12 @@ export function normalizeTag(tag) {
 
 export function escapeStringForRegExp(str) {
   return str.replace(/[\\.?+[\]{}()|^$]/g, '\\$&');
+}
+
+export function leaseBlobUrl(blob) {
+  const url = URL.createObjectURL(blob);
+  makePause(BLOB_LIFE, url).then(URL.revokeObjectURL);
+  return url;
 }
 
 /**

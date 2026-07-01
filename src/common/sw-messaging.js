@@ -1,10 +1,10 @@
 export const clientCommands = {__proto__: null};
 /** @type {Map<number, PromiseWithResolvers & { stack: string }>} */
 const pending = /*@__PURE__*/new Map();
-const swContainer = __.MV3PAGE && navigator.serviceWorker;
+const swContainer = __.SW_CLIENT && navigator.serviceWorker;
 const getController = async () => (swController = (await swContainer.ready).active);
 
-let swController = __.MV3PAGE && swContainer.controller;
+let swController = __.SW_CLIENT && swContainer.controller;
 let curId = 0;
 
 export async function sendCmdToSW(cmd, data, fakeSrc) {
@@ -77,7 +77,7 @@ export function rejectPending(msg) {
   pending.clear();
 }
 
-if (__.MV3PAGE) {
+if (__.SW_CLIENT) {
   // Receiver for a response from handleCommandMessage -> sw.onmessage
   swContainer.onmessage = onClientMessage.bind(null, ({cmd, data}, src) => (
     clientCommands[cmd](data, src)

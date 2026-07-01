@@ -2,14 +2,14 @@ import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import loadIconData from '@/common/load-icon-data';
 import { nest } from '@/common/object';
-import { addOwnCommands, commands, init, isNewSession } from './init';
+import { addOwnCommands, commands, init, sessionData } from './init';
 import { installedOver } from './on-installed';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
-import { contextMenus, handlePageMenuCommand } from './page-menu-commands';
+import { CMD_PREFIX, contextMenus, handlePageMenuCommand } from './page-menu-commands';
 import { FIREFOX, ua } from './ua';
 
 /** 1x + HiDPI 1.5x, 2x */
@@ -77,7 +77,7 @@ init.then(async () => {
   showBadge = getOption(KEY_SHOW_BADGE);
   badgeColor = getOption(KEY_BADGE_COLOR);
   badgeColorBlocked = getOption(KEY_BADGE_COLOR_BLOCKED);
-  if (isNewSession) {
+  if (!sessionData.init) {
     forEachTab(updateState);
     if (!isApplied) setIcon(); // sets the dimmed icon as default
   }
@@ -93,6 +93,7 @@ init.then(async () => {
       ))
     ).then(ignoreChromeErrors);
     const badgeChild = { parentId: KEY_SHOW_BADGE, type: 'radio' };
+    if (__.MV3 && __.DEV) await addToIcon('reload', 'Reload extension');
     await addToIcon(SKIP_SCRIPTS, i18n('skipScripts'));
     for (const args of [
       [KEY_SHOW_BADGE, i18n('labelBadge')],
@@ -109,7 +110,7 @@ init.then(async () => {
 });
 
 contextMenus?.onClicked.addListener(({ menuItemId: id, frameId }, tab) => {
-  if (!handlePageMenuCommand(id, tab, frameId)) {
+  if (!id.startsWith(CMD_PREFIX) || !handlePageMenuCommand(id, tab, frameId)) {
     handleHotkeyOrMenu(id, tab);
   }
 });
@@ -235,6 +236,8 @@ export function handleHotkeyOrMenu(id, tab) {
     openDashboard('');
   } else if (id === 'newScript') {
     commands.OpenEditor();
+  } else if (id === 'reload') {
+    chrome.runtime.reload();
   } else if (id === 'toggleInjection') {
     setOption(IS_APPLIED, !isApplied);
   } else if (id === 'updateScripts') {

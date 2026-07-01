@@ -352,6 +352,7 @@ declare namespace VMInjection {
     forceContent?: boolean;
     inject: VMInjection;
     more: EnvDelayed;
+    url?: string;
   }
   interface Info {
     gmi: {
@@ -449,12 +450,13 @@ declare var __: {
   CODEMIRROR_THEMES: string;
   DEBUG: boolean,
   DEV: boolean,
+  /** An extension context with full access to chrome API i.e. not offscreen, content */
+  EXT: boolean,
   MV3: boolean;
-  /** MV3 html page of the extension i.e. not SW, not injected */
-  MV3PAGE: boolean;
   INIT_FUNC_NAME: string;
   INJECTED: string | false;
   SW: boolean;
+  SW_CLIENT: boolean;
   SYNC_DROPBOX_CLIENT_ID: string,
   SYNC_GOOGLE_DESKTOP_ID: string,
   SYNC_GOOGLE_DESKTOP_SECRET: string,

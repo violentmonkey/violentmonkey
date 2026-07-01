@@ -15,7 +15,7 @@ import {
 } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
-import { addOwnCommands, addPublicCommands, commands, resolveInit, isNewSession } from './init';
+import { addOwnCommands, addPublicCommands, commands, resolveInit, sessionData } from './init';
 import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
 import { initOptions, kVersion, setOption } from './options';
@@ -128,7 +128,7 @@ if (__.MV3) chrome.alarms.onAlarm.addListener(a => {
   let [allKeys, data] = await Promise.all([
     getStorageKeys?.(),
     !getStorageKeys && storage.api.get(),
-    isNewSession,
+    sessionData,
   ]);
   if (allKeys) {
     // Filtering and creating Map in atomic native code operations instead of js loop
@@ -194,7 +194,7 @@ if (__.MV3) chrome.alarms.onAlarm.addListener(a => {
     });
   }
   sortScripts();
-  if (!__.MV3 || isNewSession && chrome.storage.session.set({ init: 1 })) {
+  if (!__.MV3 || !sessionData.init && chrome.storage.session.set({ init: 1 })) {
     setTimeout(async () => {
       if (allKeys?.length) {
         const set = new Set(keys); // much faster lookup

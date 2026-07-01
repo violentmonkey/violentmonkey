@@ -68,9 +68,10 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
   const SW = page === 'sw' ? 1 : 0;
   const vars = {
     ...defsObj,
+    '__.EXT': SW || !page,
     '__.INJECTED': JSON.stringify(/injected/.test(page) && page),
-    '__.MV3PAGE': MV3 && !page,
     '__.SW': SW,
+    '__.SW_CLIENT': MV3 && (!page || page === 'offscreen'),
   };
   const config = (entry ? getBaseConfig : getPageConfig)(
     page,

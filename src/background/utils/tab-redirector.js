@@ -1,6 +1,6 @@
 import { browserWindows, request, noop, i18n, getUniqId, getTab } from '@/common';
 import { executeScript } from '@/common/browser-scripts-api';
-import { FILE_GLOB_ALL } from '@/common/consts';
+import { FILE_GLOB_ALL, kMainFrame } from '@/common/consts';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
@@ -155,5 +155,5 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     `${FILE_GLOB_ALL}.user.js?*`,
     `${extensionRoot}*.user.js`,
   ],
-  types: ['main_frame'],
+  types: [kMainFrame],
 }, ['blocking']);

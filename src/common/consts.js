@@ -36,6 +36,7 @@ export const TIMEOUT_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 export const BLACKLIST = 'blacklist';
 export const BLACKLIST_NET = BLACKLIST + 'Net';
+export const BLOB_LIFE = 60e3;
 export const ERRORS = 'Errors';
 export const RUN_AT_RE = /^document-(start|body|end|idle)$/;
 export const KNOWN_INJECT_INTO = {
@@ -94,3 +95,5 @@ export const GM4_ALIAS = {
 };
 export const kOrigTag = 'origTag';
 export const kTag = 'tag';
+export const kMainFrame = 'main_frame';
+export const kSubFrame = 'sub_frame';

@@ -7,12 +7,12 @@ export const addOwnCommands = obj => {
   }
 };
 
-export let isNewSession = !__.MV3;
+export let sessionData = !__.MV3;
 export let resolveInit;
 export let init = new Promise(r => {
   resolveInit = () => Promise.all(init.deps).then(() => r());
 });
 init.deps = __.MV3 ? [
-  isNewSession = chrome.storage.session.get().then(data => (isNewSession = !data.init)),
+  sessionData = chrome.storage.session.get().then(data => (sessionData = data)),
 ] : [];
 init.then(() => (init = null));

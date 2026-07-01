@@ -236,7 +236,7 @@ const getBaseConfig = (page, bare) => ({
     ].filter(Boolean) : [],
   },
   plugins: [
-    MV3 && new webpack.NormalModuleReplacementPlugin(/\/common\/tld$/, (r) => {
+    page === 'sw' && MV3 && new webpack.NormalModuleReplacementPlugin(/\/common\/tld$/, (r) => {
       r.request += '-mv3';
     }),
     !process.env.GITHUB_ACTIONS && new progressBarPlugin({

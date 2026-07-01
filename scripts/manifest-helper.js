@@ -21,6 +21,7 @@ function readManifest() {
     data.background = { service_worker: 'sw.js' };
     data.host_permissions = ['<all_urls>'];
     data.minimum_chrome_version = '135.0'; // chrome.userScripts.execute
+    data.message_serialization = 'structured_clone'; // since Chrome 148
     data.permissions.splice(data.permissions.indexOf('<all_urls>'), 1, ...[
       !isProd && 'declarativeNetRequestFeedback',
       'alarms',

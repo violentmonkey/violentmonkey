@@ -1,5 +1,5 @@
 import { debounce, normalizeKeys, noop, sendCmd } from '@/common';
-import { TIMEOUT_HOUR } from '@/common/consts';
+import { kMainFrame, TIMEOUT_HOUR } from '@/common/consts';
 import {
   SYNC_MERGE,
   SYNC_PULL,
@@ -248,7 +248,7 @@ export function openAuthPage(url, redirectUri) {
       handler,
       {
         urls: [`${redirectUri}*`],
-        types: ['main_frame', 'xmlhttprequest'],
+        types: [kMainFrame, 'xmlhttprequest'],
       },
       ['blocking'],
     );

@@ -2,7 +2,8 @@
 export const userScriptsAPI = __.MV3 && (() => {
   try { return chrome.userScripts; }
   catch { /* older versions of Chrome threw on access if no enabled */ }
-});
+})();
+
 export const executeScript = __.MV3
   ? async (tabId, code, runAt, frameId) => (await userScriptsAPI.execute({
     js: [{code}],
