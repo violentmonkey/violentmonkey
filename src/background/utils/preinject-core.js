@@ -219,10 +219,12 @@ export function registerScriptData(inject, url) {
     matches: [url.split('#', 1)[0].replace(/\*/g, '\\$&')], // escape `*` in the URL itself
     [RUN_AT]: 'document_start',
   };
-  if (__.MV3) userScriptsAPI.unregister({
-    ids: [inject.id = INJECTED_DATA_ID + url],
-  }).catch(noop);
-  return scriptsAPI.register(__.MV3 ? [inject] : inject);
+  if (__.MV3) {
+    inject.id = INJECTED_DATA_ID + url;
+    inject = [inject];
+    userScriptsAPI.update(inject).catch(noop);
+  }
+  return scriptsAPI.register(inject).catch(noop);
 }
 
 /** @param {VMInjection.Bag} bag */
