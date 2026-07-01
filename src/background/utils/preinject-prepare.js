@@ -1,10 +1,10 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, leaseBlobUrl } from '@/common';
 import {
-  __CODE, HOMEPAGE_URL, KNOWN_INJECT_INTO, kOrigTag, kTag, META_STR, METABLOCK_RE, NEWLINE_END_RE,
-  TL_AWAIT, UNWRAP,
+  __CODE, CACHE_KEYS, HOMEPAGE_URL, KNOWN_INJECT_INTO, kOrigTag, kTag, META_STR, METABLOCK_RE,
+  NEWLINE_END_RE, PROMISE, TL_AWAIT, UNWRAP,
 } from '@/common/consts';
 import { forEachValue, mapEntry, objectPick } from '@/common/object';
-import { CACHE_KEYS, getScriptsByURL, kTryVacuuming, PROMISE } from './db';
+import { getScriptsByURL, kTryVacuuming } from './db';
 import {
   cache, CSAPI_REG, expose, ffInject, injectContentRealm, injectInto, isApplied, makeXhrHeader,
   propsToClear, registerScriptData, scriptsAPI, xhrInject,

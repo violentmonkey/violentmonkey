@@ -143,8 +143,8 @@ declare type VMBadgeData = {
   /** Map: frameId -> number of scripts in this frame */
   frameIds: { [frameId: string]: number };
   icon: string;
-  /** all ids */
-  ids: Set<number>;
+  /** all ids (using an array because chrome.storage.session doesn't support Set */
+  ids: number[];
   /**
    * undefined = after VM started (unknown injectability),
    * null = after tab navigated (unknown injectability),

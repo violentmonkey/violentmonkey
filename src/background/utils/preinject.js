@@ -1,6 +1,7 @@
 import { getActiveTab, sendTabCmd } from '@/common';
+import { CACHE_KEYS, PROMISE } from '@/common/consts';
 import { deepCopy } from '@/common/object';
-import { CACHE_KEYS, getScriptsByURL, PROMISE } from './db';
+import { getScriptsByURL } from './db';
 import { setBadge } from './icon';
 import { addOwnCommands, addPublicCommands } from './init';
 import { clearNotifications } from './notifications';

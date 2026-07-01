@@ -1,11 +1,11 @@
 import {
-  dataUri2text, i18n, getScriptHome, isDataUri,
-  getScriptName, getScriptsTags, getScriptUpdateUrl, isRemote, sendCmd, trueJoin,
-  getScriptPrettyUrl, getScriptRunAt, makePause, isValidHttpUrl,
-  ignoreChromeErrors,
+  dataUri2text, getScriptHome, getScriptName, getScriptPrettyUrl, getScriptRunAt, getScriptsTags,
+  getScriptUpdateUrl, i18n, ignoreChromeErrors, isDataUri, isRemote, isValidHttpUrl, makePause,
+  sendCmd, trueJoin,
 } from '@/common';
 import {
-  FETCH_OPTS, INFERRED, kTag, TIMEOUT_24HOURS, TIMEOUT_WEEK, TL_AWAIT,
+  CACHE_KEYS, FETCH_OPTS, INFERRED, kTag, PROMISE, REQ_KEYS, TIMEOUT_24HOURS, TIMEOUT_WEEK,
+  TL_AWAIT, VALUE_IDS,
 } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
@@ -279,10 +279,6 @@ export function getScripts() {
   return [...aliveScripts];
 }
 
-export const CACHE_KEYS = 'cacheKeys';
-export const REQ_KEYS = 'reqKeys';
-export const VALUE_IDS = 'valueIds';
-export const PROMISE = 'promise';
 const makeEnv = () => ({
   depsMap: {},
   [RUN_AT]: {},

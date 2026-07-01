@@ -1,16 +1,49 @@
 import { onClientMessage } from '@/common/sw-messaging';
+import { getData } from './utils/db';
+import { init } from './utils/init';
+import { getAllOptions } from './utils/options';
+import { initPopup } from './utils/popup-tracker';
 import { resolveVirtualUrl } from './utils/tab-redirector';
 import { handleCommandMessage } from '.';
 
+const GET_DATA_URL = extensionRoot + 'get-data.js';
+
+const makeDataResponse = async url => {
+  if (init) await init;
+  const res = {
+    opts: getAllOptions(),
+    [url]: url === 'popup' ? await initPopup()
+      : url === 'options' && await getData({ sizes: true }),
+  };
+  return new Response(`var BGDATA=${JSON.stringify(res)}`,
+    { headers: { 'cache-control': 'no-cache' } });
+};
+
 /** @param {ExtendableMessageEvent} evt */
 global.onactivate = evt => evt.waitUntil(clients.claim());
+
 /** @param {FetchEvent} evt */
-global.onfetch = evt => evt.respondWith(Response.redirect(resolveVirtualUrl(evt.request.url)));
+global.onfetch = async evt => {
+  const url = evt.request.url;
+  if (!url.startsWith(extensionRoot)) {
+    // shouldn't happen
+  } else if (url.startsWith(GET_DATA_URL)) {
+    evt.respondWith(makeDataResponse(url.slice(GET_DATA_URL.length + 1)));
+  } else if (/\.user\.js#(\d+)$/.test(url)) {
+    evt.respondWith(Response.redirect(resolveVirtualUrl(evt.request.url)));
+  }
+};
+
 global.oninstall = evt => {
   evt.addRoutes({
-    condition: {not: {urlPattern: `${extensionRoot}*.user.js`, requestDestination: 'document'}},
+    condition: { urlPattern: `${GET_DATA_URL}*` },
+    source: 'fetch-event',
+  });
+  evt.addRoutes({
+    condition: { not: { urlPattern: `${extensionRoot}*.user.js`, requestDestination: 'document' } },
     source: 'network',
   });
   importScripts('tld.js');
 };
+
 global.onmessage = onClientMessage.bind(null, handleCommandMessage);

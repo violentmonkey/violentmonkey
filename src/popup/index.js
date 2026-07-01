@@ -113,7 +113,8 @@ function initMutex(delay = 100) {
 async function initialize() {
   initMutex();
   Object.assign(store, emptyStore());
-  let [cached, data, [failure, reason, reason2]] = await sendCmdDirectly('InitPopup');
+  let [cached, data, [failure, reason, reason2]] = BGDATA.popup
+    || await sendCmdDirectly('InitPopup');
   if (!reason) {
     failure = '';
   } else if (reason === INJECT_INTO) {
@@ -132,7 +133,7 @@ async function initialize() {
     failureText: failure,
   });
   if (cached) {
-    for (const id in cached) handlers.SetPopup(...cached[id]);
+    for (const id in cached) setPopup(...cached[id]);
   }
   if (!port) {
     port = browser.runtime.connect({ name: `Popup:${cached ? 'C' : ''}:${data.tab.id}` });

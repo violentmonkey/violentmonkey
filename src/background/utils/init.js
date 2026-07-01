@@ -9,10 +9,13 @@ export const addOwnCommands = obj => {
 
 export let sessionData = !__.MV3;
 export let resolveInit;
-export let init = new Promise(r => {
-  resolveInit = () => Promise.all(init.deps).then(() => r());
+export let init = new Promise(resolve => {
+  resolveInit = async () => {
+    await Promise.all(init.deps.map(d => typeof d === 'function' ? d() : d));
+    resolve();
+    init = null;
+  };
 });
 init.deps = __.MV3 ? [
   sessionData = chrome.storage.session.get().then(data => (sessionData = data)),
 ] : [];
-init.then(() => (init = null));

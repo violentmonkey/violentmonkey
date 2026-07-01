@@ -5,7 +5,6 @@ import {
 import { kOrigTag, kTag } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
-import options from '@/common/options';
 import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
@@ -17,8 +16,8 @@ import App from './views/app';
 const NON_WS_RE = /\S/;
 let updateThrottle;
 
-loadData();
 render(App);
+loadData();
 
 /**
  * @param {UIScript} script
@@ -69,10 +68,9 @@ export function loadData() {
 }
 
 async function requestData(id) {
-  const [data] = await Promise.all([
-    sendCmdDirectly('GetData', { id, sizes: true }, { retry: true }),
-    options.ready,
-  ]);
+  const allData = BGDATA.options;
+  // Using await on the literal data to give Vue a breath to avoid a long white frame
+  const data = await (allData || sendCmdDirectly('GetData', { id, sizes: true }, { retry: true }));
   const { [SCRIPTS]: allScripts, sizes, ...auxData } = data;
   Object.assign(store, auxData); // initScripts needs `cache` in store
   const scripts = [];
@@ -85,7 +83,7 @@ async function requestData(id) {
   // now we can render
   store.scripts = scripts;
   store.removedScripts = removedScripts;
-  if (store.loaded !== 'all') store.loaded = !!id || 'all';
+  if (store.loaded !== 'all') store.loaded = !allData && !!id || 'all';
 }
 
 /**

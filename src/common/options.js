@@ -4,11 +4,11 @@ import { forEachEntry, objectGet, objectSet } from './object';
 
 let options = {};
 const { hook, fire } = initHooks();
-const ready = sendCmdDirectly('GetAllOptions', null, { retry: true })
-.then((data) => {
-  options = data;
-  if (data) fire(data);
-});
+const ready = (async () => {
+  options = __.MV3 && BGDATA.opts
+    || await sendCmdDirectly('GetAllOptions', null, { retry: true });
+  if (options) fire(options);
+})();
 
 export default {
   ready,

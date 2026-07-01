@@ -2,11 +2,11 @@ import { noop, sendTabCmd } from '@/common';
 import { executeScript, userScriptsAPI } from '@/common/browser-scripts-api';
 import initCache from '@/common/cache';
 import {
-  __CODE, BLACKLIST, GLOB_ALL, kMainFrame, kSubFrame, UNWRAP, XHR_COOKIE_RE,
+  __CODE, BLACKLIST, CACHE_KEYS, GLOB_ALL, kMainFrame, kSubFrame, REQ_KEYS, UNWRAP, VALUE_IDS,
+  XHR_COOKIE_RE,
 } from '@/common/consts';
 import { forEachEntry, objectSet } from '@/common/object';
 import { kPageMenuCommands } from '@/common/options-defaults';
-import { CACHE_KEYS, REQ_KEYS, VALUE_IDS } from './db';
 import { clearNotifications } from './notifications';
 import { INJECTED_DATA_ID } from './on-installed';
 import { hookOptionsInit } from './options';

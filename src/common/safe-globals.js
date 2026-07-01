@@ -41,4 +41,7 @@ export const kDocumentId = 'documentId';
 export const kFrameId = 'frameId';
 export const INJECT = 'inject';
 export const MULTI = 'multi';
+export const BGDATA = !__.SW && new Proxy(global.BGDATA || {}, {
+  get: (obj, k, _) => (_ = obj[k], delete obj[k], _),
+});
 export const kWindowId = 'windowId';

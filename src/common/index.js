@@ -172,15 +172,20 @@ let keepAliveChain, keepAliveTimer;
 export function keepAlive(promise) {
   let res = promise;
   if (!res) ({promise, resolve: res} = Promise.withResolvers());
-  keepAliveChain = keepAliveChain ? keepAliveChain.finally(promise) : promise;
-  keepAliveChain.finally(() => (keepAliveTimer = clearInterval(keepAliveTimer)));
-  keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 1000);
+  const chain = keepAliveChain = keepAliveChain ? keepAliveChain.finally(promise) : promise;
+  keepAliveChain.finally(() => {
+    if (keepAliveChain === chain) {
+      clearInterval(keepAliveTimer);
+      keepAliveChain = keepAliveTimer = 0;
+    }
+  });
+  keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 25e3);
   return res;
 }
 
 export function makePause(ms, arg) {
-  if (__.SW) return keepAlive(global.scheduler.postTask(noop, { delay: ms > 0 ? ms : 0 }));
-  return ms < 0
+  const res = ms < 0
     ? Promise.resolve(arg)
     : new Promise(resolve => setTimeout(resolve, ms, arg));
+  return __.SW && ms > 0 ? keepAlive(res) : res;
 }

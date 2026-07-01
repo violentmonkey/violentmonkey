@@ -1,4 +1,4 @@
-import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
+import { i18n, ignoreChromeErrors, makeDataUri, makePause, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import loadIconData from '@/common/load-icon-data';
 import { nest } from '@/common/object';
@@ -26,8 +26,6 @@ const iconDataCache = {};
 export const getImageData = url => iconCache[url] || (iconCache[url] = loadIcon(url));
 // Firefox Android does not support such APIs, use noop
 const browserAction = browser[__.MV3 ? 'action' : 'browserAction'];
-/** @type {{ [tabId: string]: VMBadgeData }}*/
-export const badges = {};
 const KEY_SHOW_BADGE = 'showBadge';
 const KEY_BADGE_COLOR = 'badgeColor';
 const KEY_BADGE_COLOR_BLOCKED = 'badgeColorBlocked';
@@ -37,6 +35,9 @@ const iconDefault = extensionManifest[BROWSER_ACTION].default_icon[16].match(/\d
 const titleDisabled = i18n('menuScriptDisabled');
 const titleNoninjectable = i18n('failureReasonNoninjectable');
 const titleSkipped = i18n('skipScriptsMsg');
+/** @type {{ [tabId: string]: VMBadgeData }}*/
+export let badges = {};
+let flushing;
 let isApplied;
 /** @type {VMBadgeMode} */
 let showBadge;
@@ -72,6 +73,9 @@ hookOptions((changes) => {
   }
 });
 
+sessionData.then(d => {
+  badges = d.badges || badges;
+});
 init.then(async () => {
   isApplied = getOption(IS_APPLIED);
   showBadge = getOption(KEY_SHOW_BADGE);
@@ -114,13 +118,22 @@ contextMenus?.onClicked.addListener(({ menuItemId: id, frameId }, tab) => {
     handleHotkeyOrMenu(id, tab);
   }
 });
-tabsOnRemoved.addListener(id => delete badges[id]);
+tabsOnRemoved.addListener(id => delete badges[id] && flush());
 tabsOnUpdated.addListener((tabId, { url }, tab) => {
   if (url) {
     const [title] = getFailureReason(url);
     if (title) updateState(tab, resetBadgeData(tabId, null), title);
   }
 }, FIREFOX && { properties: ['status'] });
+
+async function flush() {
+  if (!flushing) {
+    flushing = true;
+    await makePause(1000);
+    chrome.storage.session.set({ badges });
+    flushing = false;
+  }
+}
 
 function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js
@@ -129,11 +142,12 @@ function resetBadgeData(tabId, isInjected) {
   data.icon = iconDefault;
   data.total = 0;
   data.unique = 0;
-  data[IDS] = new Set();
+  data[IDS] = [];
   data[kFrameId] = undefined;
   data[INJECT] = isInjected;
   // Notify popup about non-injectable tab
   if (!isInjected) popupTabs[tabId]?.postMessage(null);
+  flush();
   return data;
 }
 
@@ -153,8 +167,10 @@ export function setBadge(ids, reset, { tab, [kFrameId]: frameId, [kTop]: isTop }
       [kFrameId]: totalMap = data[kFrameId] = {},
     } = data;
     // uniques
-    ids.forEach(idMap.add, idMap);
-    data.unique = idMap.size;
+    for (const id of ids) {
+      if (!idMap.includes(id)) idMap.push(id);
+    }
+    data.unique = idMap.length;
     // totals
     data.total = 0;
     totalMap[frameId] = ids.length;
@@ -244,7 +260,7 @@ export function handleHotkeyOrMenu(id, tab) {
     commands.CheckUpdate();
   } else if (id === 'updateScriptsInTab') {
     id = badges[tab.id]?.[IDS];
-    if (id) commands.CheckUpdate({ ids: [...id] });
+    if (id) commands.CheckUpdate({ ids: id });
   } else if (id.startsWith(KEY_SHOW_BADGE)) {
     setOption(KEY_SHOW_BADGE, id.slice(KEY_SHOW_BADGE.length + 1));
   }

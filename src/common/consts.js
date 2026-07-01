@@ -98,3 +98,7 @@ export const kTag = 'tag';
 export const kMainFrame = 'main_frame';
 export const kSubFrame = 'sub_frame';
 export const kContentType = 'content-type';
+export const CACHE_KEYS = 'cacheKeys';
+export const REQ_KEYS = 'reqKeys';
+export const VALUE_IDS = 'valueIds';
+export const PROMISE = 'promise';

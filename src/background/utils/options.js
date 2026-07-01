@@ -6,21 +6,7 @@ import storage from './storage';
 
 let changes;
 
-addOwnCommands({
-  /** @return {Object} */
-  GetAllOptions() {
-    return Object.assign({}, defaults, options); // eslint-disable-line no-use-before-define
-  },
-  /**
-   * @param {{ [key:string]: PlainJSONValue }} data
-   * @return {void}
-   * @throws {?} hooks can throw after the option was set */
-  SetOptions(data) {
-    for (const key in data) setOption(key, data[key], true);
-    callHooks(); // exceptions will be sent to the caller
-  },
-});
-
+export const getAllOptions = () => ({ ...defaults, ...options });
 const options = {};
 export const kOptions = 'options';
 export const kVersion = 'version';
@@ -39,6 +25,18 @@ const writeOptionsLater = debounce(writeOptions, DELAY);
 const optProxy = new Proxy(defaults, { get: (_, key) => getOption(key) });
 export const hookOptions = hooks.hook;
 hookOptions(data => sendCmd('UpdateOptions', data));
+
+addOwnCommands({
+  GetAllOptions: getAllOptions,
+  /**
+   * @param {{ [key:string]: PlainJSONValue }} data
+   * @return {void}
+   * @throws {?} hooks can throw after the option was set */
+  SetOptions(data) {
+    for (const key in data) setOption(key, data[key], true);
+    callHooks(); // exceptions will be sent to the caller
+  },
+});
 
 export function initOptions(data, lastVersion, versionChanged) {
   data = data[kOptions] || {};
@@ -89,7 +87,7 @@ function callHooks() {
 
 /** Hooks and calls the callback with a copy of all options when init is resolved */
 export function hookOptionsInit(cb) {
-  if (init) init.then(() => cb(optProxy, true));
+  if (init) init.deps.push(() => cb(optProxy, true));
   else cb(optProxy, true);
   return hookOptions(cb);
 }

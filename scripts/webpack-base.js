@@ -67,8 +67,14 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
   chunks: [`${key}/index`],
   title: 'Violentmonkey',
   scriptLoading: 'blocking', // we don't need `defer` and it breaks in some browsers, see #1632
+  inject: false,
   // For GroupAssetsPlugin, inject only `index.js` into `body` to avoid FOUC
   injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
+  templateContent: ({ htmlWebpackPlugin }) => `
+    <!DOCTYPE html><html>
+      <head><script src=/get-data.js?${key}></script>${htmlWebpackPlugin.tags.headTags}</head>
+      <body>${htmlWebpackPlugin.tags.bodyTags}</body>
+    </html>`,
 });
 
 const splitVendor = prefix => ({
