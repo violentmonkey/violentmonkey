@@ -23,7 +23,8 @@ function readManifest() {
     browser_specific_settings: undefined,
     content_scripts: undefined,
     incognito: 'split',
-    message_serialization: 'structured_clone', // since Chrome 148
+    // TODO: use it when it graduates from Canary into Stable
+    // message_serialization: 'structured_clone',
     host_permissions: ['<all_urls>'],
     permissions: data.permissions.filter(p => p !== '<all_urls>').concat([
       'alarms',

@@ -10,7 +10,7 @@ import {
   FORBIDDEN_HEADER_RE, kCookie, kSetCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
-import { CHROME, navUA, navUAD } from './ua';
+import { navUA, navUAD } from './ua';
 import { vetUrl } from './url';
 
 if (__.MV3) addOwnCommands({
@@ -99,8 +99,9 @@ async function httpRequest(opts, events, src, cb) {
   const vmHeaders = __.MV3 ? [] : {};
   const xhrHeaders = {};
   const xhrProps = {};
-  // new Chrome and Firefox can send Blob/ArrayBuffer directly
-  const willStringifyBinaries = xhrType && !(__.MV3 ? CHROME >= 148 : IS_FIREFOX);
+  // Firefox can send Blob/ArrayBuffer directly
+  // TODO: add Chrome when "message_serialization" graduates from Canary into Stable
+  const willStringifyBinaries = xhrType && !IS_FIREFOX;
   // Chrome can't fetch Blob URL in incognito so we use chunks
   const chunked = willStringifyBinaries && incognito;
   const blobbed = willStringifyBinaries && !incognito;

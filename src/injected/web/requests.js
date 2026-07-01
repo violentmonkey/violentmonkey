@@ -230,8 +230,9 @@ export function onRequestCreate(opts, context, fileName) {
     || (opts.binary || !isObject(data)) && [`${data}`]
     // No browser can send FormData/URLSearchParams directly across worlds
     || getFormData(data)
-    // Chrome148+ / FF56+ can send any cloneable data directly
-    || MSG_VIA_CLONE && [data]
+    // FF56+ can send any cloneable data directly
+    // TODO: add Chrome when "message_serialization" graduates from Canary into Stable
+    || IS_FIREFOX && [data]
     || [data, 'bin'];
   /** @type {GMReq.Message.Web} */
   bridge.call('HttpRequest', safePickInto({

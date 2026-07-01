@@ -5,9 +5,6 @@ import { Run } from './cmd-run';
 
 const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
-const messageViaClone = __.MV3
-  ? 'loading' in HTMLVideoElement.prototype /*Chrome148*/
-  : IS_FIREFOX;
 let tardyQueue;
 let bridgeInfo;
 /** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
@@ -108,7 +105,7 @@ export function injectPageSandbox(data) {
      * otherwise a same-origin parent page could use it to spoof the handshake. */
     window::on(handshakeId, handshaker, { capture: true, once: true });
     inject({
-      code: `(${VMInitInjection}(${IS_FIREFOX},${messageViaClone},'${handshakeId}','${vaultId}'))()`
+      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
         + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
     });
     // Clean up in case CSP prevented the script from running
@@ -362,7 +359,7 @@ async function injectPageList(runAt) {
 }
 
 function setupContentInvoker() {
-  invokeContent = VMInitInjection(IS_FIREFOX, messageViaClone)(bridge.onHandle, logging);
+  invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
     const fn = realm === CONTENT

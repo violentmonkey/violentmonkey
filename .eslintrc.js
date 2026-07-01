@@ -180,7 +180,6 @@ function makeOverrides() {
       ...getGlobals('injected/web'),
       ...GLOBALS_INJECTED,
       IS_FIREFOX: false, // passed as a parameter to VMInitInjection in webpack.conf.js
-      MSG_VIA_CLONE: false, // passed as a parameter to VMInitInjection in webpack.conf.js
     },
     INJECTED_RULES: {
       'no-restricted-imports': [
