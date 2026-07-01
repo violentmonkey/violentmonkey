@@ -97,3 +97,4 @@ export const kOrigTag = 'origTag';
 export const kTag = 'tag';
 export const kMainFrame = 'main_frame';
 export const kSubFrame = 'sub_frame';
+export const kContentType = 'content-type';

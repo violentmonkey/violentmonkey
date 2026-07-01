@@ -163,15 +163,23 @@ export async function getActiveTab(windowId = -2 /*chrome.windows.WINDOW_ID_CURR
 }
 
 let keepAliveChain, keepAliveTimer;
+
+/**
+ * @template T
+ * @param {T} [promise]
+ * @return {T | ((v?: any) => void)} original promise or a new promise's resolver
+ */
 export function keepAlive(promise) {
+  let res = promise;
+  if (!res) ({promise, resolve: res} = Promise.withResolvers());
   keepAliveChain = keepAliveChain ? keepAliveChain.finally(promise) : promise;
   keepAliveChain.finally(() => (keepAliveTimer = clearInterval(keepAliveTimer)));
   keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 1000);
-  return promise;
+  return res;
 }
 
 export function makePause(ms, arg) {
-  if (__.MV3) return keepAlive(global.scheduler.postTask(noop, { delay: ms > 0 ? ms : 0 }));
+  if (__.SW) return keepAlive(global.scheduler.postTask(noop, { delay: ms > 0 ? ms : 0 }));
   return ms < 0
     ? Promise.resolve(arg)
     : new Promise(resolve => setTimeout(resolve, ms, arg));

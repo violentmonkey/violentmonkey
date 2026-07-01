@@ -50,7 +50,8 @@ const globalKeys = (function makeGlobalKeys() {
     });
   }
   // wrappedJSObject is not included in getOwnPropertyNames so we add it explicitly.
-  if (IS_FIREFOX
+  if (!__.MV3
+  && IS_FIREFOX
   && !PAGE_MODE_HANDSHAKE
   && kWrappedJSObject in global
   && !globalKeysSet.get(kWrappedJSObject)) {
@@ -217,7 +218,7 @@ function setWindowEvent(desc, name, events, wrapper) {
       // like console.log set by another script
       window::on(name, events[name] = (
         // FF chokes on safeBind because the result belongs to Vault's window
-        IS_FIREFOX && PAGE_MODE_HANDSHAKE
+        !__.MV3 && IS_FIREFOX && PAGE_MODE_HANDSHAKE
           ? evt => wrapper::fn(evt)
           : safeBind(fn, wrapper)
       ));

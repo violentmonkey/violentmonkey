@@ -253,6 +253,7 @@ const getBaseConfig = (page, bare) => ({
       RegExp(`/(${[
         'consts.js',
         'consts-sync.js',
+        'utils/dnr.js',
         'utils/on-installed.js',
         'utils/storage.js',
       ].map(escapeStringRegexp).join('|')

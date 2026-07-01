@@ -1,16 +1,16 @@
-import { browserWindows, request, noop, i18n, getUniqId, getTab } from '@/common';
+import { browserWindows, getTab, getUniqId, i18n, noop, request, sendTabCmd } from '@/common';
 import { executeScript } from '@/common/browser-scripts-api';
 import { FILE_GLOB_ALL, kMainFrame } from '@/common/consts';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
-import { parseMeta, matchUserScript } from './script';
+import { matchUserScript, parseMeta } from './script';
 import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
 
 addPublicCommands({
   async CheckInstallerTab(tabId, src) {
-    const tab = IS_FIREFOX && (src.url || '').startsWith('file:') && await getTab(tabId);
+    const tab = !__.MV3 && IS_FIREFOX && (src.url || '').startsWith('file:') && await getTab(tabId);
     return tab && getTabUrl(tab).startsWith(CONFIRM_URL_BASE);
   },
   ConfirmInstall: confirmInstall,
@@ -33,7 +33,7 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
   const confirmKey = getUniqId();
   const { active, id: tabId, incognito } = tab;
   // Not testing tab.pendingUrl because it will be always equal to `url`
-  const canReplaceCurTab = (!incognito || IS_FIREFOX) && (
+  const canReplaceCurTab = __.MV3 || (!incognito || IS_FIREFOX) && (
     url === from
     || cache.has(`autoclose:${tabId}`)
     || NEWTAB_URL_RE.test(from));
@@ -49,7 +49,6 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
   }
 }
 
-const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 const whitelistRe = re`/^https:\/\/(
   (greas|sleaz)yfork\.(org|cc)\/scripts\/[^/]*\/code|
   update\.(greas|sleaz)yfork\.(org|cc)\/scripts|
@@ -68,11 +67,11 @@ const blacklistRe = re`/^https?:\/\/(
   (gist\.)?github\.com|
   ((greas|sleaz)yfork|openuserjs)\.(org|cc)
 )\//ix`;
-const resolveVirtualUrl = url => (
+export const resolveVirtualUrl = url => (
   `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`
 );
 // FF can't intercept virtual .user.js URL via webRequest, so we redirect it explicitly
-const virtualUrlRe = IS_FIREFOX && new RegExp((
+const virtualUrlRe = !__.MV3 && IS_FIREFOX && new RegExp((
   `^(view-source:)?(${extensionRoot.replace('://', '$&)?')}[^/]*\\.user\\.js#\\d+`
 ));
 const maybeRedirectVirtualUrlFF = virtualUrlRe && ((tabId, src) => {
@@ -82,6 +81,7 @@ const maybeRedirectVirtualUrlFF = virtualUrlRe && ((tabId, src) => {
 });
 
 async function maybeInstallUserJs(tabId, url, isWhitelisted) {
+  if (__.MV3 && isWhitelisted) sendTabCmd(tabId, 'Stop');
   // Getting the tab now before it navigated
   const tab = tabId >= 0 && await getTab(tabId) || {};
   const { data: code } = !isWhitelisted && await request(url).catch(noop) || {};
@@ -133,7 +133,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     return;
   }
   // open a real URL for simplified userscript URL listed in devtools of the web page
-  if (url.startsWith(extensionRoot)) {
+  if (!__.MV3 && url.startsWith(extensionRoot)) {
     return { redirectUrl: resolveVirtualUrl(url) };
   }
   let isWhitelisted;
@@ -153,7 +153,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     '*://*/*.user.js?*',
     `${FILE_GLOB_ALL}.user.js`,
     `${FILE_GLOB_ALL}.user.js?*`,
-    `${extensionRoot}*.user.js`,
-  ],
+    !__.MV3 && `${extensionRoot}*.user.js`,
+  ].filter(Boolean),
   types: [kMainFrame],
-}, ['blocking']);
+}, __.MV3 ? [] : ['blocking']);

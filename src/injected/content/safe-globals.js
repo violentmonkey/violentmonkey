@@ -65,7 +65,7 @@ export const isPromise = (proto => val => isInstance(val, proto))(SafePromise[PR
 const { document } = global;
 export const { getElementsByTagName } = document;
 export const REIFY = 'reify';
-export let IS_FIREFOX = global !== window; // true in Firefox content script context
+export let IS_FIREFOX = !__.MV3 && global !== window; // true in Firefox content script context
 /** @type {VMTopRenderMode} */
 export let topRenderMode = window !== top ? 0
   // TODO: revisit when link-preview is shipped in Chrome

@@ -250,7 +250,7 @@ export function openAuthPage(url, redirectUri) {
         urls: [`${redirectUri}*`],
         types: [kMainFrame, 'xmlhttprequest'],
       },
-      ['blocking'],
+      __.MV3 ? [] : ['blocking'],
     );
   });
   return promise;

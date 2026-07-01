@@ -1,7 +1,7 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
 import { BLOB_LIFE, NO_CACHE, U8_fromBase64 } from '@/common/consts';
-import { makePause } from '.';
+import { keepAlive, makePause } from '.';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
@@ -333,7 +333,7 @@ export function tryUrl(str, base) {
  */
 export async function request(url, options = {}) {
   // fetch supports file:// since Chrome 99 but we use XHR for consistency
-  if (url.startsWith('file:')) return requestLocalFile(url, options);
+  if (!__.MV3 && url.startsWith('file:')) return requestLocalFile(url, options);
   const { body, headers, [kResponseType]: responseType } = options;
   const isBodyObj = body && body::({}).toString() === '[object Object]';
   const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)|$/);
@@ -351,6 +351,7 @@ export async function request(url, options = {}) {
         accept && { accept })
       : headers,
   });
+  const keeper = __.MV3 && keepAlive();
   let status = -1;
   let result = { url };
   try {
@@ -369,6 +370,7 @@ export async function request(url, options = {}) {
     result = Object.assign(err, result);
     result.message += (status > 0 ? ` (HTTP ${status})` : ' (could not connect)') + '\n' + url;
   }
+  if (__.MV3) keeper();
   result.status = status;
   if (status < 0 || status > 300) throw result;
   return result;

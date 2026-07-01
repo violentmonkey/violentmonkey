@@ -32,6 +32,7 @@ export const extensionOptionsPage = __.EXT &&
   /*@__PURE__*/chrome.runtime.getURL(extensionManifest.options_ui.page).split('#', 1)[0];
 export const ICON_PREFIX = __.EXT &&
   /*@__PURE__*/chrome.runtime.getURL(extensionManifest.icons[16].replace('16.png', ''));
+export const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
 export const TAB_SETTINGS = 'settings';
 export const TAB_ABOUT = 'about';
 export const TAB_RECYCLE = 'recycleBin';

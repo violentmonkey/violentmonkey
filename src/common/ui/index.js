@@ -6,8 +6,8 @@ import Message from './message';
 import { VM_HOME } from '@/common/consts';
 
 /** Showing unexpected errors in UI so that the users can notify us */
-addEventListener(ERROR, e => showUnhandledError(e.error));
-addEventListener('unhandledrejection', e => showUnhandledError(e.reason));
+addEventListener(ERROR, e => showUnhandledError(e.error || e));
+addEventListener('unhandledrejection', e => showUnhandledError(e.reason || e));
 export function showUnhandledError(err) {
   if (!err) return;
   const id = 'unhandledError';

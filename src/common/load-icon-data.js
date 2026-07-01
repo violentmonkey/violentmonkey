@@ -1,8 +1,10 @@
+import { keepAlive } from '.';
 import { blob2base64 } from './util';
 
 export default async function loadIconData(url, isOwn) {
   let res;
   let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
+  const keeper = __.MV3 && keepAlive();
   try {
     const img = await createImageBitmap(await (await fetch(url)).blob(), isOwn ? {} : {
       resizeWidth: maxSize,
@@ -35,5 +37,6 @@ export default async function loadIconData(url, isOwn) {
   } catch (err) {
     if (__.DEV) console.log(loadIconData.name + ':', err);
   }
+  if (__.MV3) keeper();
   return res || [url];
 }

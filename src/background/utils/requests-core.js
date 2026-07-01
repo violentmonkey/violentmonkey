@@ -41,11 +41,10 @@ const API_FILTER = {
   types: ['xmlhttprequest'],
 };
 const EXTRA_HEADERS = [
+  !__.MV3 && 'blocking',
   browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
 ].filter(Boolean);
 const headersToInject = {};
-/** @param {chrome.webRequest.HttpHeader} header */
-const isVmVerify = header => header.name === VM_VERIFY;
 export const kCookie = 'cookie';
 export const kSetCookie = 'set-cookie';
 const SET_COOKIE_VALUE_RE = re`
@@ -59,15 +58,12 @@ const SAME_SITE_MAP = {
 };
 const kRequestHeaders = 'requestHeaders';
 const API_EVENTS = {
-  onBeforeSendHeaders: [
-    onBeforeSendHeaders, kRequestHeaders, 'blocking', ...EXTRA_HEADERS,
-  ],
-  onHeadersReceived: [
-    onHeadersReceived, kResponseHeaders, 'blocking', ...EXTRA_HEADERS,
-  ],
+  onBeforeSendHeaders: [onBeforeSendHeaders, kRequestHeaders, ...EXTRA_HEADERS],
+  onHeadersReceived: [onHeadersReceived, kResponseHeaders, ...EXTRA_HEADERS],
 };
+if (__.MV3) API_EVENTS.onBeforeRequest = [onBeforeRequest];
 
-/** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+/** @param {chrome.webRequest.WebRequestDetails} details */
 function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
   const req = requests[verify[requestId]];
   if (req) {
@@ -85,23 +81,33 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
   }
 }
 
-/** @param {chrome.webRequest.WebRequestHeadersDetails} details */
+/** @param {chrome.webRequest.WebRequestDetails} details */
+function onBeforeRequest({ requestId, url }) {
+  if (!verify[requestId]) {
+    const reqId = url.split('#')[1];
+    const req = requests[reqId];
+    if (req) {
+      verify[requestId] = reqId;
+      req.coreId = requestId;
+    }
+  }
+}
+
+/** @param {chrome.webRequest.WebRequestDetails} details */
 function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
-  // only the first call during a redirect/auth chain will have VM-Verify header
-  const reqId = verify[requestId] || headers.find(isVmVerify)?.value;
+  const reqId = verify[requestId];
   const req = requests[reqId];
   if (req) {
-    verify[requestId] = reqId;
-    req.coreId = requestId;
-    req.url = url; // remember redirected URL with #hash as it's stripped in XHR.responseURL
+    // remember redirected URL with #hash as it's stripped in XHR.responseURL
+    if (url !== req.xhrUrl) req.url = url;
+    if (__.MV3) return;
     const headersMap = {};
     const headers2 = headersToInject[reqId];
     const combinedHeaders = headers2 && {};
-    let name;
     let h2 = !headers2;
     for (const h of headers) {
-      if ((name = h.name) === VM_VERIFY
-      || (name = name.toLowerCase()) === 'origin' && h.value === extensionOrigin
+      let name = h.name.toLowerCase();
+      if (name === 'origin' && h.value === extensionOrigin
       || name === kCookie && !req[kCookie]) {
         continue;
       }
@@ -195,6 +201,6 @@ function string2byteString(str) {
 
 // Chrome 74-91 needs an extraHeaders listener at tab load start, https://crbug.com/1074282
 // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
-if (CHROME >= 74 && CHROME <= 91) {
+if (!__.MV3 && CHROME >= 74 && CHROME <= 91) {
   browser.webRequest.onBeforeSendHeaders.addListener(noop, API_FILTER, EXTRA_HEADERS);
 }

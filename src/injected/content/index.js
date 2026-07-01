@@ -55,6 +55,7 @@ async function init() {
 
 addBackgroundHandlers({
   [VIOLENTMONKEY]: () => true,
+  Stop: stop,
 }, true);
 
 addBackgroundHandlers({

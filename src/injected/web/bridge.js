@@ -22,7 +22,7 @@ const bridge = {
     res = new SafePromise(resolve => {
       cb = resolve;
     });
-    if (IS_FIREFOX) setPrototypeOf(res, SafePromiseConstructor);
+    if (!__.MV3 && IS_FIREFOX) setPrototypeOf(res, SafePromiseConstructor);
     postWithCallback(cmd, data, node, cb);
     return res;
   },

@@ -125,7 +125,7 @@ module.exports = [
 
   buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
     header: () => `${skipReinjectionHeader}
-      window[INIT_FUNC_NAME] = function (IS_FIREFOX,${PAGE_MODE_HANDSHAKE},${VAULT_ID}) {
+      window[INIT_FUNC_NAME] = function (IS_FIREFOX, MSG_VIA_CLONE, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) {
         const module = { __proto__: null };
         ${getGlobals()}`,
     footer: `

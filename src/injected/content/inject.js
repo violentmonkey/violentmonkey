@@ -5,6 +5,9 @@ import { Run } from './cmd-run';
 
 const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
+const messageViaClone = __.MV3
+  ? 'loading' in HTMLVideoElement.prototype /*Chrome148*/
+  : IS_FIREFOX;
 let tardyQueue;
 let bridgeInfo;
 /** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
@@ -25,7 +28,7 @@ let VMInitInjection = window[INIT_FUNC_NAME];
  * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
 setOwnProp(window, INIT_FUNC_NAME, 1, false);
 
-addHandlers({
+if (!__.MV3) addHandlers({
   /**
    * FF bug workaround to enable processing of sourceURL in injected page scripts
    */
@@ -41,7 +44,7 @@ export function injectPageSandbox(data) {
   const contentId = safeGetUniqId();
   const webId = safeGetUniqId();
   nonce = data.nonce;
-  if (IS_FIREFOX) {
+  if (!__.MV3 && IS_FIREFOX) {
     // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
     window::on(VAULT_WRITER, evt => {
       evt::stopImmediatePropagation();
@@ -69,7 +72,7 @@ export function injectPageSandbox(data) {
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
-      if (!IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
+      if (__.MV3 || !IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
         startHandshake();
       }
     });
@@ -80,7 +83,7 @@ export function injectPageSandbox(data) {
     let ok = opener && (isFrame ? frameElement : describeProperty(opener.location, 'href').get);
     if (ok) {
       ok = false;
-      if (IS_FIREFOX) {
+      if (!__.MV3 && IS_FIREFOX) {
         const setOk = evt => { ok = evt::getDetail(); };
         window::on(VAULT_WRITER_ACK, setOk, true);
         try {
@@ -105,7 +108,7 @@ export function injectPageSandbox(data) {
      * otherwise a same-origin parent page could use it to spoof the handshake. */
     window::on(handshakeId, handshaker, { capture: true, once: true });
     inject({
-      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
+      code: `(${VMInitInjection}(${IS_FIREFOX},${messageViaClone},'${handshakeId}','${vaultId}'))()`
         + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
     });
     // Clean up in case CSP prevented the script from running
@@ -262,7 +265,7 @@ function inject(item, iframeCb) {
   const isCodeArray = isObject(code);
   const script = makeElem('script', !isCodeArray && code);
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
-  const onError = IS_FIREFOX && !iframeCb && (e => {
+  const onError = !__.MV3 && IS_FIREFOX && !iframeCb && (e => {
     const { stack } = e[ERROR];
     if (!stack || `${stack}`.includes(VM_UUID)) {
       log(ERROR, [item.displayName + ':' + e.lineno + ':' + e.colno], e[ERROR]);
@@ -286,7 +289,7 @@ function inject(item, iframeCb) {
       style: 'display:none!important',
     });
     /* In FF the opener receives DOMNodeInserted attached at creation so it can see window[0] */
-    if (!IS_FIREFOX) {
+    if (__.MV3 || !IS_FIREFOX) {
       divRoot::appendChild(iframe);
     }
   } else {
@@ -304,7 +307,7 @@ function inject(item, iframeCb) {
   }
   if (iframeCb) {
     injectedRoot = divRoot;
-    if (IS_FIREFOX) divRoot::appendChild(iframe);
+    if (!__.MV3 && IS_FIREFOX) divRoot::appendChild(iframe);
     // Can be removed in DOMNodeInserted by a hostile web page or CSP forbids iframes(?)
     if ((iframeDoc = iframe.contentDocument)) {
       iframeDoc::getElementsByTagName('*')[0]::appendChild(script);
@@ -336,7 +339,7 @@ function injectAll(runAt) {
         if (!grant.length) grantless[realm] = 1;
       }
       if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
-      else if (!IS_FIREFOX) res = injectPageList(runAt);
+      else if (__.MV3 || !IS_FIREFOX) res = injectPageList(runAt);
     }
   }
   return res;
@@ -359,7 +362,7 @@ async function injectPageList(runAt) {
 }
 
 function setupContentInvoker() {
-  invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
+  invokeContent = VMInitInjection(IS_FIREFOX, messageViaClone)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
   bridge.post = (cmd, params, realm, node) => {
     const fn = realm === CONTENT

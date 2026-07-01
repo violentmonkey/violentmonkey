@@ -1,6 +1,6 @@
+import { kContentType, kMainFrame } from '@/common/consts';
 import { userScriptsAPI } from '@/common/browser-scripts-api';
-import { sessionData } from './init';
-import { DNR, revokeDnrRules } from './preinject-dnr';
+import { DNR, DNR_ID_INSTALL } from './dnr';
 import { getUpdateInterval } from './update';
 
 export const NEW_INSTALL = '0';
@@ -21,21 +21,36 @@ chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
           "style-src * 'unsafe-inline' data: blob:",
         messaging: true,
       }),
-      userScriptsAPI.register([{
+      userScriptsAPI.unregister().then(() => userScriptsAPI.register([{
         id: INJECTED_API_ID,
         runAt: 'document_start',
         allFrames: true,
         matches: ['<all_urls>'],
         js: [{file: 'injected-web.js'}, {file: 'injected.js'}],
-      }]),
-      DNR.getSessionRules().then(rules =>
-        revokeDnrRules(rules.map(r => !sessionData[r.id] && r.id).filter(Boolean)))
+      }])),
+      DNR.updateDynamicRules({
+        removeRuleIds: [DNR_ID_INSTALL],
+        addRules: [{
+          id: DNR_ID_INSTALL,
+          condition: {
+            regexFilter: '\\.user\\.js(\\?.*)?$',
+            requestMethods: ['get'],
+            resourceTypes: [kMainFrame],
+            responseHeaders: [{ header: kContentType, values: ['*/javascript*'] }],
+          },
+          action: {
+            type: 'modifyHeaders',
+            responseHeaders: [{ header: kContentType, value: 'text/html', operation: 'set' }],
+          },
+        }],
+      })
     ].flat());
   } catch (err) {
     if (__.MV3) {
       chrome.tabs.create({
-        url: 'data:text/plain,' + err.stack.replaceAll('#', '%23') + (userScriptsAPI ? '' :
-          '\nMake sure to enable "Allow User Scripts" for Violentmonkey in chrome://extensions'),
+        url: 'data:text/plain,' + (userScriptsAPI ? '' :
+          'Make sure to enable "Allow User Scripts" for Violentmonkey in chrome://extensions\n\n') +
+          err.stack.replaceAll('#', '%23'),
       });
     }
   }

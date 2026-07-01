@@ -1,4 +1,4 @@
-import { isEmpty, makePause, sendTabCmd } from '@/common';
+import { isEmpty, keepAlive, makePause, sendTabCmd } from '@/common';
 import { forEachEntry, forEachValue, nest, objectGet, objectSet } from '@/common/object';
 import { getScript } from './db';
 import { addOwnCommands, addPublicCommands } from './init';
@@ -8,6 +8,7 @@ import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
 
 /** { scriptId: { tabId: { frameId: {key: raw}, ... }, ... } } */
 const openers = {};
+const keepers = {};
 let chain = Promise.resolve();
 let toCommit = {};
 let toCommitPending;
@@ -61,11 +62,12 @@ export function clearValueOpener(tabId, frameId) {
   openers::forEachEntry(([id, tabs]) => {
     const frames = tabs[tabId];
     if (frames) {
-      if (frameId) {
-        delete frames[frameId];
-        if (isEmpty(frames)) delete tabs[tabId];
-      } else {
+      if (!frameId || (delete frames[frameId], isEmpty(frames))) {
         delete tabs[tabId];
+        if (__.MV3 && keepers[tabId]) {
+          keepers[tabId]();
+          delete keepers[tabId];
+        }
       }
     }
     if (tabId == null || isEmpty(tabs)) {
@@ -80,6 +82,7 @@ export function clearValueOpener(tabId, frameId) {
  * @param {number|string} frameId
  */
 export async function addValueOpener(injectedScripts, tabId, frameId) {
+  if (__.MV3) keepers[tabId] ||= keepAlive();
   const valuesById = +injectedScripts[0] // restoring storage for page from bfcache
     && await storage[S_VALUE].getMulti(injectedScripts);
   for (const script of injectedScripts) {

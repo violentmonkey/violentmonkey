@@ -5,7 +5,7 @@ import './content';
 
 // Script installation in Firefox as it does not support `onBeforeRequest` for `file:`
 // Using pathname and a case-sensitive check to match webRequest `urls` filter behavior
-if (IS_FIREFOX && topRenderMode === 1
+if (!__.MV3 && IS_FIREFOX && topRenderMode === 1
 && location.protocol === 'file:'
 && location.pathname.endsWith('.user.js')
 && document.contentType === 'application/x-javascript' // FF uses this for file: scheme

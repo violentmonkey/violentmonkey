@@ -9,12 +9,13 @@ import {
   cache, CSAPI_REG, expose, ffInject, injectContentRealm, injectInto, isApplied, makeXhrHeader,
   propsToClear, registerScriptData, scriptsAPI, xhrInject,
 } from './preinject-core';
-import { registerDnrBlob } from './preinject-dnr';
+import { registerDnrBlob } from './dnr';
 import { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT_PRE, S_VALUE } from './storage';
 import { ua } from './ua';
 
 const sessionId = getUniqId();
 const SKIP_COMMENTS_RE = /^\s*(?:\/\*[\s\S]*?\*\/|\/\/.*[\r\n]+|\s+)*/u;
+const isIncognito = __.MV3 && chrome.extension.inIncognitoContext;
 /** Not using a combined regex to check for the chars to avoid catastrophic backtracking */
 const isUnsafeConcat = s => (s = s.charCodeAt(s.match(SKIP_COMMENTS_RE)[0].length)) === 45/*"-"*/
   || s === 43/*"+"*/
@@ -98,7 +99,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     [MORE]: moreKey,
     [kSessionId]: sessionId,
     [IDS]: allIds,
-    info: { ua },
+    info: { ua, gmi: { isIncognito } },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   }, objectPick(env, [
     S_CACHE,

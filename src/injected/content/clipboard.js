@@ -6,7 +6,7 @@ let clipboardData;
 let setClipboard;
 
 // Attaching a dummy listener so the page can't prevent us (fwiw h@xx0rz excluded)
-if (IS_FIREFOX) {
+if (!__.MV3 && IS_FIREFOX) {
   on('copy', onClipboardCopy = e => clipboardData && doCopy(e), true);
 }
 

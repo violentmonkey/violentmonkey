@@ -45,11 +45,14 @@ declare namespace GMReq {
     frame: VMMessageTargetFrame;
     frameId: number;
     id: string;
+    resolve: (v?: any) => void;
     responseHeaders: string;
+    ruleId?: number;
     storeId: string;
     tabId: number;
     url: string;
     xhr: XMLHttpRequest;
+    xhrUrl: string;
   }
   interface Content {
     chunks?: Uint8Array | string[];

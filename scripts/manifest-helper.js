@@ -16,23 +16,24 @@ function getBrowserTargets() {
 function readManifest() {
   const input = fs.readFileSync('src/manifest.yml', 'utf8');
   const data = yaml.load(MV3 ? input.replaceAll('browser_action', 'action') : input);
-  if (MV3) {
-    data.manifest_version = 3;
-    data.background = { service_worker: 'sw.js' };
-    data.host_permissions = ['<all_urls>'];
-    data.minimum_chrome_version = '135.0'; // chrome.userScripts.execute
-    data.message_serialization = 'structured_clone'; // since Chrome 148
-    data.permissions.splice(data.permissions.indexOf('<all_urls>'), 1, ...[
-      !isProd && 'declarativeNetRequestFeedback',
+  if (MV3) Object.assign(data, {
+    manifest_version: 3,
+    minimum_chrome_version: '135.0', // chrome.userScripts.execute
+    background: { service_worker: 'sw.js' },
+    browser_specific_settings: undefined,
+    content_scripts: undefined,
+    incognito: 'split',
+    message_serialization: 'structured_clone', // since Chrome 148
+    host_permissions: ['<all_urls>'],
+    permissions: data.permissions.filter(p => p !== '<all_urls>').concat([
       'alarms',
       'declarativeNetRequestWithHostAccess',
+      !isProd && 'declarativeNetRequestFeedback',
       'offscreen',
       'scripting',
       'userScripts',
-    ].filter(Boolean));
-    delete data.browser_specific_settings;
-    delete data.content_scripts;
-  }
+    ].filter(Boolean)),
+  });
   return data;
 }
 

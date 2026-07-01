@@ -7,12 +7,11 @@ import {
 import { forEachEntry, objectSet } from '@/common/object';
 import { kPageMenuCommands } from '@/common/options-defaults';
 import { CACHE_KEYS, REQ_KEYS, VALUE_IDS } from './db';
-import { sessionData } from './init';
 import { clearNotifications } from './notifications';
 import { INJECTED_DATA_ID } from './on-installed';
 import { hookOptionsInit } from './options';
 import { addMenuConfig } from './page-menu-commands';
-import { revokeDnrRules } from './preinject-dnr';
+import { revokeBlobRules } from './dnr';
 import { normalizeRealm, prepare, prepareXhrBlob } from './preinject-prepare';
 import { clearRequestsByTabId } from './requests';
 import { kSetCookie } from './requests-core';
@@ -139,8 +138,8 @@ function toggleXhrInject(enable) {
   API_XHR.removeListener(onHeadersReceived);
   if (enable) {
     API_XHR.addListener(onHeadersReceived, API_CONFIG, __.MV3 ? undefined : API_EXTRA);
-  } else if (__.MV3 && sessionData.dnr) {
-    revokeDnrRules(Object.keys(sessionData.dnr).map(Number));
+  } else if (__.MV3) {
+    revokeBlobRules();
   }
 }
 

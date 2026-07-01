@@ -1,3 +1,4 @@
+import { kContentType } from '@/common/consts';
 import { blob2base64, isDataUri } from './util';
 
 export const nullBool2string = v => v ? '1' : v == null ? '' : '0';
@@ -88,7 +89,7 @@ export function makeDataUri(raw, url) {
  * @returns {Promise<string>}
  */
 export async function makeRaw(response) {
-  const type = (response.headers.get('content-type') || '').split(';')[0] || '';
+  const type = (response.headers.get(kContentType) || '').split(';')[0] || '';
   const body = await blob2base64(response.data);
   return `${type},${body}`;
 }

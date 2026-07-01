@@ -386,7 +386,11 @@ async function loadDeps() {
   }
 }
 function closeTab() {
-  sendCmdDirectly('TabClose');
+  if (__.MV3 && history.length > 1) {
+    history.go(-2);
+  } else {
+    sendCmdDirectly('TabClose');
+  }
 }
 async function getFile(url, opts) {
   const { isBlob, useCache } = opts || {};

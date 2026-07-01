@@ -1,13 +1,6 @@
 import { leaseBlobUrl, makePause } from '@/common';
-import { addPublicCommands } from '@/background/utils';
 
 let chain = Promise.resolve();
-
-addPublicCommands({
-  DownloadBlob(args) {
-    downloadBlob(...args);
-  },
-});
 
 /**
  * @param {Blob|string} what
