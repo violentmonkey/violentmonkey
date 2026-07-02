@@ -26,7 +26,6 @@ module.exports = {
       extensions,
     }],
     './scripts/babel-plugin-safe-bind.js',
-    ['@babel/plugin-transform-for-of', { assumeArray: true }],
     ['transform-modern-regexp', { useRe: true }],
   ],
 };

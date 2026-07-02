@@ -30,7 +30,9 @@ export function sendCmdTo(cmd, data, target, fakeSrc) {
   pending.set(++curId, p);
   target.postMessage({
     id: curId,
-    msg: { cmd, data },
+    msg: __.EXT && !__.SW && data && typeof data === 'object'
+      ? JSON.stringify({ cmd, data }) // might be a Vue Proxy which can't be sent
+      : { cmd, data },
     src: fakeSrc,
   });
   return p.promise;
@@ -44,17 +46,17 @@ export function sendCmdTo(cmd, data, target, fakeSrc) {
 export async function onClientMessage(handler, { data, source }) {
   const { id, msg } = data;
   if (__.DEBUG) console.log('%cIN', 'color:#068', location.pathname, data, pending.get(id));
-  let p, res, err;
+  let p, res, err, transfer;
   if (msg) {
     try {
-      res = handler(msg, data.src);
+      res = handler(typeof msg === 'string' ? JSON.parse(msg) : msg, data.src, transfer = []);
       if (res instanceof Promise)
         res = await res;
     } catch (e) {
       err = e;
       res = undefined; // clearing Promise
     }
-    source.postMessage({ id, res, err });
+    source.postMessage({ id, res, err }, transfer);
   } else if ((p = pending.get(id))) {
     pending.delete(id);
     if ((err = data.err)) {
@@ -79,7 +81,7 @@ export function rejectPending(msg) {
 
 if (__.SW_CLIENT) {
   // Receiver for a response from handleCommandMessage -> sw.onmessage
-  swContainer.onmessage = onClientMessage.bind(null, ({cmd, data}, src) => (
-    clientCommands[cmd](data, src)
+  swContainer.onmessage = onClientMessage.bind(null, ({cmd, data}, ...args) => (
+    clientCommands[cmd](data, ...args)
   ));
 }

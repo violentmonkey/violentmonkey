@@ -10,16 +10,6 @@ export * from './script';
 export * from './string';
 export * from './util';
 
-if (__.DEV && __.INJECTED !== 'injected-web') {
-  const get = () => {
-    throw 'Do not use `for-of` with Map/Set. Use forEach or for-of with a [...copy]'
-    + '\n(not supported due to our config of @babel/plugin-transform-for-of).';
-  };
-  for (const obj of [Map, Set, WeakMap, WeakSet]) {
-    Object.defineProperty(obj.prototype, 'length', { get, configurable: true });
-  }
-}
-
 export const ignoreChromeErrors = () => chrome.runtime.lastError;
 export const browserWindows = !__.INJECTED && browser.windows;
 export const defaultImage = !__.INJECTED && `${ICON_PREFIX}128.png`;

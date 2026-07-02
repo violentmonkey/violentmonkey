@@ -2,6 +2,7 @@ const fs = require('fs');
 const babelCore = require('@babel/core');
 const webpack = require('webpack');
 
+let babelConfig;
 const entryGlobals = {
   'common': [],
   'injected/content': [],
@@ -54,6 +55,18 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
       options: { files: entryGlobals[name].map(entryPathToFilename) },
     }],
   });
+  let babelOpts;
+  if (name.startsWith('injected')) {
+    babelConfig ||= require('../babel.config.js');
+    config.module.rules[0].options = {
+      ...babelConfig,
+      plugins: [
+        ...babelConfig.plugins,
+        ['@babel/plugin-transform-for-of', { assumeArray: true }],
+      ],
+    };
+    babelOpts = { plugins: [['@babel/plugin-transform-for-of', { assumeArray: true }]] };
+  }
   const defsRe = new RegExp(`\\b(${
     Object.keys(defsObj)
     .join('|')
@@ -61,7 +74,7 @@ function addWrapperWithGlobals(name, config, defsObj, callback) {
   })\\b`, 'g');
   const reader = () => (
     entryGlobals[name]
-    .map(path => readGlobalsFile(path))
+    .map(path => readGlobalsFile(path, babelOpts))
     .join('\n')
     .replace(defsRe, s => defsObj[s])
   );

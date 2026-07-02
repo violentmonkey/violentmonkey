@@ -1,36 +1,18 @@
-import { debounce, normalizeKeys, noop, sendCmd } from '@/common';
+import { debounce, keepAlive, noop, normalizeKeys, sendCmd } from '@/common';
 import { kMainFrame, TIMEOUT_HOUR } from '@/common/consts';
-import {
-  SYNC_MERGE,
-  SYNC_PULL,
-  SYNC_PUSH,
-  USER_CONFIG,
-} from '@/common/consts-sync';
-import { forEachEntry, objectSet, objectPick } from '@/common/object';
+import { SYNC_MERGE, SYNC_PULL, SYNC_PUSH, USER_CONFIG } from '@/common/consts-sync';
+import { forEachEntry, objectPick, objectSet } from '@/common/object';
 import { getOption, setOption } from '../utils';
 import { sortScripts, updateScriptInfo } from '../utils/db';
+import callOffscreen from '../utils/offscreen';
 import { script as pluginScript } from '../plugin';
 import {
-  events,
-  getSyncState,
-  resetSyncState,
-  setSyncState,
-  SYNC_AUTHORIZED,
-  SYNC_AUTHORIZING,
-  SYNC_ERROR,
-  SYNC_ERROR_AUTH,
-  SYNC_ERROR_INIT,
-  SYNC_IN_PROGRESS,
-  SYNC_INITIALIZING,
-  SYNC_UNAUTHORIZED,
+  events, getSyncState, resetSyncState, setSyncState, SYNC_AUTHORIZED, SYNC_AUTHORIZING, SYNC_ERROR,
+  SYNC_ERROR_AUTH, SYNC_ERROR_INIT, SYNC_IN_PROGRESS, SYNC_INITIALIZING, SYNC_UNAUTHORIZED,
 } from './state-machine';
 import { formatDate } from '@/common/date';
 import { getSyncActions } from '@usync/sync';
-import {
-  OAuth2Authorizers,
-  OAUTH2_UNAUTHORIZED,
-  OAUTH2_NEED_REFRESH,
-} from '@usync/oauth2';
+import { OAUTH2_NEED_REFRESH, OAUTH2_UNAUTHORIZED, OAuth2Authorizers } from '@usync/oauth2';
 import { DriveProviders } from '@usync/drive';
 
 // --- Module-level state ---
@@ -39,6 +21,16 @@ const serviceNames = [];
 const serviceClasses = [];
 const services = {};
 const syncLater = debounce(autoSync, TIMEOUT_HOUR);
+const getDrive = (...init) => !__.MV3
+  ? new DriveProviders[init.shift()](...init)
+  : Object.create(new Proxy({}, (init = callOffscreen('DriveInit', init)) && {
+    get: (obj, cmd) => (obj[cmd] =
+      async (...args) => (
+        init && (await init, init = false),
+        callOffscreen('Drive', [cmd, args])
+      )
+    ),
+  }));
 let syncConfig;
 let syncMode = SYNC_MERGE;
 
@@ -314,8 +306,7 @@ export function createSyncService({
     if (!uc) return false;
     const auth = mapPasswordAuth(uc);
     if (!auth) return false;
-    const Drive = DriveProviders[driveProvider];
-    drive = new Drive({ authProvider: 'password', ...auth }, {});
+    drive = getDrive(driveProvider, { authProvider: 'password', ...auth }, {});
     return true;
   }
 
@@ -337,7 +328,7 @@ export function createSyncService({
     try {
       const batches = drive.list();
       // eslint-disable-next-line no-unused-vars
-      for await (const batch of batches) {
+      for await (const batch of __.MV3 ? getListFromPort(await batches) : batches) {
         break;
       }
       setSyncState({ status: SYNC_AUTHORIZED });
@@ -384,6 +375,7 @@ export function createSyncService({
         progress.finished += 1;
         onStateChange();
       });
+      if (__.MV3) keepAlive(chain);
       return result;
     };
   }
@@ -421,8 +413,10 @@ export function createSyncService({
 
   async function getSyncData() {
     const files = [];
+    const batches = drive.list();
     progress.total += 1;
-    for await (const batch of drive.list()) {
+    for await (const batch of __.MV3 ? getListFromPort(await batches) : batches) {
+      if (__.MV3 && !batch) break; // the last item is a dummy end marker
       files.push(...batch);
     }
     progress.finished += 1;
@@ -468,6 +462,20 @@ export function createSyncService({
       scripts,
       await pluginScript.list(),
     ];
+  }
+
+  /** @param {MessagePort} port */
+  function* getListFromPort(port) {
+    let resolver, done;
+    port.onmessage = ({ data }) => {
+      done = !data;
+      resolver(data);
+    };
+    try {
+      while (!done) yield new Promise(resolve => (resolver = resolve));
+    } finally {
+      port.onmessage = null;
+    }
   }
 
   // --- Sync algorithm ---
@@ -776,8 +784,8 @@ export function createSyncService({
           refreshToken: refreshToken || undefined,
         },
       );
-      const Drive = DriveProviders[driveProvider];
-      drive = new Drive({ authProvider, user: '' }, { authorizer });
+      drive = getDrive(driveProvider, { authProvider, user: '' },
+        __.MV3 ? authorizer && 'auth' : { authorizer });
     } else {
       initPassword();
     }
