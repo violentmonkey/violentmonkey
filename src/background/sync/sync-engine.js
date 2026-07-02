@@ -25,11 +25,7 @@ const getDrive = (...init) => !__.MV3
   ? new DriveProviders[init.shift()](...init)
   : Object.create(new Proxy({}, {
     get: (obj, cmd) => (obj[cmd] =
-      async (...args) => (
-        Array.isArray(init) && (init = callOffscreen('DriveInit', init)),
-        init && (await init, init = false),
-        callOffscreen('Drive', [cmd, args])
-      )
+      (...args) => callOffscreen('Drive', [cmd, args, init.splice(0)/*emptying*/])
     ),
   }));
 let syncConfig;

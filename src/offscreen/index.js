@@ -7,34 +7,15 @@ import { initXHR, xhrs } from './xhr';
 
 let drive;
 
-async function listDrive(cmd, args, transfer) {
-  const mc = new MessageChannel();
-  const port = mc.port1;
-  transfer[0] = mc.port2;
-  for await (const item of drive[cmd](...args)) {
-    port.postMessage(item);
-  }
-  port.postMessage(NaN);
-}
-
 Object.assign(clientCommands, {
   DownloadBlob: downloadBlob,
   LeaseBlob: leaseBlobUrl,
-  Drive: ([cmd, args], src, transfer) =>
-    cmd === 'list' ? (listDrive(cmd, args, transfer), transfer[0])
-      : drive[cmd](...args),
-  DriveInit([provider, opts, context]) {
-    if (context === 'auth') {
-      context = {
-        authorizer: Object.create(new Proxy({}, {
-          get: (obj, cmd) => (obj[cmd] =
-            (...args) => sendCmdToSW('DriveAuth', [cmd, args])
-          ),
-        })),
-      };
-    }
-    drive = new DriveProviders[provider](opts, context);
-  },
+  Drive: ([cmd, args, init], src, transfer) => (
+    init.length && initDrive(...init),
+    cmd === 'list'
+      ? (listDrive(cmd, args, transfer), transfer[0])
+      : drive[cmd](...args)
+  ),
   RevokeBlob: URL.revokeObjectURL,
   SetClipboard: setClipboard,
   /** @param {XHRStartOptions} opts */
@@ -47,3 +28,23 @@ Object.assign(clientCommands, {
 });
 
 chrome.runtime.onConnect.addListener(noop);
+
+function initDrive(provider, opts, context) {
+  drive = new DriveProviders[provider](opts, context !== 'auth' ? context : {
+    authorizer: Object.create(new Proxy({}, {
+      get: (obj, cmd) => (obj[cmd] =
+        (...args) => sendCmdToSW('DriveAuth', [cmd, args])
+      ),
+    })),
+  });
+}
+
+async function listDrive(cmd, args, transfer) {
+  const mc = new MessageChannel();
+  const port = mc.port1;
+  transfer[0] = mc.port2;
+  for await (const item of drive[cmd](...args)) {
+    port.postMessage(item);
+  }
+  port.postMessage(null);
+}
