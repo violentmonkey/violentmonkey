@@ -58,12 +58,8 @@ async function notifyOpener(id, isClick) {
   if (init) await sessionData;
   const op = notifications[id];
   if (!op) return;
-  if (op.open) {
-    if (isClick) {
-      for (const scriptId of op.open) {
-        commands.OpenEditor(scriptId);
-      }
-    }
+  if (op.cmd) {
+    if (isClick) op.for.forEach(arg => commands[op.cmd](arg));
   } else if (op > 0) {
     if (isClick) clearZombieTimer(op);
   } else if (op[kZombie]) {
