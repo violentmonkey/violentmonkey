@@ -23,20 +23,20 @@ const services = {};
 const syncLater = debounce(autoSync, TIMEOUT_HOUR);
 const getDrive = (...init) => !__.MV3
   ? new DriveProviders[init.shift()](...init)
-  : Object.create(new Proxy({}, (init = callOffscreen('DriveInit', init)) && {
+  : Object.create(new Proxy({}, {
     get: (obj, cmd) => (obj[cmd] =
       async (...args) => (
+        Array.isArray(init) && (init = callOffscreen('DriveInit', init)),
         init && (await init, init = false),
         callOffscreen('Drive', [cmd, args])
       )
     ),
   }));
-let driveAuthorizer;
 let syncConfig;
 let syncMode = SYNC_MERGE;
 
 if (__.MV3) addOwnCommands({
-  DriveAuth: ([cmd, args]) => driveAuthorizer[cmd](...args),
+  DriveAuth: ([cmd, args]) => getService().authorizer?.[cmd](...args),
 });
 
 // --- Logging ---
@@ -790,7 +790,7 @@ export function createSyncService({
         },
       );
       drive = getDrive(driveProvider, { authProvider, user: '' },
-        __.MV3 ? (driveAuthorizer = authorizer) && 'auth' : { authorizer });
+        __.MV3 ? 'auth' : { authorizer });
     } else {
       initPassword();
     }
@@ -824,6 +824,9 @@ export function createSyncService({
   return {
     name,
     displayName,
+    get authorizer() {
+      return authorizer;
+    },
     get config() {
       return serviceConfig;
     },
