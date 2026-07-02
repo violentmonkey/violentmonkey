@@ -2,7 +2,7 @@ import { debounce, keepAlive, noop, normalizeKeys, sendCmd } from '@/common';
 import { kMainFrame, TIMEOUT_HOUR } from '@/common/consts';
 import { SYNC_MERGE, SYNC_PULL, SYNC_PUSH, USER_CONFIG } from '@/common/consts-sync';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
-import { getOption, setOption } from '../utils';
+import { addOwnCommands, getOption, setOption } from '../utils';
 import { sortScripts, updateScriptInfo } from '../utils/db';
 import callOffscreen from '../utils/offscreen';
 import { script as pluginScript } from '../plugin';
@@ -31,8 +31,13 @@ const getDrive = (...init) => !__.MV3
       )
     ),
   }));
+let driveAuthorizer;
 let syncConfig;
 let syncMode = SYNC_MERGE;
+
+if (__.MV3) addOwnCommands({
+  DriveAuth: ([cmd, args]) => driveAuthorizer[cmd](...args),
+});
 
 // --- Logging ---
 
@@ -785,7 +790,7 @@ export function createSyncService({
         },
       );
       drive = getDrive(driveProvider, { authProvider, user: '' },
-        __.MV3 ? authorizer && 'auth' : { authorizer });
+        __.MV3 ? (driveAuthorizer = authorizer) && 'auth' : { authorizer });
     } else {
       initPassword();
     }

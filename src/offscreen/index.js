@@ -25,11 +25,13 @@ Object.assign(clientCommands, {
       : drive[cmd](...args),
   DriveInit([provider, opts, context]) {
     if (context === 'auth') {
-      context = Object.create(new Proxy({}, {
-        get: (obj, cmd) => (obj[cmd] =
-          (...args) => sendCmdToSW('DriveAuth', [cmd, args])
-        ),
-      }));
+      context = {
+        authorizer: Object.create(new Proxy({}, {
+          get: (obj, cmd) => (obj[cmd] =
+            (...args) => sendCmdToSW('DriveAuth', [cmd, args])
+          ),
+        })),
+      };
     }
     drive = new DriveProviders[provider](opts, context);
   },
