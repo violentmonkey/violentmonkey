@@ -1,9 +1,12 @@
 import { onClientMessage } from '@/common/sw-messaging';
-import { getData } from './utils/db';
+import { checkRemove, getData } from './utils/db';
 import { init } from './utils/init';
+import { removeNotification } from './utils/notifications';
 import { getAllOptions } from './utils/options';
 import { initPopup } from './utils/popup-tracker';
+import { kAlarmRemove, kAlarmUpdate, kNotifications } from './utils/session-data';
 import { resolveVirtualUrl } from './utils/tab-redirector';
+import { autoUpdate } from './utils/update';
 import { handleCommandMessage } from '.';
 
 const GET_DATA_URL = extensionRoot + 'get-data.js';
@@ -47,3 +50,15 @@ global.oninstall = evt => {
 };
 
 global.onmessage = onClientMessage.bind(null, handleCommandMessage);
+
+chrome.alarms.onAlarm.addListener(async ({ name }) => {
+  if (init) await init;
+  if (name === kAlarmRemove) {
+    checkRemove();
+  } else if (name === kAlarmUpdate) {
+    autoUpdate();
+  } else if (name.startsWith(kNotifications)) {
+    removeNotification(name.slice(kNotifications.length));
+  }
+});
+

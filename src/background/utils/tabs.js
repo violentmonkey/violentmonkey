@@ -1,12 +1,12 @@
 import { browserWindows, getActiveTab, makePause, noop, sendTabCmd } from '@/common';
 import { getDomain } from '@/common/tld';
-import { addOwnCommands, addPublicCommands, commands } from './init';
+import { addOwnCommands, addPublicCommands, commands, init } from './init';
 import { getOption } from './options';
+import sessionData, { flushSession, kTabOpeners, tabOpeners } from './session-data';
 import { testScript } from './tester';
 import { CHROME } from './ua';
 import { vetUrl } from './url';
 
-const openers = {};
 const openerTabIdSupported = __.MV3 || !IS_FIREFOX // supported in Chrome
   || !!(global.AbortSignal && browserWindows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
@@ -56,6 +56,7 @@ try {
   });
 }
 
+/** @namespace Commands */
 addOwnCommands({
   GetTabDomain(url) {
     const host = url && new URL(url).hostname;
@@ -77,6 +78,7 @@ addOwnCommands({
   OpenDashboard: openDashboard,
 });
 
+/** @namespace Commands */
 addPublicCommands({
   /** @return {Promise<{ id: number } | chrome.tabs.Tab>} new tab is returned for internal calls */
   async TabOpen({
@@ -167,7 +169,8 @@ addPublicCommands({
       await browserWindows?.update(newTab[kWindowId], { focused: true });
     }
     if (!isInternal && srcTab.id != null) {
-      openers[newTab.id] = srcTab.id;
+      tabOpeners[newTab.id] = srcTab.id;
+      if (__.MV3) flushSession(kTabOpeners, tabOpeners);
     }
     return isInternal ? newTab : { id: newTab.id };
   },
@@ -182,11 +185,13 @@ addPublicCommands({
   },
 });
 
-tabsOnRemoved.addListener((id) => {
-  const openerId = openers[id];
+tabsOnRemoved.addListener(async (id) => {
+  if (init) await sessionData;
+  const openerId = tabOpeners[id];
   if (openerId >= 0) {
     sendTabCmd(openerId, 'TabClosed', id);
-    delete openers[id];
+    delete tabOpeners[id];
+    if (__.MV3) flushSession(kTabOpeners, tabOpeners);
   }
 });
 

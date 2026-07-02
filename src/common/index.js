@@ -183,6 +183,12 @@ export function keepAlive(promise) {
   return res;
 }
 
+/**
+ * @template T
+ * @param {number} [ms]
+ * @param {T} [arg] - resolved value of the Promise
+ * @return {Promise<T>}
+ */
 export function makePause(ms, arg) {
   const res = ms < 0
     ? Promise.resolve(arg)

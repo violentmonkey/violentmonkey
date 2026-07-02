@@ -1,0 +1,33 @@
+import { makePause } from '@/common';
+
+export const kAlarmRemove = 'remove';
+export const kAlarmUpdate = 'update';
+export const kBadges = 'badges';
+export const kNotifications = 'notifications';
+export const kTabOpeners = 'tabOpeners';
+
+/** @type {{ [tabId: string]: VMBadgeData }}*/
+export let badges = {};
+export let notifications = {};
+export let tabOpeners = {};
+
+let flushing;
+let sessionData = __.MV3 && chrome.storage.session.get().then(data => (
+  badges = data[kBadges] || badges,
+  notifications = data[kNotifications] || notifications,
+  tabOpeners = data[kTabOpeners] || tabOpeners,
+  sessionData = data
+));
+
+export default sessionData;
+
+export async function flushSession(key, val) {
+  if (flushing) {
+    flushing[key] = val;
+  } else {
+    flushing = { [key]: val };
+    await makePause(1000);
+    chrome.storage.session.set(flushing);
+    flushing = null;
+  }
+}

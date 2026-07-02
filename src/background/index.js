@@ -81,5 +81,6 @@ if (!__.MV3) {
 browser.runtime.onMessage.addListener(handleCommandMessage);
 if (__.MV3) chrome.runtime.onUserScriptMessage?.addListener(handleCommandMessage);
 browser.commands?.onCommand.addListener(async cmd => {
+  if (init) await init;
   handleHotkeyOrMenu(cmd, await getActiveTab());
 });

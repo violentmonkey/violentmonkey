@@ -1,11 +1,12 @@
-import { i18n, ignoreChromeErrors, makeDataUri, makePause, noop } from '@/common';
+import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import loadIconData from '@/common/load-icon-data';
 import { nest } from '@/common/object';
-import { addOwnCommands, commands, init, sessionData } from './init';
+import { addOwnCommands, commands, init } from './init';
 import { installedOver } from './on-installed';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
+import sessionData, { badges, flushSession, kBadges } from './session-data';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
 import { testBlacklist } from './tester';
@@ -35,9 +36,6 @@ const iconDefault = extensionManifest[BROWSER_ACTION].default_icon[16].match(/\d
 const titleDisabled = i18n('menuScriptDisabled');
 const titleNoninjectable = i18n('failureReasonNoninjectable');
 const titleSkipped = i18n('skipScriptsMsg');
-/** @type {{ [tabId: string]: VMBadgeData }}*/
-export let badges = {};
-let flushing;
 let isApplied;
 /** @type {VMBadgeMode} */
 let showBadge;
@@ -73,9 +71,6 @@ hookOptions((changes) => {
   }
 });
 
-sessionData.then(d => {
-  badges = d.badges || badges;
-});
 init.then(async () => {
   isApplied = getOption(IS_APPLIED);
   showBadge = getOption(KEY_SHOW_BADGE);
@@ -113,27 +108,24 @@ init.then(async () => {
   }
 });
 
-contextMenus?.onClicked.addListener(({ menuItemId: id, frameId }, tab) => {
+contextMenus?.onClicked.addListener(async ({ menuItemId: id, frameId }, tab) => {
+  if (init) await init;
   if (!id.startsWith(CMD_PREFIX) || !handlePageMenuCommand(id, tab, frameId)) {
     handleHotkeyOrMenu(id, tab);
   }
 });
-tabsOnRemoved.addListener(id => delete badges[id] && flush());
-tabsOnUpdated.addListener((tabId, { url }, tab) => {
+tabsOnRemoved.addListener(async id => {
+  if (init) await init;
+  delete badges[id];
+  if (__.MV3) flushSession(kBadges, badges);
+});
+tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
+  if (init) await init;
   if (url) {
     const [title] = getFailureReason(url);
     if (title) updateState(tab, resetBadgeData(tabId, null), title);
   }
 }, FIREFOX && { properties: ['status'] });
-
-async function flush() {
-  if (!flushing) {
-    flushing = true;
-    await makePause(1000);
-    chrome.storage.session.set({ badges });
-    flushing = false;
-  }
-}
 
 function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js
@@ -147,7 +139,7 @@ function resetBadgeData(tabId, isInjected) {
   data[INJECT] = isInjected;
   // Notify popup about non-injectable tab
   if (!isInjected) popupTabs[tabId]?.postMessage(null);
-  flush();
+  if (__.MV3) flushSession(kBadges, badges);
   return data;
 }
 

@@ -1,4 +1,4 @@
-import { ensureArray, ignoreChromeErrors, initHooks, isEmpty, sendCmd } from '@/common';
+import { ensureArray, ignoreChromeErrors, initHooks, isEmpty, keepAlive, sendCmd } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
@@ -226,9 +226,11 @@ function notifyWatchers(toFlush, toRemove) {
 async function undoImport(port) {
   let drop;
   let old;
+  const resolve = __.MV3 && keepAlive();
   port.onDisconnect.addListener(() => {
     ignoreChromeErrors();
     drop = true;
+    if (__.MV3) resolve();
   });
   port.onMessage.addListener(async () => {
     valuesToFlush = {};
@@ -239,8 +241,13 @@ async function undoImport(port) {
     if (toRemove.length) await cachedStorageApi.remove(toRemove);
     await cachedStorageApi.set(old);
     port.postMessage(true);
-    await sendCmd('Reload', delay);
-    location.reload();
+    if (__.MV3) {
+      // TODO: since SW can't reload, change scriptMap, options, etc. directly
+      chrome.runtime.reload();
+    } else {
+      await sendCmd('Reload', delay);
+      location.reload();
+    }
   });
   old = await api.get();
   if (!drop) port.postMessage(true);

@@ -15,10 +15,11 @@ import {
 } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
-import { addOwnCommands, addPublicCommands, commands, resolveInit, sessionData } from './init';
+import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
 import { initOptions, kVersion, setOption } from './options';
+import sessionData from './session-data';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
@@ -116,10 +117,6 @@ addOwnCommands({
   },
   /** @return {Promise<number>} */
   Vacuum: vacuum,
-});
-
-if (__.MV3) chrome.alarms.onAlarm.addListener(a => {
-  if (a.name === 'remove') checkRemove();
 });
 
 (async () => {
@@ -450,13 +447,7 @@ function reportBadScripts(ids) {
 
 export function notifyToOpenScripts(title, text, ids) {
   // FF doesn't show notifications of type:'list' so we'll use `text` everywhere
-  commands.Notification({
-    title,
-    text,
-    onclick() {
-      ids.forEach(id => commands.OpenEditor(id));
-    },
-  });
+  commands.Notification({ title, text, onclick: { cmd: 'OpenEditor', for: ids } });
 }
 
 /**

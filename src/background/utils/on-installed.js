@@ -1,6 +1,7 @@
 import { kContentType, kMainFrame } from '@/common/consts';
 import { userScriptsAPI } from '@/common/browser-scripts-api';
 import { DNR, DNR_ID_INSTALL } from './dnr';
+import { kAlarmRemove, kAlarmUpdate } from './session-data';
 import { getUpdateInterval } from './update';
 
 export const NEW_INSTALL = '0';
@@ -13,8 +14,8 @@ chrome.runtime.onInstalled.addListener(async ({reason, previousVersion}) => {
     installedOver = previousVersion || NEW_INSTALL;
     if (__.MV3) await Promise.all([
       chrome.alarms.clearAll().then(() => [
-        chrome.alarms.create('remove', { periodInMinutes: 24 * 60 }),
-        chrome.alarms.create('update', { periodInMinutes: getUpdateInterval() / 60e3 }),
+        chrome.alarms.create(kAlarmRemove, { periodInMinutes: 24 * 60 }),
+        chrome.alarms.create(kAlarmUpdate, { periodInMinutes: getUpdateInterval() / 60e3 }),
       ]),
       userScriptsAPI.configureWorld({
         csp: "script-src 'self' 'unsafe-inline' 'unsafe-eval';" +

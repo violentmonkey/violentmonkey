@@ -7,6 +7,7 @@ import {
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { addOwnCommands, commands, init } from './init';
 import { parseMeta } from './script';
+import { kAlarmUpdate } from './session-data';
 import { getOption, hookOptions, setOption } from './options';
 import { kUpdateEnabledScriptsOnly } from '@/common/options-defaults';
 import { requestNewer } from './storage-fetch';
@@ -163,11 +164,11 @@ function canNotify(script) {
     : script.config.notifyUpdates ?? allowed;
 }
 
-async function autoUpdate(val) {
+export async function autoUpdate(val) {
   const interval = getUpdateInterval(val);
-  if (val != null) {
-    await chrome.alarms.clear('update');
-    if (val) await chrome.alarms.create('update', { periodInMinutes: interval / 60e3 });
+  if (__.MV3 && val != null) {
+    await chrome.alarms.clear(kAlarmUpdate);
+    if (val) await chrome.alarms.create(kAlarmUpdate, { periodInMinutes: interval / 60e3 });
   }
   if (!interval) return;
   let elapsed = Date.now() - getOption('lastUpdate');

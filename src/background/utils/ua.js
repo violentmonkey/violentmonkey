@@ -1,6 +1,6 @@
 import { browserWindows } from '@/common';
 import { listenOnce } from '@/common/browser';
-import { addOwnCommands, init } from './init';
+import { addOwnCommands, initDependency } from './init';
 
 export const {
   userAgent: navUA,
@@ -26,7 +26,7 @@ addOwnCommands({
   UA: () => ua,
 });
 
-init.deps.push(
+initDependency(
   Promise.all([
     browser.runtime.getPlatformInfo(),
     browser.runtime.getBrowserInfo?.(),

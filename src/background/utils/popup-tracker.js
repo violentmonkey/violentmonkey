@@ -3,9 +3,10 @@ import { kMainFrame } from '@/common/consts';
 import { executeScript } from '@/common/browser-scripts-api';
 import cache from './cache';
 import { getData, getScriptsByURL } from './db';
-import { badges, getFailureReason } from './icon';
+import { getFailureReason } from './icon';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import { setMenus } from './page-menu-commands';
+import { badges } from './session-data';
 
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
 export const popupTabs = {};

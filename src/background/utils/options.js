@@ -1,7 +1,7 @@
 import { compareVersion, debounce, initHooks, normalizeKeys, sendCmd } from '@/common';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
 import defaults, { kScriptTemplate } from '@/common/options-defaults';
-import { addOwnCommands, init } from './init';
+import { addOwnCommands, init, initDependency } from './init';
 import storage from './storage';
 
 let changes;
@@ -87,7 +87,7 @@ function callHooks() {
 
 /** Hooks and calls the callback with a copy of all options when init is resolved */
 export function hookOptionsInit(cb) {
-  if (init) init.deps.push(() => cb(optProxy, true));
+  if (init) initDependency(() => cb(optProxy, true));
   else cb(optProxy, true);
   return hookOptions(cb);
 }
