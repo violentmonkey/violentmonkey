@@ -39,7 +39,6 @@ const pickEnvs = (items) => {
 
 const defsObj = {
   ...pickEnvs([
-    'DEBUG',
     'VM_VER',
     'SYNC_GOOGLE_DESKTOP_ID',
     'SYNC_GOOGLE_DESKTOP_SECRET',
@@ -47,11 +46,14 @@ const defsObj = {
     'SYNC_ONEDRIVE_ACCOUNT_TYPE',
     'SYNC_DROPBOX_CLIENT_ID',
   ]),
-  '__.INIT_FUNC_NAME': JSON.stringify(INIT_FUNC_NAME),
-  '__.CODEMIRROR_THEMES': JSON.stringify(getCodeMirrorThemes()),
-  '__.DEV': !isProd,
-  '__.TEST': process.env.BABEL_ENV === 'test',
-  '__.MV3': MV3,
+  ...Object.fromEntries(Object.entries({
+    INIT_FUNC_NAME,
+    MV3,
+    CODEMIRROR_THEMES: getCodeMirrorThemes(),
+    DEBUG: +process.env.DEBUG,
+    DEV: !isProd,
+    TEST: process.env.BABEL_ENV === 'test',
+  }).map(([k, v]) => ['__.' + k, /string|object/.test(typeof v) ? JSON.stringify(v) : v])),
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
