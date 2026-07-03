@@ -1,6 +1,6 @@
+import { executeScript, extensionDetailsUrl, registerInjector } from '@/common/browser-scripts-api';
 import { getActiveTab, i18n, noop, sendTabCmd } from '@/common';
 import { kMainFrame } from '@/common/consts';
-import { executeScript } from '@/common/browser-scripts-api';
 import cache from './cache';
 import { getData, getScriptsByURL } from './db';
 import { getFailureReason } from './icon';
@@ -28,8 +28,11 @@ export async function initPopup() {
     );
   }
   if (!failure[0] && badgeData[INJECT] == null) {
-    if (!await isInjectable(tabId, badgeData)) {
-      failure = getFailureReason('');
+    const state = await isInjectable(tabId, badgeData).catch(err => err);
+    if (state !== true) {
+      failure = __.MV3 && state
+        ? [state.stack || state, 'infoUrl', extensionDetailsUrl]
+        : getFailureReason('');
     } else if (reset && (reset = cachedSetPopup[0][0])[SCRIPTS].length) {
       /* We also show this after the background script is reloaded inside devtools, which keeps
          the content script connected, but breaks GM_xxxValue, GM_xhr, and so on. */
@@ -75,9 +78,11 @@ async function augmentSetPopup(data, src, key) {
   (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = data;
 }
 
+/** @return {Promise<void|true|Error|string>} */
 async function isInjectable(tabId, badgeData) {
   return badgeData[INJECT] && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
-    || executeScript(tabId, '1', true).catch(noop);
+    || __.MV3 && await registerInjector()
+    || executeScript(tabId, 'true', true).catch(noop);
 }
 
 function onPopupOpened(port) {

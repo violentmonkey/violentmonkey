@@ -8,6 +8,7 @@ import { initXHR, xhrs } from './xhr';
 let drive;
 
 Object.assign(clientCommands, {
+  Alert: msg => alert(msg),
   DownloadBlob: downloadBlob,
   LeaseBlob: leaseBlobUrl,
   Drive: ([cmd, args, init], src, transfer) => (

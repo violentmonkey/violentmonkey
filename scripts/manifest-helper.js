@@ -34,6 +34,7 @@ function readManifest() {
       'offscreen',
       'scripting',
       'userScripts',
+      'webNavigation',
     ].filter(Boolean)),
   });
   return data;

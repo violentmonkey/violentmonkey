@@ -8,8 +8,8 @@ import { clearNotifications } from './notifications';
 import { addMenuConfig, setMenus } from './page-menu-commands';
 import { popupTabs } from './popup-tracker';
 import {
-  cache, CSAPI_REG, getKey, injectContentRealm, isApplied, propsToClear, scriptsAPI, skippedTabs,
-  unregisterScript,
+  cache, contentScriptsAPI, CSAPI_REG, getKey, injectContentRealm, isApplied, propsToClear,
+  skippedTabs, unregisterScript,
 } from './preinject-core';
 import { prepare, prepareScripts, triageRealms } from './preinject-prepare';
 import { clearRequestsByTabId, reifyRequests } from './requests';
@@ -146,7 +146,7 @@ export async function reloadAndSkipScripts(tab) {
   if (!tab) tab = await getActiveTab();
   const tabId = tab.id;
   const bag = cache.get(getKey(tab.url, true));
-  const reg = scriptsAPI && bag && unregisterScript(bag);
+  const reg = (__.MV3 ? chrome.userScripts : contentScriptsAPI) && bag && unregisterScript(bag);
   skippedTabs[tabId] = 1;
   if (reg) await reg;
   clearFrameData(tabId);

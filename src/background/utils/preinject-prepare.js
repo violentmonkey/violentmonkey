@@ -5,11 +5,11 @@ import {
 } from '@/common/consts';
 import { forEachValue, mapEntry, objectPick } from '@/common/object';
 import { getScriptsByURL, kTryVacuuming } from './db';
-import {
-  cache, CSAPI_REG, expose, ffInject, injectContentRealm, injectInto, isApplied, makeXhrHeader,
-  propsToClear, registerScriptData, scriptsAPI, xhrInject,
-} from './preinject-core';
 import { registerDnrBlob } from './dnr';
+import {
+  cache, contentScriptsAPI, CSAPI_REG, expose, ffInject, injectContentRealm, injectInto, isApplied,
+  makeXhrHeader, propsToClear, registerScriptData, xhrInject,
+} from './preinject-core';
 import { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT_PRE, S_VALUE } from './storage';
 import { ua } from './ua';
 
@@ -110,7 +110,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     if (val !== true) bag[val] = env[val];
   });
   bag[MORE] = envDelayed;
-  if ((__.MV3 || ffInject && !xhrInject) && scriptsAPI && isTop) {
+  if (isTop && (__.MV3 ? chrome.userScripts : ffInject && !xhrInject && contentScriptsAPI)) {
     inject[PAGE] = env[PAGE] || triagePageRealm(envDelayed);
     bag[CSAPI_REG] = registerScriptData(inject, url);
     bag.url = url;

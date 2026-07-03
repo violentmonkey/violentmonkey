@@ -1,5 +1,5 @@
 import { noop, sendTabCmd } from '@/common';
-import { executeScript, userScriptsAPI } from '@/common/browser-scripts-api';
+import { executeScript, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
 import initCache from '@/common/cache';
 import {
   __CODE, BLACKLIST, CACHE_KEYS, GLOB_ALL, kMainFrame, kSubFrame, REQ_KEYS, UNWRAP, VALUE_IDS,
@@ -7,11 +7,10 @@ import {
 } from '@/common/consts';
 import { forEachEntry, objectSet } from '@/common/object';
 import { kPageMenuCommands } from '@/common/options-defaults';
+import { revokeBlobRules } from './dnr';
 import { clearNotifications } from './notifications';
-import { INJECTED_DATA_ID } from './on-installed';
 import { hookOptionsInit } from './options';
 import { addMenuConfig } from './page-menu-commands';
-import { revokeBlobRules } from './dnr';
 import { normalizeRealm, prepare, prepareXhrBlob } from './preinject-prepare';
 import { clearRequestsByTabId } from './requests';
 import { kSetCookie } from './requests-core';
@@ -46,12 +45,12 @@ const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
 const NONCE_RE = /'nonce-([-+/=\w]+)'/;
 const UNSAFE_INLINE = "'unsafe-inline'";
 export const CSAPI_REG = 'csReg';
-const contentScriptsAPI = !__.MV3 && browser.contentScripts;
-export const scriptsAPI = __.MV3 ? userScriptsAPI : contentScriptsAPI;
+export const contentScriptsAPI = !__.MV3 && browser.contentScripts;
 export const cache = initCache({
   lifetime: 5 * 60e3,
   onDispose(val) {
-    if (scriptsAPI) unregisterScript(val);
+    // In Chrome the user can disable this API at any time
+    if (__.MV3 ? chrome.userScripts : contentScriptsAPI) unregisterScript(val);
     cache.del(val[MORE]);
   },
 });
@@ -99,7 +98,7 @@ const OPT_HANDLERS = {
       const inject = val[INJECT];
       if (inject && kUseMenu in inject) {
         inject[kUseMenu] = enable;
-        if (scriptsAPI) unregisterScript(val);
+        if (__.MV3 ? chrome.userScripts : contentScriptsAPI) unregisterScript(val);
         // TODO: maybe re-register automatically?
       }
     });
@@ -222,9 +221,9 @@ export function registerScriptData(inject, url) {
   if (__.MV3) {
     inject.id = INJECTED_DATA_ID + url;
     inject = [inject];
-    userScriptsAPI.update(inject).catch(noop);
+    chrome.userScripts.update(inject).catch(noop);
   }
-  return scriptsAPI.register(inject).catch(noop);
+  return (__.MV3 ? chrome.userScripts : contentScriptsAPI).register(inject).catch(noop);
 }
 
 /** @param {VMInjection.Bag} bag */
@@ -233,7 +232,7 @@ export function unregisterScript(bag) {
   if (reg) {
     delete bag[CSAPI_REG];
     return reg.then(r => __.MV3
-      ? scriptsAPI.unregister({ ids: [INJECTED_DATA_ID + bag.url] }).catch(noop)
+      ? chrome.userScripts.unregister({ ids: [INJECTED_DATA_ID + bag.url] }).catch(noop)
       : r.unregister(),
     );
   }

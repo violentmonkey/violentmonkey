@@ -57,7 +57,9 @@
       </div>
     </div>
     <div class="failure-reason" v-if="store.failureText">
-      <span v-text="store.failureText"/>
+      <a v-if="store.infoUrl" v-text="store.failureText" :tabindex="0" target="_blank"
+         :href="store.infoUrl"/>
+      <span v-else v-text="store.failureText"/>
       <code v-text="store.blacklisted" v-if="store.blacklisted" class="ellipsis inline-block"/>
     </div>
     <div v-if="showSettings" class="mb-1c menu settings">
