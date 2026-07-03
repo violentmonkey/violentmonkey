@@ -162,7 +162,7 @@ let keepAliveChain, keepAliveTimer;
 export function keepAlive(promise) {
   let res = promise;
   if (!res) ({promise, resolve: res} = Promise.withResolvers());
-  const chain = keepAliveChain = keepAliveChain ? keepAliveChain.finally(promise) : promise;
+  const chain = keepAliveChain = keepAliveChain ? keepAliveChain.finally(() => promise) : promise;
   keepAliveChain.finally(() => {
     if (keepAliveChain === chain) {
       clearInterval(keepAliveTimer);

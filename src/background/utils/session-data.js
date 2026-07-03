@@ -19,7 +19,7 @@ let sessionData = __.MV3 && chrome.storage.session.get().then(data => (
   sessionData = data
 ));
 
-export default sessionData;
+export { sessionData as default };
 
 export async function flushSession(key, val) {
   if (flushing) {
