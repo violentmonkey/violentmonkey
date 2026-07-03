@@ -28,8 +28,8 @@ export const registerInjector = async (isInstall) => {
       || !(await chrome.userScripts.getScripts({ ids: [INJECTED_API_ID] }))[0]?.js[0].file
     ) await Promise.all([
       chrome.userScripts.configureWorld({
-        csp: 'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\';' +
-          'style-src * \'unsafe-inline\' data: blob:',
+        csp: "script-src 'self' 'unsafe-inline' 'unsafe-eval';" +
+          "style-src * 'unsafe-inline' data: blob:",
         messaging: true,
       }),
       chrome.userScripts.unregister().then(() => chrome.userScripts.register([{
