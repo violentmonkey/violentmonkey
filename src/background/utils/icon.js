@@ -128,6 +128,7 @@ tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
 }, FIREFOX && { properties: ['status'] });
 
 if (__.MV3) chrome.webNavigation.onCommitted.addListener(info => {
+  if (info.frameType !== 'outermost_frame') return;
   // In Chrome the user can disable this API at any time and we can't detect it quickly,
   // because chrome.userScripts is present, but scripts don't run when a tab is reloaded,
   // so setting to `undefined` will cause the popup to run isInjectable() for verification.
