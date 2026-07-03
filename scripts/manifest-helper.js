@@ -26,7 +26,7 @@ function readManifest() {
     // TODO: use it when it graduates from Canary into Stable
     // message_serialization: 'structured_clone',
     host_permissions: ['<all_urls>'],
-    permissions: data.permissions.filter(p => p !== '<all_urls>').concat([
+    permissions: data.permissions.filter(p => p !== '<all_urls>' && p !== 'webRequestBlocking').concat([
       'alarms',
       'declarativeNetRequestWithHostAccess',
       !isProd && 'declarativeNetRequestFeedback',
