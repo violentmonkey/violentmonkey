@@ -30,6 +30,7 @@ function readManifest() {
       'alarms',
       'declarativeNetRequestWithHostAccess',
       !isProd && 'declarativeNetRequestFeedback',
+      'identity',
       'offscreen',
       'scripting',
       'userScripts',

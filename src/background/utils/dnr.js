@@ -4,6 +4,7 @@ import { makeXhrHeader } from './preinject-core';
 
 /** @type {chrome.declarativeNetRequest} */
 export const DNR = __.MV3 && chrome.declarativeNetRequest;
+export const DNR_ID_IDENTITY = 99;
 export const DNR_ID_INSTALL = 100;
 export const DNR_ID_BLOB = 1e6;
 export const DNR_ID_XHR = 2e6;

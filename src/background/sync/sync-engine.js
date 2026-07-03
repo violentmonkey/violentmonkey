@@ -4,6 +4,7 @@ import { SYNC_MERGE, SYNC_PULL, SYNC_PUSH, USER_CONFIG } from '@/common/consts-s
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
 import { addOwnCommands, getOption, setOption } from '../utils';
 import { sortScripts, updateScriptInfo } from '../utils/db';
+import { DNR_ID_IDENTITY, updateSessionRules } from '../utils/dnr';
 import callOffscreen from '../utils/offscreen';
 import { script as pluginScript } from '../plugin';
 import {
@@ -243,10 +244,31 @@ export function openAuthPage(url, redirectUri) {
         urls: [`${redirectUri}*`],
         types: [kMainFrame, 'xmlhttprequest'],
       },
-      __.MV3 ? [] : ['blocking'],
+      ['blocking'],
     );
   });
   return promise;
+}
+
+export async function openAuthPageMV3(url, redirectUri) {
+  try {
+    await updateSessionRules(DNR_ID_IDENTITY, {
+      urlFilter: '|' + redirectUri,
+      resourceTypes: ['main_frame', 'xmlhttprequest'],
+    }, {
+      type: 'redirect',
+      redirect: {
+        transform: {
+          host: chrome.identity.getRedirectURL().split('/')[2],
+          port: '',
+          scheme: 'https',
+        },
+      },
+    });
+    return await chrome.identity.launchWebAuthFlow({interactive: true, url});
+  } finally {
+    await updateSessionRules([DNR_ID_IDENTITY]);
+  }
 }
 
 // --- createSyncService factory ---
@@ -344,7 +366,9 @@ export function createSyncService({
     setSyncState({ status: SYNC_AUTHORIZING });
     try {
       const url = await authorizer.buildAuthUrl();
-      const redirectUrl = await openAuthPage(url, providerConfig.redirect_uri);
+      const redirectUrl = await (__.MV3 ? openAuthPageMV3 : openAuthPage)(
+        url,
+        providerConfig.redirect_uri);
       if (!redirectUrl) throw new Error('Authorization timed out');
       await authorizer.finishAuth(new URL(redirectUrl));
       setSyncState({ status: SYNC_AUTHORIZED });
