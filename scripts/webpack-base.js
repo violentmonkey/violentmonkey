@@ -70,11 +70,8 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
   inject: false,
   // For GroupAssetsPlugin, inject only `index.js` into `body` to avoid FOUC
   injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
-  templateContent: ({ htmlWebpackPlugin }) => `
-    <!DOCTYPE html><html>
-      <head><script src=/get-data.js?${key}></script>${htmlWebpackPlugin.tags.headTags}</head>
-      <body>${htmlWebpackPlugin.tags.bodyTags}</body>
-    </html>`,
+  templateContent: ({ htmlWebpackPlugin: { tags: { headTags: head, bodyTags: body } } }) =>
+    `<!DOCTYPE html><script src=/get-data.js?${key}></script>${head}<body>${body}</body>`,
 });
 
 const splitVendor = prefix => ({
