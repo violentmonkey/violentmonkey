@@ -1,4 +1,3 @@
-import '@/common/browser';
 import {
   formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmdDirectly, trueJoin,
 } from '@/common';

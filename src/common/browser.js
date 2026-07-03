@@ -1,13 +1,14 @@
-let browser = __.MV3 ? global.browser = chrome : global.browser;
+let browser = __.INJECTED !== 'injected-web' && (__.MV3 ? chrome : global.browser);
 const kAddListener = 'addListener';
 const kRemoveListener = 'removeListener';
 const kSendMessage = 'sendMessage';
 
+if (__.INJECTED === 'injected-web') {
 // Since this also runs in a content script we'll guard against implicit global variables
 // for DOM elements with 'id' attribute which is a standard feature, more info:
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
-if (__.MV3 || !IS_FIREFOX && !browser?.runtime) {
+} else if (__.MV3 || !IS_FIREFOX && !browser?.runtime) {
   const { Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
   const MESSAGE = 'message';
@@ -157,7 +158,7 @@ if (__.MV3 || !IS_FIREFOX && !browser?.runtime) {
   if (__.MV3) {
     let obj;
     runtime[kSendMessage] = wrapSendMessage(runtime, runtime[kSendMessage]);
-    if (!__.INJECTED) {
+    if (__.EXT) {
       obj = chrome.tabs;
       obj[kSendMessage] = wrapSendMessage(obj, obj[kSendMessage]);
     }

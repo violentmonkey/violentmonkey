@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { browser } from './consts';
+import browser from './browser';
 import { deepCopy } from './object';
 import { noop } from './util';
 import { sendCmdToSW } from './sw-messaging';

@@ -1,4 +1,4 @@
-import { browser } from '../util';
+import browser from '@/common/browser'; // eslint-disable-line no-restricted-imports
 import { sendCmd } from './util';
 
 const handlers = createNullObj();

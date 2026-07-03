@@ -1,4 +1,4 @@
-import '@/common/browser';
+import browser from '@/common/browser';
 import { getActiveTab, makePause } from '@/common';
 import { deepCopy } from '@/common/object';
 import setClipboard from '@/common/clipboard';
