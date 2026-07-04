@@ -176,7 +176,7 @@ async function httpRequest(opts, events, src, cb) {
 
 function addDnrHeaders(req, xhrUrl, vmHeaders) {
   let ruleId = DNR_ID_XHR; while (xhrRules[++ruleId]) {/**/}
-  req.ruleId = ruleId;
+  req.ruleId = xhrRules[ruleId] = ruleId;
   updateSessionRules(ruleId, {
     tabIds: [-1/*chrome.tabs.TAB_ID_NONE*/],
     urlFilter: '|' + xhrUrl + '|',
