@@ -1,8 +1,8 @@
-import { ensureArray, ignoreChromeErrors, initHooks, isEmpty, keepAlive, sendCmd } from '@/common';
+import { ensureArray, ignoreChromeErrors, initHooks, isEmpty, keepAlive } from '@/common';
 import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
-import { dbKeys, scriptSizes, sizesPrefixRe } from './db';
+import { dbKeys, initializeDatabase, scriptSizes, sizesPrefixRe } from './db';
 import { scriptSiteVisited, updateScriptMap } from './script';
 import storage, { S_MOD_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
 import { clearValueOpener } from './values';
@@ -236,18 +236,13 @@ async function undoImport(port) {
     valuesToFlush = {};
     const cur = await cachedStorageApi.get();
     const toRemove = Object.keys(cur).filter(k => !(k in old));
-    const delay = Math.max(50, Math.min(500, performance.getEntries()[0]?.duration || 200));
     undoing = true;
     if (toRemove.length) await cachedStorageApi.remove(toRemove);
     await cachedStorageApi.set(old);
     port.postMessage(true);
-    if (__.MV3) {
-      // TODO: since SW can't reload, change scriptMap, options, etc. directly
-      chrome.runtime.reload();
-    } else {
-      await sendCmd('Reload', delay);
-      location.reload();
-    }
+    clearStorageCache();
+    await initializeDatabase();
+    undoing = false;
   });
   old = await api.get();
   if (!drop) port.postMessage(true);

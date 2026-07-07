@@ -3,9 +3,6 @@ import options from './options';
 
 const handlers = {
   __proto__: null,
-  Reload(delay) {
-    setTimeout(() => location.reload(), delay);
-  },
   UpdateOptions(data) {
     options.update(data);
   },

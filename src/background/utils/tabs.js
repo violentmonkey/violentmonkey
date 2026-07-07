@@ -1,4 +1,4 @@
-import { browserWindows, getActiveTab, makePause, noop, sendTabCmd } from '@/common';
+import { browserWindows, getActiveTab, i18n, makePause, noop, sendTabCmd } from '@/common';
 import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands, init } from './init';
 import { getOption } from './options';
@@ -158,12 +158,19 @@ addPublicCommands({
         },
       });
     } catch (err) {
-      const m = err.message;
+      const m = err.message || '';
       if (m.startsWith('Illegal to set private')) storeId = null;
       else if (m.startsWith('No tab')) srcTab.id = null;
       else if (m.startsWith('No window')) windowId = null;
       else if (m.startsWith('Tabs cannot be edited')) await makePause(100);
-      else throw err; // TODO: put in storage and show in UI
+      else {
+        console.error('[TabOpen error]', err);
+        commands.Notification({
+          text: m || String(err),
+          title: i18n('extName') + ' - TabOpen Error',
+        });
+        throw err;
+      }
     }
     if (active && newTab[kWindowId] !== windowId) {
       await browserWindows?.update(newTab[kWindowId], { focused: true });

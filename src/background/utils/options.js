@@ -39,6 +39,7 @@ addOwnCommands({
 });
 
 export function initOptions(data, lastVersion, versionChanged) {
+  for (const key in options) delete options[key];
   data = data[kOptions] || {};
   Object.assign(options, data);
   if (__.DEBUG) console.info('options:', options);
