@@ -48,15 +48,17 @@ jobs:
 
           # Build for release, also upload to GitHub assets
           pnpm build
+          pnpm build:mv3
           # Build one more time to make sure the output is the same
-          mv dist $TEMP_DIR/dist && pnpm build && diff -qr dist $TEMP_DIR/dist
+          # mv dist $TEMP_DIR/dist && pnpm build && diff -qr dist $TEMP_DIR/dist
 
           cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
+          cd dist-mv3 && zip -r ../$ASSETS_DIR/$ASSET_CWS_ZIP . && cd ..
 
           # Build for CWS beta, append `BETA` to version name
           # Same as `BETA=1 pnpm build` but only manifest is changed by now
           BETA=1 npx gulp manifest
-          cd dist && zip -r ../$TEMP_DIR/$ASSET_CWS_BETA_ZIP . && cd ..
+          cd dist-mv3 && zip -r ../$TEMP_DIR/$ASSET_CWS_BETA_ZIP . && cd ..
 
           # Build for AMO unlisted, append `BETA` to version name and set update_url for FF
           # Same as `pnpm build:selfHosted` but only manifest is changed by now
@@ -93,7 +95,7 @@ jobs:
           if [ "$PRERELEASE" != "true" ]; then
             echo Publish release
             CWS_EXT_ID=$EXTENSION_ID_RELEASE
-            CWS_SOURCE=$ASSETS_DIR/$ASSET_ZIP
+            CWS_SOURCE=$ASSETS_DIR/$ASSET_CWS_ZIP
           else
             echo Publish prerelease
             CWS_EXT_ID=$EXTENSION_ID_BETA

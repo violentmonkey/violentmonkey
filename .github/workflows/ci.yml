@@ -3,7 +3,7 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [master, mv3]
+    branches: [master]
     tags-ignore:
       - 'v*' # version-tagged commits are releases which have their own workflow
     paths-ignore:
@@ -34,7 +34,9 @@ jobs:
       - name: Install
         run: pnpm i
       - name: Test & Build
-        run: pnpm exec run-p ci build build-mv3
+        run: |
+          pnpm exec run-p ci build
+          pnpm build:mv3
         env:
           SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
           SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
