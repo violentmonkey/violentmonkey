@@ -76,7 +76,7 @@ export const getKey = (url, isTop) => (
   isTop ? url : `-${url}`
 );
 /** @param {chrome.webRequest.WebRequestDetails} info */
-const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameId];
+export const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameId];
 export const skippedTabs = {};
 
 const OPT_HANDLERS = {

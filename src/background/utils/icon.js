@@ -1,11 +1,11 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
 import { BLACKLIST } from '@/common/consts';
 import loadIconData from '@/common/load-icon-data';
-import { nest } from '@/common/object';
 import { addOwnCommands, commands, init } from './init';
 import { installedOver } from './on-installed';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
+import { isTopFrame } from './preinject-core';
 import sessionData, { badges, flushSession, kBadges } from './session-data';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
@@ -119,27 +119,27 @@ tabsOnRemoved.addListener(async id => {
   delete badges[id];
   if (__.MV3) flushSession(kBadges, badges);
 });
-tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
-  if (init) await init;
-  if (url) {
-    const [title] = getFailureReason(url);
-    if (title) updateState(tab, resetBadgeData(tabId, null), title);
-  }
-}, FIREFOX && { properties: ['status'] });
+if (__.MV3) {
+  chrome.webNavigation.onCommitted.addListener(info => {
+    if (isTopFrame(info) && info.documentLifecycle !== 'prerender') {
+      onTabUpdated(info.tabId, info, { id: info.tabId });
+    }
+  }, {
+    url: [{ schemes: ['http', 'https', 'file'] }],
+  });
+} else {
+  tabsOnUpdated.addListener(onTabUpdated, FIREFOX && { properties: ['status'] });
+}
 
-if (__.MV3) chrome.webNavigation.onCommitted.addListener(info => {
-  if (info.frameType !== 'outermost_frame') return;
-  // In Chrome the user can disable this API at any time and we can't detect it quickly,
-  // because chrome.userScripts is present, but scripts don't run when a tab is reloaded,
-  // so setting to `undefined` will cause the popup to run isInjectable() for verification.
-  const badge = badges[info.tabId];
-  if (badge?.[INJECT] === true) badge[INJECT] = undefined;
-}, { url: [{ schemes: ['http', 'https', 'file'] }] });
+async function onTabUpdated(tabId, { url }, tab) {
+  if (init) await init;
+  const title = url && getFailureReason(url)[0];
+  if (title) updateState(tab, resetBadgeData(tab.id, null), title);
+}
 
 function resetBadgeData(tabId, isInjected) {
   // 'total' and 'unique' must match showBadge in options-defaults.js
-  /** @type {VMBadgeData} */
-  const data = nest(badges, tabId);
+  const data = badges[tabId] ||= /** @type {VMBadgeData} */{};
   data.icon = iconDefault;
   data.total = 0;
   data.unique = 0;
