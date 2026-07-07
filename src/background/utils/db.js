@@ -11,7 +11,7 @@ import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/objec
 import pluginEvents from '../plugin/events';
 import {
   aliveScripts, getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta,
-  removedScripts, scriptMap,
+  removedScripts, scriptMap, scriptSiteVisited,
 } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
@@ -119,7 +119,16 @@ addOwnCommands({
   Vacuum: vacuum,
 });
 
-(async () => {
+export async function initializeDatabase() {
+  maxScriptId = 0;
+  maxScriptPosition = 0;
+  dbKeys.clear();
+  aliveScripts.length = 0;
+  removedScripts.length = 0;
+  for (const key in scriptMap) delete scriptMap[key];
+  for (const key in scriptSizes) delete scriptSizes[key];
+  for (const key in scriptSiteVisited) delete scriptSiteVisited[key];
+
   /** @type {string[]} */
   let keys;
   let [allKeys, data] = await Promise.all([
@@ -206,7 +215,9 @@ addOwnCommands({
     setInterval(checkRemove, TIMEOUT_24HOURS);
   }
   resolveInit();
-})();
+}
+
+initializeDatabase();
 
 /** @return {number} */
 function getInt(val) {
