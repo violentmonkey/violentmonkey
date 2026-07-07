@@ -1,5 +1,4 @@
 const pkg = require('../package.json');
-const { MV3 } = require('./common');
 
 /**
  * Derive extension version from pkg.version and pkg.beta fields.
@@ -7,9 +6,10 @@ const { MV3 } = require('./common');
  * > manifest.version = `${pkg.version}.${pkg.beta}`
  */
 function getVersion() {
-  const base = process.env.VERSION ||
-    `${pkg.version.match(/\d+\.\d+/)[0]}.${pkg.beta || 0}`;
-  return MV3 ? `${base}.3` : base;
+  return (
+    process.env.VERSION ||
+    `${pkg.version.match(/\d+\.\d+/)[0]}.${pkg.beta || 0}`
+  );
 }
 
 function isBeta() {
