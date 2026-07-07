@@ -1,4 +1,4 @@
-export const clientCommands = {__proto__: null};
+export const clientCommands = { __proto__: null };
 /** @type {Map<number, PromiseWithResolvers & { stack: string }>} */
 const pending = /*@__PURE__*/new Map();
 const swContainer = __.SW_CLIENT && navigator.serviceWorker;

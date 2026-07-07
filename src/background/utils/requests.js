@@ -38,7 +38,6 @@ addPublicCommands({
     const tabId = src.tab.id;
     const frameId = getFrameDocIdFromSrc(src);
     const { id, events } = opts;
-    /** @type {GMReq.BG} */
     const req = requests[id] = {
       id,
       tabId,
@@ -47,7 +46,7 @@ addPublicCommands({
     };
     /** @param {GMReq.Message.BGAny} res */
     const cb = res => requests[id] && (
-      __.MV3 && req.url && res.data && (res.data.url = req.url),
+      __.MV3 && req.url && res.data && (res.data.finalUrl = req.url), // from onBeforeSendHeaders
       sendTabCmd(tabId, 'HttpRequested', res, req.frame)
     );
     return httpRequest(opts, events, src, cb)
@@ -58,10 +57,10 @@ addPublicCommands({
       type: ERROR,
     }));
   },
-  /** @return {void} */
-  AbortRequest: id => requests[id] && (
-    __.MV3 ? callOffscreen('XHRStop', id)
-    : requests[id]?.xhr.abort()
+  /** @return {void | Promise<void>} */
+  AbortRequest: id => requests[id] && (__.MV3
+    ? callOffscreen('XHRStop', id)
+    : requests[id].xhr.abort()
   ),
   // TODO: check if the content script can revoke it
   RevokeBlob: url => __.MV3
