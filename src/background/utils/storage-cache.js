@@ -131,7 +131,7 @@ export const cachedStorageApi = storage.api = {
 setInterval(() => {
   dbKeys.forEach((val, key) => !val && dbKeys.delete(key));
 }, TTL_TINY);
-if (__.MV3) global[WATCH_STORAGE] = fn => {
+if (!__.MV3) global[WATCH_STORAGE] = fn => {
   const id = performance.now();
   watchers[id] = fn;
   return id;
@@ -141,13 +141,13 @@ browser.runtime.onConnect.addListener(port => {
   if (!port.name.startsWith(WATCH_STORAGE)) return;
   const { id, cfg, tabId } = JSON.parse(port.name.slice(WATCH_STORAGE.length));
   const fn = id ? watchers[id] : port.postMessage.bind(port);
-  const resolve = keepAlive();
+  const resolve = __.MV3 && keepAlive();
   watchStorage(fn, cfg);
   port.onDisconnect.addListener(() => {
     clearValueOpener(tabId);
     watchStorage(fn, cfg, false);
     delete watchers[id];
-    resolve();
+    if (__.MV3) resolve();
   });
 });
 
