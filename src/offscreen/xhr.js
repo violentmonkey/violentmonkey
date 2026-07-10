@@ -136,7 +136,7 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
       } : null,
       [UPLOAD]: upload,
     });
-    if (isEnd) xhrs.delete(id);
+    if (__.MV3 && isEnd) xhrs.delete(id);
   };
   return (evt) => {
     eventQueue.push(evt);
