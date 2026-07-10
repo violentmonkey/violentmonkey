@@ -82,7 +82,7 @@ async function augmentSetPopup(data, src, key) {
 async function isInjectable(tabId, badgeData) {
   return badgeData[INJECT] && await sendTabCmd(tabId, VIOLENTMONKEY, null, { [kFrameId]: 0 })
     || __.MV3 && await registerInjector()
-    || executeScript(tabId, 'true', true).catch(noop);
+    || executeScript(tabId, 'true', 'document_start').catch(noop);
 }
 
 function onPopupOpened(port) {

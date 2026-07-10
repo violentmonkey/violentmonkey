@@ -95,7 +95,7 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
     if (tabId < 0) {
       console.warn(error);
     } else {
-      executeScript(tabId, `console.warn(${JSON.stringify(error)})`, true);
+      executeScript(tabId, `console.warn(${JSON.stringify(error)})`, 'document_start');
       browser.tabs.update(tabId, { url });
     }
   }

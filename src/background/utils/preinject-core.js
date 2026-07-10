@@ -198,7 +198,7 @@ export function injectContentRealm(toContent, tabId, frameId) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
     const code = scr[__CODE].join('');
-    executeScript(tabId, code, scr[RUN_AT], frameId)
+    executeScript(tabId, code, `document_${scr[RUN_AT]}`.replace('body', 'start'), frameId)
       .then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
   }
 }

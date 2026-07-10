@@ -13,13 +13,13 @@ export const userScriptsAllowed = () => {
 export const executeScript = __.MV3
   ? async (tabId, code, runAt, frameId) => (await chrome.userScripts.execute({
     js: [{code}],
-    injectImmediately: runAt === 'document-start' || runAt === 'document-body' || !!runAt,
+    injectImmediately: runAt === 'document_start' || !!runAt,
     target: {tabId, frameIds: frameId == null ? undefined : [frameId]},
   }))[0].result
   : async (tabId, code, runAt, frameId) => (await browser.tabs.executeScript(tabId, {
     code,
     frameId,
-    [RUN_AT]: runAt === true ? 'document_start' : runAt,
+    [RUN_AT]: runAt,
   }))[0];
 
 export const registerInjector = async (isInstall) => {
