@@ -58,7 +58,6 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id))
       || (Object.assign(data, await sendCmdDirectly('GetData', { ids })))[SCRIPTS];
     metas.forEach(script => {
-      loadScriptIcon(script, data);
       let v;
       const { id } = script.props;
       const state = idMap[id];
@@ -68,7 +67,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       const renderedScript = scope.find(({ props }) => props.id === id);
       if (renderedScript) script = renderedScript;
       else if (isTop || !(id in idMapMain)) {
-        scope.push(script);
+        script = scope[scope.push(script) - 1]; // get the Vue-proxified script
         if (isTop) { // removing script from frameScripts if it ran there before the main frame
           // frameScripts may be appended multiple times if iframes have unique scripts
           const frameScripts = store[SCRIPTS][1];
@@ -87,6 +86,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       if (badRealm && !store.injectionFailure) {
         store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
       }
+      loadScriptIcon(script, data);
       menus[id]::forEachValue(cmd => {
         loadCommandIcon(cmd, store);
       });
