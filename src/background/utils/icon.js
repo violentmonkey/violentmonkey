@@ -125,7 +125,9 @@ if (__.MV3) {
       onTabUpdated(info.tabId, info, { id: info.tabId });
     }
   }, {
-    url: [{ schemes: ['http', 'https', 'file'] }],
+    // A webpage may be navigated to a non-injectable page so we need to reset the badge.
+    // Listing the schemes explicitly to exclude detached devtools windows.
+    url: [{ schemes: ['http', 'https', 'file', 'chrome', 'chrome-extension'] }],
   });
 } else {
   tabsOnUpdated.addListener(onTabUpdated, FIREFOX && { properties: ['status'] });
