@@ -17,69 +17,62 @@
       </label>
     </div>
     <h4 v-text="i18n('editLabelMeta')"></h4>
-    <!-- Using tables to auto-adjust width, which differs substantially between languages -->
-    <table>
-      <tr>
-        <td>
-          <code>@run-at</code>
-        </td>
-        <td>
-          <p v-text="i18n('labelRunAt')"/>
-        </td>
-        <td>
-          <select v-model="custom.runAt" :disabled="readOnly">
-            <option value="" v-text="i18n('labelRunAtDefault')"></option>
-            <option value="document-start">document-start</option>
-            <option value="document-body">document-body</option>
-            <option value="document-end">document-end</option>
-            <option value="document-idle">document-idle</option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <code>@<s style="color: var(--fill-6)">no</s>frames</code>
-        </td>
-        <td>
-          <p v-text="i18n('labelNoFrames')"/>
-        </td>
-        <td>
-          <select v-model="custom.noframes" :disabled="readOnly">
-            <option value="" v-text="i18n('labelRunAtDefault')"/>
-            <option value="0" v-text="i18n('genericOn')"/>
-            <option value="1" v-text="i18n('genericOff')"/>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <code>@inject-into</code>
-        </td>
-        <td>
-          <p v-text="i18n('labelInjectionMode')"/>
-        </td>
-        <td>
-          <select v-model="custom.injectInto" :disabled="readOnly">
-            <option value="" v-text="i18n('labelRunAtDefault')"/>
-            <option v-for="(_, mode) in KII" :key="mode" v-text="mode" />
-          </select>
-        </td>
-      </tr>
-      <tr v-for="([ name, label ]) in textInputs" :key="name">
-        <td>
+    <dl class="grid3">
+      <dd>
+        <code>@run-at</code>
+      </dd>
+      <dd>
+        <p v-text="i18n('labelRunAt')"/>
+      </dd>
+      <dd>
+        <select v-model="custom.runAt" :disabled="readOnly">
+          <option value="" v-text="i18n('labelRunAtDefault')"></option>
+          <option value="document-start">document-start</option>
+          <option value="document-body">document-body</option>
+          <option value="document-end">document-end</option>
+          <option value="document-idle">document-idle</option>
+        </select>
+      </dd>
+      <dd>
+        <code>@<s style="color: var(--fill-6)">no</s>frames</code>
+      </dd>
+      <dd>
+        <p v-text="i18n('labelNoFrames')"/>
+      </dd>
+      <dd>
+        <select v-model="custom.noframes" :disabled="readOnly">
+          <option value="" v-text="i18n('labelRunAtDefault')"/>
+          <option value="0" v-text="i18n('genericOn')"/>
+          <option value="1" v-text="i18n('genericOff')"/>
+        </select>
+      </dd>
+      <dd>
+        <code>@inject-into</code>
+      </dd>
+      <dd>
+        <p v-text="i18n('labelInjectionMode')"/>
+      </dd>
+      <dd>
+        <select v-model="custom.injectInto" :disabled="readOnly">
+          <option value="" v-text="i18n('labelRunAtDefault')"/>
+          <option v-for="(_, mode) in KII" :key="mode" v-text="mode" />
+        </select>
+      </dd>
+      <template v-for="([ name, label ]) in textInputs" :key="name">
+        <dd>
           <code v-text="`@${name}`"/>
-        </td>
-        <td>
+        </dd>
+        <dd>
           <p v-text="label"/>
-        </td>
-        <td class="w-100">
+        </dd>
+        <dd class="w-100">
           <input type="text" v-model="custom[name]" :placeholder="placeholders[name]" :disabled="readOnly">
-        </td>
-      </tr>
-    </table>
-    <table>
-      <tr v-for="([ name, orig, labelA, code, labelB ]) in textAreas" :key="name">
-        <td>
+        </dd>
+      </template>
+    </dl>
+    <dl class="grid2">
+      <template v-for="([ name, orig, labelA, code, labelB ]) in textAreas" :key="name">
+        <dd>
           <p>
             <span v-text="labelA"/>
             <code v-text="code"/>
@@ -90,19 +83,19 @@
             <input type="checkbox" v-model="custom[orig]" :disabled="readOnly">
             <span v-text="i18n('labelKeepOriginal')"/>
           </label>
-        </td>
-        <td v-bind="name === kTag ? { class: 'w-100' } : { colspan: 2 }">
+        </dd>
+        <dd>
           <textarea v-model="custom[name]" spellcheck="false" :rows="calcRows(custom[name])"
                     :disabled="readOnly" :data-area="name" />
-        </td>
-        <th v-if="name === kTag">
-          <button v-if="!store.tags" @click="onTagsFocused">...</button>
-          <span v-else @click="onTagClicked" class="mr-1c">
-            <a v-for="tag in store.tags" :key="tag" v-text="tag" tabindex="0" />
-          </span>
-        </th>
-      </tr>
-    </table>
+          <template v-if="name === kTag">
+            <button v-if="!store.tags" @click="onTagsFocused">...</button>
+            <span v-else @click="onTagClicked" class="mr-1c flex flex-wrap">
+              <a v-for="tag in store.tags" :key="tag" v-text="tag" tabindex="0" class="ellipsis"/>
+            </span>
+          </template>
+        </dd>
+      </template>
+    </dl>
     <div class="flex flex-wrap mr-1c">
       <span v-text="i18n('labelComment')" />
       <textarea v-model="custom[kComment]" :rows="calcRows(custom[kComment])" />
@@ -222,19 +215,19 @@ $leftColWidth: 12rem;
   h4 {
     margin: 2em 0 1em;
   }
-  table {
-    border-spacing: 0 1em;
+  dl {
+    $GAP: 1em;
+    display: grid;
     break-inside: avoid;
-  }
-  tr {
-    margin-bottom: 1em;
-    > td {
-      white-space: nowrap;
-      break-inside: avoid-column;
-      padding-right: 1em;
-      > :nth-child(2) {
-        margin-left: 2em;
-      }
+    gap: $GAP;
+    &.grid2 {
+      grid-template-columns: max-content minmax(0, 1fr);
+    }
+    &.grid3 {
+      grid-template-columns: max-content max-content 1fr;
+    }
+    + dl {
+      margin-top: $GAP;
     }
     input[type=checkbox] + span {
       user-select: none;
@@ -242,9 +235,6 @@ $leftColWidth: 12rem;
     .w-100 input[type=text] {
       width: 100%;
     }
-  }
-  tr:focus-within code {
-    text-decoration: underline;
   }
   code {
     background: none;
