@@ -17,7 +17,7 @@ async function init() {
     await chrome.offscreen.createDocument({
       url: URL,
       justification: 'MV3 requirement',
-      reasons: ['BLOBS', 'CLIPBOARD', 'DOM_PARSER', 'MATCH_MEDIA', 'WORKERS'],
+      reasons: ['BLOBS', 'CLIPBOARD', 'DOM_PARSER', 'WORKERS'],
     });
   } catch (err) {
     if (!err.message.startsWith('Only a single offscreen')) {
@@ -28,7 +28,7 @@ async function init() {
   for (const c of await clients.matchAll({includeUncontrolled: true})) {
     if (c.url === URL) {
       client = c;
-      port = chrome.runtime.connect({name: URL});
+      port = chrome.runtime.connect({name: 'offscreen'});
       port.onDisconnect.addListener(onDisconnect);
       return;
     }

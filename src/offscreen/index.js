@@ -1,4 +1,4 @@
-import { leaseBlobUrl, noop } from '@/common';
+import { leaseBlobUrl } from '@/common';
 import setClipboard from '@/common/clipboard';
 import { downloadBlob } from '@/common/download';
 import { clientCommands, sendCmdToSW } from '@/common/sw-messaging';
@@ -6,6 +6,7 @@ import { DriveProviders } from '@usync/drive';
 import { initXHR, xhrs } from './xhr';
 
 let drive;
+let autoCloseTimer;
 
 Object.assign(clientCommands, {
   Alert: msg => alert(msg),
@@ -28,7 +29,16 @@ Object.assign(clientCommands, {
   XHRStop: id => xhrs.get(id).abort(),
 });
 
-chrome.runtime.onConnect.addListener(noop);
+chrome.runtime.onConnect.addListener(port => {
+  if (port.name === 'offscreen') {
+    autoCloseTimer &&= clearTimeout(autoCloseTimer);
+    port.onDisconnect.addListener(autoClose);
+  }
+});
+
+function autoClose() {
+  autoCloseTimer ||= setTimeout(close, 15 * 60e3);
+}
 
 function initDrive(provider, opts, context) {
   drive = new DriveProviders[provider](opts, context !== 'auth' ? context : {
