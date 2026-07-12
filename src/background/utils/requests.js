@@ -163,6 +163,7 @@ async function httpRequest(opts, events, src, cb) {
     props: xhrProps,
   };
   toggleHeaderInjector(id, vmHeaders, xhrUrl);
+  Object.defineProperty(req, 'cb', {value: cb}); // non-enumerable to ensure it's not messaged
   if (__.MV3) {
     if (vmHeaders.length) addDnrHeaders(req, xhrUrl, vmHeaders);
     await callOffscreen('XHRStart', xhrOpts); // send the pure object,
@@ -170,7 +171,6 @@ async function httpRequest(opts, events, src, cb) {
   } else {
     initXHR(xhrOpts);
   }
-  req.cb = cb;
 }
 
 function addDnrHeaders(req, xhrUrl, vmHeaders) {
