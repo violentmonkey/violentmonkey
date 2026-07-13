@@ -691,7 +691,7 @@ learnInjectionMode:
   message: 인젝션 모드에 대해 자세히 알아보기
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: 원격 파일 관리
 menuCommands:
   description: Menu item to list script commands.
   message: 스크립트 명령어

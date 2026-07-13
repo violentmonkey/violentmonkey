@@ -593,7 +593,7 @@ labelRemovedAt:
   message: Eliminado el $1
 labelReplace:
   description: Label for replace input in search box.
-  message: 'Remplazar con:'
+  message: 'Reemplazar con:'
 labelRunAt:
   description: Label of script @run-at properties in custom meta data.
   message: 'Ejecutar en:'
