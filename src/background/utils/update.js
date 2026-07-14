@@ -5,7 +5,7 @@ import {
   __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX,
 } from '@/common/consts';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
-import { addOwnCommands, commands, init } from './init';
+import { addOwnCommands, init } from './init';
 import { parseMeta } from './script';
 import { kAlarmUpdate } from './session-data';
 import { getOption, hookOptions, setOption } from './options';
@@ -19,54 +19,15 @@ const FAST_CHECK = {
   headers: { Accept: 'text/x-userscript-meta,*/*' },
 };
 const kChecking = 'checking';
+let autoUpdateTimer;
 
 init.then(autoUpdate);
 hookOptions(changes => (changes = changes.autoUpdate) != null && autoUpdate(changes));
 
+/** @namespace commands */
 addOwnCommands({
-  /**
-   * @param {{}} [_]
-   * @param {number[]} [_.ids] - when omitted, all scripts are checked
-   * @param {boolean} [_.auto] - scheduled auto update
-   * @param {boolean} [_.force] - force (ignore checks)
-   * @return {Promise<number>} number of updated scripts
-   */
-  async CheckUpdate({ ids, force, [AUTO]: auto } = {}) {
-    const isAll = auto || !ids;
-    const scripts = isAll ? getScripts() : ids.map(getScriptById).filter(Boolean);
-    const urlOpts = {
-      all: true,
-      allowedOnly: isAll,
-      enabledOnly: isAll && getOption(kUpdateEnabledScriptsOnly),
-    };
-    const opts = {
-      force,
-      [FETCH_OPTS]: {
-        ...NO_CACHE,
-        [MULTI]: auto ? AUTO : isAll,
-      },
-    };
-    const jobs = scripts.map(script => {
-      const curId = script.props.id;
-      const urls = getScriptUpdateUrl(script, urlOpts);
-      return urls
-        ? processes[curId] ??= doCheckUpdate(curId, script, urls, opts)
-        : force && fetchResources(script, { update: {}, ...opts });
-    }).filter(Boolean);
-    const results = await Promise.all(jobs);
-    const notes = results.filter(r => r?.text);
-    if (notes.length) {
-      notifyToOpenScripts(
-        notes.some(n => n.err) ? i18n('msgOpenUpdateErrors')
-          : IS_FIREFOX ? i18n('optionUpdate')
-            : '', // Chrome confusingly shows the title next to message using the same font
-        notes.map(n => `* ${n.text}\n`).join(''),
-        notes.map(n => n.script.props.id),
-      );
-    }
-    if (isAll) setOption('lastUpdate', Date.now());
-    return results.reduce((num, r) => num + (r === true), 0);
-  },
+  CheckUpdate: checkUpdate,
+
   /**
    * @param {{ id: number } & VMScriptSourceOptions} opts
    * @return {Promise<?string>}
@@ -77,6 +38,51 @@ addOwnCommands({
     ...opts
   }),
 });
+
+/**
+ * @param {{}} [_]
+ * @param {number[]} [_.ids] - when omitted, all scripts are checked
+ * @param {boolean} [_.auto] - scheduled auto update
+ * @param {boolean} [_.force] - force (ignore checks)
+ * @return {Promise<number>} number of updated scripts
+ */
+async function checkUpdate({ ids, force, [AUTO]: auto } = {}) {
+  const isAll = auto || !ids;
+  const scripts = isAll ? getScripts() : ids.map(getScriptById).filter(Boolean);
+  const urlOpts = {
+    all: true,
+    allowedOnly: isAll,
+    enabledOnly: isAll && getOption(kUpdateEnabledScriptsOnly),
+  };
+  const opts = {
+    force,
+    [FETCH_OPTS]: {
+      ...NO_CACHE,
+      [MULTI]: auto ? AUTO : isAll,
+    },
+  };
+  const jobs = scripts.map(script => {
+    const curId = script.props.id;
+    const urls = getScriptUpdateUrl(script, urlOpts);
+    return urls
+      ? processes[curId] ??= doCheckUpdate(curId, script, urls, opts)
+      : force && fetchResources(script, { update: {}, ...opts });
+  }).filter(Boolean);
+  const results = await Promise.all(jobs);
+  const notes = results.filter(r => r?.text);
+  if (notes.length) {
+    notifyToOpenScripts(
+      notes.some(n => n.err) ? i18n('msgOpenUpdateErrors')
+        : IS_FIREFOX ? i18n('optionUpdate')
+          : '', // Chrome confusingly shows the title next to message using the same font
+      notes.map(n => `* ${n.text}\n`).join(''),
+      notes.map(n => n.script.props.id),
+    );
+  }
+  if (isAll) setOption('lastUpdate', Date.now());
+  if (auto && __.MV3) autoUpdateTimer = 0;
+  return results.reduce((num, r) => num + (r === true), 0);
+}
 
 async function doCheckUpdate(id, script, urls, opts) {
   let res;
@@ -170,16 +176,18 @@ export async function autoUpdate(val) {
     await chrome.alarms.clear(kAlarmUpdate);
     if (val) await chrome.alarms.create(kAlarmUpdate, { periodInMinutes: interval / 60e3 });
   }
-  if (!interval) return;
+  if (!interval || __.MV3 && autoUpdateTimer/* reentry from onAlarm */) {
+    return;
+  }
   let elapsed = Date.now() - getOption('lastUpdate');
   if (elapsed >= interval) {
     // Wait on startup for things to settle and after unsuspend for network reconnection
-    setTimeout(commands.CheckUpdate, 20e3, { [AUTO]: true });
+    autoUpdateTimer = setTimeout(checkUpdate, 20e3, { [AUTO]: true });
     elapsed = 0;
   }
   if (!__.MV3) {
-    clearTimeout(autoUpdate.timer);
-    autoUpdate.timer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
+    clearTimeout(autoUpdateTimer);
+    autoUpdateTimer = setTimeout(autoUpdate, Math.min(TIMEOUT_MAX, interval - elapsed));
   }
 }
 
