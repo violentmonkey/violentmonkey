@@ -11,10 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v1 # v1 keeps tags
+      - name: Checkout code
+        uses: actions/checkout@v6
         with:
-          fetch-depth: 250 # for `action-helper`
-          # persist-credentials: false # not implemented in v1
+          fetch-depth: 100 # for git history in release info
+          fetch-tags: true
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v6
 
