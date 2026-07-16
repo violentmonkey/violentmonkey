@@ -52,11 +52,11 @@ importers:
   .:
     dependencies:
       '@usync/drive':
+        specifier: ^0.2.3
+        version: 0.2.3
+      '@usync/oauth2':
         specifier: ^0.1.7
         version: 0.1.7
-      '@usync/oauth2':
-        specifier: ^0.1.6
-        version: 0.1.6
       '@usync/sync':
         specifier: ^0.1.1
         version: 0.1.1
@@ -2083,11 +2083,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@usync/drive@0.1.7':
-    resolution: {integrity: sha512-mLtHc+0o2HFTB648GSXuLJDNF3Xd783N/mjV931zAXA8K6OhPN9/Nx6THJRmIjt3RCYqSzKDVovgQnf1CHCa4g==}
+  '@usync/drive@0.2.3':
+    resolution: {integrity: sha512-LpOpbsUbZbHHQI6D0SruJwb/YdnJBFrm/fVZ8OR3YM2NkCj8w9jLQAMEijj50aqF+Hc36GVBRWSgDxrbNEDF9w==}
 
-  '@usync/oauth2@0.1.6':
-    resolution: {integrity: sha512-n7GmXTn2yvapSVrqIvObdUbtyZl/ZIKQKhlzFjfw36F6Eax1lRSDYyZEzV2hsN4XbBZ0DjGjosS1gTfI9wXY8Q==}
+  '@usync/oauth2@0.1.7':
+    resolution: {integrity: sha512-95/fQRjRCkMo9DZlMebAklkiHEQMQGNnA8rBclRkshieN+SikTOk0N13VT6IFOUwQ6NB1pStUaY3nL+FujRF/Q==}
 
   '@usync/sync@0.1.1':
     resolution: {integrity: sha512-tlMEj9AUTfEzkvRprPLrGaC82l2PUheAEMFDs0izUO5zPCo/IUVHCsQySp2sBskroqRYyAIXxEdTtoVA4YLNbg==}
@@ -7987,11 +7987,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@usync/drive@0.1.7':
+  '@usync/drive@0.2.3':
     dependencies:
-      '@usync/oauth2': 0.1.6
+      '@usync/oauth2': 0.1.7
 
-  '@usync/oauth2@0.1.6':
+  '@usync/oauth2@0.1.7':
     dependencies:
       nanoid: 5.1.11
 
