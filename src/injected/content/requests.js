@@ -7,7 +7,7 @@ const LOAD = 'load';
 const LOADEND = 'loadend';
 const READYSTATECHANGE = 'readystatechange';
 const isBlobXhr = req => req[kXhrType] === 'blob';
-/** @type {GMReq.Content} */
+/** @type {{ [id:string]: GMReq.Content }} */
 const requests = createNullObj();
 let BlobProto, getArrayBuffer, getBlob, getBlobType, getTypedArrayBuffer;
 let SafeFileReader, getReaderResult, readAsDataURL;
@@ -118,7 +118,10 @@ addBackgroundHandlers({
     let response = data?.[kResponse];
     if (response != null) {
       if (msg.blobbed) {
-        response = await importBlob(response, isBlobXhr(req));
+        data[kResponse] = await (
+          req.p = importBlob(response, isBlobXhr(req))
+        );
+        req.p = null;
         sendCmd('RevokeBlob', response);
       } else if (msg.chunked) {
         processChunk(req, response);
@@ -131,8 +134,10 @@ addBackgroundHandlers({
         } else {
           // sending text chunks as-is to avoid memory overflow due to concatenation
         }
+        data[kResponse] = response;
       }
-      data[kResponse] = response;
+    } else if (req.p) {
+      await req.p;
     }
     if (msg.type === LOADEND && !msg[UPLOAD]) {
       delete requests[msg.id];

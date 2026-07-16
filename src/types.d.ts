@@ -58,7 +58,8 @@ declare namespace GMReq {
     chunks?: Uint8Array | string[];
     fileName: string;
     realm: VMScriptInjectInto;
-    response?: Response;
+    /** Used to wait before dispatching events that follow an event that asynchrously imports a binary response */
+    p?: Promise<Blob|ArrayBuffer>;
     xhrType: XMLHttpRequestResponseType;
   }
   interface Web {
