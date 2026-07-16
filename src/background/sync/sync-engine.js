@@ -1,4 +1,4 @@
-import { debounce, keepAlive, noop, normalizeKeys, sendCmd } from '@/common';
+import { debounce, keepAlive, noop, normalizeKeys } from '@/common';
 import { kMainFrame, TIMEOUT_HOUR } from '@/common/consts';
 import {
   SYNC_MERGE,
@@ -8,6 +8,7 @@ import {
 } from '@/common/consts-sync';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
 import { addOwnCommands, getOption, setOption } from '../utils';
+import broadcast from '../utils/broadcast';
 import { sortScripts, updateScriptInfo } from '../utils/db';
 import { DNR_ID_IDENTITY, updateSessionRules } from '../utils/dnr';
 import callOffscreen from '../utils/offscreen';
@@ -229,7 +230,7 @@ function objectPurify(obj) {
 // --- State change listener ---
 
 const onStateChange = debounce(() => {
-  sendCmd('UpdateSync', getStates());
+  broadcast('UpdateSync', getStates());
 });
 events.on('change', (state) => {
   logInfo('status:', state.status);

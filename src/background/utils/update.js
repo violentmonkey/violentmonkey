@@ -1,9 +1,8 @@
-import {
-  compareVersion, getScriptName, getScriptUpdateUrl, i18n, sendCmd, trueJoin,
-} from '@/common';
+import { compareVersion, getScriptName, getScriptUpdateUrl, i18n, trueJoin } from '@/common';
 import {
   __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_24HOURS, TIMEOUT_MAX,
 } from '@/common/consts';
+import broadcast from './broadcast';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
 import { addOwnCommands, init } from './init';
 import { parseMeta } from './script';
@@ -155,7 +154,7 @@ async function downloadUpdate(script, urls, opts) {
       error: error ? `${i18n('genericError')} ${error.status}, ${error.url}` : null,
       // `null` is transferable in Chrome unlike `undefined`
     });
-    sendCmd('UpdateScript', result);
+    broadcast('UpdateScript', result);
   }
   function announceUpdate() {
     announce(i18n('msgUpdating'));

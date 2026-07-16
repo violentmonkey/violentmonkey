@@ -1,4 +1,4 @@
-import { onClientMessage } from '@/common/sw-messaging';
+import { onClientMessage } from '@/common/messaging-sw';
 import { checkRemove, getData } from './utils/db';
 import { init } from './utils/init';
 import { removeNotification } from './utils/notifications';

@@ -1,6 +1,7 @@
-import { compareVersion, debounce, initHooks, normalizeKeys, sendCmd } from '@/common';
+import { compareVersion, debounce, initHooks, normalizeKeys } from '@/common';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
 import defaults, { kScriptTemplate } from '@/common/options-defaults';
+import broadcast from './broadcast';
 import { addOwnCommands, init, initDependency } from './init';
 import storage from './storage';
 
@@ -24,7 +25,7 @@ const callHooksLater = debounce(callHooks, DELAY);
 const writeOptionsLater = debounce(writeOptions, DELAY);
 const optProxy = new Proxy(defaults, { get: (_, key) => getOption(key) });
 export const hookOptions = hooks.hook;
-hookOptions(data => sendCmd('UpdateOptions', data));
+hookOptions(data => broadcast('UpdateOptions', data));
 
 addOwnCommands({
   GetAllOptions: getAllOptions,

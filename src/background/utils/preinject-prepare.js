@@ -6,6 +6,7 @@ import {
 import { forEachValue, mapEntry, objectPick } from '@/common/object';
 import { getScriptsByURL, kTryVacuuming } from './db';
 import { registerDnrBlob } from './dnr';
+import { inIncognitoContext } from './init';
 import {
   cache, contentScriptsAPI, CSAPI_REG, expose, ffInject, injectContentRealm, injectInto, isApplied,
   makeXhrHeader, propsToClear, registerScriptData, xhrInject,
@@ -15,7 +16,7 @@ import { ua } from './ua';
 
 const sessionId = getUniqId();
 const SKIP_COMMENTS_RE = /^\s*(?:\/\*[\s\S]*?\*\/|\/\/.*[\r\n]+|\s+)*/u;
-const isIncognito = __.MV3 && chrome.extension.inIncognitoContext;
+const isIncognito = __.MV3 && inIncognitoContext;
 /** Not using a combined regex to check for the chars to avoid catastrophic backtracking */
 const isUnsafeConcat = s => (s = s.charCodeAt(s.match(SKIP_COMMENTS_RE)[0].length)) === 45/*"-"*/
   || s === 43/*"+"*/

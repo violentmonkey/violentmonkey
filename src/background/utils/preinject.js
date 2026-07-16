@@ -14,8 +14,9 @@ import {
 import { prepare, prepareScripts, triageRealms } from './preinject-prepare';
 import { clearRequestsByTabId, reifyRequests } from './requests';
 import { updateVisitedTime } from './script';
-import { S_CACHE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE } from './storage';
-import { onStorageChanged } from './storage-cache';
+import {
+  onStorageChanged, S_CACHE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
+} from './storage';
 import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
 

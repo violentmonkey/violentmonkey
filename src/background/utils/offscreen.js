@@ -1,4 +1,4 @@
-import { rejectPending, sendCmdTo } from '@/common/sw-messaging';
+import { getClients, rejectPending, sendCmdTo } from '@/common/messaging-sw';
 
 /** @type {chrome.runtime.Port | Promise} */
 let port;
@@ -25,7 +25,7 @@ async function init() {
       throw err;
     }
   }
-  for (const c of await clients.matchAll({includeUncontrolled: true})) {
+  for (const c of await getClients()) {
     if (c.url === URL) {
       client = c;
       port = chrome.runtime.connect({name: 'offscreen'});

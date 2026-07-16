@@ -1,6 +1,7 @@
 import { openExtensionDetails, registerInjector } from '@/common/browser-scripts-api';
 import { kContentType, kMainFrame } from '@/common/consts';
 import { DNR, DNR_ID_INSTALL } from './dnr';
+import { inIncognitoContext } from './init';
 import callOffscreen from './offscreen';
 import { kAlarmRemove, kAlarmUpdate } from './session-data';
 import { getUpdateInterval } from './update';
@@ -11,7 +12,7 @@ export let installedOver;
 chrome.runtime.onInstalled.addListener(({reason, previousVersion}) => {
   if (reason === 'update' || reason === 'install') {
     installedOver = previousVersion || NEW_INSTALL;
-    if (__.MV3) {
+    if (__.MV3 && !inIncognitoContext) {
       registerInjector(true).catch(err => {
         callOffscreen('Alert', err.stack || err);
         openExtensionDetails();

@@ -20,3 +20,12 @@ export let init = new Promise(resolve => {
     init = null;
   };
 });
+export const inIncognitoContext = __.SW && chrome.extension.inIncognitoContext;
+/** @type {boolean | Promise<boolean>} */
+export let incognitoAllowed = __.SW && inIncognitoContext;
+
+if (__.SW && !incognitoAllowed) {
+  deps.push(incognitoAllowed = chrome.extension.isAllowedIncognitoAccess().then(ok => (
+    incognitoAllowed = ok
+  )));
+}

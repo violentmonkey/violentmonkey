@@ -1,14 +1,15 @@
 import { leaseBlobUrl } from '@/common';
 import setClipboard from '@/common/clipboard';
 import { downloadBlob } from '@/common/download';
-import { clientCommands, sendCmdToSW } from '@/common/sw-messaging';
+import handlers from '@/common/handlers';
+import { sendCmdToSW } from '@/common/messaging-sw';
 import { DriveProviders } from '@usync/drive';
 import { initXHR, xhrs } from './xhr';
 
 let drive;
 let autoCloseTimer;
 
-Object.assign(clientCommands, {
+Object.assign(handlers, {
   Alert: msg => alert(msg),
   DownloadBlob: downloadBlob,
   LeaseBlob: leaseBlobUrl,

@@ -1,3 +1,4 @@
+import { initHooks } from '@/common';
 import { mapEntry } from '@/common/object';
 import { ensureArray } from '@/common/util';
 import { addOwnCommands } from './init';
@@ -113,6 +114,12 @@ const storage = {
   [S_SCRIPT]: new VMStorageArea(S_SCRIPT, S_SCRIPT_PRE),
   [S_VALUE]: new VMStorageArea(S_VALUE, S_VALUE_PRE),
 };
+const { hook, fire } = initHooks();
+/**
+ * Not using browser.storage.onChanged to improve performance, as it sends data across processes.
+ * WARNING: when editing the db directly in devtools, restart the background page via Ctrl-R.
+*/
+export { hook as onStorageChanged, fire as fireStorageChanged };
 export default storage;
 
 addOwnCommands({

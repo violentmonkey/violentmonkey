@@ -1,8 +1,13 @@
-export const clientCommands = { __proto__: null };
+import handlers from './handlers';
+
+/** @return {Promise<WindowClient[]>} */
+export const getClients = () => global.clients.matchAll({ includeUncontrolled: true });
 /** @type {Map<number, PromiseWithResolvers & { stack: string }>} */
 const pending = /*@__PURE__*/new Map();
 const swContainer = __.SW_CLIENT && navigator.serviceWorker;
 const getController = async () => (swController = (await swContainer.ready).active);
+
+export const broadcaster = __.MV3 && !__.INJECTED && /*@__PURE__*/new BroadcastChannel('bus');
 
 let swController = __.SW_CLIENT && swContainer.controller;
 let curId = 0;
@@ -84,8 +89,11 @@ export function rejectPending(msg) {
 }
 
 if (__.SW_CLIENT) {
+  broadcaster.onmessage = ({data: { cmd, data }}) => {
+    handlers[cmd]?.(data);
+  };
   // Receiver for a response from handleCommandMessage -> sw.onmessage
-  swContainer.onmessage = onClientMessage.bind(null, ({cmd, data}, ...args) => (
-    clientCommands[cmd](data, ...args)
+  swContainer.onmessage = onClientMessage.bind(null, ({ cmd, data }, ...args) => (
+    handlers[cmd](data, ...args)
   ));
 }

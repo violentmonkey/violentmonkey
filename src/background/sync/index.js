@@ -2,7 +2,7 @@ import { SYNC_MERGE } from '@/common/consts-sync';
 import { addOwnCommands, hookOptionsInit } from '../utils';
 import sessionData from '../utils/session-data';
 import { S_CODE_PRE, S_SCRIPT_PRE } from '../utils/storage';
-import { onStorageChanged } from '../utils/storage-cache';
+import { onStorageChanged } from '../utils/storage';
 import {
   authorize,
   autoSync,

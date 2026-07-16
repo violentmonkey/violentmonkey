@@ -1,5 +1,5 @@
 import {
-  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, getTab, i18n, sendCmd,
+  encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, getTab, i18n,
 } from '@/common';
 import {
   __CODE, GLOB_ALL, HOMEPAGE_URL, INFERRED, kOrigTag, kTag, METABLOCK_RE, SUPPORT_URL, TL_AWAIT,
@@ -8,6 +8,7 @@ import {
 import { formatDate } from '@/common/date';
 import { mapEntry } from '@/common/object';
 import defaults, { kScriptTemplate } from '@/common/options-defaults';
+import broadcast from './broadcast';
 import { addOwnCommands, commands } from './init';
 import { getOption, hookOptionsInit } from './options';
 import storage, { S_MOD_PRE, S_SCRIPT_PRE } from './storage';
@@ -265,7 +266,7 @@ export function updateVisitedTime(arr, isIds) {
     if (!isIds) v = v.id;
     scriptSiteVisited[v] = toBroadcast[v] = toWrite[S_MOD_PRE + v] = now;
   }
-  sendCmd('Visited', toBroadcast);
+  broadcast('Visited', toBroadcast);
   storage.api.set(toWrite);
 }
 
