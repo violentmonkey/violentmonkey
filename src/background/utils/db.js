@@ -193,7 +193,7 @@ export async function initializeDatabase() {
       meta.grant = [...new Set(meta.grant || [])]; // deduplicate
     }
   });
-  initOptions(data, installedOver, installedOver !== NEW_INSTALL);
+  initOptions(data, installedOver, installedOver && installedOver !== NEW_INSTALL);
   if (__.DEBUG) {
     console.info('store:', {
       aliveScripts, removedScripts, maxScriptId, maxScriptPosition, scriptMap, scriptSizes,
