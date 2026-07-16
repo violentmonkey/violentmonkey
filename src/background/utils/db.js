@@ -199,7 +199,6 @@ export async function initializeDatabase() {
       aliveScripts, removedScripts, maxScriptId, maxScriptPosition, scriptMap, scriptSizes,
     });
   }
-  sortScripts();
   if (!__.MV3 || !sessionData.init && chrome.storage.session.set({ init: 1 })) {
     setTimeout(async () => {
       if (allKeys?.length) {
@@ -210,6 +209,7 @@ export async function initializeDatabase() {
       vacuum(data);
     }, 100);
     checkRemove();
+    sortScripts();
   }
   if (!__.MV3) {
     setInterval(checkRemove, TIMEOUT_24HOURS);
@@ -255,10 +255,12 @@ export async function normalizePosition() {
 
 /** @return {Promise<Boolean>} */
 export async function sortScripts() {
-  aliveScripts.sort((a, b) => getInt(a.props.position) - getInt(b.props.position));
-  const changed = await normalizePosition();
-  sendCmd('ScriptsUpdated', null);
-  return changed;
+  const old = [...aliveScripts];
+  aliveScripts.sort((a, b) => (a.props.position || 0) - (b.props.position || 0));
+  if (await normalizePosition() || old.some((val, i) => val !== aliveScripts[i])) {
+    sendCmd('ScriptsUpdated', null);
+    return true;
+  }
 }
 
 /** @return {?VMScript} */
