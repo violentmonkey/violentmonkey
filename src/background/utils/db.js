@@ -199,7 +199,7 @@ export async function initializeDatabase() {
       aliveScripts, removedScripts, maxScriptId, maxScriptPosition, scriptMap, scriptSizes,
     });
   }
-  if (!__.MV3 || !sessionData.init && chrome.storage.session.set({ init: 1 })) {
+  if (!__.MV3 || !sessionData.init) {
     setTimeout(async () => {
       if (allKeys?.length) {
         const set = new Set(keys); // much faster lookup
