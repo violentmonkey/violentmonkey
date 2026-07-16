@@ -488,6 +488,7 @@ function handleEditScript(id) {
 }
 async function onHashChange() {
   const [tab, id, cacheId] = store.route.paths;
+  if (__.MV3 && id) store.busyId = id;
   const newData = id === '_new' && await sendCmdDirectly('NewScript', +cacheId);
   const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
   const scrollElem1 = scroller.value;
@@ -499,8 +500,9 @@ async function onHashChange() {
   if (script) {
     state.code = newData ? newData.code : await sendCmdDirectly('GetScriptCode', id);
     state.script = script;
-    return;
   }
+  if (__.MV3 && id) store.busyId = 0;
+  if (script) return;
   // Strip the invalid id from the URL so |App| can render the aside,
   // which was hidden to avoid flicker on initial page load directly into the editor.
   if (id) setRoute(tab, true);
