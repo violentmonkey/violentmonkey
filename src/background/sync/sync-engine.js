@@ -392,7 +392,7 @@ export function createSyncService({
         break;
       }
     } catch (err) {
-      if (err.response?.status === 404 && driveProvider === 'webdav') {
+      if ((__.MV3 ? err.cause : err.response?.status) === 404 && driveProvider === 'webdav') {
         await drive.mkdir(VIOLENTMONKEY);
       } else {
         prepareError = err;

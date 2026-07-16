@@ -15,7 +15,7 @@ Object.assign(clientCommands, {
   Drive: ([cmd, args, init], src, transfer) => (
     init.length && initDrive(...init),
     cmd === 'list'
-      ? (listDrive(cmd, args, transfer), transfer[0])
+      ? listDrive(cmd, args, transfer)
       : drive[cmd](...args)
   ),
   RevokeBlob: URL.revokeObjectURL,
@@ -53,9 +53,9 @@ function initDrive(provider, opts, context) {
 async function listDrive(cmd, args, transfer) {
   const mc = new MessageChannel();
   const port = mc.port1;
-  transfer[0] = mc.port2;
   for await (const item of drive[cmd](...args)) {
     port.postMessage(item);
   }
   port.postMessage(null);
+  return (transfer[0] = mc.port2);
 }

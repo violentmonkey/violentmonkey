@@ -54,6 +54,10 @@ export async function onClientMessage(handler, { data, source }) {
         res = await res;
     } catch (e) {
       err = e;
+      if (__.SW_CLIENT && !__.EXT && (res = err.response)) {
+        // `cause` is a standard property that can be sent via messaging.
+        err.cause = res.status;
+      }
       res = undefined; // clearing Promise
     }
     source.postMessage({ id, res, err }, transfer);
