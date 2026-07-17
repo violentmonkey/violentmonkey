@@ -33,8 +33,11 @@ export function getTab(tabId) {
 }
 
 /** @return {Promise<chrome.tabs.Tab | void>} */
-export async function getActiveTab(windowId = -2 /*chrome.windows.WINDOW_ID_CURRENT*/) {
-  let [res] = await browser.tabs.query({ active: true, [kWindowId]: windowId });
+export async function getActiveTab(windowId) {
+  let res = { active: true };
+  if (windowId != null) res[kWindowId] = windowId; // not supported in Kiwi
+  else res.currentWindow = true;
+  [res] = await browser.tabs.query(res);
   // Chrome bug workaround when an undocked devtools window is focused
   if (!res && browserWindows && (res = await browserWindows.getCurrent().catch(noop))) {
     [res] = await browser.tabs.query({ active: true, [kWindowId]: res.id });

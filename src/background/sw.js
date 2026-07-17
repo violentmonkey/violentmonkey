@@ -38,15 +38,16 @@ global.onfetch = async evt => {
 };
 
 global.oninstall = evt => {
-  evt.addRoutes({
+  importScripts('tld.js');
+  // Not implemented in some browsers?
+  evt.addRoutes?.({
     condition: { urlPattern: `${GET_DATA_URL}*` },
     source: 'fetch-event',
   });
-  evt.addRoutes({
+  evt.addRoutes?.({
     condition: { not: { urlPattern: `${extensionRoot}*.user.js`, requestDestination: 'document' } },
     source: 'network',
   });
-  importScripts('tld.js');
 };
 
 global.onmessage = onClientMessage.bind(null, handleCommandMessage);

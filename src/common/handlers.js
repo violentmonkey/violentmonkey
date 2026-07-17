@@ -1,3 +1,5 @@
+import browser from './browser';
+
 const handlers = {
   __proto__: null,
 };
@@ -12,7 +14,7 @@ const handleMessage = (res, src) => {
   }
 };
 
-if (__.EXT) {
+if (__.EXT && (__.MV3 ? !__.SW : !global._bg)) {
   browser.runtime.onMessage.addListener(handleMessage);
   if (__.MV3) chrome.runtime.onUserScriptMessage?.addListener(handleMessage);
 }

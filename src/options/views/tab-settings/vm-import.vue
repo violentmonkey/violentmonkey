@@ -122,7 +122,7 @@ async function doImportBackup(buf, zipName) {
     });
   });
   if (!undoPort) {
-    now = ' ⯈ ' + new Date().toLocaleTimeString();
+    now = ' ▶ ' + new Date().toLocaleTimeString();
     undoPort = chrome.runtime.connect({ name: 'undoImport' });
     await new Promise(resolveOnUndoMessage);
   }
