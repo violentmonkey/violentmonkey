@@ -1,6 +1,6 @@
 import { browserWindows, getTab, getUniqId, i18n, noop, request, sendTabCmd } from '@/common';
 import { executeScript } from '@/common/browser-scripts-api';
-import { FILE_GLOB_ALL, kMainFrame } from '@/common/consts';
+import { FILE_GLOB_ALL, kMainFrame, NO_CACHE } from '@/common/consts';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
@@ -19,8 +19,8 @@ addPublicCommands({
 async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
   if (!fs) {
     code ??= parsed
-      ? request(url).then(r => r.data) // cache the Promise and start fetching now
-      : (await request(url)).data;
+      ? request(url, NO_CACHE).then(r => r.data) // cache the Promise and start fetching now
+      : (await request(url, NO_CACHE)).data;
     // TODO: display the error in UI
     if (!parsed && !matchUserScript(code)) {
       throw `${i18n('msgInvalidScript')}\n\n${
@@ -84,7 +84,7 @@ async function maybeInstallUserJs(tabId, url, isWhitelisted) {
   if (__.MV3 && isWhitelisted) sendTabCmd(tabId, 'Stop');
   // Getting the tab now before it navigated
   const tab = tabId >= 0 && await getTab(tabId) || {};
-  const { data: code } = !isWhitelisted && await request(url).catch(noop) || {};
+  const { data: code } = !isWhitelisted && await request(url, NO_CACHE).catch(noop) || {};
   if (isWhitelisted || code && parseMeta(code).name) {
     confirmInstall({ code, url, from: tab.url, parsed: true }, { tab });
   } else {
