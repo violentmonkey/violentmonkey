@@ -61,7 +61,7 @@ const skipReinjectionHeader = `{
   const INIT_FUNC_NAME = '${INIT_FUNC_NAME}';
   if (window[INIT_FUNC_NAME] !== 1)`;
 const ownWrappers = (getGlobals) => ({
-  header: () => `\ufeff"use strict"; { ${getGlobals()}`,
+  header: () => `"use strict"; { ${getGlobals()}`,
   footer: '}',
   test: /^(?!injected|public).*\.js$/,
 });
