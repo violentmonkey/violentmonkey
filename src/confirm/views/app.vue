@@ -387,7 +387,7 @@ async function loadDeps() {
 }
 function closeTab() {
   if (__.MV3 && history.length) {
-    chrome.tabs.goBack();
+    chrome.tabs.goBack().catch(close);
   } else {
     sendCmdDirectly('TabClose');
   }
