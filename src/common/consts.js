@@ -99,3 +99,4 @@ export const CACHE_KEYS = 'cacheKeys';
 export const REQ_KEYS = 'reqKeys';
 export const VALUE_IDS = 'valueIds';
 export const PROMISE = 'promise';
+export const TLDJS = '/public/lib/tld.js';

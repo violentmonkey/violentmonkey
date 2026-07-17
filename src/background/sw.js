@@ -1,3 +1,4 @@
+import { TLDJS } from '@/common/consts';
 import { onClientMessage } from '@/common/messaging-sw';
 import { autoSync } from './sync/sync-engine';
 import { checkRemove, getData } from './utils/db';
@@ -39,7 +40,7 @@ global.onfetch = async evt => {
 };
 
 global.oninstall = evt => {
-  importScripts('tld.js');
+  importScripts(TLDJS);
   // Not implemented in some browsers?
   evt.addRoutes?.({
     condition: { urlPattern: `${GET_DATA_URL}*` },

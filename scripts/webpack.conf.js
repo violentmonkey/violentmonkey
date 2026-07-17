@@ -108,6 +108,7 @@ module.exports = [
   }),
 
   MV3 && buildConfig('tld', 'tldts', '', null, (config) => {
+    config.output.path += '/public/lib';
     config.output.library = {
       type: 'global',
       name: 'tld',
