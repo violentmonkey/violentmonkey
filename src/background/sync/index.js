@@ -1,8 +1,7 @@
 import { SYNC_MERGE } from '@/common/consts-sync';
 import { addOwnCommands, hookOptionsInit } from '../utils';
-import sessionData from '../utils/session-data';
-import { S_CODE_PRE, S_SCRIPT_PRE } from '../utils/storage';
-import { onStorageChanged } from '../utils/storage';
+import { kAlarmSync } from '../utils/session-data';
+import { onStorageChanged, S_CODE_PRE, S_SCRIPT_PRE } from '../utils/storage';
 import {
   authorize,
   autoSync,
@@ -23,8 +22,7 @@ const keysToSyncRe = new RegExp(`^(?:${[S_SCRIPT_PRE, S_CODE_PRE].join('|')})`);
 let unwatch;
 
 hookOptionsInit((changes, firstRun) => {
-  if (firstRun && (!__.MV3 || !sessionData.init)
-  || 'sync.current' in changes) {
+  if (firstRun || 'sync.current' in changes) {
     reconfigure();
   }
 });
@@ -40,7 +38,7 @@ addOwnCommands({
   },
 });
 
-function reconfigure() {
+async function reconfigure() {
   if (initialize()) {
     if (!unwatch) {
       unwatch = onStorageChanged(dbSentry);
@@ -50,6 +48,10 @@ function reconfigure() {
       unwatch();
       unwatch = null;
     }
+  }
+  if (!unwatch !== !await chrome.alarms.get(kAlarmSync)) {
+    if (unwatch) chrome.alarms.create(kAlarmSync, { periodInMinutes: 60 });
+    else chrome.alarms.clear(kAlarmSync);
   }
 }
 

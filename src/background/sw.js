@@ -1,10 +1,11 @@
 import { onClientMessage } from '@/common/messaging-sw';
+import { autoSync } from './sync/sync-engine';
 import { checkRemove, getData } from './utils/db';
 import { init } from './utils/init';
 import { removeNotification } from './utils/notifications';
 import { getAllOptions } from './utils/options';
 import { initPopup } from './utils/popup-tracker';
-import { kAlarmRemove, kAlarmUpdate, kNotifications } from './utils/session-data';
+import { kAlarmRemove, kAlarmSync, kAlarmUpdate, kNotifications } from './utils/session-data';
 import { resolveVirtualUrl } from './utils/tab-redirector';
 import { autoUpdate } from './utils/update';
 import { handleCommandMessage } from '.';
@@ -56,10 +57,11 @@ chrome.alarms.onAlarm.addListener(async ({ name }) => {
   if (init) await init;
   if (name === kAlarmRemove) {
     checkRemove();
+  } else if (name === kAlarmSync) {
+    autoSync();
   } else if (name === kAlarmUpdate) {
     autoUpdate();
   } else if (name.startsWith(kNotifications)) {
     removeNotification(name.slice(kNotifications.length));
   }
 });
-

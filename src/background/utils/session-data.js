@@ -1,6 +1,7 @@
 import { makePause } from '@/common';
 
 export const kAlarmRemove = 'remove';
+export const kAlarmSync = 'sync';
 export const kAlarmUpdate = 'update';
 export const kBadges = 'badges';
 export const kNotifications = 'notifications';
