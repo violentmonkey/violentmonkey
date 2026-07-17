@@ -550,6 +550,10 @@ export function createSyncService({
     let resolver, done;
     port.onmessage = ({ data }) => {
       done = !data;
+      if (!done) {
+        done = data.err;
+        data = done ? Promise.reject(done) : data.res;
+      }
       resolver(data);
     };
     try {

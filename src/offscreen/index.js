@@ -16,7 +16,7 @@ Object.assign(handlers, {
   Drive: ([cmd, args, init], src, transfer) => (
     init.length && initDrive(...init),
     cmd === 'list'
-      ? listDrive(cmd, args, transfer)
+      ? (listDrive(cmd, args, transfer), transfer[0])
       : drive[cmd](...args)
   ),
   RevokeBlob: URL.revokeObjectURL,
@@ -54,9 +54,15 @@ function initDrive(provider, opts, context) {
 async function listDrive(cmd, args, transfer) {
   const mc = new MessageChannel();
   const port = mc.port1;
-  for await (const item of drive[cmd](...args)) {
-    port.postMessage(item);
+  transfer[0] = mc.port2; // must be before async work as it's used by the caller
+  try {
+    for await (const item of drive[cmd](...args)) {
+      port.postMessage({ res: item });
+    }
+    port.postMessage(null);
+  } catch (err) {
+    // `cause` is a standard property that can be sent via messaging.
+    err.cause = err.response?.status;
+    port.postMessage({ err });
   }
-  port.postMessage(null);
-  return (transfer[0] = mc.port2);
 }
