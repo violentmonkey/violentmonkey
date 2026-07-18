@@ -82,7 +82,8 @@ export function prepare(cacheKey, url, isTop) {
   cache.put(cacheKey, res); // must be called before prepareBag overwrites it synchronously
   if (env) {
     env[PROMISE] = prepareBag(cacheKey, url, isTop,
-      env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors);
+      env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors
+    ).catch(() => (env[PROMISE] = null));
   }
   return res;
 }
@@ -113,7 +114,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
   bag[MORE] = envDelayed;
   if (isTop && (__.MV3 ? chrome.userScripts : ffInject && !xhrInject && contentScriptsAPI)) {
     inject[PAGE] = env[PAGE] || triagePageRealm(envDelayed);
-    bag[CSAPI_REG] = registerScriptData(inject, url);
+    try { bag[CSAPI_REG] = registerScriptData(inject, url); } catch {/*ignoring*/}
     bag.url = url;
   }
   if (moreKey) {
