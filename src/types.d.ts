@@ -39,7 +39,7 @@ declare namespace GMReq {
     cookie?: boolean;
     /** allow Set-Cookie header to affect browser */
     'set-cookie'?: boolean;
-    coreId: number;
+    coreId: string;
     /** Firefox-only workaround for CSP blocking a blob: URL */
     fileName: string;
     frame: VMMessageTargetFrame;

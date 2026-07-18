@@ -61,7 +61,6 @@ const API_EVENTS = {
   onBeforeSendHeaders: [onBeforeSendHeaders, kRequestHeaders, ...EXTRA_HEADERS],
   onHeadersReceived: [onHeadersReceived, kResponseHeaders, ...EXTRA_HEADERS],
 };
-if (__.MV3) API_EVENTS.onBeforeRequest = [onBeforeRequest];
 
 /** @param {chrome.webRequest.WebRequestDetails} details */
 function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
@@ -82,21 +81,19 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
 }
 
 /** @param {chrome.webRequest.WebRequestDetails} details */
-function onBeforeRequest({ requestId, url }) {
-  if (!verify[requestId]) {
-    const reqId = url.split('#')[1];
-    const req = requests[reqId];
+function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
+  let req;
+  let reqId = verify[requestId];
+  if (reqId) {
+    req = requests[reqId];
+  } else {
+    reqId = url.split('#')[1];
+    req = requests[reqId];
     if (req) {
       verify[requestId] = reqId;
       req.coreId = requestId;
     }
   }
-}
-
-/** @param {chrome.webRequest.WebRequestDetails} details */
-function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
-  const reqId = verify[requestId];
-  const req = requests[reqId];
   if (req) {
     // remember redirected URL with #hash as it's stripped in XHR.responseURL
     if (url !== req.xhrUrl) req.url = url;
