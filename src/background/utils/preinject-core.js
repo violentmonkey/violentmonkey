@@ -14,6 +14,7 @@ import { addMenuConfig } from './page-menu-commands';
 import { normalizeRealm, prepare, prepareXhrBlob } from './preinject-prepare';
 import { clearRequestsByTabId } from './requests';
 import { kSetCookie } from './requests-core';
+import { flushSession, skippedTabs } from './session-data';
 import { S_CACHE_PRE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE } from './storage';
 import { clearStorageCache } from './storage-cache';
 import { tabsOnRemoved } from './tabs';
@@ -77,7 +78,6 @@ export const getKey = (url, isTop) => (
 );
 /** @param {chrome.webRequest.WebRequestDetails} info */
 export const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameId];
-export const skippedTabs = {};
 
 const OPT_HANDLERS = {
   [BLACKLIST]: cache.destroy,
@@ -277,6 +277,7 @@ function detectStrictCsp(info, bag, response) {
 function onTabRemoved(id /* , info */) {
   clearFrameData(id, 0, true);
   delete skippedTabs[id];
+  if (__.MV3) flushSession(SKIP_SCRIPTS, skippedTabs);
 }
 
 function onTabReplaced(addedId, removedId) {

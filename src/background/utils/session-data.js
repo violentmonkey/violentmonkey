@@ -10,12 +10,14 @@ export const kTabOpeners = 'tabOpeners';
 /** @type {{ [tabId: string]: VMBadgeData }}*/
 export let badges = {};
 export let notifications = {};
+export let skippedTabs = {};
 export let tabOpeners = {};
 
 let flushing;
 let sessionData = __.MV3 && chrome.storage.session.get().then(data => (
   badges = data[kBadges] || badges,
   notifications = data[kNotifications] || notifications,
+  skippedTabs = data[SKIP_SCRIPTS] || skippedTabs,
   tabOpeners = data[kTabOpeners] || tabOpeners,
   !data.init && chrome.storage.session.set({ init: 1 }),
   sessionData = data
