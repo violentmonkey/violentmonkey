@@ -122,21 +122,39 @@ tabsOnRemoved.addListener(async id => {
 if (__.MV3) {
   chrome.webNavigation.onCommitted.addListener(info => {
     if (isTopFrame(info) && info.documentLifecycle !== 'prerender') {
-      onTabUpdated(info.tabId, info, { id: info.tabId });
+      onTabUpdated(info.tabId, info);
     }
   }, {
     // A webpage may be navigated to a non-injectable page so we need to reset the badge.
     // Listing the schemes explicitly to exclude detached devtools windows.
     url: [{ schemes: ['http', 'https', 'file', 'chrome', 'chrome-extension'] }],
   });
-} else {
-  tabsOnUpdated.addListener(onTabUpdated, FIREFOX && { properties: ['status'] });
 }
+tabsOnUpdated.addListener(onTabUpdated, FIREFOX && { properties: ['status'] });
 
-async function onTabUpdated(tabId, { url }, tab) {
+/**
+ * @param {number} tabId
+ * @param {browser.tabs._OnUpdatedChangeInfo} change
+ * @param {chrome.tabs.Tab} [tab] not present when called from webNavigation.onCommitted
+ */
+async function onTabUpdated(tabId, { url, status }, tab) {
   if (init) await init;
-  const title = url && getFailureReason(url)[0];
-  if (title) updateState(tab, resetBadgeData(tab.id, null), title);
+  const loading = status === 'loading';
+  const title = !(__.MV3 && tab && loading) // skip "loading": in MV3 we use onCommitted
+    && (url ||= tab && getTabUrl(tab)) // when tab is reloaded there's no change of url
+    && getFailureReason(url)[0];
+  // A known failure reason or no script ran since tab started to load
+  if (title || status === 'complete' && !badges[tabId]) {
+    updateState(
+      tab || { id: tabId },
+      resetBadgeData(tabId, title ? null : undefined),
+      title,
+    );
+  } else if ((__.MV3 ? !tab/*onCommitted*/ : loading) && badges[tabId]) {
+    // Resetting, but not updating the UI yet, waiting for scripts to run or tab load
+    delete badges[tabId];
+    flushSession(kBadges, badges);
+  }
 }
 
 function resetBadgeData(tabId, isInjected) {
