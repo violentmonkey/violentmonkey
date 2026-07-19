@@ -49,7 +49,7 @@ async function reconfigure() {
       unwatch = null;
     }
   }
-  if (!unwatch !== !await chrome.alarms.get(kAlarmSync)) {
+  if (__.MV3 && !unwatch !== !await chrome.alarms.get(kAlarmSync)) {
     if (unwatch) chrome.alarms.create(kAlarmSync, { periodInMinutes: 60 });
     else chrome.alarms.clear(kAlarmSync);
   }
