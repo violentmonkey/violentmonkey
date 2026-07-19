@@ -418,14 +418,14 @@ async function refreshUI() {
 }
 function sortScripts(scripts) {
   const { compare, reversed } = currentSort.value;
-  if (compare) {
-    const searching = state.search.rules.length;
-    const enabledFirst = filters.showEnabledFirst;
+  const searching = state.search.rules.length;
+  const enabledFirst = filters.showEnabledFirst;
+  if (compare || enabledFirst) {
     scripts.sort(!enabledFirst && !searching && !reversed
       ? compare
       : (a, b) => enabledFirst && (b.config.enabled - a.config.enabled)
         || searching && (b.$cache.show - a.$cache.show)
-        || (reversed ? compare(b, a) : compare(a, b)),
+        || compare && (reversed ? compare(b, a) : compare(a, b)),
     );
   }
   sortedScripts.value = scripts;
