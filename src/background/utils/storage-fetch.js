@@ -1,8 +1,8 @@
-import { isCdnUrlRe, isDataUri, isRemote, makeRaw, request } from '@/common';
+import { isCdnUrlRe, isDataUri, isRemote, makeRaw } from '@/common';
 import { NO_CACHE } from '@/common/consts';
 import storage from './storage';
 import { getUpdateInterval } from './update';
-import { requestLimited } from './url';
+import { request, requestLimited } from './url';
 
 storage.cache.fetch = cacheOrFetch({
   init: options => ({ ...options, [kResponseType]: 'blob' }),

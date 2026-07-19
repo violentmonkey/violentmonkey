@@ -1,7 +1,7 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { BLOB_LIFE, NO_CACHE, U8_fromBase64 } from '@/common/consts';
-import { keepAlive, makePause } from '.';
+import { BLOB_LIFE, U8_fromBase64 } from '@/common/consts';
+import { makePause } from '.';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
@@ -216,52 +216,6 @@ export function ensureArray(data) {
   return Array.isArray(data) ? data : [data];
 }
 
-const binaryTypes = [
-  'blob',
-  'arraybuffer',
-];
-
-/**
- * @param {string} url
- * @param {VMReq.Options} options
- * @return {Promise<VMReq.Response>}
- */
-export async function requestLocalFile(url, options = {}) {
-  // only GET method is allowed for local files
-  // headers is meaningless
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    /** @type {VMReq.Response} */
-    const result = {
-      headers: {
-        get: name => xhr.getResponseHeader(name),
-      },
-      url,
-    };
-    const { [kResponseType]: responseType } = options;
-    xhr.open('GET', url, true);
-    if (binaryTypes.includes(responseType)) xhr[kResponseType] = responseType;
-    xhr.onload = () => {
-      // status for `file:` protocol will always be `0`
-      result.status = xhr.status || 200;
-      result.data = xhr[binaryTypes.includes(responseType) ? kResponse : kResponseText];
-      if (responseType === 'json') {
-        try {
-          result.data = JSON.parse(result.data);
-        } catch {
-          // ignore invalid JSON
-        }
-      }
-      resolve(result);
-    };
-    xhr.onerror = () => {
-      result.status = -1;
-      reject(result);
-    };
-    xhr.send();
-  });
-}
-
 const isDataUriRe = /^data:/i;
 const isHttpOrHttpsRe = /^https?:\/\//i;
 const isLocalUrlRe = re`/^(
@@ -323,57 +277,6 @@ export function tryUrl(str, base) {
   } catch (e) {
     // undefined
   }
-}
-
-/**
- * Make a request.
- * @param {string} url
- * @param {VMReq.Options} options
- * @return {Promise<VMReq.Response>}
- */
-export async function request(url, options = {}) {
-  // fetch supports file:// since Chrome 99 but we use XHR for consistency
-  if (!__.MV3 && url.startsWith('file:')) return requestLocalFile(url, options);
-  const { body, headers, [kResponseType]: responseType } = options;
-  const isBodyObj = body && body::({}).toString() === '[object Object]';
-  const [, scheme, auth, hostname, urlTail] = url.match(/^([-\w]+:\/\/)([^@/]*@)?([^/]*)(.*)|$/);
-  // Avoiding LINK header prefetch of js in 404 pages which cause CSP violations in our console
-  // TODO: toggle a webRequest/declarativeNetRequest rule to strip LINK headers
-  const accept = (hostname === 'greasyfork.org' || hostname === 'sleazyfork.org')
-    && 'application/javascript, text/plain, text/css';
-  const init = Object.assign({}, !isRemote(url) && NO_CACHE, options, {
-    body: isBodyObj ? JSON.stringify(body) : body,
-    headers: isBodyObj || accept || auth
-      ? Object.assign({},
-        headers,
-        isBodyObj && { 'Content-Type': 'application/json' },
-        auth && { Authorization: `Basic ${btoa(decodeURIComponent(auth.slice(0, -1)))}` },
-        accept && { accept })
-      : headers,
-  });
-  const keeper = __.MV3 && keepAlive();
-  let status = -1;
-  let result = { url };
-  try {
-    const urlNoAuth = auth ? scheme + hostname + urlTail : url;
-    const resp = await fetch(urlNoAuth, init);
-    const loadMethod = {
-      arraybuffer: 'arrayBuffer',
-      blob: 'blob',
-      json: 'json',
-    }[responseType] || 'text';
-    // status for `file:` protocol will always be `0`
-    status = resp.status || 200;
-    result.headers = resp.headers;
-    result.data = await resp[loadMethod]();
-  } catch (err) {
-    result = Object.assign(err, result);
-    result.message += (status > 0 ? ` (HTTP ${status})` : ' (could not connect)') + '\n' + url;
-  }
-  if (__.MV3) keeper();
-  result.status = status;
-  if (status < 0 || status > 300) throw result;
-  return result;
 }
 
 // Used by `injected`

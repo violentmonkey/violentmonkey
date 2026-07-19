@@ -409,16 +409,13 @@ declare namespace VMReq {
     /** truthy = multi script update, 'auto' = autoUpdate, falsy = single */
     multi?: boolean | 'auto';
   }
-  type Response = {
+  type Response = (ResponseOK | Error) & {
     url: string;
     status: number;
-  } & (ResponseOK | ResponseError);
+  };
   type ResponseOK = {
     headers: Headers;
     data: string | ArrayBuffer | Blob | PlainJSONValue;
-  };
-  type ResponseError = {
-    message: string;
   };
 }
 

@@ -26,7 +26,7 @@ chrome.runtime.onInstalled.addListener(({reason, previousVersion}) => {
         addRules: [{
           id: DNR_ID_INSTALL,
           condition: {
-            regexFilter: '\\.user\\.js(\\?.*)?$',
+            regexFilter: '\\.user\\.js(\\[?#].*)?$',
             requestMethods: ['get'],
             resourceTypes: [kMainFrame],
             responseHeaders: [{ header: kContentType, values: ['*/javascript*'] }],
