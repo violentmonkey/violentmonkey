@@ -59,22 +59,6 @@
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
         <div>
-          <div class="sorter flex center-items mx-1"
-               :class="{ 'btn-ghost': collapseSorter }">
-            <Tooltip align="start"
-                     :content="i18n('sortOrder').trim() + (collapseSorter ? ' ' + (currentSort.text || '') : '')">
-              <component :is="currentSort.icon || IconSort"/>
-            </Tooltip>
-            <select :value="filters.sort" @change="handleOrderChange" class="h-100">
-              <option
-                v-for="({text, title}, name) in sortModes"
-                v-text="text"
-                :title
-                :key="name"
-                :value="name">
-              </option>
-            </select>
-          </div>
           <!-- form and id are required for the built-in autocomplete using entered values -->
           <form class="filter-search hidden-xs" @submit.prevent>
             <label>
@@ -100,6 +84,22 @@
               </div>
             </template>
           </Dropdown>
+          <div class="sorter flex center-items mx-1"
+               :class="{ 'btn-ghost': collapseSorter }">
+            <Tooltip align="start"
+                     :content="i18n('sortOrder').trim() + (collapseSorter ? ' ' + (currentSort.text || '') : '')">
+              <component :is="currentSort.icon || IconSort"/>
+            </Tooltip>
+            <select :value="filters.sort" @change="handleOrderChange" class="h-100">
+              <option
+                v-for="({text, title}, name) in sortModes"
+                v-text="text"
+                :title
+                :key="name"
+                :value="name">
+              </option>
+            </select>
+          </div>
           <Dropdown align="right" class="settings">
             <Tooltip :content="i18n('labelSettings')" placement="bottom" align="end">
               <a class="btn-ghost" tabindex="0">
