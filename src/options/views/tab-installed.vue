@@ -420,7 +420,7 @@ function sortScripts(scripts) {
   const { compare, reversed } = currentSort.value;
   const searching = state.search.rules.length;
   const enabledFirst = filters.showEnabledFirst;
-  if (compare || enabledFirst) {
+  if (compare || enabledFirst || searching) {
     scripts.sort(!enabledFirst && !searching && !reversed
       ? compare
       : (a, b) => enabledFirst && (b.config.enabled - a.config.enabled)
