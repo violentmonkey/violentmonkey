@@ -6,6 +6,8 @@ const menus = createNullObj();
 const HEAD_TAGS = ['script', 'style', 'link', 'meta'];
 const { toLowerCase } = '';
 const { [IDS]: ids } = bridge;
+const jsonStringify = JSON.stringify;
+let sentMenus = '{}';
 let setPopupThrottle;
 let isPopupShown;
 let grantlessUsage;
@@ -74,6 +76,10 @@ export async function sendSetPopup(isDelayed) {
       menus,
     });
   } else if (bridge[kUseMenu]) {
-    await sendCmd('SetMenus', menus);
+    const str = jsonStringify(menus);
+    if (str !== sentMenus) {
+      sentMenus = str;
+      await sendCmd('SetMenus', str);
+    }
   }
 }

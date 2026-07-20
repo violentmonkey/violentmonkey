@@ -60,6 +60,9 @@ export function setMenus(menus, { tab, [kFrameId]: frameId, [kTop]: isTop }, res
   const tabId = tab.id;
   const routes = tabRoutes[tabId] ??= {};
   const byTab = tabData[tabId] ??= {};
+  if (typeof menus === 'string') {
+    menus = JSON.parse(menus);
+  }
   if (isEmpty(menus)) {
     if (reset && isTop) {
       delete tabData[tabId];
