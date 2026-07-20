@@ -279,16 +279,26 @@ footer {
     }
   }
   &-commands {
+    $cmdHeight: 1.5rem;
+    $cmdIconPad: 4px;
     font-size: .8rem;
     color: var(--fill-12);
+    padding-left: calc($leftPaneWidth - $cmdIconPad);
+    details:not([open]) ~ * {
+      display: inline-flex;
+      padding-right: 0;
+    }
+    summary {
+      padding-left: $iconML;
+      width: calc($leftPaneWidth - $cmdIconPad);
+      line-height: $cmdHeight;
+    }
     > .menu-item {
-      $cmdHeight: 1.5rem;
       min-height: $cmdHeight;
       line-height: $cmdHeight;
-      padding-left: $leftPaneWidth;
-      display: block;
+      display: block; /* enables ellipsis overflow */
       > .icon {
-        margin-right: .5rem;
+        margin: 0 $cmdIconPad;
         vertical-align: text-top;
       }
     }

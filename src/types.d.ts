@@ -170,6 +170,7 @@ declare interface VMScript {
     /** 2 = allow updates and local edits */
     shouldUpdate: NumBool | 2;
     notifyUpdates?: NumBoolNull;
+    noCmdNames: NumBool;
   };
   custom: {
     name?: string;

@@ -84,7 +84,7 @@
       </div>
       <div class="submenu">
         <div
-          v-for="item in scope.list"
+          v-for="item in /** @type {(VMScript & ScopeListItem)[]} */scope.list"
           :key="item.id"
           :class="{
             disabled: !item.config.enabled,
@@ -157,10 +157,13 @@
               </small>
             </details>
           </div>
-          <div class="submenu-commands">
+          <div v-if="item.cmds" class="submenu-commands pos-rel">
+            <details v-show="item.cmds.length > 1" :open="!item.config[kNoCmdNames]" :item.prop="item"
+                     class="abs-full flex center-items"
+                     @click.prevent="onCmdNamesToggled"><summary/></details>
             <div
               class="menu-item menu-area ellipsis"
-              v-for="({ autoClose = true, safeIcon, text, title }, key) in store.menus[scope.depth][item.id]"
+              v-for="[key, { autoClose = true, safeIcon, text, title }] of item.cmds"
               :key
               :tabIndex
               :cmd.prop="[item.id, key, autoClose]"
@@ -170,9 +173,8 @@
               @keydown.enter="onCommand"
               @keydown.space="onCommand">
               <img v-if="safeIcon" class="icon" :src="safeIcon">
-              <icon v-else name="command" />{{
-                text
-              }}
+              <icon v-else name="command" />
+              <span v-text="text" v-if="!item.config[kNoCmdNames]"/>
             </div>
           </div>
         </div>
@@ -251,6 +253,7 @@ const INJECT_LEARN = IS_FIREFOX
   : '@inject-into content\n' + i18n('learnInjectionMode');
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
+const kNoCmdNames = 'noCmdNames';
 const needsReload = reactive({});
 const collator = getSortCollator();
 const $extras = ref();
@@ -335,6 +338,7 @@ function makeInjectionScopes() {
     if (groupByEnabled != null) {
       list = list.filter(script => !script.config.enabled === !groupByEnabled);
     }
+    const menus = store.menus[depth];
     const numTotal = list.length;
     const numEnabled = groupByEnabled == null
       ? list.reduce((num, script) => num + script.config.enabled, 0)
@@ -347,6 +351,8 @@ function makeInjectionScopes() {
       const { id } = script.props;
       const { enabled, removed, shouldUpdate } = script.config;
       const upd = !removed && getScriptUpdateUrl(script, { enabledOnly });
+      const cmds = menus[id];
+      /** @namespace ScopeListItem */
       const item = {
         ...script,
         id,
@@ -361,6 +367,7 @@ function makeInjectionScopes() {
           1e6 + script.props.position
         }`,
         excludes: null,
+        cmds: cmds && Object.entries(cmds),
       };
       if (upd) item.upd = null;
       if (upd && shouldUpdate) {
@@ -369,7 +376,7 @@ function makeInjectionScopes() {
       }
       return item;
     }).sort((a, b) => collator.compare(a.key, b.key));
-    return numTotal && {
+    return numTotal && /** @namespace Scope */{
       depth,
       name,
       title,
@@ -424,6 +431,11 @@ function onToggle() {
   options.set(IS_APPLIED, optionsData[IS_APPLIED] = !optionsData[IS_APPLIED]);
   checkReload();
   updateMessage();
+}
+function onCmdNamesToggled(evt) {
+  const { id, config } = evt.currentTarget.item;
+  const state = config[kNoCmdNames] = +!config[kNoCmdNames];
+  sendCmdDirectly('UpdateScriptInfo', { id, config: { [kNoCmdNames]: state } });
 }
 /** @param {number | MouseEvent} evt - index of tab to open in src/options/views/app.vue */
 function onManage(evt) {
@@ -567,17 +579,19 @@ function focus(item) {
 function delegateMouseEnter({ target }) {
   if (target.tabIndex >= 0) target.focus();
   else if (!target.closest('[data-message]')) message.value = '';
-  else if ((target = getInnerMessage(target))) message.value = target;
+  else if ((target = getEllipsizedMessage(target))) message.value = target;
 }
 function delegateMouseLeave({ target }) {
   if (target === getActiveElement() && !isInput(target)) target.blur();
 }
-function getInnerMessage(el) {
+function getEllipsizedMessage(el) {
   el = el.querySelector('[data-message]') || el;
-  return el && el.scrollWidth > el.clientWidth && el.dataset.message;
+  return el
+    && (!el.textContent || el.scrollWidth > el.clientWidth)
+    && el.dataset.message;
 }
 function updateMessage({ target: el = getActiveElement() } = {}) {
-  message.value = el && (el.dataset.message || getInnerMessage(el)) || '';
+  message.value = el && getEllipsizedMessage(el) || '';
 }
 function showButtons(item) {
   return extras.value?.id === item.id || focusedItem.value?.id === item.id || focusBug;
