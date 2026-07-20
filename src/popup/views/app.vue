@@ -224,7 +224,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onActivated, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref } from 'vue';
 import { VM_DOCS_INJECT_INTO, VM_DOCS_MATCHING } from '@/common/consts';
 import options from '@/common/options';
 import optionsDefaults, {
@@ -244,7 +244,8 @@ import { handleTabNavigation, isInput, kbdTypable, keyboardService } from '@/com
 import { isFullscreenPopup, store } from '../utils';
 
 let mousedownElement;
-let focusBug;
+/** Some browsers and desktop envs don't autofocus the popup so CSS hover doesn't work */
+const focusBug = !document.hasFocus();
 const HOME = extensionManifest.homepage_url.split('/')[2];
 const NAME = `${extensionManifest.name} ${__.VM_VER}${__.MV3 ? ' MV3' : ''}`;
 const TARDY_MATCH = i18n('msgTardyMatch');
@@ -623,11 +624,6 @@ onMounted(() => {
   keyboardService.register('e', () => {
     onEditScript(focusedItem.value);
   }, opts);
-});
-
-onActivated(() => {
-  // issue #1520: Firefox + Wayland doesn't autofocus the popup so CSS hover doesn't work
-  focusBug = !document.hasFocus();
 });
 </script>
 
