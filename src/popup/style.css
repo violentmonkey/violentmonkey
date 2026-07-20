@@ -12,7 +12,6 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
-$footerHeight: 40px;
 
 $hoverColor: var(--bg);
 $hoverBack: cornflowerblue;
@@ -50,13 +49,21 @@ a {
 }
 
 footer {
-  height: $footerHeight;
-  line-height: $footerHeight;
+  min-height: 40px;
+  max-height: 60px;
+  padding: 4px $padding;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font-size: $fontSize;
-  color: var(--fill-6);
+  word-wrap: break-word;
+  white-space: pre-wrap !important;
+  z-index: 1000;
+  a[href]:not(:hover) {
+    color: var(--fill-5);
+  }
   a:not([href]) {
-    color: var(--fg);
     font-weight: bold;
   }
 }
@@ -275,29 +282,17 @@ footer {
     font-size: .8rem;
     color: var(--fill-12);
     > .menu-item {
-      min-height: 1.5rem;
+      $cmdHeight: 1.5rem;
+      min-height: $cmdHeight;
+      line-height: $cmdHeight;
       padding-left: $leftPaneWidth;
+      display: block;
       > .icon {
         margin-right: .5rem;
+        vertical-align: text-top;
       }
     }
   }
-}
-
-.message {
-  position: absolute;
-  max-width: 100%;
-  left: 0;
-  bottom: 0;
-  padding: 4px $padding;
-  word-wrap: break-word;
-  font-size: $fontSize;
-  line-height: 1.2; /* lower values cut descender in "g" */
-  background: var(--fill-0-5);
-  border: 1px solid var(--fill-2);
-  max-height: $footerHeight;
-  overflow: hidden;
-  white-space: pre-wrap;
 }
 
 .failure-reason {

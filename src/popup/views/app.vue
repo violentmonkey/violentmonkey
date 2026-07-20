@@ -98,7 +98,6 @@
           <div
             class="menu-item menu-area"
             :tabIndex
-            :data-message="item.name"
             @focus="focusedItem = item"
             @keydown.enter.exact.stop="onEditScript(item)"
             @keydown.space.exact.stop="onToggleScript(item)"
@@ -110,7 +109,7 @@
                  @contextmenu.exact.stop.prevent="onEditScript(item)"
                  @mousedown.middle.exact.stop="onEditScript(item)">
               <sup class="syntax" v-if="item.syntax" v-text="i18n('msgSyntaxError')"/>
-              {{item.name}}
+              <div class="ellipsis" v-text="item.name" :data-message="item.name"/>
               <a v-if="!store.failure && item.more"
                  class="tardy" tabindex="0" :title="TARDY_MATCH"
                  @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
@@ -160,7 +159,7 @@
           </div>
           <div class="submenu-commands">
             <div
-              class="menu-item menu-area"
+              class="menu-item menu-area ellipsis"
               v-for="({ autoClose = true, safeIcon, text, title }, key) in store.menus[scope.depth][item.id]"
               :key
               :tabIndex
@@ -171,8 +170,9 @@
               @keydown.enter="onCommand"
               @keydown.space="onCommand">
               <img v-if="safeIcon" class="icon" :src="safeIcon">
-              <icon v-else name="command" />
-              <div class="flex-auto ellipsis" v-text="text" />
+              <icon v-else name="command" />{{
+                text
+              }}
             </div>
           </div>
         </div>
@@ -187,11 +187,11 @@
     <div class="incognito"
        v-if="store.tab?.incognito"
        v-text="i18n('msgIncognitoChanges')"/>
-    <footer>
-      <a v-if="reloadHint" v-text="reloadHint" :tabIndex @click="reloadTab" />
+    <footer class="ellipsis" ref="$footer">
+      <template v-if="message">{{message}}</template>
+      <a v-else-if="reloadHint" v-text="reloadHint" :tabIndex @click="reloadTab" />
       <a v-else target="_blank" :href="'https://' + HOME" :tabIndex v-text="HOME" />
     </footer>
-    <div class="message" v-if="message" v-text="message"/>
     <div v-show="topExtras" ref="$topExtras" class="extras-menu">
       <div v-text="i18n('labelSettings')" @click="onManage(1)" tabindex="0"/>
       <div v-text="i18n('popupSettings')" @click="showSettings = true" tabindex="0"/>
@@ -254,6 +254,7 @@ const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const needsReload = reactive({});
 const collator = getSortCollator();
 const $extras = ref();
+const $footer = ref();
 const $topExtras = ref();
 const optionsData = reactive(objectPick(optionsDefaults, [
   IS_APPLIED,
@@ -408,7 +409,7 @@ async function showExtras(evt) {
     await nextTick();
     const menu = (isPerItem ? $extras : $topExtras).value;
     const top = Math.min(
-      innerHeight - menu.getBoundingClientRect().height,
+      $footer.value.getBoundingClientRect().y - menu.getBoundingClientRect().height,
       el.getBoundingClientRect().bottom);
     menu.style.top = `${top}px`;
   }
@@ -566,12 +567,17 @@ function focus(item) {
 function delegateMouseEnter({ target }) {
   if (target.tabIndex >= 0) target.focus();
   else if (!target.closest('[data-message]')) message.value = '';
+  else if ((target = getInnerMessage(target))) message.value = target;
 }
 function delegateMouseLeave({ target }) {
   if (target === getActiveElement() && !isInput(target)) target.blur();
 }
-function updateMessage() {
-  message.value = getActiveElement()?.dataset.message || '';
+function getInnerMessage(el) {
+  el = el.querySelector('[data-message]') || el;
+  return el && el.scrollWidth > el.clientWidth && el.dataset.message;
+}
+function updateMessage({ target: el = getActiveElement() } = {}) {
+  message.value = el && (el.dataset.message || getInnerMessage(el)) || '';
 }
 function showButtons(item) {
   return extras.value?.id === item.id || focusedItem.value?.id === item.id || focusBug;
