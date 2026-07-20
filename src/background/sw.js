@@ -1,8 +1,9 @@
+import { registerInjector } from '@/common/browser-scripts-api';
 import { TLDJS } from '@/common/consts';
 import { onClientMessage } from '@/common/messaging-sw';
 import { autoSync } from './sync/sync-engine';
 import { checkRemove, getData } from './utils/db';
-import { init } from './utils/init';
+import { addOwnCommands, init } from './utils/init';
 import { removeNotification } from './utils/notifications';
 import { getAllOptions } from './utils/options';
 import { initPopup } from './utils/popup-tracker';
@@ -65,4 +66,8 @@ chrome.alarms.onAlarm.addListener(async ({ name }) => {
   } else if (name.startsWith(kNotifications)) {
     removeNotification(name.slice(kNotifications.length));
   }
+});
+
+addOwnCommands({
+  GetInjectorError: () => registerInjector(), // ensuring no parameters are passed
 });

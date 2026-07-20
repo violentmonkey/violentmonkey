@@ -53,20 +53,26 @@ html:not(.narrow) {
     width: 14rem;
     bottom: 0;
     flex-flow: column;
-    padding: 4rem 1rem 1rem;
+    padding: 1rem;
     border-width: 0 1px 0 0;
     > * {
       flex-flow: column;
       align-items: flex-end;
     }
+    header:first-child { /* when no error */
+      padding-top: 4rem;
+    }
     header {
       padding-bottom: .75em;
-      border-bottom: 1px inset var(--fill-5);
+      border-bottom: 1px solid var(--fill-3);
       margin-bottom: 1.5em;
     }
     img {
       width: 5rem;
       height: 5rem;
+      a + header & {
+        filter: invert(1);
+      }
     }
     [data-num-scripts="0"]::before {
       visibility: hidden;

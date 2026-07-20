@@ -59,6 +59,7 @@ function initScript(script, sizes, code) {
 }
 
 export function loadData() {
+  if (__.MV3) sendCmdDirectly('GetInjectorError').then(err => { store.error = err; });
   const id = (!__.MV3 || !store.busyId) && +store.route.paths[1];
   return requestData(id)
   .catch(id && (() => requestData()));

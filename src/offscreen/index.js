@@ -10,7 +10,6 @@ let drive;
 let autoCloseTimer;
 
 Object.assign(handlers, {
-  Alert: msg => alert(msg),
   DownloadBlob: downloadBlob,
   LeaseBlob: leaseBlobUrl,
   Drive: ([cmd, args, init], src, transfer) => (

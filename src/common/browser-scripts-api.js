@@ -1,5 +1,3 @@
-import { getActiveTab } from '@/common';
-
 export const INJECTED_DATA_ID = '1000';
 export const INJECTED_API_ID = '1001';
 export const extensionDetailsUrl = __.MV3 && `chrome://extensions/?id=${chrome.runtime.id}`;
@@ -37,24 +35,14 @@ export const registerInjector = async (isInstall) => {
       }])),
     ]);
   } catch (err) {
-    throw !api || err.message.includes("'userScripts.getScripts' is not available")
-      ? `Please enable ${
+    if (!api || err.message.includes("'userScripts.getScripts' is not available")) {
+      err = `Please enable ${ // eslint-disable-line no-ex-assign
         +navigator.userAgent.match(/chrom\D+(\d{3,})/i)?.[1] >= 138
           ? '"Allow User Scripts" in details for Violentmonkey'
           : '"Developer Mode"'
-      } in chrome://extensions`
-      : err;
-  }
-};
-
-export const openExtensionDetails = async () => {
-  const url = extensionDetailsUrl;
-  const tab = await getActiveTab();
-  if (tab?.url?.split('://')[1] !== url.split('://')[1]) {
-    chrome.tabs.create({
-      url,
-      index: tab?.index + 1,
-      openerTabId: tab?.id,
-    });
+      } in chrome://extensions`;
+    }
+    if (isInstall) console.error(err);
+    return err;
   }
 };

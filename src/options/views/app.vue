@@ -1,6 +1,8 @@
 <template>
   <div class="page-options">
     <aside v-if="canRenderAside" :data-recycled="numbers[TAB_RECYCLE] ? '' : null">
+      <a v-if="SHOW_ERROR && store.error" v-text="store.error" :href="extensionDetailsUrl"
+         @click="updateTabWithChromeUrl"/>
       <header>
         <img src="/public/images/icon128.png">
         <h1 class="hidden-sm" v-text="i18n('extName')"/>
@@ -24,6 +26,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { extensionDetailsUrl } from '@/common/browser-scripts-api';
 import { i18n } from '@/common';
 import { keyboardService } from '@/common/keyboard';
 import { TAB_RECYCLE } from '@/common/safe-globals'; // explicit import for the template
@@ -32,6 +35,7 @@ import Installed from './tab-installed';
 import Settings from './tab-settings';
 import About from './tab-about';
 
+const SHOW_ERROR = __.MV3; // applying conditional compilation to the template
 const i18nSettings = i18n('sideMenuSettings');
 const tabs = [
   {
@@ -71,7 +75,9 @@ function updateContext() {
   keyboardService.setContext('tabScripts', isScriptsTab && !paths[1]);
   keyboardService.setContext('showRecycle', current.value.name === TAB_RECYCLE);
 }
-
+function updateTabWithChromeUrl(evt) {
+  chrome.tabs.update({url: evt.target.href});
+}
 function switchTab(step) {
   const index = tabs.indexOf(current.value);
   const switchTo = tabs[(index + step + tabs.length) % tabs.length];
