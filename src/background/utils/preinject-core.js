@@ -1,4 +1,4 @@
-import { noop, sendTabCmd } from '@/common';
+import { getUUID,noop, sendTabCmd } from '@/common';
 import { executeScript, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
 import initCache from '@/common/cache';
 import {
@@ -22,6 +22,7 @@ import { clearValueOpener } from './values';
 
 export let isApplied;
 export let injectInto;
+export let ffCsp;
 export let ffInject;
 export let xhrInject = false; // must be initialized for proper comparison when toggling
 let xhrInjectKey;
@@ -111,6 +112,10 @@ const OPT_HANDLERS = {
       expose[decodeURIComponent(site)] = isExposed;
     });
   },
+  ffCsp: value => {
+    if (ffCsp != null) cache.destroy();
+    ffCsp = value;
+  }
 };
 if (contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastFirefoxInject;
 
@@ -244,7 +249,8 @@ export function unregisterScript(bag) {
  * @param {browser.webRequest.BlockingResponse} response
  */
 function detectStrictCsp(info, bag, response) {
-  const h = info[kResponseHeaders].find(findCspHeader);
+  const headers = info[kResponseHeaders];
+  const h = headers.find(findCspHeader);
   if (!h) return;
   let tmp = '';
   let m, scriptSrc, scriptElemSrc, defaultSrc;
@@ -252,26 +258,33 @@ function detectStrictCsp(info, bag, response) {
     tmp += m[2] ? (defaultSrc = m[3]) : m[1] ? (scriptElemSrc = m[3]) : (scriptSrc = m[3]);
   }
   if (!tmp) return;
-  const nonce = tmp.match(NONCE_RE);
+  let nonce = tmp.match(NONCE_RE);
   if (nonce) {
-    bag[INJECT].nonce = nonce[1];
+    nonce = nonce[1];
   } else if (
     scriptSrc && !scriptSrc.includes(UNSAFE_INLINE) ||
     scriptElemSrc && !scriptElemSrc.includes(UNSAFE_INLINE) ||
     !scriptSrc && !scriptElemSrc && defaultSrc && !defaultSrc.includes(UNSAFE_INLINE)
   ) {
-    bag[FORCE_CONTENT] = bag[INJECT][FORCE_CONTENT] = true;
+    if (ffCsp) {
+      nonce = getUUID();
+      h.value = h.value.replace(CSP_RE, `$& 'nonce-${nonce}'`);
+      response ||= { [kResponseHeaders]: headers };
+    } else {
+      bag[FORCE_CONTENT] = bag[INJECT][FORCE_CONTENT] = true;
+    }
   } else {
     return;
   }
-  // Always unregister, then re-register if no nonce to avoid reusing the old value on tab reload
-  if (contentScriptsAPI && unregisterScript(bag) && !nonce) {
+  if (nonce) bag[INJECT].nonce = nonce;
+  if (contentScriptsAPI && unregisterScript(bag)) {
     bag.csStop?.(); // resolving a potential deadlock in CS API on a fast redirect
     return Promise.race([
       bag[CSAPI_REG] = registerScriptData(bag[INJECT], info.url),
       new Promise(resolve => (bag.csStop = resolve)),
     ]).then(() => (bag.csStop = null, response));
   }
+  return response;
 }
 
 function onTabRemoved(id /* , info */) {

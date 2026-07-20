@@ -65,6 +65,7 @@ export default {
   version: null,
   /** @type {VMScriptInjectInto} */
   defaultInjectInto: AUTO,
+  ffCsp: false,
   ffInject: true,
   xhrInject: false,
   filters: {

@@ -246,7 +246,9 @@ let focusBug;
 const HOME = extensionManifest.homepage_url.split('/')[2];
 const NAME = `${extensionManifest.name} ${__.VM_VER}${__.MV3 ? ' MV3' : ''}`;
 const TARDY_MATCH = i18n('msgTardyMatch');
-const INJECT_LEARN = '@inject-into content\n' + i18n('learnInjectionMode');
+const INJECT_LEARN = IS_FIREFOX
+  ? i18n('labelFirefoxPatchCspPopup', ['<content>', i18n('labelFirefoxPatchCsp')])
+  : '@inject-into content\n' + i18n('learnInjectionMode');
 const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const needsReload = reactive({});

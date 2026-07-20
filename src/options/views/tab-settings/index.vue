@@ -18,8 +18,7 @@
       </div>
       <div class="ml-2c flex flex-col">
         <setting-check name="notifyUpdates" :label="i18n('labelNotifyUpdates')" />
-        <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')"
-                       class="ml-2" />
+        <setting-check name="notifyUpdatesGlobal" :label="i18n('labelNotifyUpdatesGlobal')" />
       </div>
     </section>
     <section class="mb-2c">
@@ -56,21 +55,18 @@
             </select>
             <a class="ml-1" :href="VM_DOCS_INJECT_INTO" v-bind="EXTERNAL_LINK_PROPS" v-text="i18n('learnInjectionMode')"/>
           </label>
-          <tooltip :content="i18n('labelXhrInjectHint')">
+          <tooltip :content="i18n('labelXhrInjectHint')" align="start">
             <setting-check name="xhrInject">
-              <locale-group i18n-key="labelXhrInject">
-                <code>page</code>
-              </locale-group> <ruby v-text="i18n('labelXhrInjectNote')"/>
+              <span v-text="i18n('labelXhrInject', '<page>')"/>
+              <ruby v-text="i18n('labelXhrInjectNote')" class="ml-1"/>
             </setting-check>
           </tooltip>
-          <label>
-            <setting-check name="ffInject"/>
-            <tooltip :content="i18n('labelFastFirefoxInjectHint')">
-              <locale-group i18n-key="labelFastFirefoxInject">
-                <code>page</code>
-              </locale-group>
-            </tooltip>
-          </label>
+          <tooltip :content="i18n('labelFastFirefoxInjectHint')" align="start">
+            <setting-check name="ffInject" :label="i18n('labelFastFirefoxInject', '<page>')"/>
+          </tooltip>
+          <tooltip :content="i18n('labelFirefoxPatchCspHint', ['<page>', '<wrappedJSObject>'])" align="start">
+            <setting-check name="ffCsp" :label="i18n('labelFirefoxPatchCsp')"/>
+          </tooltip>
         </div>
         <div class="flex flex-col">
           <locale-group i18n-key="labelExposeStatus">
@@ -205,6 +201,9 @@ onDeactivated(() => {
     width: 16px;
     height: 16px;
     fill: var(--fg);
+  }
+  .ml-2c.flex-col {
+    align-items: flex-start;
   }
 }
 </style>
