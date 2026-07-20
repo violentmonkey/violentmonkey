@@ -235,7 +235,9 @@ const cmpName = (a, b) => collator.compare(a.$cache.lowerName, b.$cache.lowerNam
 const sortModes = [
   ['exec', i18n('filterExecutionOrder'), IconSort, IconSortDown],
   ['alpha', i18n('filterAlphabeticalOrder'), IconAlpha, IconAlphaDown, cmpName],
-  ['author', i18n('labelAuthor').replace(/\W+/, '').toLowerCase(), IconUser, IconUserDown,
+  ['author',
+    i18n('labelAuthor').replace(/[\s:\u{A789}\u{FE13}\u{FE55}\u{FF1A}]+/u, '').toLowerCase(),
+    IconUser, IconUserDown,
     (a, b) => collator.compare(a.meta.author || '', b.meta.author || '') || cmpName(a, b)],
   [UPDATE, i18n('filterLastUpdateOrder'), IconClock, IconClockDown,
     (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
