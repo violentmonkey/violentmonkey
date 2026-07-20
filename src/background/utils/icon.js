@@ -150,7 +150,7 @@ async function onTabUpdated(tabId, { url, status }, tab) {
       resetBadgeData(tabId, title ? null : undefined),
       title,
     );
-  } else if ((__.MV3 ? !tab/*onCommitted*/ : loading) && badges[tabId]) {
+  } else if (__.MV3 && !tab/*onCommitted*/ && badges[tabId]) {
     // Resetting, but not updating the UI yet, waiting for scripts to run or tab load
     delete badges[tabId];
     flushSession(kBadges, badges);
