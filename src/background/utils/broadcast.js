@@ -16,7 +16,7 @@ let incomingStr = '';
 if (__.SW) init.then(() => incognitoAllowed &&
   apiSession.onChanged.addListener(changes => {
     let val;
-    if ((val = changes[S_MSG_IN]) && (val = val.newValue) !== ACK) {
+    if ((val = changes[S_MSG_IN]) && (val = val.newValue) && val !== ACK) {
       if (val > 0) {
         incomingLen = val;
         incomingStr = '';

@@ -137,7 +137,7 @@ if (!__.MV3) global[WATCH_STORAGE] = fn => {
     const keys = Object.keys(changes);
     for (const key of keys) {
       const val = changes[key] = changes[key].newValue;
-      const exists = val === undefined ? 1 : 0;
+      const exists = val !== undefined ? 1 : 0;
       if (key !== S_MSG_IN && key !== S_MSG_OUT) {
         if (exists) cache.put(key, val); else cache.del(key);
         dbKeys.set(key, exists);
