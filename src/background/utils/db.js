@@ -1,6 +1,6 @@
 import {
   dataUri2text, getScriptHome, getScriptName, getScriptPrettyUrl, getScriptRunAt, getScriptsTags,
-  getScriptUpdateUrl, getUUID, i18n, ignoreChromeErrors, isDataUri, isRemote, isValidHttpUrl,
+  getScriptUpdateUrl, i18n, ignoreChromeErrors, isDataUri, isRemote, isValidHttpUrl,
   makePause, trueJoin,
 } from '@/common';
 import {
@@ -655,7 +655,7 @@ export async function parseScript(src) {
     delete script[INFERRED];
   }
   props.lastModified = now;
-  props.uuid = props.uuid || getUUID();
+  props.uuid = props.uuid || crypto.randomUUID();
   // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
   for (const key of ['config', 'custom', 'props']) {
     const dst = script[key];

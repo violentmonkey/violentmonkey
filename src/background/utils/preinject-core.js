@@ -1,4 +1,4 @@
-import { getUUID,noop, sendTabCmd } from '@/common';
+import { noop, sendTabCmd } from '@/common';
 import { executeScript, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
 import initCache from '@/common/cache';
 import {
@@ -267,7 +267,7 @@ function detectStrictCsp(info, bag, response) {
     !scriptSrc && !scriptElemSrc && defaultSrc && !defaultSrc.includes(UNSAFE_INLINE)
   ) {
     if (ffCsp) {
-      nonce = getUUID();
+      nonce = crypto.randomUUID();
       h.value = h.value.replace(CSP_RE, `$& 'nonce-${nonce}'`);
       response ||= { [kResponseHeaders]: headers };
     } else {
