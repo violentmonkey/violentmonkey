@@ -33,7 +33,7 @@ if (success) {
   description = [
     'An error occurred:',
     '',
-    `> ${ERROR}`,
+    ...ERROR.split('\n').map((line) => `> ${line}`),
     ...(ACTION_BUILD_URL
       ? ['', `See ${ACTION_BUILD_URL} for more details.`]
       : []),
@@ -44,11 +44,13 @@ const res = await fetch(DISCORD_WEBHOOK_RELEASE, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    embeds: [{
-      title,
-      description,
-      color: success ? 0x00ff00 : 0xff0000,
-    }],
+    embeds: [
+      {
+        title,
+        description,
+        color: success ? 0x00ff00 : 0xff0000,
+      },
+    ],
   }),
 });
 
