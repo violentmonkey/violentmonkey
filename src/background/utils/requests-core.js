@@ -56,7 +56,7 @@ const SAME_SITE_MAP = {
   lax: 'lax',
   none: 'no_restriction',
 };
-const kRequestHeaders = 'requestHeaders';
+export const kRequestHeaders = 'requestHeaders';
 const API_EVENTS = {
   onBeforeSendHeaders: [onBeforeSendHeaders, kRequestHeaders, ...EXTRA_HEADERS],
   onHeadersReceived: [onHeadersReceived, kResponseHeaders, ...EXTRA_HEADERS],

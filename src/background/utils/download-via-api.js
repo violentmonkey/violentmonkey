@@ -5,8 +5,15 @@ import { downloads, flushSession } from './session-data';
 
 const objEntryToApiHeader = e => ({ name: e[0], value: e[1] });
 
-export default async function downloadViaApi(opts, dlEvents, reqId, req) {
-  const id = await browser.downloads.download({
+/**
+ * @param {GMReq.Message.Web} opts
+ * @param {GMReq.EventTypeMap[]} events
+ * @param {string} id
+ * @param {GMReq.BG} req
+ * -@param {VMMessageSender} src
+ */
+export default async function downloadViaApi(opts, events, id, req/*, src*/) {
+  const dlId = await browser.downloads.download({
     conflictAction: opts.conflictAction,
     filename: opts[kFileName],
     headers: Object.entries(opts.headers || {}).map(objEntryToApiHeader),
@@ -17,9 +24,9 @@ export default async function downloadViaApi(opts, dlEvents, reqId, req) {
   if (isEmpty(downloads)) {
     browser.downloads.onChanged.addListener(onDownloadChanged);
   }
-  downloads[id] = reqId;
-  req.dlEvents = dlEvents;
-  req.dlId = id;
+  downloads[dlId] = id;
+  req.dlEvents = events[0];
+  req.dlId = dlId;
 };
 
 /** @param {browser.downloads._OnChangedDownloadDelta} _ */
