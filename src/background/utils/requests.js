@@ -67,11 +67,7 @@ addPublicCommands({
       cbError: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
-    return (
-      opts[kFileName] && permissionDownloads && getOption(kGmDownloadViaApi)
-      ? downloadViaApi
-      : httpRequest
-    )(opts, events, id, req, src).catch(cbError);
+    return httpRequest(opts, events, id, req, src).catch(cbError);
   },
   /** @return {void | Promise<void>} */
   AbortRequest(id) {
@@ -103,41 +99,58 @@ const UA_HEADERS = Object.keys(UA_GETTERS);
  * @param {GMReq.EventTypeMap[]} events
  * @param {string} id
  * @param {GMReq.BG} req
- * @param {VMMessageSender} src
+ * @param {chrome.runtime.MessageSender} src
  */
 async function httpRequest(opts, events, id, req, src) {
   const { tab } = src;
   const { incognito } = tab;
-  const { anonymous, overrideMimeType, [kXhrType]: xhrType } = opts;
+  const {
+    anonymous,
+    overrideMimeType,
+    user,
+    password,
+    [kFileName]: fileName,
+    [kXhrType]: xhrType,
+  } = opts;
+  const method = opts.method || 'GET';
+  const dlva = fileName && permissionDownloads && getOption(kGmDownloadViaApi);
+  const dlvaHeaders = [];
   const url = vetUrl(opts.url, src.url, true);
   const vmHeaders = __.MV3 ? [] : {};
   const xhrHeaders = {};
   const xhrProps = {};
   // Firefox can send Blob/ArrayBuffer directly
   // TODO: add Chrome when "message_serialization" graduates from Canary into Stable
-  const willStringifyBinaries = xhrType && !IS_FIREFOX;
+  const willStringifyBinaries = !dlva && xhrType && !IS_FIREFOX;
   // Chrome can't fetch Blob URL in incognito so we use chunks
   const chunked = willStringifyBinaries && incognito;
   const blobbed = willStringifyBinaries && !incognito;
   const [body, contentType] = decodeBody(opts.data);
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
-  // Both Chrome & FF need explicit routing of cookies in containers or incognito
-  const shouldSendCookies = !anonymous && (incognito || IS_FIREFOX);
+  // Chrome MV2 & FF need explicit routing of cookies in containers or "spanning" mode incognito
+  const shouldSendCookies = !__.MV3 && !anonymous && (incognito || IS_FIREFOX);
   const uaHeaders = [];
   const kOrigin = 'origin';
   let hasOriginHeader;
-  req[kFileName] = opts[kFileName];
+  let storeId;
   if (!__.MV3) {
     req[kCookie] = !anonymous && !shouldSendCookies;
     req[kSetCookie] = !anonymous;
   }
-  if (contentType) xhrHeaders['Content-Type'] = contentType;
+  if (!dlva) {
+    req[kFileName] = fileName;
+    if (contentType) xhrHeaders['Content-Type'] = contentType;
+    xhrProps[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
+    xhrProps.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
+  }
   opts.headers::forEachEntry(([name, value]) => {
     const nameLow = name.toLowerCase();
     const i = UA_HEADERS.indexOf(nameLow);
     if (i >= 0 && (uaHeaders[i] = true) || FORBIDDEN_HEADER_RE.test(name)) {
       pushHeader(vmHeaders, name, value, nameLow);
       hasOriginHeader ||= nameLow === kOrigin;
+    } else if (dlva) {
+      dlvaHeaders.push({ name, value });
     } else {
       xhrHeaders[name] = value;
     }
@@ -148,15 +161,13 @@ async function httpRequest(opts, events, id, req, src) {
       pushHeader(vmHeaders, name, UA_GETTERS[name](val), name);
     }
   });
-  xhrProps[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
-  xhrProps.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (shouldSendCookies) {
     for (const store of await browser.cookies.getAllCookieStores()) {
       if (store.tabIds.includes(tab.id)) {
-        if (!__.MV3 && IS_FIREFOX ? !store.id.endsWith('-default') : store.id !== '0') {
+        if (IS_FIREFOX ? !store.id.endsWith('-default') : store.id !== '0') {
           /* Cookie routing. For the main store we rely on the browser.
            * The ids are hard-coded as `stores` may omit the main store if no such tabs are open. */
-          req.storeId = store.id;
+          storeId = req.storeId = store.id;
         }
         break;
       }
@@ -164,8 +175,8 @@ async function httpRequest(opts, events, id, req, src) {
     const now = Date.now() / 1000;
     const cookies = (await browser.cookies.getAll({
       url,
-      storeId: req.storeId,
-      ...!__.MV3 && IS_FIREFOX && { firstPartyDomain: null },
+      storeId,
+      ...IS_FIREFOX && { firstPartyDomain: null },
     })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
     if (cookies.length) {
       pushHeader(vmHeaders, kCookie,
@@ -173,10 +184,22 @@ async function httpRequest(opts, events, id, req, src) {
     }
   }
   const xhrUrl = req.xhrUrl = url.split('#', 1)[0] + '#' + id;
-  const xhrOpts = /** @namespace XHRStartOptions */{
+  const useOpts = dlva ? /** @type {browser.downloads._DownloadOptions} */ {
+    body,
+    method,
+    url,
+    conflictAction: opts.conflictAction,
+    filename: fileName,
+    headers: dlvaHeaders,
+    saveAs: opts.saveAs,
+    ...IS_FIREFOX && {
+      cookieStoreId: storeId,
+      incognito: tab.incognito,
+    },
+  } : /** @namespace XHRStartOptions */ {
     body,
     events,
-    open: [opts.method || 'GET', xhrUrl, true, opts.user || '', opts.password || ''],
+    open: [method, xhrUrl, true, user || '', password || ''],
     // Sending as params to avoid storing one-time init data in `requests`
     cb: [req, events, blobbed, chunked, opts[kResponseType] === 'json'],
     headers: xhrHeaders,
@@ -189,9 +212,13 @@ async function httpRequest(opts, events, id, req, src) {
     let ruleId = DNR_ID_XHR; while (xhrRules[++ruleId]) {/**/}
     req.ruleId = ruleId;
     xhrRules[ruleId] = 1;
-    if (anonymous) pushHeader(responseHeaders = [], kSetCookie);
-    if (!hasOriginHeader) pushHeader(vmHeaders, kOrigin);
-    if (!shouldSendCookies) pushHeader(vmHeaders, kCookie);
+    if (anonymous) {
+      pushHeader(vmHeaders, kCookie);
+      pushHeader(responseHeaders = [], kSetCookie);
+    }
+    if (!hasOriginHeader) {
+      pushHeader(vmHeaders, kOrigin);
+    }
     await DNR.updateSessionRules({
       addRules: [{
         id: ruleId,
@@ -206,9 +233,9 @@ async function httpRequest(opts, events, id, req, src) {
         },
       }]
     });
-    await callOffscreen('XHRStart', xhrOpts);
+    await (dlva ? downloadViaApi(useOpts, events, id, req) : callOffscreen('XHRStart', useOpts));
   } else {
-    initXHR(xhrOpts);
+    initXHR(useOpts);
   }
 }
 

@@ -3,24 +3,15 @@ import { kDownloads } from '@/common/consts';
 import { requests } from './requests-core';
 import { downloads, flushSession } from './session-data';
 
-const objEntryToApiHeader = e => ({ name: e[0], value: e[1] });
-
 /**
- * @param {GMReq.Message.Web} opts
+ * @param {browser.downloads._DownloadOptions} opts
  * @param {GMReq.EventTypeMap[]} events
  * @param {string} id
  * @param {GMReq.BG} req
  * -@param {VMMessageSender} src
  */
 export default async function downloadViaApi(opts, events, id, req/*, src*/) {
-  const dlId = await browser.downloads.download({
-    conflictAction: opts.conflictAction,
-    filename: opts[kFileName],
-    headers: Object.entries(opts.headers || {}).map(objEntryToApiHeader),
-    method: opts.method || 'GET',
-    saveAs: opts.saveAs,
-    url: opts.url,
-  });
+  const dlId = await browser.downloads.download(opts);
   if (isEmpty(downloads)) {
     browser.downloads.onChanged.addListener(onDownloadChanged);
   }
