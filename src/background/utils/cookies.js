@@ -6,6 +6,7 @@ import { testScript } from './tester';
 import { vetUrl } from './url';
 
 const MUST_MATCH = `Script must match/include `;
+const FIRST_PARTY = IS_FIREFOX;
 
 addPublicCommands({
   /**
@@ -14,7 +15,7 @@ addPublicCommands({
    * @return {Promise<browser.cookies.Cookie[]>}
    */
   async CookieList(data, src) {
-    const httpOnlyEnabled = checkCookieOpts(data, src, true);
+    const httpOnlyEnabled = checkCookieOpts(data, src, FIRST_PARTY);
     const res = await browser.cookies.getAll(data);
     return httpOnlyEnabled
       ? res
@@ -43,7 +44,7 @@ addPublicCommands({
    * @param {VMMessageSender} src
    */
   async CookieDelete(data, src) {
-    checkCookieOpts(data, src, true);
+    checkCookieOpts(data, src, FIRST_PARTY);
     await browser.cookies.remove(data);
   },
 });
