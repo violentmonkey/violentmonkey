@@ -105,13 +105,14 @@ addBackgroundHandlers({
    * @returns {Promise<void>}
    */
   async HttpRequested(msg) {
+    setPrototypeOf(msg, null);
     const { id, data } = msg;
     const req = requests[id];
     if (!req) {
       if (__.DEV) console.warn('[HttpRequested][content]: no request for id', id);
       return;
     }
-    if (hasOwnProperty(msg, 'chunk')) {
+    if (msg.chunk) {
       processChunk(req, data, msg);
       return;
     }
