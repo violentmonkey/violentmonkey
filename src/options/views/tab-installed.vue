@@ -86,7 +86,7 @@
           </Dropdown>
           <div class="sorter flex center-items mx-1"
                :class="{ 'btn-ghost': collapseSorter }">
-            <Tooltip align="start"
+            <Tooltip align="end"
                      :content="i18n('sortOrder').trim() + (collapseSorter ? ' ' + (currentSort.text || '') : '')">
               <component :is="currentSort.icon || IconSort"/>
             </Tooltip>
