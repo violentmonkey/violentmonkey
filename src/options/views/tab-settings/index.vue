@@ -12,8 +12,7 @@
       <tooltip :content="i18n('labelGmDownloadViaApiHint')">
         <setting-check
           :name="kGmDownloadViaApi" :label="i18n('labelGmDownloadViaApi')" ref="$dlApi"
-          :data-needs-grant="!store[kDownloads] && $dlApi?.value && !granting ? 1 : 0"
-          @click="requestDownloadsPermission" />
+          :data-needs-grant="!store[kDownloads] && $dlApi?.value && !granting ? 1 : 0" />
         <button class="ml-1" v-text="i18n('labelGrantPermission')"
                 @click="requestDownloadsPermission" />
       </tooltip>
@@ -171,6 +170,7 @@ const granting = ref();
 const settings = reactive({});
 const expose = ref();
 let revokers;
+let dlApiInput;
 
 onActivated(() => {
   focusMe($el.value);
@@ -179,13 +179,16 @@ onActivated(() => {
     ...hookSettingsForUI(items, settings, watch, 50),
   ];
   expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
+  // TODO: find out why using @click on <setting-check> fires twice
+  dlApiInput = $dlApi.value.$input;
+  dlApiInput.onclick = requestDownloadsPermission;
 });
 onDeactivated(() => {
   revokers.forEach(r => r());
   revokers = null;
 });
 async function requestDownloadsPermission() {
-  if ($dlApi.value.$input.checked) {
+  if (dlApiInput.checked) {
     granting.value = true;
     store[kDownloads] ||= await browser.permissions.request({
       permissions: [kDownloads]
