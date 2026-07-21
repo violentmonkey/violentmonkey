@@ -35,7 +35,7 @@ export const registerInjector = async (isInstall) => {
       }])),
     ]);
   } catch (err) {
-    if (!api || err.message.includes("'userScripts.getScripts' is not available")) {
+    if (!api || /'userScripts\.\w+' is not available|No changes to loaded/.test(err.message)) {
       err = `Please enable ${ // eslint-disable-line no-ex-assign
         +navigator.userAgent.match(/chrom\D+(\d{3,})/i)?.[1] >= 138
           ? '"Allow User Scripts" in details for Violentmonkey'
