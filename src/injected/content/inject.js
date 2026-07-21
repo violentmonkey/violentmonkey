@@ -6,7 +6,7 @@ import { Run } from './cmd-run';
 const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
-let bridgeInfo;
+export let bridgeInfo;
 /** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
 let contLists, pageLists;
 /** @type {?boolean} */

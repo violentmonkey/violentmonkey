@@ -1,5 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers, grantless } from './bridge';
-import { addNonceAttribute } from './inject';
+import { addNonceAttribute, bridgeInfo } from './inject';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
 const menus = createNullObj();
@@ -14,8 +14,10 @@ let grantlessUsage;
 
 addBackgroundHandlers({
   SetGMI(data) {
-    assign(bridge.gmi, data);
-    for (const realm in bridge.realms) bridge.post('SetGMI', data, realm);
+    for (const realm in bridge.realms) {
+      if (bridgeInfo) assign(bridgeInfo[realm], data);
+      bridge.post('SetGMI', data, realm);
+    }
   },
   [kUseMenu](state) {
     bridge[kUseMenu] = state;
