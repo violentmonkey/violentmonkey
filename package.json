@@ -19,7 +19,7 @@
     "test": "cross-env BABEL_ENV=test TEST=test jest test --maxWorkers=50%",
     "ci": "run-p lint test",
     "bumpVersion": "gulp bump",
-    "bump": "run-s ci \"bumpVersion -- --commit\"",
+    "bump": "run-s ci && gulp bump --commit",
     "preversion": "run-s ci",
     "version": "gulp bump --reset"
   },
