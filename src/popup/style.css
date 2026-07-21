@@ -255,6 +255,7 @@ footer {
     position: absolute;
     top: 0;
     right: 0;
+    .script:hover &, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
     .touch & {
       display: flex !important;
     }
@@ -264,11 +265,12 @@ footer {
     line-height: 1;
     background: var(--bg);
     cursor: pointer;
+    &:hover, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
     &:focus {
       color: var(--bg);
       background: $hoverBack;
     }
-    .menu-item:hover + .submenu-buttons &:not(:focus) {
+    .menu-item:hover + .submenu-buttons &:not(:focus):not(:hover) {
       background: $hoverButtonInactiveBack;
       @media (prefers-color-scheme: dark) {
         background: $DARKhoverButtonInactiveBack;

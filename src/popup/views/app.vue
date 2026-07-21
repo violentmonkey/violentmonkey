@@ -244,8 +244,6 @@ import { handleTabNavigation, isInput, kbdTypable, keyboardService } from '@/com
 import { isFullscreenPopup, store } from '../utils';
 
 let mousedownElement;
-/** Some browsers and desktop envs don't autofocus the popup so CSS hover doesn't work */
-const focusBug = !document.hasFocus();
 const HOME = extensionManifest.homepage_url.split('/')[2];
 const NAME = `${extensionManifest.name} ${__.VM_VER}${__.MV3 ? ' MV3' : ''}`;
 const TARDY_MATCH = i18n('msgTardyMatch');
@@ -595,7 +593,7 @@ function updateMessage({ target: el = getActiveElement() } = {}) {
   message.value = el && getEllipsizedMessage(el) || '';
 }
 function showButtons(item) {
-  return extras.value?.id === item.id || focusedItem.value?.id === item.id || focusBug;
+  return extras.value?.id === item.id || focusedItem.value?.id === item.id;
 }
 
 onMounted(() => {
