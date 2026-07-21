@@ -84,6 +84,16 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
+        <div class="ml-2c">
+          <tooltip :content="i18n('labelGmDownloadModeBrowserHint')">
+            <setting-check name="gmDownloadModeBrowser">
+              {{ i18n('labelGmDownloadModeBrowser') }} <ruby v-text="i18n('labelGmDownloadModeBrowserPermissionRequired')" />
+            </setting-check>
+          </tooltip>
+          <button class="btn-ghost" :disabled="permGranted"
+                  @click="requestDlPerm"
+                  v-text="i18n('labelGmDownloadModeBrowserGrantPerm')" />
+        </div>
       </section>
 
       <vm-editor />
@@ -130,6 +140,7 @@ const items = {
     light: i18n('optionUiThemeLight'),
   },
   xhrInject: value => value,
+  gmDownloadModeBrowser: value => value,
 };
 const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
 </script>
@@ -149,6 +160,13 @@ import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
 import VmDateInfo from './vm-date-info';
 import { kbdTypable } from '@/common/keyboard';
+import browser from '@/common/browser';
+
+const permGranted = ref(false);
+
+async function requestDlPerm() {
+  permGranted.value = await browser.permissions.request({ permissions: ['downloads'] });
+}
 
 const $el = ref();
 const settings = reactive({});
@@ -162,6 +180,7 @@ onActivated(() => {
     ...hookSettingsForUI(items, settings, watch, 50),
   ];
   expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
+  browser.permissions.contains({ permissions: ['downloads'] }).then(r => { permGranted.value = r; });
 });
 
 onDeactivated(() => {

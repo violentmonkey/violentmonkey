@@ -12,6 +12,7 @@ import {
   makeXhrHeader, propsToClear, registerScriptData, xhrInject,
 } from './preinject-core';
 import { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT_PRE, S_VALUE } from './storage';
+import { getOption } from './options';
 import { ua } from './ua';
 
 const sessionId = getUniqId();
@@ -101,7 +102,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     [MORE]: moreKey,
     [kSessionId]: sessionId,
     [IDS]: allIds,
-    info: { ua, gmi: { isIncognito } },
+    info: { ua, gmi: { isIncognito }, gmDownloadModeBrowser: getOption('gmDownloadModeBrowser') },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   }, objectPick(env, [
     S_CACHE,
@@ -246,6 +247,7 @@ function prepareScript(script, env) {
     gmi: {
       scriptWillUpdate: shouldUpdate,
       uuid: props.uuid,
+      downloadMode: getOption('gmDownloadModeBrowser') ? 'browser' : 'native',
     },
     id,
     key: plantKey,

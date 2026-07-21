@@ -68,6 +68,7 @@ export default {
   ffCsp: false,
   ffInject: true,
   xhrInject: false,
+  gmDownloadModeBrowser: false,
   filters: {
     /** @type {boolean} */
     showOrder: false,
