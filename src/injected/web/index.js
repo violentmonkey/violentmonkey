@@ -12,6 +12,7 @@ import { safeConcat } from './util';
 // Make sure to call safe::methods() in code that may run after userscripts
 
 const toRun = createNullObj();
+const gmis = createNullObj();
 const grantlessUsage = createNullObj();
 
 export default function initialize(invokeHost, console) {
@@ -92,10 +93,11 @@ addHandlers({
     }
     const toRunNow = [];
     for (const script of items) {
-      const { key } = script;
+      const { id, key } = script;
       toRun[key.data] = script;
-      displayNames[script.id] = script.displayName;
-      storages[script.id] = setPrototypeOf(script[VALUES] || {}, null);
+      displayNames[id] = script.displayName;
+      gmis[id] = script.gmi;
+      storages[id] = setPrototypeOf(script[VALUES] || {}, null);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;
         const data = window[winKey];
@@ -113,6 +115,10 @@ addHandlers({
     }
     if (!PAGE_MODE_HANDSHAKE) toRunNow::forEach(onCodeSet);
     else if (!__.MV3 && IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
+  },
+  SetGMI(data) {
+    assign(bridge.gmi, data);
+    for (const id in gmis) try { assign(gmis[id], data); } catch {/*ignore possible setters*/}
   },
   Expose(allowGetScriptVer) {
     const key = 'external';

@@ -90,6 +90,8 @@ export const GM4_ALIAS = {
   getResourceURL: 'getResourceUrl',
   xmlhttpRequest: 'xmlHttpRequest',
 };
+export const kDownloadMode = 'downloadMode';
+export const kDownloads = 'downloads';
 export const kOrigTag = 'origTag';
 export const kTag = 'tag';
 export const kMainFrame = 'main_frame';

@@ -7,6 +7,14 @@
           {{i18n('labelHttpOnlyCookie')}} <ruby v-text="i18n('labelScriptOptionRequired')"/>
         </setting-check>
       </tooltip>
+      <tooltip :content="i18n('labelGmDownloadViaApiHint')">
+        <setting-check
+          :name="kGmDownloadViaApi" :label="i18n('labelGmDownloadViaApi')" ref="$dlApi"
+          :data-needs-grant="!store[kDownloads] && $dlApi?.value && !granting ? 1 : 0"
+          @click="requestDownloadsPermission" />
+        <button class="ml-1" v-text="i18n('labelGrantPermission')"
+                @click="requestDownloadsPermission" />
+      </tooltip>
     </section>
     <section class="mb-1c">
       <h3 v-text="i18n('optionPopup')"/>
@@ -84,16 +92,6 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
-        <div class="ml-2c">
-          <tooltip :content="i18n('labelGmDownloadModeBrowserHint')">
-            <setting-check name="gmDownloadModeBrowser">
-              {{ i18n('labelGmDownloadModeBrowser') }} <ruby v-text="i18n('labelGmDownloadModeBrowserPermissionRequired')" />
-            </setting-check>
-          </tooltip>
-          <button class="btn-ghost" :disabled="permGranted"
-                  @click="requestDlPerm"
-                  v-text="i18n('labelGmDownloadModeBrowserGrantPerm')" />
-        </div>
       </section>
 
       <vm-editor />
@@ -122,9 +120,12 @@
 
 <script>
 import { i18n } from '@/common';
-import { KNOWN_INJECT_INTO, VM_DOCS_INJECT_INTO } from '@/common/consts';
+import browser from '@/common/browser';
+import { kDownloads, KNOWN_INJECT_INTO, VM_DOCS_INJECT_INTO } from '@/common/consts';
 import options from '@/common/options';
-import { kScriptTemplate, kUpdateEnabledScriptsOnly, kGmCookieHttpOnly } from '@/common/options-defaults';
+import {
+  kGmCookieHttpOnly, kGmDownloadViaApi, kScriptTemplate, kUpdateEnabledScriptsOnly,
+} from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
 import { EXTERNAL_LINK_PROPS, focusMe, getActiveElement } from '@/common/ui';
 import { hookSettingsForUI } from '@/common/ui/util';
@@ -140,12 +141,13 @@ const items = {
     light: i18n('optionUiThemeLight'),
   },
   xhrInject: value => value,
-  gmDownloadModeBrowser: value => value,
+  [kGmDownloadViaApi]: value => value,
 };
 const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
 </script>
 
 <script setup>
+import { noop } from '@/common';
 import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import LocaleGroup from '@/common/ui/locale-group';
@@ -160,15 +162,10 @@ import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
 import VmDateInfo from './vm-date-info';
 import { kbdTypable } from '@/common/keyboard';
-import browser from '@/common/browser';
-
-const permGranted = ref(false);
-
-async function requestDlPerm() {
-  permGranted.value = await browser.permissions.request({ permissions: ['downloads'] });
-}
 
 const $el = ref();
+const $dlApi = ref();
+const granting = ref();
 const settings = reactive({});
 const expose = ref();
 let revokers;
@@ -180,13 +177,20 @@ onActivated(() => {
     ...hookSettingsForUI(items, settings, watch, 50),
   ];
   expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
-  browser.permissions.contains({ permissions: ['downloads'] }).then(r => { permGranted.value = r; });
 });
-
 onDeactivated(() => {
   revokers.forEach(r => r());
   revokers = null;
 });
+async function requestDownloadsPermission() {
+  if ($dlApi.value.$input.checked) {
+    granting.value = true;
+    store[kDownloads] ||= await browser.permissions.request({
+      permissions: [kDownloads]
+    }).catch(noop);
+    granting.value = false;
+  }
+}
 </script>
 
 <style>
@@ -228,6 +232,12 @@ onDeactivated(() => {
     > :not(h3):not([class*="flex"]):not(.setting-text) {
       align-self: flex-start;
     }
+  }
+  [data-needs-grant="1"] {
+    text-decoration: line-through;
+  }
+  [data-needs-grant="0"] + button {
+    display: none;
   }
 }
 </style>

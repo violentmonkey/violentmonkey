@@ -27,7 +27,6 @@ export const addHandlers = addHandlersImpl.bind({}, handlers);
 export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
 
 /**
- * @property {VMBridgePostFunc} [post] - present only when the web bridge was initialized
  * @property {VMScriptInjectInto} [injectInto] - present only after GetInjected received data
  * @property {Promise<void>} [reify] - present in pre-rendered documents, resolved when it's shown
  * @property {boolean} [useMenu]
@@ -37,6 +36,9 @@ const bridge = {
   [IDS]: createNullObj(),
   cache: createNullObj(),
   pathMaps: createNullObj(),
+  /** @property {VMBridgePostFunc} [post] - set only when the web bridge was initialized */
+  post: null,
+  realms: createNullObj(),
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {
     let res, err;

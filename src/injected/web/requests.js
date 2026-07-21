@@ -25,12 +25,12 @@ const OPTS_TO_KEEP = [
   kResponseType,
 ];
 const OPTS_TO_PASS = [
+  'conflictAction',
   'headers',
   'method',
   'overrideMimeType',
   'password',
   'saveAs',
-  'conflictAction',
   'timeout',
   'user',
 ];

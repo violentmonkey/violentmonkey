@@ -4,8 +4,8 @@ import {
   makePause, trueJoin,
 } from '@/common';
 import {
-  CACHE_KEYS, FETCH_OPTS, INFERRED, kTag, PROMISE, REQ_KEYS, TIMEOUT_24HOURS, TIMEOUT_WEEK,
-  TL_AWAIT, VALUE_IDS,
+  CACHE_KEYS, FETCH_OPTS, INFERRED, kDownloads, kTag, PROMISE, REQ_KEYS, TIMEOUT_24HOURS,
+  TIMEOUT_WEEK, TL_AWAIT, VALUE_IDS,
 } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import pluginEvents from '../plugin/events';
@@ -19,6 +19,7 @@ import { getImageData } from './icon';
 import { addOwnCommands, addPublicCommands, commands, resolveInit } from './init';
 import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
+import { permissionDownloads } from './permissions';
 import { initOptions, kVersion, setOption } from './options';
 import sessionData from './session-data';
 import storage, {
@@ -476,6 +477,7 @@ export async function getData({ id, ids, sizes }) {
     ? getScriptsByIdsOrAll(ids).filter(Boolean)
     : getScriptsByIdsOrAll();
   scripts.forEach(inferScriptProps);
+  res[kDownloads] = permissionDownloads;
   res[SCRIPTS] = scripts;
   if (sizes) res.sizes = getSizes(ids);
   if (!id) res.cache = await getIconCache(scripts);

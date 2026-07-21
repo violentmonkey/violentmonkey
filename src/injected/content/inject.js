@@ -329,6 +329,7 @@ function injectAll(runAt) {
     const lists = inPage ? pageLists : contLists;
     const items = lists?.[runAt];
     if (items) {
+      bridge.realms[realm] = true;
       bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
       for (const { id, meta: { grant } } of items) {

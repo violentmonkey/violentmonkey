@@ -107,6 +107,9 @@ Object.assign(handlers, {
   ScriptsUpdated() {
     loadData();
   },
+  SetPermissions(data) {
+    Object.assign(store, data);
+  },
   UpdateSync(data) {
     store.sync = data;
   },

@@ -13,10 +13,17 @@ let isPopupShown;
 let grantlessUsage;
 
 addBackgroundHandlers({
+  SetGMI(data) {
+    assign(bridge.gmi, data);
+    for (const realm in bridge.realms) bridge.post('SetGMI', data, realm);
+  },
   [kUseMenu](state) {
     bridge[kUseMenu] = state;
     if (state) sendSetPopup();
   },
+});
+
+addBackgroundHandlers({
   async PopupShown(state) {
     await bridge[REIFY];
     isPopupShown = state;

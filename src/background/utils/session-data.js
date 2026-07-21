@@ -1,4 +1,5 @@
 import { makePause } from '@/common';
+import { kDownloads } from '@/common/consts';
 
 export const kAlarmRemove = 'remove';
 export const kAlarmSync = 'sync';
@@ -9,6 +10,7 @@ export const kTabOpeners = 'tabOpeners';
 
 /** @type {{ [tabId: string]: VMBadgeData }}*/
 export let badges = {};
+export let downloads = {};
 export let notifications = {};
 export let skippedTabs = {};
 export let tabOpeners = {};
@@ -16,6 +18,7 @@ export let tabOpeners = {};
 let flushing;
 let sessionData = __.MV3 && chrome.storage.session.get().then(data => (
   badges = data[kBadges] || badges,
+  downloads = data[kDownloads] || downloads,
   notifications = data[kNotifications] || notifications,
   skippedTabs = data[SKIP_SCRIPTS] || skippedTabs,
   tabOpeners = data[kTabOpeners] || tabOpeners,

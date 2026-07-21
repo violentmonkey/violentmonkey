@@ -1,5 +1,5 @@
 import { getActiveTab, sendTabCmd } from '@/common';
-import { CACHE_KEYS, PROMISE } from '@/common/consts';
+import { CACHE_KEYS, kDownloadMode, PROMISE } from '@/common/consts';
 import { deepCopy } from '@/common/object';
 import { getScriptsByURL } from './db';
 import { setBadge } from './icon';
@@ -8,8 +8,8 @@ import { clearNotifications } from './notifications';
 import { addMenuConfig, setMenus } from './page-menu-commands';
 import { popupTabs } from './popup-tracker';
 import {
-  cache, contentScriptsAPI, CSAPI_REG, getKey, injectContentRealm, isApplied, propsToClear,
-  unregisterScript,
+  cache, contentScriptsAPI, CSAPI_REG, downloadMode, getKey, injectContentRealm, isApplied,
+  propsToClear, unregisterScript,
 } from './preinject-core';
 import { prepare, prepareScripts, triageRealms } from './preinject-prepare';
 import { clearRequestsByTabId, reifyRequests } from './requests';
@@ -59,7 +59,8 @@ addPublicCommands({
       if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
         updateVisitedTime(scripts);
       }
-      inject.info.gmi = { isIncognito: tab.incognito };
+      inject.info.gmi[kDownloadMode] = downloadMode;
+      inject.info.gmi.isIncognito = tab.incognito;
     }
     if (popupTabs[tabId]) {
       sendPopupShown(tabId, frameDoc);
@@ -189,8 +190,6 @@ function setBaggedScriptValues(bag, id, val) {
     }
   }
 }
-
-
 
 function clearFrameData(tabId, frameId, tabRemoved) {
   clearRequestsByTabId(tabId, frameId);

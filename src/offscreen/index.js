@@ -34,7 +34,7 @@ Object.assign(handlers, {
     req.cb = sendCmdToSW.bind(null, 'XHRNotify');
     initXHR(opts, req.id);
   },
-  XHRStop: id => xhrs.get(id).abort(),
+  XHRStop: id => xhrs.get(id)?.abort(),
 });
 
 chrome.runtime.onConnect.addListener(port => {

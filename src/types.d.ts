@@ -35,21 +35,25 @@ declare namespace GMReq {
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
+    cbe?: (err: string|Error) => Promise<void>;
     /** use browser's `Cookie` header */
     cookie?: boolean;
     /** allow Set-Cookie header to affect browser */
     'set-cookie'?: boolean;
     coreId: string;
+    dlEvents?: EventTypeMap;
+    dlId?: number;
     /** Firefox-only workaround for CSP blocking a blob: URL */
     fileName: string;
     frame: VMMessageTargetFrame;
     frameId: number;
     id: string;
-    resolve: (v?: any) => void;
+    resolve?: (v?: any) => void;
     responseHeaders: string;
     ruleId?: number;
     storeId: string;
     tabId: number;
+    timer?: number;
     url: string;
     xhr: XMLHttpRequest;
     xhrUrl: string;
@@ -103,6 +107,7 @@ declare namespace GMReq {
       id: string;
       scriptId: number;
       anonymous: boolean;
+      conflictAction?: chrome.downloads.FilenameConflictAction;
       fileName: string;
       data: any[];
       events: [EventTypeMap, EventTypeMap];
@@ -111,6 +116,7 @@ declare namespace GMReq {
       overrideMimeType?: string;
       password?: string;
       responseType: XMLHttpRequestResponseType;
+      saveAs?: boolean;
       timeout?: number;
       ua?: string[];
       url: string;
@@ -361,11 +367,11 @@ declare namespace VMInjection {
   }
   interface Info {
     gmi: {
+      downloadMode: 'browser' | 'native';
       isIncognito: boolean;
     };
     ua: VMScriptGMInfoPlatform;
     uad?: true;
-    gmDownloadModeBrowser?: boolean;
   }
   /**
    * Script prepared for injection
@@ -468,17 +474,5 @@ declare var __: {
   TEST: boolean,
   VM_VER: string,
 };
-
-/**
- * The download mode for the current script: `"native"` or `"browser"`.
- *
- * - `"native"` — downloads use XMLHttpRequest.
- * - `"browser"` — downloads are delegated to the browser's native download manager
- *   (`browser.downloads.download`), controlled by the "Use browser download API"
- *   setting in Violentmonkey's Advanced settings.
- */
-declare interface VMScriptGMInfoObject {
-  downloadMode: 'native' | 'browser';
-}
 
 //#endregion Generic

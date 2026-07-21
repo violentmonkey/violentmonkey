@@ -1,26 +1,25 @@
-import { keepAlive, sendTabCmd, string2uint8array } from '@/common';
+import { keepAlive, noop, sendTabCmd, string2uint8array } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS, UPLOAD } from '@/common/consts';
 import { downloadBlob } from '@/common/download';
 import { deepEqual, forEachEntry, forEachValue } from '@/common/object';
+import { kGmDownloadViaApi } from '@/common/options-defaults';
 import { initXHR } from '@/offscreen/xhr';
+import { DNR_ID_XHR, updateSessionRules, xhrRules } from './dnr';
+import downloadViaApi from './download-via-api';
 import { addOwnCommands, addPublicCommands, commands } from './init';
 import callOffscreen from './offscreen';
-import { DNR_ID_XHR, updateSessionRules, xhrRules } from './dnr';
+import { getOption } from './options';
+import { permissionDownloads } from './permissions';
 import {
   FORBIDDEN_HEADER_RE, kCookie, kSetCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
-import { getOption } from './options';
 import { navUA, navUAD } from './ua';
 import { vetUrl } from './url';
 
 if (__.MV3) addOwnCommands({
-  XHRNotify(data) {
-    const req = requests[data.id];
-    req.cb(data);
-    if (data.type === 'loadend' && !data[UPLOAD]) {
-      clearRequest(req);
-    }
+  XHRNotify: data => {
+    requests[data.id].cb(data);
   },
 });
 else addPublicCommands({
@@ -39,51 +38,48 @@ addPublicCommands({
     const tabId = src.tab.id;
     const frameId = getFrameDocIdFromSrc(src);
     const { id, events } = opts;
-    const req = requests[id] = {
+    const req = requests[id] = /** @type {GMReq.BG} */ {
       id,
       tabId,
       [kFrameId]: frameId,
       frame: getFrameDocIdAsObj(frameId),
     };
     /** @param {GMReq.Message.BGAny} res */
-    const cb = res => requests[id] && (
-      __.MV3 && req.url && res.data && (res.data.finalUrl = req.url), // from onBeforeSendHeaders
-      sendTabCmd(tabId, 'HttpRequested', res, req.frame)
-    );
-    if (getOption('gmDownloadModeBrowser') && opts[kFileName]) {
-      const downloadOpts = { url: opts.url, filename: opts[kFileName] };
-      if (opts.headers) {
-        downloadOpts.headers = Object.entries(opts.headers).map(
-          ([n, v]) => ({ name: n, value: v }),
-        );
+    const cb = res => {
+      if (!requests[id]) return;
+      const { data } = res;
+      if (__.MV3 && data && req.url) {
+        data.finalUrl = req.url; // from onBeforeSendHeaders
       }
-      if (opts.saveAs != null) downloadOpts.saveAs = opts.saveAs;
-      if (opts.conflictAction) downloadOpts.conflictAction = opts.conflictAction;
-      if (opts.method) downloadOpts.method = opts.method;
-      browser.downloads.download(downloadOpts)
-        .then(() => {
-          cb({ id, type: 'load', data: { finalUrl: opts.url, readyState: 4, status: 200, response: null, responseHeaders: null } });
-          cb({ id, type: 'loadend', data: null });
-        })
-        .catch(err => {
-          cb({ id, [ERROR]: [err.message || `${err}`, 'DownloadError'], data: null });
-          cb({ id, type: 'loadend', data: null });
-        });
-      return;
-    }
-    return httpRequest(opts, events, src, cb)
-    .catch(err => cb({
+      if (res.type === 'loadend' && !data?.[UPLOAD]) {
+        clearRequest(req);
+      }
+      sendTabCmd(tabId, 'HttpRequested', res, req.frame);
+    };
+    const cbError = err => cb({
       id,
       [ERROR]: [err.message || `${err}`, err.name],
       data: null,
       type: ERROR,
-    }));
+    });
+    Object.defineProperties(req, { // non-enumerable props won't be messaged
+      cb: {value: cb},
+      cbError: {value: cbError},
+      resolve: {value: __.MV3 ? keepAlive() : noop},
+    });
+    return (
+      opts[kFileName] && permissionDownloads && getOption(kGmDownloadViaApi)
+      ? downloadViaApi(opts, events[0], id, req)
+      : httpRequest(opts, events, src)
+    ).catch(cbError);
   },
   /** @return {void | Promise<void>} */
-  AbortRequest: id => requests[id] && (__.MV3
-    ? callOffscreen('XHRStop', id)
-    : requests[id].xhr.abort()
-  ),
+  AbortRequest(id) {
+    const req = requests[id];
+    if (req) return req.dlId ? browser.downloads.cancel(req.dlId)
+      : __.MV3 ? callOffscreen('XHRStop', id)
+        : requests[id].xhr.abort();
+  },
   // TODO: check if the content script can revoke it
   RevokeBlob: url => __.MV3
     ? callOffscreen('RevokeBlob', url)
@@ -106,10 +102,9 @@ const UA_HEADERS = Object.keys(UA_GETTERS);
  * @param {GMReq.Message.Web} opts
  * @param {GMReq.EventTypeMap[]} events
  * @param {VMMessageSender} src
- * @param {function} cb
  * @returns {Promise<void>}
  */
-async function httpRequest(opts, events, src, cb) {
+async function httpRequest(opts, events, src) {
   const { tab } = src;
   const { incognito } = tab;
   const { anonymous, id, overrideMimeType, [kXhrType]: xhrType } = opts;
@@ -185,11 +180,9 @@ async function httpRequest(opts, events, src, cb) {
     props: xhrProps,
   };
   toggleHeaderInjector(id, vmHeaders, xhrUrl);
-  Object.defineProperty(req, 'cb', {value: cb}); // non-enumerable to ensure it's not messaged
   if (__.MV3) {
     if (vmHeaders.length) addDnrHeaders(req, xhrUrl, vmHeaders);
-    await callOffscreen('XHRStart', xhrOpts); // send the pure object,
-    req.resolve = keepAlive(); // ...then add an unsendable prop (function)
+    await callOffscreen('XHRStart', xhrOpts);
   } else {
     initXHR(xhrOpts);
   }
@@ -214,7 +207,7 @@ function clearRequest({ id, coreId, resolve, ruleId }) {
   delete xhrRules[ruleId];
   if (ruleId) updateSessionRules([ruleId]);
   toggleHeaderInjector(id, false);
-  resolve?.();
+  if (__.MV3) resolve();
 }
 
 export function clearRequestsByTabId(tabId, frameId) {

@@ -2,26 +2,28 @@ import { noop, sendTabCmd } from '@/common';
 import { executeScript, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
 import initCache from '@/common/cache';
 import {
-  __CODE, BLACKLIST, CACHE_KEYS, GLOB_ALL, kMainFrame, kSubFrame, REQ_KEYS, UNWRAP, VALUE_IDS,
-  XHR_COOKIE_RE,
+  __CODE, BLACKLIST, CACHE_KEYS, GLOB_ALL, kDownloadMode, kMainFrame, kSubFrame, REQ_KEYS, UNWRAP,
+  VALUE_IDS, XHR_COOKIE_RE,
 } from '@/common/consts';
 import { forEachEntry, objectSet } from '@/common/object';
-import { kPageMenuCommands } from '@/common/options-defaults';
+import { kGmDownloadViaApi, kPageMenuCommands } from '@/common/options-defaults';
 import { revokeBlobRules } from './dnr';
 import { clearNotifications } from './notifications';
-import { hookOptionsInit } from './options';
+import { getOption, hookOptionsInit } from './options';
 import { addMenuConfig } from './page-menu-commands';
+import { onPermissionChanged, permissionDownloads } from './permissions';
 import { normalizeRealm, prepare, prepareXhrBlob } from './preinject-prepare';
 import { clearRequestsByTabId } from './requests';
 import { kSetCookie } from './requests-core';
 import { flushSession, skippedTabs } from './session-data';
 import { S_CACHE_PRE, S_CODE_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE } from './storage';
 import { clearStorageCache } from './storage-cache';
-import { tabsOnRemoved } from './tabs';
+import { forEachTab, tabsOnRemoved } from './tabs';
 import { clearValueOpener } from './values';
 
 export let isApplied;
 export let injectInto;
+export let downloadMode;
 export let ffCsp;
 export let ffInject;
 export let xhrInject = false; // must be initialized for proper comparison when toggling
@@ -115,10 +117,11 @@ const OPT_HANDLERS = {
   ffCsp: value => {
     if (ffCsp != null) cache.destroy();
     ffCsp = value;
-  }
+  },
+  [kGmDownloadViaApi]: updateDownloadMode,
 };
 if (contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastFirefoxInject;
-
+onPermissionChanged.add(() => updateDownloadMode(getOption(kGmDownloadViaApi)));
 hookOptionsInit(onOptionChanged);
 
 function onOptionChanged(changes) {
@@ -212,6 +215,7 @@ export function injectContentRealm(toContent, tabId, frameId) {
 // (this will also allow proper handling of @noframes)
 export function registerScriptData(inject, url) {
   addMenuConfig(inject);
+  (/**@type{VMInjection}*/inject).info.gmi[kDownloadMode] = downloadMode;
   for (const scr of inject[SCRIPTS]) {
     scr.code = scr[__CODE];
   }
@@ -301,4 +305,14 @@ function clearFrameData(tabId, frameId, tabRemoved) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
   clearNotifications(tabId, frameId, tabRemoved);
+}
+
+function updateDownloadMode(val) {
+  val = val && permissionDownloads ? 'browser' : 'native';
+  if (downloadMode !== val) {
+    if (downloadMode != null) {
+      forEachTab(sendTabCmd, 'SetGMI', { [kDownloadMode]: val });
+    }
+    downloadMode = val;
+  }
 }

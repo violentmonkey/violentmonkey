@@ -1,18 +1,17 @@
 import { getScriptName, getScriptPrettyUrl, getUniqId, leaseBlobUrl } from '@/common';
 import {
-  __CODE, CACHE_KEYS, HOMEPAGE_URL, KNOWN_INJECT_INTO, kOrigTag, kTag, META_STR, METABLOCK_RE,
-  NEWLINE_END_RE, PROMISE, TL_AWAIT, UNWRAP,
+  __CODE, CACHE_KEYS, HOMEPAGE_URL, kDownloadMode, KNOWN_INJECT_INTO, kOrigTag, kTag, META_STR,
+  METABLOCK_RE, NEWLINE_END_RE, PROMISE, TL_AWAIT, UNWRAP,
 } from '@/common/consts';
 import { forEachValue, mapEntry, objectPick } from '@/common/object';
 import { getScriptsByURL, kTryVacuuming } from './db';
 import { registerDnrBlob } from './dnr';
 import { inIncognitoContext } from './init';
 import {
-  cache, contentScriptsAPI, CSAPI_REG, expose, ffInject, injectContentRealm, injectInto, isApplied,
-  makeXhrHeader, propsToClear, registerScriptData, xhrInject,
+  cache, contentScriptsAPI, CSAPI_REG, downloadMode, expose, ffInject, injectContentRealm,
+  injectInto, isApplied, makeXhrHeader, propsToClear, registerScriptData, xhrInject,
 } from './preinject-core';
 import { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT_PRE, S_VALUE } from './storage';
-import { getOption } from './options';
 import { ua } from './ua';
 
 const sessionId = getUniqId();
@@ -102,7 +101,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     [MORE]: moreKey,
     [kSessionId]: sessionId,
     [IDS]: allIds,
-    info: { ua, gmi: { isIncognito }, gmDownloadModeBrowser: getOption('gmDownloadModeBrowser') },
+    info: { ua, gmi: { [kDownloadMode]: downloadMode, isIncognito } },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   }, objectPick(env, [
     S_CACHE,
@@ -247,7 +246,6 @@ function prepareScript(script, env) {
     gmi: {
       scriptWillUpdate: shouldUpdate,
       uuid: props.uuid,
-      downloadMode: getOption('gmDownloadModeBrowser') ? 'browser' : 'native',
     },
     id,
     key: plantKey,
