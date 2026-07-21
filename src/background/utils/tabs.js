@@ -215,11 +215,12 @@ tabsOnRemoved.addListener(async (id) => {
   }
 })();
 
-export async function forEachTab(callback) {
+export async function forEachTab(callback, ...args) {
   const tabs = await browser.tabs.query({});
   let i = 0;
   for (const tab of tabs) {
-    callback(tab);
+    if (callback === sendTabCmd) callback(tab.id, ...args);
+    else callback(tab, ...args);
     i += 1;
     // we'll run at most this many tabs in one event loop cycle
     // because hundreds of tabs would make our extension process unresponsive,

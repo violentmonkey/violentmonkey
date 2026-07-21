@@ -153,7 +153,7 @@ if (contextMenus) {
   hookOptionsInit(({ [kPageMenuCommands]: state }, firstRun) => {
     if (state != null && state !== !!tabData) {
       setEnabled(state);
-      if (!firstRun) forEachTab(tab => sendTabCmd(tab.id, kUseMenu, state));
+      if (!firstRun) forEachTab(sendTabCmd, kUseMenu, state);
     }
   });
 }
