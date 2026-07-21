@@ -239,7 +239,7 @@ onActivated(() => {
   storageSentry = chrome.runtime.connect({
     name: WATCH_STORAGE + JSON.stringify({
       cfg: { value: id },
-      id: bg?.[WATCH_STORAGE](onStorageChanged),
+      id: bg && bg[WATCH_STORAGE](onStorageChanged),
       tabId: sender.tab.id,
     }),
   });
