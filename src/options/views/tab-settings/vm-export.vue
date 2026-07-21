@@ -1,5 +1,5 @@
 <template>
-  <div class="export">
+  <div class="export flex-1">
     <div class="flex flex-wrap center-items mr-1c">
       <button v-text="i18n('buttonExportData')" @click="handleExport" :disabled="exporting"/>
       <setting-text name="exportNameTemplate" ref="tpl" has-reset :has-save="false" :rows="1"

@@ -1,8 +1,4 @@
-$compactHeaderHeight: 4rem;
-$tabPadX: 2rem;
-$tabPadY: 3rem;
-$tabPadTopY: 1.5rem;
-$sectionBorder: 1px solid var(--fill-2);
+@import 'vars.css';
 
 button {
   height: 1.5rem;
@@ -98,21 +94,18 @@ html:not(.narrow) {
   text-transform: uppercase;
 }
 section {
-  padding: 0 0 $tabPadY;
-  > h3 {
-    background: linear-gradient(to right, var(--hbg, var(--fill-1)), transparent);
-    border-top: $sectionBorder;
-    line-height: 2;
-    padding: 0 $tabPadX;
-    margin: 0 calc(-1 * $tabPadX);
-    margin-bottom: calc($tabPadY * .75) !important;
-  }
-  > h4 {
-    margin-bottom: .3rem;
-  }
+  padding: $tabPadTopY 0 $tabPadY;
   > p {
     margin-bottom: .3rem;
   }
+}
+[open] > .h3,
+section > h3 {
+  background: linear-gradient(to right, var(--hbg, var(--fill-1)), transparent);
+  border-top: $sectionBorder;
+  line-height: 2;
+  padding: 0 $tabPadX;
+  margin: -$tabPadTopY -$tabPadX calc($tabPadY * .75) !important;
 }
 textarea:not([rows="1"]):not(.h100) {
   resize: vertical;

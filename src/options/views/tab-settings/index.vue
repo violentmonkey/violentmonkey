@@ -1,6 +1,13 @@
 <template>
   <div ref="$el" class="tab-settings" :data-show-advanced="settings.showAdvanced">
     <h1 v-text="i18n('labelSettings')"></h1>
+    <section>
+      <tooltip :content="i18n('labelHttpOnlyCookieHint')">
+        <setting-check :name="kGmCookieHttpOnly">
+          {{i18n('labelHttpOnlyCookie')}} <ruby v-text="i18n('labelScriptOptionRequired')"/>
+        </setting-check>
+      </tooltip>
+    </section>
     <section class="mb-1c">
       <h3 v-text="i18n('optionPopup')"/>
       <settings-popup/>
@@ -30,13 +37,12 @@
     </section>
     <vm-sync></vm-sync>
     <details v-for="(obj, key) in {showAdvanced: settings}" :key :open="obj[key]">
-      <summary @click.prevent="obj[key] = !obj[key]">
+      <summary class="h3" @click.prevent="obj[key] = !obj[key]">
         <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
         <component v-text="i18n('labelAdvanced')" class="inline-block"
                    :is="obj[key] ? 'h1' : 'h3'"/>
       </summary>
       <section class="mb-1c">
-        <h3 v-text="i18n('labelGeneral')"></h3>
         <div>
           <label>
             <locale-group i18n-key="optionUiTheme">
@@ -68,7 +74,7 @@
             <setting-check name="ffCsp" :label="i18n('labelFirefoxPatchCsp')"/>
           </tooltip>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col" style="align-items: flex-start">
           <locale-group i18n-key="labelExposeStatus">
             <setting-check v-for="([key, host]) in expose" :key="host"
                            :name="`expose.${key}`" class="ml-2 mr-1c">
@@ -78,14 +84,6 @@
           </locale-group>
         </div>
         <setting-check name="helpForLocalFile" :label="i18n('helpForLocalFile')"/>
-      </section>
-
-      <section>
-        <h3 v-text="i18n('editLabelSettings')"/>
-        <tooltip :content="i18n('labelHttpOnlyCookieHint')">
-          <setting-check :name="kGmCookieHttpOnly"
-                         :label="i18n('labelHttpOnlyCookie') + '\n' + i18n('labelScriptOptionRequired')"/>
-        </tooltip>
       </section>
 
       <vm-editor />
@@ -133,6 +131,7 @@ const items = {
   },
   xhrInject: value => value,
 };
+const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
 </script>
 
 <script setup>
@@ -154,7 +153,6 @@ import { kbdTypable } from '@/common/keyboard';
 const $el = ref();
 const settings = reactive({});
 const expose = ref();
-const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
 let revokers;
 
 onActivated(() => {
@@ -173,6 +171,8 @@ onDeactivated(() => {
 </script>
 
 <style>
+@import '../../vars.css';
+
 .tab-settings {
   overflow-y: auto;
   input[type="number"] {
@@ -182,16 +182,17 @@ onDeactivated(() => {
   h1 {
     margin-top: 0;
   }
-  summary {
+  h3 {
+    margin: 0;
+  }
+  summary.h3 {
     cursor: pointer;
-    margin-left: -1em;
+    margin-top: $tabPadTopY !important;
+    padding-left: calc($tabPadX / 2);
     user-select: none;
     &:focus > *,
     &:hover > * {
       text-decoration: underline;
-    }
-    h3 {
-      margin-top: 0;
     }
   }
   ruby {
@@ -202,8 +203,12 @@ onDeactivated(() => {
     height: 16px;
     fill: var(--fg);
   }
-  .ml-2c.flex-col {
-    align-items: flex-start;
+  section {
+    display: flex;
+    flex-flow: column;
+    > :not(h3):not([class*="flex"]):not(.setting-text) {
+      align-self: flex-start;
+    }
   }
 }
 </style>
