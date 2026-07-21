@@ -1,6 +1,6 @@
 <template>
   <label class="setting-check">
-    <input type="checkbox" v-model="value" :disabled>
+    <input type="checkbox" v-model="value" :disabled ref="$input">
     <slot>
       <span v-text="label" />
     </slot>
@@ -22,10 +22,12 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['change']);
+const $input = ref();
 const value = ref();
 const revoke = hookSetting(props.name, val => { value.value = val; });
 
 defineExpose({
+  $input,
   value,
 });
 watch(value, val => {
