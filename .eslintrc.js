@@ -184,7 +184,7 @@ function makeOverrides() {
     INJECTED_RULES: {
       'no-restricted-imports': [
         'error', {
-          patterns: ['*/common', '*/common/*'],
+          patterns: ['*/common', '*/common/*', '!*/common/consts'],
         }
       ],
       'no-restricted-syntax': ['error', ...restrictedSyntax],

@@ -54,6 +54,9 @@ const defsObj = {
     DEV: !isProd,
     TEST: process.env.BABEL_ENV === 'test',
   }).map(([k, v]) => ['__.' + k, /string|object/.test(typeof v) ? JSON.stringify(v) : v])),
+  __VUE_OPTIONS_API__: true,
+  __VUE_PROD_DEVTOOLS__: false,
+  __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts

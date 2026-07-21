@@ -40,7 +40,7 @@ export function objectSet(obj, rawKey, val, retParent) {
 /**
  * @param {{}} obj
  * @param {string[]} keys
- * @param {function(value,key):?} [transform]
+ * @param {(value: any, key: string) => any} [transform]
  * @returns {{}}
  */
 export function objectPick(obj, keys, transform) {
