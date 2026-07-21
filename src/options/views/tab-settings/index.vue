@@ -4,7 +4,9 @@
     <section>
       <tooltip :content="i18n('labelHttpOnlyCookieHint')">
         <setting-check :name="kGmCookieHttpOnly">
-          {{i18n('labelHttpOnlyCookie')}} <ruby v-text="i18n('labelScriptOptionRequired')"/>
+          <span>{{
+            i18n('labelHttpOnlyCookie')
+          }} <ruby v-text="i18n('labelScriptOptionRequired')"/></span>
         </setting-check>
       </tooltip>
       <tooltip :content="i18n('labelGmDownloadViaApiHint')">
