@@ -1,6 +1,5 @@
 import { leaseBlobUrl } from '@/common';
 import setClipboard from '@/common/clipboard';
-import { downloadBlob } from '@/common/download';
 import handlers from '@/common/handlers';
 import { sendCmdToSW } from '@/common/messaging-sw';
 import { DriveProviders } from '@usync/drive';
@@ -10,7 +9,6 @@ let drive;
 let autoCloseTimer;
 
 Object.assign(handlers, {
-  DownloadBlob: downloadBlob,
   LeaseBlob: leaseBlobUrl,
   Drive: ([cmd, args, init], src, transfer) => (
     init.length && initDrive(...init),
