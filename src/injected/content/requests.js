@@ -1,12 +1,10 @@
-import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
-import { createObjectURL, decodeResource, makeSafeBlob, sendCmd } from './util';
 import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
+import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
+import { makeSafeBlob, sendCmd } from './util';
 
 const CHUNKS = 'chunks';
 const LOAD = 'load';
 const LOADEND = 'loadend';
-const READYSTATECHANGE = 'readystatechange';
-const isBlobXhr = req => req[kXhrType] === 'blob';
 /** @type {{ [id:string]: GMReq.Content }} */
 const requests = createNullObj();
 let BlobProto, getArrayBuffer, getBlob, getBlobType, getTypedArrayBuffer;
@@ -60,14 +58,8 @@ addHandlers({
   async HttpRequest(msg, realm) {
     if (IS_FIREFOX) msg = nullObjFrom(msg); // copying into our realm to set its props freely
     else setPrototypeOf(msg, null);
-    const { url } = msg;
     const data = !IS_FIREFOX && msg.data;
     const uaData = getUAData && navigator::getUAData();
-    const sch = url::slice(0, 5);
-    const isDataUri = sch === 'data:';
-    if (isDataUri || sch === 'blob:') {
-      return requestVirtualUrl(msg, url, isDataUri, realm);
-    }
     requests[msg.id] = {
       __proto__: null,
       realm,
@@ -118,9 +110,11 @@ addBackgroundHandlers({
     }
     let response = data?.[kResponse];
     if (response != null) {
+      const wantsBinary = req[kXhrType];
+      const wantsBlob = wantsBinary === 'blob';
       if (msg.blobbed) {
         data[kResponse] = await (
-          req.p = importBlob(response, isBlobXhr(req))
+          req.p = importBlob(response, wantsBlob)
         );
         req.p = null;
         sendCmd('RevokeBlob', response);
@@ -128,9 +122,9 @@ addBackgroundHandlers({
         processChunk(req, response);
         response = req[CHUNKS];
         delete req[CHUNKS];
-        if (isBlobXhr(req)) {
+        if (wantsBlob) {
           response = makeSafeBlob(response, msg.contentType);
-        } else if (req[kXhrType]) {
+        } else if (wantsBinary) {
           response = response::getTypedArrayBuffer();
         } else {
           // sending text chunks as-is to avoid memory overflow due to concatenation
@@ -146,49 +140,6 @@ addBackgroundHandlers({
     sendHttpRequested(msg, req.realm);
   },
 });
-
-/**
- * @param {GMReq.Message.Web} msg
- * @param {string} url
- * @param {boolean} isDataUri
- * @param {string} realm
- * @return {Promise<void>}
- */
-async function requestVirtualUrl(msg, url, isDataUri, realm) {
-  const { id, [kFileName]: fileName } = msg;
-  const events = msg.events[0];
-  const wantsResult = events[LOAD] || events[LOADEND] || events[READYSTATECHANGE];
-  const wantsBlob = !wantsResult || isBlobXhr(msg);
-  const data = !isDataUri ? await importBlob(url, wantsBlob)
-    : wantsResult || url.length > 100e3
-      ? decodeResource(url, wantsBlob ? SafeBlob : SafeUint8Array, true)
-      : url;
-  if (fileName) {
-    // download in bg to a) circumvent CSP in Firefox and b) use a single throttled download chain
-    let blob;
-    sendCmd('DownloadBlob', [
-      !isObject(data) ? data
-        : (blob = wantsBlob ? data : makeSafeBlob(data)) &&
-          (IS_FIREFOX ? blob : createObjectURL(blob)),
-      fileName,
-    ]);
-  }
-  for (const type of [READYSTATECHANGE, LOAD, LOADEND]) {
-    if (!(type === LOADEND/*to delete the request*/ || events[type]))
-      continue;
-    sendHttpRequested({
-      id,
-      type,
-      data: {
-        finalUrl: url,
-        readyState: 4,
-        status: 200,
-        [kResponse]: events[type] ? data : null,
-        [kResponseHeaders]: '',
-      },
-    }, realm);
-  }
-}
 
 function sendHttpRequested(msg, realm) {
   bridge.post('HttpRequested', msg, realm);

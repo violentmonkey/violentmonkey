@@ -1,6 +1,5 @@
 import { keepAlive, noop, sendTabCmd, string2uint8array } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS, UPLOAD } from '@/common/consts';
-import { downloadBlob } from '@/common/download';
 import { deepEqual, forEachEntry, forEachValue } from '@/common/object';
 import { kGmDownloadViaApi } from '@/common/options-defaults';
 import { initXHR } from '@/offscreen/xhr';
@@ -20,11 +19,6 @@ import { vetUrl } from './url';
 if (__.MV3) addOwnCommands({
   XHRNotify: data => {
     requests[data.id].cb(data);
-  },
-});
-else addPublicCommands({
-  DownloadBlob(args) {
-    downloadBlob(...args);
   },
 });
 
@@ -82,9 +76,7 @@ addPublicCommands({
         : requests[id].xhr.abort();
   },
   // TODO: check if the content script can revoke it
-  RevokeBlob: url => __.MV3
-    ? callOffscreen('RevokeBlob', url)
-    : URL.revokeObjectURL(url),
+  RevokeBlob: __.MV3 ? callOffscreen : URL.revokeObjectURL,
 });
 
 const quoteHeaderValue = str => `"${str.replace(/[\\"]/g, '\\$&')}"`;

@@ -57,7 +57,7 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let sentTextLength = 0;
   let sentReadyState4;
   let tmp;
-  const { id, xhr } = req;
+  const { id, xhr, [kFileName]: fileName } = req;
   const getResponseHeaders = () => req[kResponseHeaders] || xhr.getAllResponseHeaders();
   const eventQueue = [];
   const sequentialize = async () => {
@@ -81,7 +81,7 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     if (!upload && fullResponse !== xhr[kResponse]) {
       fullResponse = response = xhr[kResponse];
       sent = false;
-      if (response) {
+      if (response && !fileName) {
         if ((tmp = response.length - sentTextLength)) { // a non-empty text response has `length`
           chunked = tmp > TEXT_CHUNK_SIZE;
           chunkSize = TEXT_CHUNK_SIZE;
@@ -98,10 +98,11 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           : blobbed ? 1 : 0;
       }
     }
-    if (response && isEnd && req[kFileName]) {
-      downloadBlob(response, req[kFileName]);
+    if (response && isEnd && fileName) {
+      downloadBlob(response, fileName);
     }
-    const shouldSendResponse = !upload && shouldNotify && (!isJson || readyState4) && !sent;
+    const shouldSendResponse =
+      !upload && !fileName && shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
