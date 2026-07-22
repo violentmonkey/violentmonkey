@@ -67,8 +67,8 @@ addHandlers({
     }
     if (hasOwnProperty(msg, ERROR)) {
       msg = msg[ERROR];
-      msg = new SafeDOMException(msg[0], msg[1]);
-      if (cb) cb(msg); else log(ERROR, displayNames[req.scriptId], msg);
+      msg = new SafeError(msg[0], msg[1]);
+      if (cb) cb(msg); else log(ERROR, [displayNames[req.scriptId]], msg);
       return;
     }
     if (!cb) {

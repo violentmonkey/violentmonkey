@@ -15,7 +15,6 @@ export let
   safeBind,
   // window
   SafeCustomEvent,
-  SafeDOMException,
   SafeError,
   SafeEventTarget,
   SafeKeyboardEvent,
@@ -116,7 +115,6 @@ export const VAULT = (() => {
   res = [
     // window
     SafeCustomEvent = res[i += 1] || src.CustomEvent,
-    SafeDOMException = res[i += 1] || src.DOMException,
     SafeError = res[i += 1] || src.Error,
     SafeEventTarget = res[i += 1] || src.EventTarget,
     SafeKeyboardEvent = res[i += 1] || src.KeyboardEvent,
