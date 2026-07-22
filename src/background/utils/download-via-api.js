@@ -2,8 +2,15 @@ import { isEmpty } from '@/common';
 import { kDownloads } from '@/common/consts';
 import { FORBIDDEN_HEADER_RE, requests } from './requests-core';
 import { downloads, flushSession } from './session-data';
+import { FIREFOX } from './ua';
 
-const objEntryToApiHeader = e => !FORBIDDEN_HEADER_RE.test(e[0]) && { name: e[0], value: e[1] };
+const reReferer = /^referer$/i; // allowed since Firefox 70
+const reUA = /^user-agent$/i; // allowed since Firefox 43
+const objEntryToApiHeader = ([k, v]) => (
+  FORBIDDEN_HEADER_RE.test(k)
+    ? !__.MV3 && IS_FIREFOX && (reUA.test(k) || reReferer.test(k) && FIREFOX >= 70)
+    : !reUA.test(k) || !__.MV3 && IS_FIREFOX
+) && { name: k, value: v };
 
 /**
  * @param {GMReq.Message.Web} opts
