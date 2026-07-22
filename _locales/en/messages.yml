@@ -266,6 +266,11 @@ fileInstallBlocked:
     http://localhost. <3> Enable "Allow access to file URLs" in details for
     Violentmonkey in chrome://extensions page. This is dangerous because any
     userscript may read any local file.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: >-
+    Open about:addons, click "Violentmonkey", click "Permissions and data",
+    enable "Access local files on your computer".
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alphabetical
@@ -320,7 +325,7 @@ headerRecycleBin:
   message: Recycle Bin
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Show the instruction for drag'n'dropped local scripts
+  message: Show help when a local script can't be installed
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: for $1 matching scripts

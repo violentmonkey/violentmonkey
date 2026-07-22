@@ -220,7 +220,12 @@ onMounted(async () => {
     return;
   }
   if (infoVal.fs) {
-    info.value.fs = i18n('fileInstallBlocked').split(/<\d+>/);
+    const parts = i18n('fileInstallBlocked').split(/<\d+>/);
+    if (!__.MV3 && IS_FIREFOX) {
+      parts[1] = i18n('fileInstallBlockedFF'); // replace drag'n'drop part
+      parts.pop(); // drop chrome://extensions part
+    }
+    info.value.fs = parts;
     return;
   }
   if (!fileHandle) {

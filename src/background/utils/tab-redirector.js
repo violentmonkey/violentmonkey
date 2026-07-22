@@ -1,4 +1,5 @@
 import { browserWindows, getTab, getUniqId, i18n, isRemote, noop, sendTabCmd } from '@/common';
+import browser from '@/common/browser';
 import { executeScript } from '@/common/browser-scripts-api';
 import { FILE_GLOB_ALL, kMainFrame, NO_CACHE } from '@/common/consts';
 import cache from './cache';
@@ -75,12 +76,6 @@ export const resolveVirtualUrl = url => (
 const virtualUrlRe = !__.MV3 && IS_FIREFOX && new RegExp((
   `^(view-source:)?(${extensionRoot.replace('://', '$&)?')}[^/]*\\.user\\.js#\\d+`
 ));
-const maybeRedirectVirtualUrlFF = virtualUrlRe && ((tabId, src) => {
-  if (virtualUrlRe.test(src)) {
-    browser.tabs.update(tabId, { url: resolveVirtualUrl(src) });
-  }
-});
-
 async function maybeInstallUserJs(tabId, url, isWhitelisted) {
   if (__.MV3 && isWhitelisted) sendTabCmd(tabId, 'Stop');
   // Getting the tab now before it navigated
@@ -102,16 +97,9 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
   }
 }
 
-if (virtualUrlRe) {
-  tabsOnUpdated.addListener(
-    (tabId, { url }) => url && maybeRedirectVirtualUrlFF(tabId, url),
-    FIREFOX && { properties: [FIREFOX >= 88 ? 'url' : 'status'] }
-  );
-}
-
-browser.tabs.onCreated.addListener((tab) => {
+tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
+  if (!url) return;
   const { id, title } = tab;
-  const url = getTabUrl(tab);
   const isFile = url.startsWith('file:');
   const isUserJS = /\.user\.js([?#]|$)/.test(url);
   /* Determining if this tab can be auto-closed (replaced, actually).
@@ -119,14 +107,18 @@ browser.tabs.onCreated.addListener((tab) => {
   if (isUserJS && !isFile) {
     cache.put(`autoclose:${id}`, true, 10e3);
   }
-  if (virtualUrlRe && url === 'about:blank') {
-    maybeRedirectVirtualUrlFF(id, title);
-  }
-  if (isUserJS && isFile && !fileSchemeRequestable && !IS_FIREFOX
-  && getOption('helpForLocalFile')) {
+  if (url === 'about:blank' && virtualUrlRe && virtualUrlRe.test(title)) {
+    browser.tabs.update(id, { url: resolveVirtualUrl(title) });
+  } else if (isUserJS && isFile && getOption('helpForLocalFile') && (
+    IS_FIREFOX && !__.MV3
+      // FF153 requires user explicitly enabling file: access (without reloading the extension)
+      ? IDBIndex.prototype.getAllRecords &&
+        !await browser.extension.isAllowedFileSchemeAccess()
+      : !fileSchemeRequestable
+  )) {
     confirmInstall({ url, fs: true }, { tab });
   }
-});
+}, !__.MV3 && FIREFOX && { properties: [FIREFOX >= 88 ? 'url' : 'status'] });
 
 browser.webRequest.onBeforeRequest.addListener((req) => {
   const { method, tabId, url } = req;
