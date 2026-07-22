@@ -37,11 +37,12 @@ addPublicCommands({
   HttpRequest(opts, src) {
     const tabId = src.tab.id;
     const frameId = getFrameDocIdFromSrc(src);
-    const { id, events } = opts;
+    const { id, events, [kFileName]: fileName } = opts;
     const req = requests[id] = /** @type {GMReq.BG} */ {
       id,
       tabId,
       [kFrameId]: frameId,
+      [kFileName]: fileName,
       frame: getFrameDocIdAsObj(frameId),
     };
     /** @param {GMReq.Message.BGAny} res */
@@ -67,7 +68,11 @@ addPublicCommands({
       cbError: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
-    return httpRequest(opts, events, id, req, src).catch(cbError);
+    return (
+      fileName && permissionDownloads && getOption(kGmDownloadViaApi)
+      ? downloadViaApi
+      : httpRequest
+    )(opts, events, id, req, src, fileName).catch(cbError);
   },
   /** @return {void | Promise<void>} */
   AbortRequest(id) {
@@ -99,29 +104,20 @@ const UA_HEADERS = Object.keys(UA_GETTERS);
  * @param {GMReq.EventTypeMap[]} events
  * @param {string} id
  * @param {GMReq.BG} req
- * @param {chrome.runtime.MessageSender} src
+ * @param {VMMessageSender} src
+ * -@param {string} [fileName]
  */
 async function httpRequest(opts, events, id, req, src) {
   const { tab } = src;
   const { incognito } = tab;
-  const {
-    anonymous,
-    overrideMimeType,
-    user,
-    password,
-    [kFileName]: fileName,
-    [kXhrType]: xhrType,
-  } = opts;
-  const method = opts.method || 'GET';
-  const dlva = fileName && permissionDownloads && getOption(kGmDownloadViaApi);
-  const dlvaHeaders = [];
+  const { anonymous, overrideMimeType, [kXhrType]: xhrType } = opts;
   const url = vetUrl(opts.url, src.url, true);
   const vmHeaders = __.MV3 ? [] : {};
   const xhrHeaders = {};
   const xhrProps = {};
   // Firefox can send Blob/ArrayBuffer directly
   // TODO: add Chrome when "message_serialization" graduates from Canary into Stable
-  const willStringifyBinaries = !dlva && xhrType && !IS_FIREFOX;
+  const willStringifyBinaries = xhrType && !IS_FIREFOX;
   // Chrome can't fetch Blob URL in incognito so we use chunks
   const chunked = willStringifyBinaries && incognito;
   const blobbed = willStringifyBinaries && !incognito;
@@ -137,20 +133,13 @@ async function httpRequest(opts, events, id, req, src) {
     req[kCookie] = !anonymous && !shouldSendCookies;
     req[kSetCookie] = !anonymous;
   }
-  if (!dlva) {
-    req[kFileName] = fileName;
-    if (contentType) xhrHeaders['Content-Type'] = contentType;
-    xhrProps[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
-    xhrProps.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
-  }
+  if (contentType) xhrHeaders['Content-Type'] = contentType;
   opts.headers::forEachEntry(([name, value]) => {
     const nameLow = name.toLowerCase();
     const i = UA_HEADERS.indexOf(nameLow);
     if (i >= 0 && (uaHeaders[i] = true) || FORBIDDEN_HEADER_RE.test(name)) {
       pushHeader(vmHeaders, name, value, nameLow);
       hasOriginHeader ||= nameLow === kOrigin;
-    } else if (dlva) {
-      dlvaHeaders.push({ name, value });
     } else {
       xhrHeaders[name] = value;
     }
@@ -161,6 +150,8 @@ async function httpRequest(opts, events, id, req, src) {
       pushHeader(vmHeaders, name, UA_GETTERS[name](val), name);
     }
   });
+  xhrProps[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
+  xhrProps.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
   if (shouldSendCookies) {
     for (const store of await browser.cookies.getAllCookieStores()) {
       if (store.tabIds.includes(tab.id)) {
@@ -184,22 +175,10 @@ async function httpRequest(opts, events, id, req, src) {
     }
   }
   const xhrUrl = req.xhrUrl = url.split('#', 1)[0] + '#' + id;
-  const useOpts = dlva ? /** @type {browser.downloads._DownloadOptions} */ {
-    body,
-    method,
-    url,
-    conflictAction: opts.conflictAction,
-    filename: fileName,
-    headers: dlvaHeaders,
-    saveAs: opts.saveAs,
-    ...IS_FIREFOX && {
-      cookieStoreId: storeId,
-      incognito: tab.incognito,
-    },
-  } : /** @namespace XHRStartOptions */ {
+  const xhrOpts = /** @namespace XHRStartOptions */{
     body,
     events,
-    open: [method, xhrUrl, true, user || '', password || ''],
+    open: [opts.method || 'GET', xhrUrl, true, opts.user || '', opts.password || ''],
     // Sending as params to avoid storing one-time init data in `requests`
     cb: [req, events, blobbed, chunked, opts[kResponseType] === 'json'],
     headers: xhrHeaders,
@@ -233,9 +212,9 @@ async function httpRequest(opts, events, id, req, src) {
         },
       }]
     });
-    await (dlva ? downloadViaApi(useOpts, events, id, req) : callOffscreen('XHRStart', useOpts));
+    await callOffscreen('XHRStart', xhrOpts);
   } else {
-    initXHR(useOpts);
+    initXHR(xhrOpts);
   }
 }
 

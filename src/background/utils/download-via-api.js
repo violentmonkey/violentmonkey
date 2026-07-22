@@ -1,17 +1,28 @@
 import { isEmpty } from '@/common';
 import { kDownloads } from '@/common/consts';
-import { requests } from './requests-core';
+import { FORBIDDEN_HEADER_RE, requests } from './requests-core';
 import { downloads, flushSession } from './session-data';
 
+const objEntryToApiHeader = e => !FORBIDDEN_HEADER_RE.test(e[0]) && { name: e[0], value: e[1] };
+
 /**
- * @param {browser.downloads._DownloadOptions} opts
+ * @param {GMReq.Message.Web} opts
  * @param {GMReq.EventTypeMap[]} events
  * @param {string} id
  * @param {GMReq.BG} req
- * -@param {VMMessageSender} src
+ * @param {VMMessageSender} src
+ * @param {string} [fileName]
  */
-export default async function downloadViaApi(opts, events, id, req/*, src*/) {
-  const dlId = await browser.downloads.download(opts);
+export default async function downloadViaApi(opts, events, id, req, src, fileName) {
+  const { headers } = opts;
+  const dlId = await browser.downloads.download({
+    conflictAction: opts.conflictAction,
+    filename: fileName,
+    headers: headers ? Object.entries(headers).map(objEntryToApiHeader).filter(Boolean) : undefined,
+    method: opts.method || 'GET',
+    saveAs: opts.saveAs,
+    url: opts.url,
+  });
   if (isEmpty(downloads)) {
     browser.downloads.onChanged.addListener(onDownloadChanged);
   }
