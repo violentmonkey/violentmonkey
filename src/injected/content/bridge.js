@@ -38,7 +38,6 @@ const bridge = {
   pathMaps: createNullObj(),
   /** @property {VMBridgePostFunc} [post] - set only when the web bridge was initialized */
   post: null,
-  realms: createNullObj(),
   // realm is provided when called directly via invokeHost
   async onHandle({ cmd, data, node }, realm) {
     let res, err;

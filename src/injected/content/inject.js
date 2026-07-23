@@ -7,6 +7,7 @@ const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
 export let bridgeInfo;
+export let bridgeRealms;
 /** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
 let contLists, pageLists;
 /** @type {?boolean} */
@@ -134,6 +135,7 @@ export async function injectScripts(data, info, isXml) {
   bridgeInfo = createNullObj();
   bridgeInfo[PAGE] = info;
   bridgeInfo[CONTENT] = info;
+  bridgeRealms = createNullObj();
   assign(bridge[CACHE], data[CACHE]);
   if (isXml || data[FORCE_CONTENT]) {
     pageInjectable = false;
@@ -329,9 +331,9 @@ function injectAll(runAt) {
     const lists = inPage ? pageLists : contLists;
     const items = lists?.[runAt];
     if (items) {
-      bridge.realms[realm] = true;
       bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
       bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
+      bridgeRealms[realm] = true;
       for (const { id, meta: { grant } } of items) {
         tardyQueue[id] = 1;
         if (!grant.length) grantless[realm] = 1;

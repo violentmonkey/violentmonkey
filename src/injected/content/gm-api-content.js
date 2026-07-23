@@ -1,5 +1,5 @@
 import bridge, { addBackgroundHandlers, addHandlers, grantless } from './bridge';
-import { addNonceAttribute, bridgeInfo } from './inject';
+import { addNonceAttribute, bridgeInfo, bridgeRealms } from './inject';
 import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
 const menus = createNullObj();
@@ -14,8 +14,9 @@ let grantlessUsage;
 
 addBackgroundHandlers({
   SetGMI(data) {
-    for (const realm in bridge.realms) {
-      if (bridgeInfo) assign(bridgeInfo[realm], data);
+    for (const realm in bridgeRealms) {
+      // Augment info if still injecting scripts
+      if (bridgeInfo?.[realm]) assign(bridgeInfo[realm], data);
       bridge.post('SetGMI', data, realm);
     }
   },
