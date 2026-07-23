@@ -252,6 +252,9 @@ fileInstallBlocked:
     페이지나 팝업으로 끌어다 놓습니다. <2> 이 파일의 로컬 HTTP 서버를 설치한 뒤 http://localhost 주소로 파일을
     엽니다. <3> chrome://extensions 페이지의 확장 세부정보에서 "파일 URL에 대한 액세스 허용"을 켭니다. 이 방식은
     모든 유저스크립트에서 모든 파일에 접근할 수 있게 되므로 위험합니다.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 가나다 순
@@ -457,9 +460,32 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: 피드백
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: ''
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: ''
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: ''
 labelGeneral:
   description: Label for general settings.
   message: 일반
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: ''
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: ''
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 번역 도와주기

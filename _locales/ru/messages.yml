@@ -154,7 +154,7 @@ descCustomCSS:
   description: Description of custom CSS section.
   message: >-
     Пользовательский стиль CSS для страниц настроек и установки скриптов. Если
-    вы не знаете, зачем это нужно, пожалуйста, не редактируйте его.
+    вы не знаете, зачем это нужно, пожалуйста, не изменяйте его.
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
@@ -274,6 +274,9 @@ fileInstallBlocked:
     открывать локальные файлы по ссылкам» в сведениях Violentmonkey на странице
     chrome://extensions. Это опасно, так как любой пользовательский скрипт может
     прочитать любой локальный файл.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавитному порядку
@@ -483,9 +486,39 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: Обход CSP в Firefox
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: >-
+    Добавляет случайное значение в CSP веб-страниц, которое может использовать
+    только Violentmonkey для запуска скриптов в режиме внедрения $1, в противном
+    случае скрипты придётся править для использования $2.
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: >-
+    Изолированный режим $1 может ограничивать функциональность, см. «$2» в
+    параметрах.
 labelGeneral:
   description: Label for general settings.
   message: Общие настройки
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: Использовать API загрузки из браузера
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: >-
+    Позволяет скриптам сохранять файлы во вложенных папках внутри вашего
+    каталога загрузок и отображать ход загрузки в панели загрузки браузера.
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: Предоставить разрешение
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Улучшить перевод

@@ -110,7 +110,7 @@ buttonSyncPushOnce:
   message: Uzağa bir kez "push"
 buttonUndo:
   description: Button to undo removement of a script.
-  message: Geri Al
+  message: Geri al
 buttonUpdate:
   description: Button to update a script.
   message: Güncelle
@@ -192,7 +192,7 @@ descScriptTemplate:
     <{{date:YYYY-MM-DD}}>).
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: grupla
+  message: gruplandır
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
   message: gizle
@@ -279,6 +279,9 @@ fileInstallBlocked:
     “Dosya URL’lerine erişime izin ver” seçeneğini etkinleştirin. Bu, herhangi
     bir kullanıcı betiğinin herhangi bir yerel dosyayı okuyabilmesi nedeniyle
     tehlikelidir.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetik
@@ -495,9 +498,32 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Geri bildirim
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: Firefox'ta CSP'yi atla
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: ''
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: ''
 labelGeneral:
   description: Label for general settings.
   message: Genel
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: Tarayıcının indirme API'sini kullan
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: ''
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: İzin ver
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Çeviriye yardımcı olun
