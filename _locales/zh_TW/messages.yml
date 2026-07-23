@@ -253,6 +253,9 @@ fileInstallBlocked:
     <2> 為該檔案架設一個本機 HTTP 伺服器，然後透過 http://localhost 的網址來存取它。 <3> 透過 Chrome
     瀏覽器的「擴充功能」頁面 chrome://extensions，啟用 Violentmonkey 的「允許存取檔案網址」。請注意，此操作具有風險，
     因為這將允許所有使用者腳本讀取您電腦上的任何檔案。
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母順序
@@ -456,9 +459,32 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: 回饋
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: ''
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: ''
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: ''
 labelGeneral:
   description: Label for general settings.
   message: 一般
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: ''
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: ''
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 協助翻譯

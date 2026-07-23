@@ -276,6 +276,9 @@ fileInstallBlocked:
     Violentmonkey na stránke chrome://extensions povoľte možnosť "Povoliť
     prístup k webovým adresám súboru". Je to nebezpečné, pretože akýkoľvek
     používateľský skript môže čítať akýkoľvek lokálny súbor.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedne
@@ -489,9 +492,38 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Spätná väzba
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: Obísť CSP vo Firefoxe
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: >-
+    Pridá náhodnú hodnotu do CSP webových stránok, ktorú môže na spúšťanie
+    skriptov v režime injektovania $1 využiť iba Violentmonkey; v opačnom
+    prípade je potrebné skripty upraviť, aby mohli byť použité $2.
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: Režim izolovaného $1 môže obmedziť funkčnosť, pozri "$2" v nastaveniach.
 labelGeneral:
   description: Label for general settings.
   message: Všeobecné
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: Použiť rozhranie API pre sťahovanie v prehliadači
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: >-
+    Umožňuje skriptom ukladať súbory do podpriečinkov v rámci priečinka na
+    stiahnuté súbory a zobrazuje priebeh sťahovania na paneli sťahovania v
+    prehliadači.
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: Udeleliť povolenia
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Pomôžte s prekladom

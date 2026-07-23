@@ -251,6 +251,9 @@ fileInstallBlocked:
     有几种方法可以在本地文件中安装或跟踪编辑： <1> 将文件拖放到打开的暴力猴页面或弹出窗口中，包括此页面。 <2>为此文件安装本地 HTTP
     服务器并通过 http://localhost 打开它。 <3> 在 chrome://extensions 页面中为暴力猴启用“允许访问文件
     URL”。但这是危险的，因为任何用户脚本都可以读取任何本地文件。
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母顺序
@@ -453,9 +456,32 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: 反馈
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: ''
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: ''
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: ''
 labelGeneral:
   description: Label for general settings.
   message: 通用
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: ''
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: ''
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 帮助翻译

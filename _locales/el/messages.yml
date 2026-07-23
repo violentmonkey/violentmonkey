@@ -291,6 +291,9 @@ fileInstallBlocked:
     URL αρχείων». Σημειώνουμε, πάντως, πως η ενεργοποίηση αυτής της ρύθμισης
     είναι επικίνδυνη επειδή δίνει σε κάθε userscript τη δυνατότητα ανάγνωσης
     όλων των τοπικών αρχείων.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: αλφαβητικά
@@ -510,9 +513,32 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Σχόλια
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: ''
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: ''
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: ''
 labelGeneral:
   description: Label for general settings.
   message: Γενικές ρυθμίσεις
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: ''
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: ''
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Βοηθήστε στη μετάφραση

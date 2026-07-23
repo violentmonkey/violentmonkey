@@ -279,6 +279,9 @@ fileInstallBlocked:
     acceso a las URL del archivo" en los detalles de Violentmonkey en la página
     chrome://extensions. Esto es peligroso, ya que cualquier userscript podría
     leer cualquier archivo local.
+fileInstallBlockedFF:
+  description: Text in the installer when a local file is dropped into Firefox window.
+  message: ''
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabéticamente
@@ -496,9 +499,40 @@ labelFastFirefoxInjectHint:
 labelFeedback:
   description: Label of link to feedback page.
   message: Comentarios
+labelFirefoxPatchCsp:
+  description: Option in Advanced settings.
+  message: 'Omitir CSP en Firefox '
+labelFirefoxPatchCspHint:
+  description: >-
+    (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
+    in Advanced settings.
+  message: >-
+    Agrega un valor aleatorio al CSP de las páginas web que solo Violentmonkey
+    puede usar para ejecutar scripts en el modo de inyección $1; de lo
+    contrario, los scripts deben editarse para usar $2.
+labelFirefoxPatchCspPopup:
+  description: >-
+    ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
+    in the popup's extras menu.
+  message: >-
+    El modo aislado $1 puede limitar la funcionalidad, consulta "$2" en las
+    opciones.
 labelGeneral:
   description: Label for general settings.
   message: General
+  touched: false
+labelGmDownloadViaApi:
+  description: Option in Advanced settings to use the browser download API for GM_download.
+  message: Usar la API de descargas del navegador
+labelGmDownloadViaApiHint:
+  description: Tooltip for the browser download option in Advanced settings.
+  message: >-
+    Permite que los scripts guarden archivos en subcarpetas dentro de tu
+    directorio de descargas y muestra el progreso en la barra de descargas del
+    navegador.
+labelGrantPermission:
+  description: Button to request the API permission.
+  message: Conceder permiso
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Ayudar con la traducción
