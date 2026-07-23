@@ -309,7 +309,6 @@ onMounted(() => {
 });
 
 onActivated(() => {
-  document.body.classList.add('edit-open');
   disposeList = [
     keyboardService.register('a-pageup', switchPrevPanel),
     keyboardService.register('a-pagedown', switchNextPanel),
@@ -321,7 +320,6 @@ onActivated(() => {
 });
 
 onDeactivated(() => {
-  document.body.classList.remove('edit-open');
   store.tags =
   store.title = null;
   toggleUnloadSentry(false);

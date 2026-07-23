@@ -1,6 +1,7 @@
 <template>
   <div class="tab-installed" ref="scroller">
-    <div v-if="store.canRenderScripts">
+    <div v-if="store.canRenderScripts"
+         v-show="!store.title /* edit::onActivated + onDeactivated */">
       <header class="flex">
         <div v-if="!showRecycle">
           <div class="btn-group">
