@@ -471,15 +471,12 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'إظهار الإصدار المثبت على مواقع كتالوج سكربتات المستخدم: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: وضع $1 بديل في Firefox
-labelFastFirefoxInjectHint:
+  message: ''
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: >-
-    طريقة حقن بديلة لسكربتات <document-start> بدءًا من Firefox 59، أسرع من الوضع
-    الافتراضي. مثل "وضع الصفحة المتزامن"، فإنه يزيد أيضًا من استهلاك الذاكرة،
-    لذا قد ترغب في تعطيله إذا كانت سكربتاتك تعمل بشكل صحيح دونه.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: ملاحظات

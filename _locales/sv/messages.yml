@@ -468,15 +468,15 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Visa installerad version på användarskriptkatalogsidor: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Alternativt $1-läge i Firefox
-labelFastFirefoxInjectHint:
+  message: Alternativt $1-läge
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    En alternativ injektionsmetod för <document-start> skript sedan Firefox 59,
-    snabbare än standardläget. På samma sätt som "Synkront sidläge" ökar det
-    också minnesförbrukningen, så du kanske vill inaktivera det om dina skript
+    En alternativ injektionsmetod för <document-start> skript, snabbare än
+    standardläget. På samma sätt som "Synkront sidläge" ökar det också
+    minnesförbrukningen, så du kanske vill inaktivera det om dina skript
     fungerar korrekt utan detta alternativ.
 labelFeedback:
   description: Label of link to feedback page.

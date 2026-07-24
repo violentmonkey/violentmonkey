@@ -216,7 +216,7 @@ editLongLineTooltip:
     Овај ред је предугачак па је његов текст скупљен да би се избегла кашњења
     приликом уређивања.
 
-    Можете подесити ограничење у напредним подешавањима, на пример: 
+    Можете подесити ограничење у напредним подешавањима, на пример:
 
     „maxDisplayLength“: 20000
 editNavCode:
@@ -460,10 +460,10 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: Изложите инсталирану верзију на сајтовима каталога корисничких скрипта:$1
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Алтернативни режим $1 у Firefox-у
-labelFastFirefoxInjectHint:
+  message: Алтернативни режим $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: ''
 labelFeedback:

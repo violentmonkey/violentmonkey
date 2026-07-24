@@ -473,16 +473,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Показывать версию установленного скрипта на сайтах каталогов скриптов: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Альтернативный режим $1 в Firefox
-labelFastFirefoxInjectHint:
+  message: Альтернативный режим $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Альтернативный способ внедрения для скриптов <document-start> с Firefox 59,
-    более быстрый, чем режим по умолчанию. Как и «Синхронный режим страницы», он
-    также увеличивает потребление памяти, поэтому вы можете отключить его, если
-    ваши скрипты работают верно без этого параметра.
+    Альтернативный способ внедрения для скриптов <document-start>, более
+    быстрый, чем режим по умолчанию. Как и «Синхронный режим страницы», он также
+    увеличивает потребление памяти, поэтому вы можете отключить его, если ваши
+    скрипты работают верно без этого параметра.
 labelFeedback:
   description: Label of link to feedback page.
   message: Обратная связь
@@ -881,7 +881,7 @@ msgNamespaceConflict:
     Message shown when namespace of the new script conflicts with an existent
     one.
   message: |-
-    Конфликт пространства имён скрипта. 
+    Конфликт пространства имён скрипта.
     Пожалуйста, смените @name и @namespace здесь или исправьте этот скрипт.
 msgNamespaceConflictRestore:
   description: >-

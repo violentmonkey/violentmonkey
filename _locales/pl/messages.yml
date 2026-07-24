@@ -483,16 +483,16 @@ labelExposeStatus:
   message: >-
     Pokazuj informację o obecnie zainstalowanej wersji skryptu na jego stronie
     listingu w katalogach: $1
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Alternatywny tryb $1 w Firefoksie
-labelFastFirefoxInjectHint:
+  message: Alternatywny tryb $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Alternatywna metoda wstrzykiwania <document-start> skryptów od Firefoksa w
-    wersji 59, szybsza niż tryb domyślny. Podobnie jak „Tryb strony
-    synchronicznej”, zwiększa on również zużycie pamięci, więc możesz go
-    wyłączyć, jeśli Twoje skrypty działają poprawnie bez tej opcji.
+    Alternatywna metoda wstrzykiwania <document-start> skryptów, szybsza niż
+    tryb domyślny. Podobnie jak „Tryb strony synchronicznej”, zwiększa on
+    również zużycie pamięci, więc możesz go wyłączyć, jeśli Twoje skrypty
+    działają poprawnie bez tej opcji.
 labelFeedback:
   description: Label of link to feedback page.
   message: Informacje zwrotne

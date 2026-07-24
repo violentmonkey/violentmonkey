@@ -449,14 +449,14 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: '유저스크립트 카탈로그 사이트에 설치된 버전 표시: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Firefox에서 대체 $1 모드
-labelFastFirefoxInjectHint:
+  message: 대체 $1 모드
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Firefox 59 이후 <document-start> 스크립트를 기본 모드보다 빠르게 인젝션하는 방식이 도입되었습니다. "페이지 동기화
-    모드"처럼 메모리 사용량이 증가하므로, 이 옵션 없이도 스크립트가 올바르게 동작한다면 끄실 수 있습니다.
+    <document-start> 스크립트를 기본 모드보다 빠르게 인젝션하는 방식이 도입되었습니다. "페이지 동기화 모드"처럼 메모리
+    사용량이 증가하므로, 이 옵션 없이도 스크립트가 올바르게 동작한다면 끄실 수 있습니다.
 labelFeedback:
   description: Label of link to feedback page.
   message: 피드백

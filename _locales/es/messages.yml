@@ -486,16 +486,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Exponer la versión instalada en los sitios del catálogo de userscripts: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Modo $1 alternativo en Firefox
-labelFastFirefoxInjectHint:
+  message: Modo $1 alternativo
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Un método de inyección alternativo para scripts <document-start> disponible
-    desde Firefox 59, más rápido que el modo predeterminado. Al igual que el
-    "modo page sincrónico", también incrementa el uso de memoria, por lo que
-    podrías desactivarlo si tus scripts funcionan correctamente sin esta opción.
+    Un método de inyección alternativo para scripts <document-start> disponible,
+    más rápido que el modo predeterminado. Al igual que el "modo page
+    sincrónico", también incrementa el uso de memoria, por lo que podrías
+    desactivarlo si tus scripts funcionan correctamente sin esta opción.
 labelFeedback:
   description: Label of link to feedback page.
   message: Comentarios

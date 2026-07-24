@@ -468,16 +468,16 @@ labelExposeStatus:
   message: >-
     Hiển thị phiên bản đã cài đặt trên các trang web danh mục phiên bản người
     dùng: $1
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Chế độ $1 thay thế trong Firefox
-labelFastFirefoxInjectHint:
+  message: Chế độ $1 thay thế
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Kể từ Firefox 59, phương pháp tiêm thay thế cho 1 kịch bản nhanh hơn chế độ
-    mặc định. Tương tự như "Sync Page Mode", nó cũng làm tăng mức tiêu thụ bộ
-    nhớ, vì vậy nếu kịch bản của bạn hoạt động tốt mà không có tùy chọn này, bạn
-    có thể muốn vô hiệu hóa nó.
+    Phương pháp tiêm thay thế cho 1 kịch bản nhanh hơn chế độ mặc định. Tương tự
+    như "Sync Page Mode", nó cũng làm tăng mức tiêu thụ bộ nhớ, vì vậy nếu kịch
+    bản của bạn hoạt động tốt mà không có tùy chọn này, bạn có thể muốn vô hiệu
+    hóa nó.
 labelFeedback:
   description: Label of link to feedback page.
   message: Phản hồi

@@ -484,17 +484,12 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Kullanıcı betik kataloğu sitelerinde yüklü sürümü göster: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Firefox'ta alternatif $1 modu
-labelFastFirefoxInjectHint:
+  message: ''
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: >-
-    <document-start> betikleri için Firefox 59'dan beri kullanılabilen
-    alternatif bir enjeksiyon yöntemi. Varsayılan moddan daha hızlıdır. "Eş
-    zamanlı sayfa modu" ile benzer şekilde bellek tüketimini artırır. Bu
-    nedenle, betikleriniz bu seçenek olmadan düzgün çalışıyorsa devre dışı
-    bırakmayı düşünebilirsiniz.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: Geri bildirim

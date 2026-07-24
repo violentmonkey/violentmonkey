@@ -497,19 +497,18 @@ labelExposeStatus:
   message: >-
     Εμφάνιση της εγκατεστημένης έκδοσης σε ιστοσελίδες με καταλόγους userscript:
     $1
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Εναλλακτική λειτουργία $1 για Firefox
-labelFastFirefoxInjectHint:
+  message: Εναλλακτική λειτουργία $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
     Ένας εναλλακτικός τρόπος εκτέλεσης για τα script που χρησιμοποιούν το
-    <document-start>, διαθέσιμος στις νεότερες εκδόσεις του Firefox (59 και
-    εξής) και ο οποίος είναι γρηγορότερος από τον προεπιλεγμένο. Όπως και με την
-    επιλογή «Λειτουργία συγχρονισμένης σελίδας», η ρύθμιση αυτή έχει ως
-    αποτέλεσμα τη δέσμευση περισσότερης μνήμης. Σε περίπτωση, δηλαδή, που τα
-    script λειτουργούν κανονικά χωρίς αυτή τη ρύθμιση, ίσως είναι καλύτερο να
-    την απενεργοποιήσετε.
+    <document-start>, και ο οποίος είναι γρηγορότερος από τον προεπιλεγμένο.
+    Όπως και με την επιλογή «Λειτουργία συγχρονισμένης σελίδας», η ρύθμιση αυτή
+    έχει ως αποτέλεσμα τη δέσμευση περισσότερης μνήμης. Σε περίπτωση, δηλαδή,
+    που τα script λειτουργούν κανονικά χωρίς αυτή τη ρύθμιση, ίσως είναι
+    καλύτερο να την απενεργοποιήσετε.
 labelFeedback:
   description: Label of link to feedback page.
   message: Σχόλια
