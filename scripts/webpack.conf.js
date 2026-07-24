@@ -64,7 +64,10 @@ const skipReinjectionHeader = `{
   const INIT_FUNC_NAME = '${INIT_FUNC_NAME}';
   if (window[INIT_FUNC_NAME] !== 1)`;
 const ownWrappers = (getGlobals) => ({
-  header: () => `"use strict"; { ${getGlobals()}`,
+  header: data => `"use strict"; { const __IS_BG__=${
+    /^(background|sw)/.test(data.chunk.name) ||
+    !MV3 && /common/.test(data.chunk.name) && 'location.href.includes("background")'
+  }; ${getGlobals()}`,
   footer: '}',
   test: /^(?!injected|public).*\.js$/,
 });
@@ -73,6 +76,7 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
   const SW = page === 'sw' ? 1 : 0;
   const vars = {
     ...defsObj,
+    '__.BG': SW || !page && '__IS_BG__',
     '__.EXT': SW || !page,
     '__.INJECTED': JSON.stringify(/injected/.test(page) && page),
     '__.SW': SW,

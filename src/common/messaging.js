@@ -33,7 +33,7 @@ const COMMANDS_WITH_SRC = [
  */
 export function sendCmd(cmd, data, options) {
   // Firefox+Vue3 bug workaround for "Proxy object could not be cloned"
-  if (!__.MV3 && !__.INJECTED && IS_FIREFOX && global._bg !== 1 && isObject(data)) {
+  if (!__.MV3 && !__.INJECTED && IS_FIREFOX && !__.BG && isObject(data)) {
     data = deepCopy(data);
   }
   return sendMessage({ cmd, data }, options);
