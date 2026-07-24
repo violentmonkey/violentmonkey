@@ -77,7 +77,8 @@
             </setting-check>
           </tooltip>
           <tooltip :content="i18n('labelFastInjectHint')" align="start">
-            <setting-check name="ffInject" :label="i18n('labelFastInject', '<page>')"/>
+            <setting-check name="ffInject" :label="i18n('labelFastInject', '<page>')"
+                           :disabled="!CAN_FAST_INJECT"/>
           </tooltip>
           <tooltip :content="i18n('labelFirefoxPatchCspHint', ['<page>', '<wrappedJSObject>'])" align="start">
             <setting-check name="ffCsp" :label="i18n('labelFirefoxPatchCsp')"/>
@@ -145,6 +146,7 @@ const items = {
   [kGmDownloadViaApi]: value => value,
 };
 const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
+const CAN_FAST_INJECT = __.MV3 || browser.contentScripts;
 </script>
 
 <script setup>
