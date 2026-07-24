@@ -66,9 +66,6 @@ importers:
       codemirror:
         specifier: ^5.65.20
         version: 5.65.20
-      fflate:
-        specifier: ^0.8.3
-        version: 0.8.3
       tldts:
         specifier: ^7.4.0
         version: 7.4.0
@@ -78,6 +75,9 @@ importers:
       vueleton:
         specifier: ^2.0.2
         version: 2.0.2(codemirror@5.65.20)(vue@3.5.35(typescript@6.0.3))
+      web-jszipp:
+        specifier: ^1.0.8
+        version: 1.0.8
     devDependencies:
       '@actions/core':
         specifier: ^1.11.1
@@ -3209,9 +3209,6 @@ packages:
       picomatch:
         optional: true
 
-  fflate@0.8.3:
-    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
-
   file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
     engines: {node: ^10.12.0 || >=12.0.0}
@@ -5785,6 +5782,10 @@ packages:
   watchpack@2.5.1:
     resolution: {integrity: sha512-Zn5uXdcFNIA1+1Ei5McRd+iRzfhENPCe7LeABkJtNulSxjma+l7ltNx55BWZkRlwRnpOgHqxnjyaDgJnNXnqzg==}
     engines: {node: '>=10.13.0'}
+
+  web-jszipp@1.0.8:
+    resolution: {integrity: sha512-Gnk+hsa7PQC+JT89ROxEZcYMJQTVxqr8WMljSYydum2oiixXfDUmneK5Y/ueL4xnWRsB3xL/16a050Cd9XDF5A==}
+    engines: {node: '>=20', pnpm: '>=10.33.2'}
 
   webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
@@ -9230,8 +9231,6 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.4
 
-  fflate@0.8.3: {}
-
   file-entry-cache@6.0.1:
     dependencies:
       flat-cache: 3.2.0
@@ -12073,6 +12072,8 @@ snapshots:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
+
+  web-jszipp@1.0.8: {}
 
   webidl-conversions@7.0.0: {}
 
