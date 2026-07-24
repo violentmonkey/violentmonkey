@@ -17,7 +17,7 @@ async function init() {
   /** Could be a DOM element with an `id` attribute equal to ours */
   const regRaw = canReg && global[VIOLENTMONKEY];
   const regData = regRaw?.[kSessionId] && delete global[VIOLENTMONKEY] && regRaw;
-  const xhrData = !regData && getXhrInjection();
+  const xhrData = getXhrInjection(regData);
   const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
@@ -95,7 +95,7 @@ async function getRegistration(viaMessaging) {
   return data;
 }
 
-function getXhrInjection() {
+function getXhrInjection(regData) {
   try {
     const key = VM_UUID.match(XHR_COOKIE_RE)[1];
     // Accessing document.cookie may throw due to CSP sandbox
@@ -103,6 +103,7 @@ function getXhrInjection() {
     const blobId = cookieValue && cookieValue.split(';', 1)[0];
     if (blobId) {
       document.cookie = `${key}=0; max-age=0; SameSite=Lax`; // this removes our cookie
+      if (regData) return;
       const xhr = new XMLHttpRequest();
       const url = `blob:${VM_UUID}${blobId}`;
       xhr.open('get', url, false); // `false` = synchronous
