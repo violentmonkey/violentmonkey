@@ -49,7 +49,7 @@ function autoClose() {
 function initDrive(provider, opts, context) {
   drive = new DriveProviders[provider](opts, context !== 'auth' ? context : {
     authorizer: Object.create(new Proxy({}, {
-      get: (obj, cmd) => (obj[cmd] =
+      get: (dummy, cmd, obj) => (obj[cmd] =
         (...args) => sendCmdToSW('DriveAuth', [cmd, args])
       ),
     })),

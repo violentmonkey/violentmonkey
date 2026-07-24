@@ -26,25 +26,6 @@ export const getOwnProp = (obj, key, defVal) => {
   return defVal;
 };
 
-/**
- * @param {T} obj
- * @param {string|Symbol} key
- * @param {?} value
- * @param {boolean} [mutable]
- * @param {'set' | 'get'} [valueKey]
- * @return {T}
- * @template T
- */
-export const setOwnProp = (obj, key, value, mutable = true, valueKey) => (
-  defineProperty(obj, key, {
-    __proto__: null,
-    [valueKey || 'value']: value,
-    [!valueKey && 'writable']: mutable, // only allowed for 'value'
-    configurable: mutable,
-    enumerable: mutable,
-  })
-);
-
 export const nullObjFrom = src => __.TEST
   ? global.Object.assign({ __proto__: null }, src)
   : assign(createNullObj(), src);

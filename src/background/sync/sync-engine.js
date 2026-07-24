@@ -46,20 +46,13 @@ const syncLater = !__.MV3 && debounce(autoSync, TIMEOUT_HOUR);
 const getDrive = (...init) =>
   !__.MV3
     ? new DriveProviders[init.shift()](...init)
-    : Object.create(
-        new Proxy(
-          {},
-          {
-            get: (obj, cmd) =>
-              (obj[cmd] = (...args) =>
-                callOffscreen('Drive', [
-                  cmd,
-                  args,
-                  init.splice(0) /*emptying*/,
-                ])),
-          },
-        ),
-      );
+    : Object.create(new Proxy({}, {
+        get: (dummy, cmd, obj) => (obj[cmd] = (...args) => callOffscreen('Drive', [
+          cmd,
+          args,
+          init.splice(0) /*emptying*/,
+        ])),
+      }));
 let syncConfig;
 let syncMode = SYNC_MERGE;
 
