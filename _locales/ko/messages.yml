@@ -307,7 +307,7 @@ headerRecycleBin:
   message: 휴지통
 helpForLocalFile:
   description: Label of the checkbox.
-  message: 끌어다 놓은 로컬 스크립트에 대한 지침 표시
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: 일치하는 스크립트 $1개

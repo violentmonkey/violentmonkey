@@ -336,7 +336,7 @@ headerRecycleBin:
   message: Geri Dönüşüm Kutusu
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Sürükle ve bırak yöntemiyle eklenen yerel betikler için talimatları göster
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: $1 adet eşleşen betik için

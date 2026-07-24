@@ -336,7 +336,7 @@ headerRecycleBin:
   message: Papierkorb
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Anleitung für per Drag-and-Drop hinzugefügte lokale Skripte anzeigen
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: für $1 gematchte Skripte

@@ -329,7 +329,7 @@ headerRecycleBin:
   message: سلة المحذوفات
 helpForLocalFile:
   description: Label of the checkbox.
-  message: عرض التعليمات الخاصة بالسكربتات المحلية التي تم سحبها وإفلاتها
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: لـ $1 سكربتًا مطابقًا

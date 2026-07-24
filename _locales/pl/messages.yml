@@ -332,7 +332,7 @@ headerRecycleBin:
   message: Kosz
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Pokaż instrukcję dotyczącą przeciągania i upuszczania lokalnych skryptów
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: dla $1 pasujących skryptów

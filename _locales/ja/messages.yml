@@ -306,7 +306,7 @@ headerRecycleBin:
   message: ゴミ箱
 helpForLocalFile:
   description: Label of the checkbox.
-  message: パソコン内のスクリプトをドラッグ＆ドロップするための説明を表示
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: $1 個の一致したスクリプトに対して

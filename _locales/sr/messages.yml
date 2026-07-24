@@ -317,7 +317,7 @@ headerRecycleBin:
   message: Отпад
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Прикажи упутство за повучене и испуштене локалне скрипте.
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: за $1 одговарајуће скрипте

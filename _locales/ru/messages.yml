@@ -331,7 +331,7 @@ headerRecycleBin:
   message: Корзина
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Показать инструкцию по перетаскиванию локальных скриптов
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: применить к этим ($1) скриптам

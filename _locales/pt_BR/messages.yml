@@ -334,7 +334,7 @@ headerRecycleBin:
   message: Lixeira
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Mostrar as instruções para scripts locais arrastados e soltos
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: para $1 scripts correspondentes

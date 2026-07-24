@@ -327,7 +327,7 @@ headerRecycleBin:
   message: Papperskorg
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Visa instruktionerna för drag och släpp för lokala skript
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: för $1 matchande skript

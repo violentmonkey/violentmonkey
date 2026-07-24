@@ -335,9 +335,7 @@ headerRecycleBin:
   message: Cestino
 helpForLocalFile:
   description: Label of the checkbox.
-  message: >-
-    Mostra le istruzioni per gli script locali che vengono trascinati nella
-    finestra di Violentmonkey
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: per $1 script corrispondenti

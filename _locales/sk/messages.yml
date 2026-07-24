@@ -335,7 +335,7 @@ headerRecycleBin:
   message: Kôš
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Zobraziť pokyny pre pretiahnuté lokálne skripty
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: pre zodpovedajúce skripty ($1)

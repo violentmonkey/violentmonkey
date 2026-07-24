@@ -324,7 +324,7 @@ headerRecycleBin:
   message: Thùng rác
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Hiển thị hướng dẫn cho việc kéo và thả các tập lệnh cục bộ.
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: Đối với các tập lệnh khớp với $1

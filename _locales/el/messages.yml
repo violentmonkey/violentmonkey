@@ -348,7 +348,7 @@ headerRecycleBin:
   message: Κάδος Ανακύκλωσης
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Εμφάνιση οδηγιών για τα τοπικά script που έχουν μεταφερθεί και αποτεθεί
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: θα εφαρμοστεί σε $1 script

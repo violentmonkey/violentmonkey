@@ -333,7 +333,7 @@ headerRecycleBin:
   message: Кошик
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Показати інструкцію для перетягування локальних скриптів
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: для $1 співпадаючого скрипту

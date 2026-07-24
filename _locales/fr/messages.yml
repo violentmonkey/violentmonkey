@@ -338,7 +338,7 @@ headerRecycleBin:
   message: Corbeille
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Montrer les instructions pour les scripts locaux glissés-déposés
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: pour les $1 scripts correspondants

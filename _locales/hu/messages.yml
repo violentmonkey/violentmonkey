@@ -321,7 +321,7 @@ headerRecycleBin:
   message: Kuka
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Az oldalra húzott helyi szkriptekre vonatkozó instrukciók mutatása
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: ''
