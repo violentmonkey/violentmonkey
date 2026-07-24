@@ -68,7 +68,7 @@ export default {
   /** @type {VMScriptInjectInto} */
   defaultInjectInto: AUTO,
   ffCsp: false,
-  ffInject: __.MV3,
+  ffInject: false,
   xhrInject: false,
   filters: {
     /** @type {boolean} */
