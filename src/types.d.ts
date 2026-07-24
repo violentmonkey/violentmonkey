@@ -200,6 +200,7 @@ declare interface VMScript {
     origMatch: boolean;
     origTag: boolean;
     pathMap?: StringMap;
+    publishedByMe?: boolean;
     runAt?: VMScriptRunAt;
     /** @since v2.36 */
     tag?: string[];

@@ -4,7 +4,7 @@ import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
 import './requests';
 import './tabs';
-import { sendCmd } from './util';
+import { getAttribute, querySelector, sendCmd } from './util';
 import { isEmpty, XHR_COOKIE_RE } from '../util';
 import { Run, finish } from './cmd-run';
 
@@ -41,7 +41,18 @@ async function init() {
     IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
   if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
-    addHandlers({ GetScriptVer: true });
+    addHandlers({
+      GetScriptVer({ meta }) {
+        setPrototypeOf(meta, null);
+        const el = document::querySelector('a.install-link');
+        if (el && el::getAttribute('data-script-name') === meta.name
+        && el::getAttribute('data-script-namespace') === meta.namespace) {
+          meta.publishVersion = el::getAttribute('data-script-version');
+          meta.publishDownloadURL = el::getAttribute('href');
+        }
+        return sendCmd('GetScriptVer', { meta });
+      },
+    });
     bridge.post('Expose', data[EXPOSE]);
   }
   if (objectKeys(ids).length) {
