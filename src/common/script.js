@@ -6,6 +6,9 @@ import { i18n, tryUrl } from './util';
 const BAD_URL_CHAR = /[#/?]/g;
 /** Fullwidth range starts at 0xFF00, normal range starts at space char code 0x20 */
 const replaceWithFullWidthForm = s => String.fromCharCode(s.charCodeAt(0) - 0x20 + 0xFF00);
+const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Values?)$/;
+/** @param {VMScript['meta']} meta */
+export const isGmStorageGranted = meta => meta.grant.some(GMVALUES_RE.test, GMVALUES_RE);
 
 /**
  * @param {VMScript} script
