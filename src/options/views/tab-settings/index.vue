@@ -76,8 +76,8 @@
               <ruby v-text="i18n('labelXhrInjectNote')" class="ml-1"/>
             </setting-check>
           </tooltip>
-          <tooltip :content="i18n('labelFastFirefoxInjectHint')" align="start">
-            <setting-check name="ffInject" :label="i18n('labelFastFirefoxInject', '<page>')"/>
+          <tooltip :content="i18n('labelFastInjectHint')" align="start">
+            <setting-check name="ffInject" :label="i18n('labelFastInject', '<page>')"/>
           </tooltip>
           <tooltip :content="i18n('labelFirefoxPatchCspHint', ['<page>', '<wrappedJSObject>'])" align="start">
             <setting-check name="ffCsp" :label="i18n('labelFirefoxPatchCsp')"/>
@@ -234,6 +234,7 @@ async function requestDownloadsPermission() {
   section {
     display: flex;
     flex-flow: column;
+    > .flex-col > *,
     > :not(h3):not([class*="flex"]):not(.setting-text) {
       align-self: flex-start;
     }

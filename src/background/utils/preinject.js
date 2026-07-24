@@ -47,7 +47,7 @@ addPublicCommands({
       if (__.MV3) flushSession(SKIP_SCRIPTS, skippedTabs);
     }
     const bagKey = getKey(url, isTop);
-    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop);
+    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop, true);
     const bag = bagP[INJECT] ? bagP : await bagP[PROMISE];
     /** @type {VMInjection} */
     const inject = bag[INJECT];
