@@ -71,4 +71,3 @@ export let topRenderMode = window !== top ? 0
   // TODO: revisit when link-preview is shipped in Chrome
   : document.prerendering && document.visibilityState === 'hidden' ? 2
     : 1;
-

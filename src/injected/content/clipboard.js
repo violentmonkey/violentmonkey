@@ -1,4 +1,4 @@
-import bridge, { addHandlers, onScripts } from './bridge';
+import * as bridge from './bridge';
 
 export let onClipboardCopy;
 let doCopy;
@@ -10,8 +10,8 @@ if (!__.MV3 && IS_FIREFOX) {
   on('copy', onClipboardCopy = e => clipboardData && doCopy(e), true);
 }
 
-onScripts.push(({ clipFF }) => {
-  if (clipFF) {
+bridge.onScripts.push(({ clipFF }) => {
+  if (!__.MV3 && clipFF) {
     const { execCommand } = document;
     const { setData } = DataTransfer[PROTO];
     const { get: getClipboardData } = describeProperty(ClipboardEvent[PROTO], 'clipboardData');
@@ -23,7 +23,7 @@ onScripts.push(({ clipFF }) => {
       e::getClipboardData()::setData(clipboardData.type || 'text/plain', clipboardData.data);
     };
     setClipboard = async params => {
-      await bridge[REIFY];
+      await bridge.reify;
       clipboardData = params;
       if (!document::execCommand('copy') && __.DEBUG) {
         log('warn', null, 'GM_setClipboard failed!');
@@ -31,7 +31,7 @@ onScripts.push(({ clipFF }) => {
       clipboardData = null;
     };
   }
-  addHandlers({
+  bridge.addHandlers({
     SetClipboard: setClipboard || REIFY,
   });
 });

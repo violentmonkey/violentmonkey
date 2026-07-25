@@ -1,7 +1,8 @@
-import bridge, { addHandlers } from './bridge';
+import * as bridge from './bridge';
 
 const notifications = createNullObj();
-addHandlers({
+
+bridge.addHandlers({
   NotificationClicked(id) {
     notifications[id]?.onclick?.();
   },

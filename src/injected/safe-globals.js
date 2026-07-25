@@ -43,18 +43,6 @@ export const safePickInto = (dst, src, keys) => {
   return dst;
 };
 
-// WARNING! `obj` must use __proto__:null
-export const ensureNestedProp = (obj, bucketId, key, defaultValue) => {
-  if (__.DEBUG) throwIfProtoPresent(obj);
-  const bucket = obj[bucketId] || (
-    obj[bucketId] = createNullObj()
-  );
-  const val = bucket[key] ?? (
-    bucket[key] = (defaultValue ?? createNullObj())
-  );
-  return val;
-};
-
 export const promiseResolve = async val => val;
 
 // Using just one random() to avoid many methods in vault just for this
