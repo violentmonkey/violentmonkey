@@ -126,7 +126,8 @@ module.exports = [
 
   buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
     header: () => `${skipReinjectionHeader} window["${INIT_FUNC_NAME}"] = ` +
-      `(IS_FIREFOX, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}`,
+      `(IS_FIREFOX, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}` +
+      'let VMInitInjection;\n',
     footer: 'return VMInitInjection};1',
   }), (config) => {
     config.output.iife = false;

@@ -15,8 +15,8 @@ const toRun = createNullObj();
 const gmis = createNullObj();
 const grantlessUsage = createNullObj();
 
-/** Exported via footer added in webpack */// eslint-disable-next-line no-unused-vars
-const VMInitInjection = (invokeHost, console) => {
+/** Exported via banner added in webpack */// eslint-disable-next-line no-undef
+VMInitInjection = (invokeHost, console) => {
   if (PAGE_MODE_HANDSHAKE) {
     window::on(PAGE_MODE_HANDSHAKE + '*', e => {
       e = e::getDetail();
