@@ -59,11 +59,16 @@ export let
   jsonParse,
   jsonStringify,
   logging,
-  mathRandom,
   reflectOwnKeys,
   stopImmediatePropagation,
   then,
   urlSearchParamsToString,
+  // safeGetUniqId
+  SafeUint8Array,
+  U8_toBase64,
+  getRandomValues,
+  safeBtoa,
+  stringFromCharCode,
   // various getters
   getCurrentScript, // Document
   getDetail, // CustomEvent
@@ -119,6 +124,8 @@ export const VAULT = (() => {
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
     SafeSymbol = res[i += 1] || src.Symbol,
+    SafeUint8Array = res[i += 1] || src.Uint8Array,
+    U8_toBase64 = res[i += 1] || SafeUint8Array[PROTO].toBase64,
     // In FF content mode global.Proxy !== window.Proxy
     SafeProxy = res[i += 1] || src.Proxy,
     fire = res[i += 1] || src.dispatchEvent,
@@ -141,7 +148,8 @@ export const VAULT = (() => {
     // Element.prototype
     remove = res[i += 1] || src.Element[PROTO].remove,
     // String.prototype
-    slice = res[i += 1] || src.String[PROTO].slice,
+    slice = res[i += 1] || (tmp = src.String)[PROTO].slice,
+    stringFromCharCode = res[i += 1] || tmp.fromCharCode,
     // safeCall
     safeApply = res[i += 1] || (Reflect = src.Reflect).apply,
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
@@ -153,13 +161,14 @@ export const VAULT = (() => {
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
     hasOwnProperty = res[i += 1] || safeBind(call, SafeObject[PROTO].hasOwnProperty),
     arrayIsArray = res[i += 1] || src.Array.isArray,
+    getRandomValues = res[i += 1] || safeBind((tmp = src.crypto).getRandomValues, tmp),
     /* Exporting JSON methods separately instead of exporting SafeJSON as its props may be broken
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
     jsonParse = res[i += 1] || src.JSON.parse,
     jsonStringify = res[i += 1] || src.JSON.stringify,
     logging = res[i += 1] || nullObjFrom((srcFF || src).console),
-    mathRandom = res[i += 1] || src.Math.random,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
+    safeBtoa = res[i += 1] || src.btoa,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     SafePromise = res[i += 1] || src.Promise,
     withResolvers = res[i += 1] || SafePromise.withResolvers,

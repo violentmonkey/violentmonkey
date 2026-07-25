@@ -63,14 +63,16 @@ export function throttle(func, time) {
 
 export function noop() {}
 
-export function getRandomString(minLength = 10, maxLength = 0) {
-  for (let rnd = ''; (rnd += Math.random().toString(36).slice(2));) {
-    if (rnd.length >= minLength) return maxLength ? rnd.slice(0, maxLength) : rnd;
+export function getUniqId(prefix = 'VM', idSafe) {
+  let res = crypto.getRandomValues(new Uint8Array(16));
+  if (__.MV3 || U8_fromBase64) {
+    res = res.toBase64({ alphabet: 'base64url', omitPadding: true });
+    if (idSafe) res = res.replaceAll('-', '$');
+  } else {
+    res = btoa(String.fromCharCode(...res));
+    if (idSafe) res = res.replace(/\+/g, '$').replace(/\//g, '_').replace(/=+/, '');
   }
-}
-
-export function getUniqId(prefix = 'VM') {
-  return prefix + getRandomString();
+  return prefix + res;
 }
 
 /**

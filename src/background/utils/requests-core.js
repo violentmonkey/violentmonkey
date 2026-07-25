@@ -1,10 +1,9 @@
-import { buffer2string, getUniqId, isEmpty, noop } from '@/common';
+import { buffer2string, isEmpty, noop } from '@/common';
 import { forEachEntry } from '@/common/object';
 import { CHROME } from './ua';
 
 let encoder;
 
-export const VM_VERIFY = getUniqId('VM-Verify');
 /** @type {Object<string,GMReq.BG>} */
 export const requests = { __proto__: null };
 export const verify = { __proto__: null };

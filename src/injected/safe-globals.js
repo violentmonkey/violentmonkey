@@ -45,8 +45,11 @@ export const safePickInto = (dst, src, keys) => {
 
 export const promiseResolve = async val => val;
 
-// Using just one random() to avoid many methods in vault just for this
-export const safeGetUniqId = (prefix = 'VM') => prefix + mathRandom();
+export const safeGetUniqId = (prefix = 'VM') => prefix + (
+  __.MV3 || U8_toBase64
+  ? getRandomValues(new SafeUint8Array(16))::U8_toBase64()
+  : safeBtoa(safeApply(stringFromCharCode, null, getRandomValues(new SafeUint8Array(16))))
+);
 
 /** args is [tags?, ...rest] */
 export const log = (level, ...args) => {

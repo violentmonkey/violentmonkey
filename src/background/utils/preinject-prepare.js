@@ -163,13 +163,13 @@ function prepareScript(script, env) {
   const { id } = props;
   const { [S_REQUIRE]: require, [RUN_AT]: runAt } = env;
   const code = env[S_CODE][id];
-  const dataKey = getUniqId();
-  const winKey = getUniqId();
+  const dataKey = getUniqId('d', true);
+  const winKey = getUniqId('w', true);
   const plantKey = { data: dataKey, win: winKey };
   const displayName = getScriptName(script);
   const pathMap = custom.pathMap || {};
   const wrap = !meta[UNWRAP];
-  const wrapTryCatch = wrap && IS_FIREFOX; // FF doesn't show errors in content script's console
+  const wrapTryCatch = !__.MV3 && wrap && IS_FIREFOX; // FF doesn't show errors for content scripts
   const { grant, [TL_AWAIT]: topLevelAwait } = meta;
   const startIIFE = topLevelAwait ? 'await(async' : '(';
   const grantNone = grant.includes('none');

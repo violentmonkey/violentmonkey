@@ -32,7 +32,7 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
     }
     cache.put(url, code, 3000);
   }
-  const confirmKey = getUniqId();
+  const confirmKey = getUniqId('', true);
   const { active, id: tabId, incognito } = tab;
   // Not testing tab.pendingUrl because it will be always equal to `url`
   const canReplaceCurTab = __.MV3 || (!incognito || IS_FIREFOX) && (
