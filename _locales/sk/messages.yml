@@ -278,7 +278,10 @@ fileInstallBlocked:
     používateľský skript môže čítať akýkoľvek lokálny súbor.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    Otvorte "about:addons", kliknite na položku "Violentmonkey", kliknite na
+    "Oprávnenia a údaje" a aktivujte možnosť "Prístup k lokálnym súborom v
+    počítači".
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: abecedne

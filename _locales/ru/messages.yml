@@ -276,7 +276,9 @@ fileInstallBlocked:
     прочитать любой локальный файл.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    Откройте about:addons, щёлкните Violentmonkey, нажмите «Разрешения и
+    данные», включите «Доступ к локальным файлам на вашем компьютере».
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: алфавитному порядку
@@ -331,7 +333,7 @@ headerRecycleBin:
   message: Корзина
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Показывать справку, если не удаётся установить локальный скрипт
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: применить к этим ($1) скриптам
