@@ -17,7 +17,7 @@ async function init() {
     await chrome.offscreen.createDocument({
       url: URL,
       justification: 'MV3 requirement',
-      reasons: ['BLOBS', 'CLIPBOARD', 'DOM_PARSER', 'WORKERS'],
+      reasons: ['BLOBS', 'CLIPBOARD', 'WORKERS'],
     });
   } catch (err) {
     if (!err.message.startsWith('Only a single offscreen')) {
