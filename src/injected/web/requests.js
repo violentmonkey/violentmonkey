@@ -4,7 +4,6 @@ import { UPLOAD } from '../util';
 /** @type {Object<string,GMReq.Web>} */
 const idMap = createNullObj();
 const kContentTextHtml = 'text/html';
-const kResponse = 'response';
 const kResponseXML = 'responseXML';
 const kDocument = 'document';
 const kRaw = 'raw';

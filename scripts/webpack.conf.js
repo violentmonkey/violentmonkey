@@ -3,7 +3,6 @@ const { resolve } = require('path');
 const webpack = require('webpack');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
 const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
-const ProtectWebpackBootstrapPlugin = require('./webpack-protect-bootstrap-plugin');
 const { getVersion } = require('./version-helper');
 const { MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
@@ -60,9 +59,7 @@ const defsObj = {
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
-const skipReinjectionHeader = `{
-  const INIT_FUNC_NAME = '${INIT_FUNC_NAME}';
-  if (window[INIT_FUNC_NAME] !== 1)`;
+const skipReinjectionHeader = `if (window["${INIT_FUNC_NAME}"] !== 1)`;
 const ownWrappers = (getGlobals) => ({
   header: data => `"use strict"; { const __IS_BG__=${
     /^(background|sw)/.test(data.chunk.name) ||
@@ -124,22 +121,14 @@ module.exports = [
 
   buildConfig('injected', './src/injected', 'injected/content', (getGlobals) => ({
     header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
-    footer: '}}',
-  }), (config) => {
-    config.plugins.push(new ProtectWebpackBootstrapPlugin());
-  }),
+    footer: '}',
+  })),
 
   buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
-    header: () => `${skipReinjectionHeader}
-      window[INIT_FUNC_NAME] = function (IS_FIREFOX, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) {
-        const module = { __proto__: null };
-        ${getGlobals()}`,
-    footer: `
-        const { exports } = module;
-        return exports.__esModule ? exports.default : exports;
-      }};0;`,
+    header: () => `${skipReinjectionHeader} window["${INIT_FUNC_NAME}"] = ` +
+      `(IS_FIREFOX, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}`,
+    footer: 'return VMInitInjection};1',
   }), (config) => {
-    config.output.libraryTarget = 'commonjs2';
-    config.plugins.push(new ProtectWebpackBootstrapPlugin());
+    config.output.iife = false;
   }),
 ].filter(Boolean);

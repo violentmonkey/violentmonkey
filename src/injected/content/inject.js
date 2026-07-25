@@ -21,10 +21,10 @@ let getAttribute;
 let querySelector;
 
 // https://bugzil.la/1408996
-let VMInitInjection = window[INIT_FUNC_NAME];
+let VMInitInjection = window[__.INIT_FUNC_NAME];
 /** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
  * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
-setOwnProp(window, INIT_FUNC_NAME, 1, false);
+setOwnProp(window, __.INIT_FUNC_NAME, 1, false);
 
 if (!__.MV3) addHandlers({
   /**
@@ -106,7 +106,7 @@ export function injectPageSandbox(data) {
      * otherwise a same-origin parent page could use it to spoof the handshake. */
     window::on(handshakeId, handshaker, { capture: true, once: true });
     inject({
-      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
+      code: `(${VMInitInjection})(${IS_FIREFOX},'${handshakeId}','${vaultId}')()`
         + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
     });
     // Clean up in case CSP prevented the script from running

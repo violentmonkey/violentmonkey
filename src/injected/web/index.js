@@ -15,7 +15,8 @@ const toRun = createNullObj();
 const gmis = createNullObj();
 const grantlessUsage = createNullObj();
 
-export default function initialize(invokeHost, console) {
+/** Exported via footer added in webpack */// eslint-disable-next-line no-unused-vars
+const VMInitInjection = (invokeHost, console) => {
   if (PAGE_MODE_HANDSHAKE) {
     window::on(PAGE_MODE_HANDSHAKE + '*', e => {
       e = e::getDetail();
@@ -52,7 +53,7 @@ export default function initialize(invokeHost, console) {
       bridge.onHandle({ cmd, data, node });
     };
   }
-}
+};
 
 addHandlers({
   Command({ id, key, evt }) {

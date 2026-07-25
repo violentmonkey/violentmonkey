@@ -170,7 +170,6 @@ function makeOverrides() {
       re: false, // transform-modern-regexp with useRe option
     },
     GLOBALS_CONTENT: {
-      INIT_FUNC_NAME: false,
       ...GLOBALS_SHARED,
       ...getGlobals('injected/content'),
       ...GLOBALS_INJECTED,

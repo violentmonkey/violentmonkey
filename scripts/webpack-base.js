@@ -206,6 +206,7 @@ const getBaseConfig = (page) => ({
     ],
   },
   optimization: {
+    concatenateModules: true, // makes output simpler and closer to prod in debugging
     runtimeChunk: false,
     splitChunks: !page && {
       cacheGroups: {
