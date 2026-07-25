@@ -60,6 +60,10 @@ export function initOptions(data, lastVersion, versionChanged) {
     && compareVersion(lastVersion, '2.12.7') <= 0) {
       options[key] = AUTO;
     }
+    if (__.MV3 && options[key = 'ffInject']
+    && compareVersion(lastVersion, '2.45.4') <= 0) {
+      options[key] = false; // In older VM it was enabled by default but used only in Firefox
+    }
     if ((val = options.filters) && val[key = 'sort'] === 'exec'
     && compareVersion(lastVersion, '2.31.2') <= 0) {
       val[key] += '-'; // Until reverse sort was implemented, 'size' was reversed by design
