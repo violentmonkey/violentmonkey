@@ -281,7 +281,9 @@ fileInstallBlocked:
     leer cualquier archivo local.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    Abre about:addons, selecciona “Violentmonkey”, entra en “Permisos y datos” y
+    activa la opción “Acceso a archivos locales en tu computadora”.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabéticamente

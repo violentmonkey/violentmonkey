@@ -255,11 +255,7 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: >-
-    Violentmonkey nie może uruchamiać skryptów użytkownika na tej stronie
-
-    (pospolite przykłady: interfejs przeglądarki, rozszerzenia, zablokowane
-    przez zasady, strona wyszukiwarki w Operze)
+  message: "Violentmonkey nie może uruchamiać skryptów użytkownika na tej stronie\n(typowe przykłady: interfejs przeglądarki, rozszerzenia, zablokowane przez zasady, strona wyszukiwarki w\_Operze)"
 failureReasonRestarted:
   description: Shown in the popup.
   message: >-
@@ -277,7 +273,9 @@ fileInstallBlocked:
     lokalne pliki.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    Otwórz about:addons, kliknij „Violentmonkey”, kliknij „Uprawnienia i dane”,
+    włącz „Dostęp do lokalnych plików na tym komputerze”.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: alfabetycznie
@@ -405,7 +403,7 @@ labelAutoReloadCurrentTabDisabled:
   touched: false
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
-  message: Sprawdzaj aktualizacje skryptów co  $1 dni, użyj 0 aby wyłączyć
+  message: Sprawdzaj aktualizacje skryptów co $1 dni; użyj 0, aby wyłączyć
 labelBackup:
   description: Label of the import/export section in settings.
   message: Kopia zapasowa
@@ -518,13 +516,16 @@ labelGeneral:
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: Użyj interfejsu API przeglądarki do pobierania
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: >-
+    Umożliwia skryptom zapisywanie plików w podfolderach wewnątrz katalogu
+    pobranych plików i wyświetlanie postępu pobierania na pasku pobierania
+    przeglądarki.
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: Udziel uprawnienia
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Pomóż w tłumaczeniu
@@ -1091,7 +1092,7 @@ sideMenuSettings:
   message: Ustawienia
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: Odśwież stronę pomijając skrypty
+  message: Odśwież stronę, pomijając skrypty
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: >-
@@ -1105,7 +1106,7 @@ stopTracking:
   message: Przestań śledzić
 titleBadgeColor:
   description: Tooltip for option to set badge color.
-  message: Kolor normalnej odznaki
+  message: Kolor normalnej plakietki
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: >-
