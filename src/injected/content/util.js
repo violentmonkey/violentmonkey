@@ -8,6 +8,8 @@ export * from './util-task';
  * Note that we avoid spoofed prototype getters by using hasOwnProperty, and not using `length`
  * as it searches for ALL matching nodes when this tag wasn't cached internally. */
 export const elemByTag = (tag, i) => getOwnProp(document::getElementsByTagName(tag), i || 0);
+export const getAttribute = Element[PROTO].getAttribute;
+export const querySelector = document.querySelector;
 const {
   TextDecoder: SafeTextDecoder,
 } = global;

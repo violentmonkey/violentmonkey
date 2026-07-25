@@ -23,6 +23,7 @@ export const store = reactive({
   title: null,
 });
 
+export const kPublishedByMe = 'publishedByMe';
 export const kComment = 'comment';
 export const kInclude = 'include';
 export const kMatch = 'match';

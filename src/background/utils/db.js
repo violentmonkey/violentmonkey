@@ -31,6 +31,7 @@ import storage, {
 import { storageCacheHas } from './storage-cache';
 import { reloadTabForScript } from './tabs';
 import { vetUrl } from './url';
+import { kDownloadURL, kPublishedByMe, kUpdateURL } from '@/options/utils';
 
 let maxScriptId = 0;
 let maxScriptPosition = 0;
@@ -47,15 +48,53 @@ export const sizesPrefixRe = RegExp(
 /** @type {{ [type: 'cache' | 'require']: { [url: string]: Promise<?> } }} */
 const pendingDeps = { [S_CACHE]: {}, [S_REQUIRE]: {} };
 const depsPorts = {};
+let listenForPublishScriptId = 0;
 
 addPublicCommands({
   GetScriptVer(opts) {
-    const script = getScript(opts);
-    return script
-      ? script.meta.version
-      : null;
+    try {
+      const script = getScript(opts);
+      if (!script) return null;
+      if (script.props.id === listenForPublishScriptId) void onScriptPublished(opts, script);
+      return script.meta.version;
+    } finally {
+      listenForPublishScriptId = 0;
+    }
   },
 });
+
+/**
+ * Adds @downloadURL after going through "Publish userscript" button
+ */
+async function onScriptPublished(opts, script) {
+  // For security, validate meta and edit local code, instead of fetching the downloadURL
+  const url = opts.meta.publishDownloadURL;
+  if (opts?.meta?.name !== script.meta.name || opts.meta.namespace !== script.meta.namespace
+  || opts.meta.publishVersion !== script.meta.version || script.custom[kUpdateURL] || script.meta[kUpdateURL]
+  || script.custom[kDownloadURL] || script.meta[kDownloadURL] || script.custom.lastInstallURL
+  || !url.startsWith('https://update.greasyfork.org/scripts/') || !url.endsWith('.user.js')
+  || url.includes('\n')) throw new Error;
+  const id = script.props.id;
+  const [ head, tail, ...excess ] = (await GetScriptCode(id)).split('\n// ==/UserScript==\n');
+  if (excess.length || head.includes('@downloadURL') || head.includes('@updateURL')) throw new Error;
+  await parseScript({
+    bumpDate: true,
+    code: `${head}
+// @downloadURL ${url}
+// @updateURL ${url.substr(0, url.length - 8)}.meta.js
+// ==/UserScript==
+${tail}`,
+    config: { ...script.config, shouldUpdate: 0 },
+    custom: { ...script.custom, [kPublishedByMe]: true },
+    id,
+    isNew: false,
+    message: '',
+  });
+}
+
+function GetScriptCode(id) {
+  return storage[S_CODE][Array.isArray(id) ? 'getMulti' : 'getOne'](id);
+}
 
 addOwnCommands({
   CheckPosition: sortScripts,
@@ -79,10 +118,9 @@ addOwnCommands({
     };
   },
   /** @return {Promise<string>} */
-  GetScriptCode(id) {
-    return storage[S_CODE][Array.isArray(id) ? 'getMulti' : 'getOne'](id);
-  },
+  GetScriptCode,
   GetTags: () => getScriptsTags(aliveScripts),
+  ListenForPublish: ({ id }) => void (listenForPublishScriptId = id),
   /** @return {Promise<void>} */
   async MarkRemoved({ id, removed }) {
     if (!removed) {
