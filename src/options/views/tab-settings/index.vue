@@ -150,7 +150,7 @@ const CAN_FAST_INJECT = __.MV3 || browser.contentScripts;
 </script>
 
 <script setup>
-import { noop } from '@/common';
+import { noop, sendCmdDirectly } from '@/common';
 import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import LocaleGroup from '@/common/ui/locale-group';
@@ -196,6 +196,9 @@ async function requestDownloadsPermission() {
       permissions: [kDownloads]
     }).catch(noop);
     granting.value = false;
+    if (!__.MV3 && !browser.permissions.onAdded) {
+      sendCmdDirectly('SetPermissions', { [kDownloads]: store[kDownloads] });
+    }
   }
 }
 </script>

@@ -4,13 +4,15 @@ import { blob2base64 } from './util';
 export default async function loadIconData(url, isOwn) {
   let res;
   let maxSize = !isOwn && (2 * 38); // dashboard icon size for 2xDPI
-  const keeper = __.MV3 && keepAlive();
+  const keeper = __.SW && keepAlive();
   try {
-    const img = await createImageBitmap(await (await fetch(url)).blob(), isOwn ? {} : {
+    const blob = await (await fetch(url)).blob();
+    // TODO: remove ?: when strict_min_version>=93
+    const img = await (isOwn || !__.MV3 ? createImageBitmap(blob) : createImageBitmap(blob, {
       resizeWidth: maxSize,
       resizeHeight: maxSize,
       resizeQuality: 'high',
-    });
+    }));
     let { width, height } = img;
     if (width && height) {  // TODO: check if FF reports 0 for SVG via createImageBitmap
       const canvas = __.MV3
@@ -37,6 +39,6 @@ export default async function loadIconData(url, isOwn) {
   } catch (err) {
     if (__.DEV) console.log(loadIconData.name + ':', err);
   }
-  if (__.MV3) keeper();
+  if (__.SW) keeper();
   return res || [url];
 }

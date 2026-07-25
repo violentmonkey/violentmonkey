@@ -55,7 +55,7 @@ async function onDownloadChanged({ id, error, state } = {}) {
     if (req.dlEvents.progress) req.timer = setInterval(queryDownload, 1000, id, reqId, req);
   } else {
     delete downloads[id];
-    flushSession(kDownloads, downloads);
+    if (__.MV3) flushSession(kDownloads, downloads);
     if (req.timer) clearInterval(req.timer);
     if (isEmpty(downloads)) browser.downloads.onChanged.removeListener(onDownloadChanged);
   }
