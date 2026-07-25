@@ -2,20 +2,12 @@ import { leaseBlobUrl } from '@/common';
 import setClipboard from '@/common/clipboard';
 import handlers from '@/common/handlers';
 import { sendCmdToSW } from '@/common/messaging-sw';
-import { DriveProviders } from '@usync/drive';
 import { initXHR, xhrs } from './xhr';
 
-let drive;
 let autoCloseTimer;
 
 Object.assign(handlers, {
   LeaseBlob: leaseBlobUrl,
-  Drive: ([cmd, args, init], src, transfer) => (
-    init.length && initDrive(...init),
-    cmd === 'list'
-      ? (listDrive(cmd, args, transfer), transfer[0])
-      : drive[cmd](...args)
-  ),
   async Fetch([url, init, get = 'text']) {
     const req = await fetch(url, init);
     return {
@@ -44,30 +36,4 @@ chrome.runtime.onConnect.addListener(port => {
 
 function autoClose() {
   autoCloseTimer ||= setTimeout(close, 15 * 60e3);
-}
-
-function initDrive(provider, opts, context) {
-  drive = new DriveProviders[provider](opts, context !== 'auth' ? context : {
-    authorizer: Object.create(new Proxy({}, {
-      get: (dummy, cmd, obj) => (obj[cmd] =
-        (...args) => sendCmdToSW('DriveAuth', [cmd, args])
-      ),
-    })),
-  });
-}
-
-async function listDrive(cmd, args, transfer) {
-  const mc = new MessageChannel();
-  const port = mc.port1;
-  transfer[0] = mc.port2; // must be before async work as it's used by the caller
-  try {
-    for await (const item of drive[cmd](...args)) {
-      port.postMessage({ res: item });
-    }
-    port.postMessage(null);
-  } catch (err) {
-    // `cause` is a standard property that can be sent via messaging.
-    err.cause = err.response?.status;
-    port.postMessage({ err });
-  }
 }

@@ -7,12 +7,12 @@ import {
   USER_CONFIG,
 } from '@/common/consts-sync';
 import { forEachEntry, objectPick, objectSet } from '@/common/object';
-import { addOwnCommands, getOption, setOption } from '../utils';
+import { getOption, setOption } from '../utils';
 import broadcast from '../utils/broadcast';
 import { sortScripts, updateScriptInfo } from '../utils/db';
 import { DNR_ID_IDENTITY, updateSessionRules } from '../utils/dnr';
-import callOffscreen from '../utils/offscreen';
 import { script as pluginScript } from '../plugin';
+import { parseXml } from '@violentmonkey/xml-parser';
 import sessionData from '../utils/session-data';
 import {
   events,
@@ -43,23 +43,10 @@ const serviceNames = [];
 const serviceClasses = [];
 const services = {};
 const syncLater = !__.MV3 && debounce(autoSync, TIMEOUT_HOUR);
-const getDrive = (...init) =>
-  !__.MV3
-    ? new DriveProviders[init.shift()](...init)
-    : Object.create(new Proxy({}, {
-        get: (dummy, cmd, obj) => (obj[cmd] = (...args) => callOffscreen('Drive', [
-          cmd,
-          args,
-          init.splice(0) /*emptying*/,
-        ])),
-      }));
+const xmlParser = { parse: str => parseXml(str, { removeNSPrefix: true }).node };
+const getDrive = (provider, opts, ctx) => new DriveProviders[provider](opts, { ...ctx, xmlParser });
 let syncConfig;
 let syncMode = SYNC_MERGE;
-
-if (__.MV3)
-  addOwnCommands({
-    DriveAuth: ([cmd, args]) => getService().authorizer?.[cmd](...args),
-  });
 
 // --- Logging ---
 
@@ -381,13 +368,11 @@ export function createSyncService({
     try {
       const batches = drive.list();
       // eslint-disable-next-line no-unused-vars
-      for await (const batch of __.MV3
-        ? getListFromPort(await batches)
-        : batches) {
+      for await (const batch of batches) {
         break;
       }
     } catch (err) {
-      if ((__.MV3 ? err.cause : err.response?.status) === 404 && driveProvider === 'webdav') {
+      if ((err.response?.status) === 404 && driveProvider === 'webdav') {
         await drive.mkdir(VIOLENTMONKEY);
       } else {
         prepareError = err;
@@ -487,10 +472,7 @@ export function createSyncService({
     const files = [];
     const batches = drive.list();
     progress.total += 1;
-    for await (const batch of __.MV3
-      ? getListFromPort(await batches)
-      : batches) {
-      if (__.MV3 && !batch) break; // the last item is a dummy end marker
+    for await (const batch of batches) {
       files.push(...batch);
     }
     progress.finished += 1;
@@ -536,24 +518,6 @@ export function createSyncService({
       scripts,
       await pluginScript.list(),
     ];
-  }
-
-  /** @param {MessagePort} port */
-  function* getListFromPort(port) {
-    let resolver, done;
-    port.onmessage = ({ data }) => {
-      done = !data;
-      if (!done) {
-        done = data.err;
-        data = done ? Promise.reject(done) : data.res;
-      }
-      resolver(data);
-    };
-    try {
-      while (!done) yield new Promise((resolve) => (resolver = resolve));
-    } finally {
-      port.onmessage = null;
-    }
   }
 
   // --- Sync algorithm ---
@@ -865,7 +829,7 @@ export function createSyncService({
       drive = getDrive(
         driveProvider,
         { authProvider, user: '' },
-        __.MV3 ? 'auth' : { authorizer },
+        { authorizer },
       );
     } else {
       initPassword();

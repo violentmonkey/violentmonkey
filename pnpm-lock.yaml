@@ -63,6 +63,9 @@ importers:
       '@violentmonkey/shortcut':
         specifier: ^1.4.4
         version: 1.4.4
+      '@violentmonkey/xml-parser':
+        specifier: ^1.0.0
+        version: 1.0.0
       codemirror:
         specifier: ^5.65.20
         version: 5.65.20
@@ -2097,6 +2100,9 @@ packages:
 
   '@violentmonkey/types@0.3.3':
     resolution: {integrity: sha512-ISaLOU7tBR8WiSgHAzrYj5GHU99YP+ZAB0YNwaN7vvK9TZLm4LjxOLHnqy9O7dd0LAEVAa60r8jLd6VSZfsjLA==}
+
+  '@violentmonkey/xml-parser@1.0.0':
+    resolution: {integrity: sha512-b85soSVIrN23l2WXeMUSsUiHQr7GFUgbmbYOuKDQEgM+uRmHf/gCY+P49IhzmnGO0ME0wTaAVRvlkksxcfZ+kA==}
 
   '@volar/language-core@2.4.28':
     resolution: {integrity: sha512-w4qhIJ8ZSitgLAkVay6AbcnC7gP3glYM3fYwKV3srj8m494E3xtrCv6E+bWviiK/8hs6e6t1ij1s2Endql7vzQ==}
@@ -8043,6 +8049,8 @@ snapshots:
   '@violentmonkey/types@0.3.3':
     dependencies:
       user-agent-data-types: 0.4.2
+
+  '@violentmonkey/xml-parser@1.0.0': {}
 
   '@volar/language-core@2.4.28':
     dependencies:
