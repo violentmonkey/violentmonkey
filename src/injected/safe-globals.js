@@ -46,7 +46,7 @@ export const safePickInto = (dst, src, keys) => {
 export const promiseResolve = async val => val;
 
 export const safeGetUniqId = (prefix = 'VM') => prefix + (
-  __.MV3 || U8_toBase64
+  U8_toBase64 // minimum_chrome_version>=140, strict_min_version>=133
   ? getRandomValues(new SafeUint8Array(16))::U8_toBase64()
   : safeBtoa(safeApply(stringFromCharCode, null, getRandomValues(new SafeUint8Array(16))))
 );
