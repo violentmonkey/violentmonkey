@@ -22,17 +22,14 @@ export let
   Object,
   SafeProxy,
   SafeSymbol,
-  /** Note that in Firefox it's reused to store the current realm's prototype of Promise */
-  SafePromiseConstructor,
   /** May be unsafe in old bugged Chrome */
   SafePromise,
+  withResolvers,
   fire,
   getWindowLength,
   getWindowParent,
   off,
   on,
-  // Symbol
-  toStringTagSym,
   // Object
   assign,
   defineProperty,
@@ -62,12 +59,16 @@ export let
   jsonParse,
   jsonStringify,
   logging,
-  mathRandom,
-  parseFromString, // DOMParser
   reflectOwnKeys,
   stopImmediatePropagation,
   then,
   urlSearchParamsToString,
+  // safeGetUniqId
+  SafeUint8Array,
+  U8_toBase64,
+  getRandomValues,
+  safeBtoa,
+  stringFromCharCode,
   // various getters
   getCurrentScript, // Document
   getDetail, // CustomEvent
@@ -78,7 +79,9 @@ export const cloneInto = PAGE_MODE_HANDSHAKE ? null : global.cloneInto;
  * VAULT consists of the parent's safe globals to protect our communications/globals
  * from a page that creates an iframe with src = location and modifies its contents
  * immediately after adding it to DOM via direct manipulation in frame.contentWindow
- * or window[0] before our content script runs at document_start, https://crbug.com/1261964 */
+ * or window[0] before our content script runs at document_start, https://crbug.com/1261964
+ * WARNING: Also applies to a normal document created via window.open() and its `opener` cleared.
+ */
 export const VAULT = (() => {
   let tmp;
   let ChromePromiseBug;
@@ -121,6 +124,8 @@ export const VAULT = (() => {
     SafeMouseEvent = res[i += 1] || src.MouseEvent,
     Object = res[i += 1] || src.Object,
     SafeSymbol = res[i += 1] || src.Symbol,
+    SafeUint8Array = res[i += 1] || src.Uint8Array,
+    U8_toBase64 = res[i += 1] || SafeUint8Array[PROTO].toBase64,
     // In FF content mode global.Proxy !== window.Proxy
     SafeProxy = res[i += 1] || src.Proxy,
     fire = res[i += 1] || src.dispatchEvent,
@@ -143,7 +148,8 @@ export const VAULT = (() => {
     // Element.prototype
     remove = res[i += 1] || src.Element[PROTO].remove,
     // String.prototype
-    slice = res[i += 1] || src.String[PROTO].slice,
+    slice = res[i += 1] || (tmp = src.String)[PROTO].slice,
+    stringFromCharCode = res[i += 1] || tmp.fromCharCode,
     // safeCall
     safeApply = res[i += 1] || (Reflect = src.Reflect).apply,
     safeCall = res[i += 1] || (call = SafeObject.call).bind(call),
@@ -155,20 +161,18 @@ export const VAULT = (() => {
     formDataEntries = res[i += 1] || src.FormData[PROTO].entries,
     hasOwnProperty = res[i += 1] || safeBind(call, SafeObject[PROTO].hasOwnProperty),
     arrayIsArray = res[i += 1] || src.Array.isArray,
+    getRandomValues = res[i += 1] || safeBind((tmp = src.crypto).getRandomValues, tmp),
     /* Exporting JSON methods separately instead of exporting SafeJSON as its props may be broken
      * by the page if it gains access to any Object from the vault e.g. a thrown SafeError. */
     jsonParse = res[i += 1] || src.JSON.parse,
     jsonStringify = res[i += 1] || src.JSON.stringify,
     logging = res[i += 1] || nullObjFrom((srcFF || src).console),
-    mathRandom = res[i += 1] || src.Math.random,
     reflectOwnKeys = res[i += 1] || Reflect.ownKeys,
+    safeBtoa = res[i += 1] || src.btoa,
     stopImmediatePropagation = res[i += 1] || src.Event[PROTO].stopImmediatePropagation,
     SafePromise = res[i += 1] || src.Promise,
-    SafePromiseConstructor = res[i += 1] || (
-      tmp = SafePromise[PROTO],
-        !__.MV3 && IS_FIREFOX ? SafePromise : tmp.constructor
-    ),
-    then = res[i += 1] || tmp.then,
+    withResolvers = res[i += 1] || SafePromise.withResolvers,
+    then = res[i += 1] || SafePromise[PROTO].then,
     urlSearchParamsToString = res[i += 1] || src.URLSearchParams[PROTO].toString,
     // various getters
     getCurrentScript = res[i += 1] || describeProperty(src.Document[PROTO], 'currentScript').get,
@@ -192,19 +196,23 @@ export const VAULT = (() => {
       return funcs;
     })(createNullObj()),
   ];
-  // Well-known Symbols are unforgeable
-  toStringTagSym = SafeSymbol.toStringTag;
-  if (!__.MV3 && ChromePromiseBug) {
-    /* Chrome pre-115 can't use SafePromise when iframe is removed, fixed in crrev.com/1142900.
-     * We'll use the unsafe one from `window` only for userscript API stuff, not internally.
-     * Getting it in a `try` because `Promise` may already have a broken getter. */
-    try { SafePromise = Promise; } catch {/**/}
-  } else if (!__.MV3 && IS_FIREFOX) {
-    // Hijacking an unused global to store the current realm's Promise prototype
-    SafePromiseConstructor = getPrototypeOf(promiseResolve());
-  } else {
-    // Chrome 115+: binding Promise to this realm
-    SafePromise = safeBind(SafePromiseConstructor, getPrototypeOf(promiseResolve()));
-  }
+  /* Chrome pre-115 can't use SafePromise when iframe is removed, fixed in crrev.com/1142900.
+   * We'll use the unsafe one from `window` only for userscript API stuff, not internally.
+   * Getting it in a `try` because `Promise` may already have a broken getter. */
+  if (!__.MV3 && ChromePromiseBug) { try { SafePromise = Promise; } catch {/**/} }
   return res;
 })();
+export const PromiseProto = getPrototypeOf(promiseResolve());
+/** @return {PromiseWithResolvers<any>} */
+export const SafePromiseWithResolvers = () => {
+  const prr = __.MV3 || withResolvers
+    ? SafePromise::withResolvers()
+    : createNullObj();
+  const p = __.MV3 || withResolvers
+    ? prr.promise
+    : prr.promise = new SafePromise((ok, ko) => { prr.resolve = ok; prr.reject = ko; });
+  setPrototypeOf(p, PromiseProto);
+  return prr;
+};
+// Well-known Symbols are unforgeable
+export const toStringTagSym = SafeSymbol.toStringTag;

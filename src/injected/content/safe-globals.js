@@ -42,11 +42,14 @@ export const {
   setPrototypeOf,
   keys: objectKeys,
 } = Object;
-export const { random: mathRandom } = Math;
 export const { toStringTag: toStringTagSym } = Symbol; // used by ProtectWebpackBootstrapPlugin
 export const { stopImmediatePropagation } = Event[PROTO];
 export const getDetail = describeProperty(SafeCustomEvent[PROTO], 'detail').get;
 export const getRelatedTarget = describeProperty(SafeMouseEvent[PROTO], 'relatedTarget').get;
+export const getRandomValues = crypto.getRandomValues.bind(crypto);
+export const U8_toBase64 = SafeUint8Array[PROTO].toBase64;
+export const safeBtoa = !U8_toBase64 && btoa;
+export const stringFromCharCode = !U8_toBase64 && String.fromCharCode;
 export const logging = nullObjFrom(console);
 export const VM_UUID = __.MV3
   ? `chrome-extension://${chrome.runtime.id}/`
@@ -71,4 +74,3 @@ export let topRenderMode = window !== top ? 0
   // TODO: revisit when link-preview is shipped in Chrome
   : document.prerendering && document.visibilityState === 'hidden' ? 2
     : 1;
-

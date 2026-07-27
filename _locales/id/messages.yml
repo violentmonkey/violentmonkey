@@ -459,16 +459,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Bagikan versi skrip terpasang pada situs katalog userscript: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Mode $1alternatif di Firefox
-labelFastFirefoxInjectHint:
+  message: Mode $1alternatif
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Metode injeksi alternatif untuk skrip <document-start> sejak Firefox 59,
-    lebih cepat daripada mode default. Sama halnya dengan "Mode halaman
-    sinkron", mode ini juga meningkatkan konsumsi memori, jadi Anda mungkin
-    ingin menonaktifkannya jika skrip Anda bekerja dengan baik tanpa opsi ini.
+    Metode injeksi alternatif untuk skrip <document-start>, lebih cepat daripada
+    mode default. Sama halnya dengan "Mode halaman sinkron", mode ini juga
+    meningkatkan konsumsi memori, jadi Anda mungkin ingin menonaktifkannya jika
+    skrip Anda bekerja dengan baik tanpa opsi ini.
 labelFeedback:
   description: Label of link to feedback page.
   message: Umpanbalik

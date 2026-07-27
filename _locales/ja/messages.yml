@@ -306,7 +306,7 @@ headerRecycleBin:
   message: ゴミ箱
 helpForLocalFile:
   description: Label of the checkbox.
-  message: パソコン内のスクリプトをドラッグ＆ドロップするための説明を表示
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: $1 個の一致したスクリプトに対して
@@ -445,14 +445,13 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'ユーザスクリプト集積サイトにインストールしたバージョンを知らせる: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Firefox用の別の $1 モード
-labelFastFirefoxInjectHint:
+  message: 別の $1 モード
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    <document-start> スクリプトのFireFox 59
-    以降での別の挿入方法で、標準の方法より高速です。同期ページモードと同じくメモリ消費量が増加するので、このオプションを使わずにスクリプトが正常に動作するなら無効にします。
+    <document-start>スクリプトの別の挿入方法で、標準の方法より高速です。同期ページモードと同じくメモリ消費量が増加するので、このオプションを使わずにスクリプトが正常に動作するなら無効にします。
 labelFeedback:
   description: Label of link to feedback page.
   message: 意見や報告

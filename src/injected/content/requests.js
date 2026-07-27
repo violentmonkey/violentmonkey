@@ -1,5 +1,5 @@
 import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
-import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
+import * as bridge from './bridge';
 import { makeSafeBlob, sendCmd } from './util';
 
 const CHUNKS = 'chunks';
@@ -15,7 +15,7 @@ let safeFetch;
 let navigator, getUAData, getUAProps, getHighEntropyValues;
 let SafeDOMParser, parseFromString;
 
-onScripts.push(data => {
+bridge.onScripts.push(data => {
   safeFetch = fetch;
   BlobProto = SafeBlob[PROTO];
   SafeFileReader = FileReader;
@@ -49,7 +49,7 @@ onScripts.push(data => {
 });
 
 // TODO: extract all prop names used across files into consts.js to ensure sameness
-addHandlers({
+bridge.addHandlers({
   /**
    * @param {GMReq.Message.Web} msg
    * @param {VMScriptInjectInto} realm
@@ -91,7 +91,7 @@ addHandlers({
   UAH: hints => (navigator::getUAData())::getHighEntropyValues(hints),
 });
 
-addBackgroundHandlers({
+bridge.addBackgroundHandlers({
   /**
    * @param {GMReq.Message.BG} msg
    * @returns {Promise<void>}

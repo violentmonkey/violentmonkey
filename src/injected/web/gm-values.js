@@ -1,21 +1,14 @@
-import bridge, { addHandlers } from './bridge';
-import { storages } from './store';
+import * as bridge from './bridge';
 import { jsonDump } from './util';
 import { dumpScriptValue } from '../util';
 
 // Nested objects: scriptId -> keyName -> listenerId -> GMValueChangeListener
 export const changeHooks = createNullObj();
-const dataDecoders = {
-  __proto__: null,
-  o: jsonParse,
-  n: val => +val,
-  b: val => val === 'true',
-};
 
-addHandlers({
+bridge.addHandlers({
   UpdatedValues(updates) {
     objectKeys(updates)::forEach(id => {
-      const oldData = storages[id];
+      const oldData = bridge.storages[id];
       if (oldData) {
         const update = updates[id];
         const keyHooks = changeHooks[id];
@@ -35,7 +28,7 @@ addHandlers({
 export function dumpValue(context, add, what) {
   let res;
   const { id, async } = context;
-  const values = storages[id];
+  const values = bridge.storages[id];
   const keyHooks = changeHooks[id];
   for (const key of add ? objectKeys(what) : what) {
     let val, raw, oldRaw, tmp;
@@ -61,10 +54,11 @@ export function dumpValue(context, add, what) {
 
 export function decodeValue(raw) {
   const type = raw[0];
-  const handle = dataDecoders[type];
   let val = raw::slice(1);
-  try {
-    if (handle) val = handle(val);
+  if (type === 'n') val = +val;
+  else if (type === 'b') val = val === 'true';
+  else if (type === 'o') try {
+    val = jsonParse(val);
   } catch (e) {
     if (__.DEBUG) log('warn', ['GM_getValue'], e);
   }

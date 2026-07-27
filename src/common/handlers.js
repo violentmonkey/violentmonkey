@@ -14,7 +14,7 @@ const handleMessage = (res, src) => {
   }
 };
 
-if (__.EXT && (__.MV3 ? !__.SW : !global._bg)) {
+if (__.EXT && !__.BG) {
   browser.runtime.onMessage.addListener(handleMessage);
   if (__.MV3) chrome.runtime.onUserScriptMessage?.addListener(handleMessage);
 }

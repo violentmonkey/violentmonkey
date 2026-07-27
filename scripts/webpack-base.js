@@ -71,7 +71,9 @@ const createHtmlPage = key => new HtmlWebpackPlugin({
   // For GroupAssetsPlugin, inject only `index.js` into `body` to avoid FOUC
   injectTo: item => ((item.attributes.src || '').endsWith('/index.js') ? 'body' : 'head'),
   templateContent: ({ htmlWebpackPlugin: { tags: { headTags: head, bodyTags: body } } }) =>
-    `<!DOCTYPE html><meta charset=utf-8><script src=/get-data.js?${key}></script>${head}<body>${body}</body>`,
+    `<!DOCTYPE html><meta charset=utf-8>${
+      MV3 ? `<script src=/get-data.js?${key}></script>` : ''
+    }${head}<body>${body}</body>`,
 });
 
 const splitVendor = prefix => ({
@@ -147,7 +149,7 @@ const getBaseConfig = (page) => ({
         test: /\.m?[jt]sx?$/,
         loader: 'babel-loader',
         exclude: file => /node_modules/.test(file) &&
-          !/vueleton|@vue[/\\]shared|@usync/.test(file),
+          !/vueleton|@vue[/\\]shared|@usync|@violentmonkey/.test(file),
       },
       // CSS
       {
@@ -206,6 +208,7 @@ const getBaseConfig = (page) => ({
     ],
   },
   optimization: {
+    concatenateModules: true, // makes output simpler and closer to prod in debugging
     runtimeChunk: false,
     splitChunks: !page && {
       cacheGroups: {

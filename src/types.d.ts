@@ -456,6 +456,7 @@ declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string
 declare type VMTopRenderMode = 0 | 1 | 2 | 3 | 4;
 
 declare var __: {
+  BG: boolean,
   CODEMIRROR_THEMES: string;
   DEBUG: boolean,
   DEV: boolean,

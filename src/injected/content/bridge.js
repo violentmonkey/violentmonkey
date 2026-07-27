@@ -3,16 +3,8 @@ import { sendCmd } from './util';
 
 const handlers = createNullObj();
 const bgHandlers = createNullObj();
+export const ids = createNullObj();
 export const grantless = createNullObj();
-/** @type {function(VMInjection)[]} */
-export const onScripts = [];
-const addHandlersImpl = (dest, src, force) => {
-  if (force || INJECT_INTO in bridge) { // eslint-disable-line no-use-before-define
-    assign(dest, src);
-  } else {
-    onScripts.push(() => assign(dest, src));
-  }
-};
 /**
  * Without `force` handlers will be added only when userscripts are about to be injected.
  * { CommandName: true } will relay the request via sendCmd as is.
@@ -22,55 +14,53 @@ const addHandlersImpl = (dest, src, force) => {
  * @param {boolean} [force]
  */
 /** @type {AddHandlers} */
-export const addHandlers = addHandlersImpl.bind({}, handlers);
+export const addHandlers = assign.bind(null, handlers);
 /** @type {AddHandlers} */
-export const addBackgroundHandlers = addHandlersImpl.bind({}, bgHandlers);
-
-/**
- * @property {VMScriptInjectInto} [injectInto] - present only after GetInjected received data
- * @property {Promise<void>} [reify] - present in pre-rendered documents, resolved when it's shown
- * @property {boolean} [useMenu]
- */
-const bridge = {
-  __proto__: null,
-  [IDS]: createNullObj(),
-  cache: createNullObj(),
-  pathMaps: createNullObj(),
-  /** @property {VMBridgePostFunc} [post] - set only when the web bridge was initialized */
-  post: null,
-  // realm is provided when called directly via invokeHost
-  async onHandle({ cmd, data, node }, realm) {
-    let res, err;
-    let handle = handlers[cmd];
-    let callbackId = data && getOwnProp(data, CALLBACK_ID);
-    if (callbackId) {
-      data = data.data;
-    }
-    const nodeRet = [null]; // elem must be present to skip a poisoned prototype on arr[0]=val
-    try {
-      if (!handle) throw data;
-      if (handle === REIFY) {
-        handle = true;
-        res = bridge[REIFY];
-        if (res) await res;
-      }
-      res = handle === true
-        ? sendCmd(cmd, data)
-        : node::handle(data, realm || PAGE, nodeRet);
-      if (isPromise(res)) {
-        res = await res;
-      }
-    } catch (e) {
-      res = null; // prevent the rejected Promise from being sent to Callback
-      err = e;
-    }
-    if (callbackId || err) {
-      bridge.post('Callback', { res, err, id: callbackId || '' }, realm, nodeRet[0]);
-    }
-  },
+export const addBackgroundHandlers = (src, force) => {
+  if (force || !onScripts) {
+    assign(bgHandlers, src);
+  } else {
+    onScripts.push(() => assign(bgHandlers, src));
+  }
 };
-
-export default bridge;
+// realm is provided when called directly via invokeHost
+export const onHandle = async ({ cmd, data, node }, realm) => {
+  let res, err;
+  let handle = handlers[cmd];
+  let callbackId = data && getOwnProp(data, CALLBACK_ID);
+  if (callbackId) {
+    data = data.data;
+  }
+  const nodeRet = [null]; // elem must be present to skip a poisoned prototype on arr[0]=val
+  try {
+    if (!handle) throw data;
+    if (handle === REIFY) {
+      handle = true;
+      if (reify) await reify;
+    }
+    res = handle === true
+      ? sendCmd(cmd, data)
+      : node::handle(data, realm || PAGE, nodeRet);
+    if (isPromise(res)) {
+      res = await res;
+    }
+  } catch (e) {
+    res = null; // prevent the rejected Promise from being sent to Callback
+    err = e;
+  }
+  if (callbackId || err) {
+    post('Callback', { res, err, id: callbackId || '' }, realm, nodeRet[0]);
+  }
+};
+export let cache;
+export let injectInto;
+export let pathMaps;
+export let reify;
+export let useMenu;
+/** @type {VMBridgePostFunc} */
+export let post;
+/** @type {function(VMInjection)[]} */
+export let onScripts = [];
 
 browser.runtime.onMessage.addListener(({ cmd, data }, src) => {
   if ((cmd = bgHandlers[cmd])) {

@@ -189,6 +189,7 @@ import { forEachKey } from '@/common/object';
 import { setRoute, lastRoute } from '@/common/router';
 import { keyboardService, handleTabNavigation, kbdTypable, kbdNavigatable } from '@/common/keyboard';
 import { loadData } from '@/options';
+import { TAB_SETTINGS } from '@/common/safe-globals'; // added as a banner but Vue needs an import
 import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';

@@ -3,13 +3,14 @@ import {
   __CODE, CACHE_KEYS, HOMEPAGE_URL, kDownloadMode, KNOWN_INJECT_INTO, kOrigTag, kTag, META_STR,
   METABLOCK_RE, NEWLINE_END_RE, PROMISE, TL_AWAIT, UNWRAP,
 } from '@/common/consts';
-import { forEachValue, mapEntry, objectPick } from '@/common/object';
+import { deepSize, forEachValue, mapEntry, objectPick } from '@/common/object';
 import { getScriptsByURL, kTryVacuuming } from './db';
 import { registerDnrBlob } from './dnr';
 import { inIncognitoContext } from './init';
 import {
   cache, contentScriptsAPI, CSAPI_REG, downloadMode, expose, ffInject, injectContentRealm,
-  injectInto, isApplied, makeXhrHeader, propsToClear, registerScriptData, xhrInject,
+  injectInto, isApplied, lastRegDuration, lastRegTime, makeXhrHeader,
+  propsToClear, registerScriptData, xhrInject,
 } from './preinject-core';
 import { S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT_PRE, S_VALUE } from './storage';
 import { ua } from './ua';
@@ -66,7 +67,7 @@ export function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, frameId, t
   }
 }
 
-export function prepare(cacheKey, url, isTop) {
+export function prepare(cacheKey, url, isTop, isLate) {
   const shouldExpose = isTop && url.startsWith('https://')
     ? expose[url.split('/', 3)[2]]
     : null;
@@ -81,14 +82,14 @@ export function prepare(cacheKey, url, isTop) {
   const res = env || bagNoOp;
   cache.put(cacheKey, res); // must be called before prepareBag overwrites it synchronously
   if (env) {
-    env[PROMISE] = prepareBag(cacheKey, url, isTop,
+    env[PROMISE] = prepareBag(cacheKey, url, isTop, isLate,
       env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors
     ).catch(() => (env[PROMISE] = null));
   }
   return res;
 }
 
-async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
+async function prepareBag(cacheKey, url, isTop, isLate, env, inject, errors) {
   if (env[PROMISE]) await env[PROMISE];
   if (!isApplied) return; // the user disabled injection while we awaited
   cache.batch(true);
@@ -112,7 +113,10 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
     if (val !== true) bag[val] = env[val];
   });
   bag[MORE] = envDelayed;
-  if (isTop && (__.MV3 ? chrome.userScripts : ffInject && !xhrInject && contentScriptsAPI)) {
+  if (isTop && !isLate && ffInject && !xhrInject && (__.MV3 || contentScriptsAPI) && (
+    performance.now() - lastRegTime > lastRegDuration ||
+    env.size + deepSize(env[S_CACHE]) < 1e6
+  )) {
     inject[PAGE] = env[PAGE] || triagePageRealm(envDelayed);
     try { bag[CSAPI_REG] = registerScriptData(inject, url); } catch {/*ignoring*/}
     bag.url = url;
@@ -129,6 +133,7 @@ async function prepareBag(cacheKey, url, isTop, env, inject, errors) {
 export function prepareScripts(env) {
   env[PROMISE] = null; // let GC have it
   const scripts = env[SCRIPTS];
+  let size = 0;
   for (let i = 0, script, key, id; i < scripts.length; i++) {
     script = scripts[i];
     id = script.id;
@@ -142,7 +147,9 @@ export function prepareScripts(env) {
       env[PAGE] = true; // for registerScriptData
     }
     script[VALUES] = env[S_VALUE][id] || null;
+    size += script.size;
   }
+  if (size) env.size = size;
   return scripts;
 }
 
@@ -156,13 +163,13 @@ function prepareScript(script, env) {
   const { id } = props;
   const { [S_REQUIRE]: require, [RUN_AT]: runAt } = env;
   const code = env[S_CODE][id];
-  const dataKey = getUniqId();
-  const winKey = getUniqId();
+  const dataKey = getUniqId('d', true);
+  const winKey = getUniqId('w', true);
   const plantKey = { data: dataKey, win: winKey };
   const displayName = getScriptName(script);
   const pathMap = custom.pathMap || {};
   const wrap = !meta[UNWRAP];
-  const wrapTryCatch = wrap && IS_FIREFOX; // FF doesn't show errors in content script's console
+  const wrapTryCatch = !__.MV3 && wrap && IS_FIREFOX; // FF doesn't show errors for content scripts
   const { grant, [TL_AWAIT]: topLevelAwait } = meta;
   const startIIFE = topLevelAwait ? 'await(async' : '(';
   const grantNone = grant.includes('none');
@@ -173,6 +180,7 @@ function prepareScript(script, env) {
   const metaStrMatch = METABLOCK_RE.exec(code);
   let codeIndex;
   let tmp;
+  let size = 0;
   for (const key of META_KEYS_TO_ENSURE) {
     if (metaCopy[key] == null) metaCopy[key] = '';
   }
@@ -219,6 +227,7 @@ function prepareScript(script, env) {
       url.replace(/\*\//g, '%2A/')
     }\n${kTryVacuuming} */`;
     if (/\S/.test(req)) {
+      size += req.length;
       injectedCode.push(...[
         tmp && isUnsafeConcat(req) && ';',
         req,
@@ -260,6 +269,7 @@ function prepareScript(script, env) {
       tmp + metaStrMatch?.[4].length,
     ],
     [RUN_AT]: runAt[id],
+    size: (__.MV3 || contentScriptsAPI) && size + code.length + deepSize(metaCopy),
   };
 }
 

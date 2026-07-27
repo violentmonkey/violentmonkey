@@ -1,13 +1,25 @@
 import browser from '@/common/browser';
 import { kDownloads } from '@/common/consts';
 import broadcast from './broadcast';
-import { initDependency } from './init';
+import { addOwnCommands, initDependency } from './init';
 
 export let permissionDownloads;
 /** @type {Set<(state: boolean) => any>} */
 export const onPermissionChanged = new Set();
-initDependency(browser.permissions.contains({ permissions: [kDownloads] })
+const browserPermissions = browser.permissions;
+const { onAdded, onRemoved } = browserPermissions;
+initDependency(browserPermissions.contains({ permissions: [kDownloads] })
     .then(onDownloadsToggled));
+
+if (!__.MV3 && !onAdded) {
+  addOwnCommands({
+    SetPermissions(data) {
+      if ((data = data[kDownloads]) != null) {
+        onDownloadsToggled(data, true);
+      }
+    },
+  });
+}
 
 function onPermissionAdded({ permissions }) {
   if (permissions?.includes(kDownloads)) {
@@ -23,8 +35,8 @@ function onPermissionRemoved({ permissions }) {
 
 function onDownloadsToggled(ok, dynamic) {
   permissionDownloads = ok;
-  browser.permissions.onAdded[`${ok ? 'remove' : 'add'}Listener`](onPermissionAdded);
-  browser.permissions.onRemoved[`${ok ? 'add' : 'remove'}Listener`](onPermissionRemoved);
+  onAdded?.[`${ok ? 'remove' : 'add'}Listener`](onPermissionAdded);
+  onRemoved?.[`${ok ? 'add' : 'remove'}Listener`](onPermissionRemoved);
   if (dynamic) {
     broadcast('SetPermissions', { [kDownloads]: ok });
     for (const fn of onPermissionChanged) fn(ok);

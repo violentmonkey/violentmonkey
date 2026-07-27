@@ -338,7 +338,7 @@ headerRecycleBin:
   message: Corbeille
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Montrer les instructions pour les scripts locaux glissés-déposés
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: pour les $1 scripts correspondants
@@ -493,17 +493,17 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: "Exposer la version installée sur les sites de scripts utilisateur\_: $1"
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Mode alternatif $1 sur Firefox
-labelFastFirefoxInjectHint:
+  message: Mode alternatif $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Méthode d'injection alternative pour les scripts <document-start> depuis
-    Firefox 59, offrant de meilleures performances que le mode par défaut. Tout
-    comme le mode "page synchrone", cette méthode consomme plus de mémoire, vous
-    voudrez donc peut-être désactiver cette option si vos scripts fonctionnent
-    mieux sans cette option.
+    Méthode d'injection alternative pour les scripts <document-start>, offrant
+    de meilleures performances que le mode par défaut. Tout comme le mode "page
+    synchrone", cette méthode consomme plus de mémoire, vous voudrez donc
+    peut-être désactiver cette option si vos scripts fonctionnent mieux sans
+    cette option.
 labelFeedback:
   description: Label of link to feedback page.
   message: Retour d’expérience
@@ -1139,19 +1139,19 @@ titleSearchHintV2:
     * Les conditions séparées par des espaces peuvent être combinées
 
 
-    * Recherche par métadonnées : <code>"Awesome Script" "Description"</code> 
+    * Recherche par métadonnées : <code>"Awesome Script" "Description"</code>
 
 
-    * Recherche par tags : <code>#tag1 #tag2</code> 
+    * Recherche par tags : <code>#tag1 #tag2</code>
 
 
-    * Recherche par nom de script : <code>name : "awesome name"</code> 
+    * Recherche par nom de script : <code>name : "awesome name"</code>
 
 
-    * Recherche par code du script : <code>code : "awesome code"</code> 
+    * Recherche par code du script : <code>code : "awesome code"</code>
 
 
-    * Recherche négative : <code>!#tag2 !name : "unwanted" 
+    * Recherche négative : <code>!#tag2 !name : "unwanted"
 
 
     * Expressions régulières : <code>/\w+?/</code>, <code>/\w+?/gi</code>,

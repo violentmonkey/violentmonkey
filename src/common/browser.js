@@ -11,6 +11,7 @@ if (__.INJECTED === 'injected-web') {
 } else if (__.MV3 || !IS_FIREFOX && !browser?.runtime) {
   const { Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
+  const safeObjectCreate = Object.create; // eslint-disable-line no-restricted-syntax
   const MESSAGE = 'message';
   const STACK = 'stack';
   const runtime = chrome.runtime;
@@ -19,28 +20,27 @@ if (__.INJECTED === 'injected-web') {
     || key === 'hasListener'
     || key === 'hasListeners';
   /** API types or enums or literal constants */
-  const proxifyValue = (target, key, src, metaVal) => {
-    const srcVal = src[key];
-    if (srcVal === undefined) return;
-    let res;
-    if (isFunction(metaVal)) {
-      res = metaVal(src, srcVal);
-    } else if (isFunction(srcVal)) {
-      res = metaVal === 0 || isSyncMethodName(key) || !hasOwnProperty(src, key)
-        ? srcVal::bind(src)
-        : wrapAsync(src, srcVal); // eslint-disable-line no-use-before-define
-    } else if (isObject(srcVal) && metaVal !== 0) {
-      res = proxifyGroup(srcVal, metaVal); // eslint-disable-line no-use-before-define
-    } else {
-      res = srcVal;
-    }
-    target[key] = res;
-    return res;
-  };
-  const proxifyGroup = (src, meta) => new SafeProxy({ __proto__: null }, {
+  const proxyHandler = {
     __proto__: null,
-    get: (group, key) => group[key] ?? proxifyValue(group, key, src, meta?.[key]),
-  });
+    get({ src, meta }, key, target) {
+      let res = src[key];
+      if (res != null) {
+        meta = meta?.[key];
+        if (isFunction(meta)) {
+          res = meta(src, res);
+        } else if (isFunction(res)) {
+          res = meta === 0 || isSyncMethodName(key) || !hasOwnProperty(src, key)
+            ? res::bind(src)
+            : wrapAsync(src, res);
+        } else if (meta !== 0 && isObject(res)) {
+          res = proxifyGroup(res, meta);
+        }
+      }
+      setOwnProp(target, key, res);
+      return res;
+    },
+  };
+  const proxifyGroup = (src, meta) => safeObjectCreate(new SafeProxy({ src, meta }, proxyHandler));
   /**
    * @param {Object} thisArg - original API group
    * @param {function} func - original API function

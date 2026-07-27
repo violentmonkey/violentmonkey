@@ -1,5 +1,4 @@
-import bridge, { addHandlers, callbacks, displayNames } from './bridge';
-import { commands, storages } from './store';
+import * as bridge from './bridge';
 import { GM_API_CTX } from './gm-api';
 import { makeGmApiWrapper } from './gm-api-wrapper';
 import './gm-values';
@@ -15,15 +14,16 @@ const toRun = createNullObj();
 const gmis = createNullObj();
 const grantlessUsage = createNullObj();
 
-export default function initialize(invokeHost, console) {
+/** Exported via banner added in webpack */// eslint-disable-next-line no-undef
+VMInitInjection = (invokeHost, console) => {
   if (PAGE_MODE_HANDSHAKE) {
     window::on(PAGE_MODE_HANDSHAKE + '*', e => {
       e = e::getDetail();
-      bindEvents(e[0], e[1], bridge);
+      bridge.post = bindEvents(e[0], e[1], bridge.onHandle); // eslint-disable-line no-import-assign
     }, { __proto__: null, once: true, capture: true });
     window::fire(new SafeCustomEvent(PAGE_MODE_HANDSHAKE));
-    bridge.mode = PAGE;
-    addHandlers({
+    bridge.mode = PAGE; // eslint-disable-line no-import-assign
+    bridge.addHandlers({
       /** @this {Node} contentWindow */
       WriteVault(id) {
         this[id] = VAULT;
@@ -40,31 +40,29 @@ export default function initialize(invokeHost, console) {
       };
     }
   } else {
-    bridge.mode = CONTENT;
-    bridge.post = (cmd, data, node) => {
+    bridge.mode = CONTENT; // eslint-disable-line no-import-assign
+    bridge.post = (cmd, data, node) => // eslint-disable-line no-import-assign
       invokeHost({ cmd, data, node }, CONTENT);
-    };
-    global.chrome = undefined;
-    global.browser = undefined;
+    global.browser = global.chrome = undefined;
     logging = console; // eslint-disable-line no-global-assign
     return (cmd, data, realm, node) => {
       if (__.DEBUG) console.info('[bridge.guest.content] received', { cmd, data, node });
       bridge.onHandle({ cmd, data, node });
     };
   }
-}
+};
 
-addHandlers({
+bridge.addHandlers({
   Command({ id, key, evt }) {
-    commands[id]?.[key]?.cb(
+    bridge.commands[id]?.[key]?.cb(
       new (evt.key ? SafeKeyboardEvent : SafeMouseEvent)(
         evt.type, evt
       )
     );
   },
   Callback({ id, res, err }) {
-    const cb = callbacks[id];
-    delete callbacks[id];
+    const cb = bridge.callbacks[id];
+    delete bridge.callbacks[id];
     if (cb) {
       if (err && cb[1]) addErrorStack(err, cb[1]);
       this::cb[0](res, err);
@@ -89,15 +87,15 @@ addHandlers({
    */
   ScriptData({ info, items }) {
     if (info) {
-      assign(bridge, info);
+      assign(bridge.info, info);
     }
     const toRunNow = [];
     for (const script of items) {
       const { id, key } = script;
       toRun[key.data] = script;
-      displayNames[id] = script.displayName;
       gmis[id] = script.gmi;
-      storages[id] = setPrototypeOf(script[VALUES] || {}, null);
+      bridge.displayNames[id] = script.displayName;
+      bridge.storages[id] = setPrototypeOf(script[VALUES] || {}, null);
       if (!PAGE_MODE_HANDSHAKE) {
         const winKey = key.win;
         const data = window[winKey];
@@ -117,7 +115,7 @@ addHandlers({
     else if (!__.MV3 && IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
   },
   SetGMI(data) {
-    assign(bridge.gmi, data);
+    assign(bridge.info.gmi, data);
     for (const id in gmis) try { assign(gmis[id], data); } catch {/*ignore possible setters*/}
   },
   Expose(allowGetScriptVer) {

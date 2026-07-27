@@ -97,9 +97,9 @@
     "vinyl": "^3.0.1",
     "vue-loader": "^17.4.2",
     "vue-tsc": "^3.3.2",
-    "webpack": "^5.107.2",
-    "webpack-bundle-analyzer": "^5.3.0",
-    "webpack-cli": "^7.0.3"
+    "webpack": "^5.109.0",
+    "webpack-bundle-analyzer": "^5.3.1",
+    "webpack-cli": "^7.2.1"
   },
   "author": "Gerald <i@gerald.top>",
   "repository": {
@@ -116,6 +116,7 @@
     "@usync/oauth2": "^0.1.7",
     "@usync/sync": "^0.1.1",
     "@violentmonkey/shortcut": "^1.4.4",
+    "@violentmonkey/xml-parser": "^1.0.0",
     "codemirror": "^5.65.20",
     "fflate": "^0.8.3",
     "tldts": "^7.4.0",
@@ -132,5 +133,5 @@
     ],
     "testEnvironment": "./test/mock/env.js"
   },
-  "beta": 3
+  "beta": 5
 }

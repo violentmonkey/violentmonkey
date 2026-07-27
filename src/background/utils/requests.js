@@ -5,7 +5,7 @@ import { kGmDownloadViaApi } from '@/common/options-defaults';
 import { initXHR } from '@/offscreen/xhr';
 import { DNR, DNR_ID_XHR, updateSessionRules, xhrRules } from './dnr';
 import downloadViaApi from './download-via-api';
-import { addOwnCommands, addPublicCommands, commands } from './init';
+import { addOwnCommands, addPublicCommands } from './init';
 import callOffscreen from './offscreen';
 import { getOption } from './options';
 import { permissionDownloads } from './permissions';
@@ -68,13 +68,7 @@ addPublicCommands({
       : httpRequest
     )(opts, events, id, req, src, fileName).catch(cbError);
   },
-  /** @return {void | Promise<void>} */
-  AbortRequest(id) {
-    const req = requests[id];
-    if (req) return req.dlId ? browser.downloads.cancel(req.dlId)
-      : __.MV3 ? callOffscreen('XHRStop', id)
-        : requests[id].xhr.abort();
-  },
+  AbortRequest: abortRequest,
   // TODO: check if the content script can revoke it
   RevokeBlob: __.MV3 ? callOffscreen : URL.revokeObjectURL,
 });
@@ -210,6 +204,13 @@ async function httpRequest(opts, events, id, req, src) {
   }
 }
 
+function abortRequest(id) {
+  const req = requests[id];
+  if (req) return req.dlId ? browser.downloads.cancel(req.dlId)
+    : __.MV3 ? callOffscreen('XHRStop', id)
+      : req.xhr.abort();
+}
+
 /** @param {GMReq.BG} req */
 function clearRequest({ id, coreId, resolve, ruleId }) {
   delete verify[coreId];
@@ -223,10 +224,11 @@ function clearRequest({ id, coreId, resolve, ruleId }) {
 }
 
 export function clearRequestsByTabId(tabId, frameId) {
-  requests::forEachValue(req => {
+  requests::forEachValue(/**@param{GMReq.BG}req*/req => {
     if ((tabId == null || req.tabId === tabId)
-    && (!frameId || req[kFrameId] === frameId)) {
-      commands.AbortRequest(req.id);
+    && (!frameId || req[kFrameId] === frameId)
+    && !req[kFileName]) {
+      abortRequest(req.id);
     }
   });
 }

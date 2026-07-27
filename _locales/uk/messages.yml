@@ -333,7 +333,7 @@ headerRecycleBin:
   message: Кошик
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Показати інструкцію для перетягування локальних скриптів
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: для $1 співпадаючого скрипту
@@ -477,16 +477,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: Показувати версію встановленого скрипту на сайтах каталогів скриптів:$1
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Альтернативний $1 режим у Firefox
-labelFastFirefoxInjectHint:
+  message: Альтернативний $1 режим
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Альтернативний метод введення для<document-start> скриптів, починаючи з
-    Firefox 59, швидший за стандартний режим. Подібно до «Синхронного режиму
-    сторінки», він також збільшує споживання пам'яті, тому ви можете вимкнути
-    його, якщо ваші скрипти працюють коректно без цієї опції.
+    Альтернативний метод введення для<document-start> скриптів, швидший за
+    стандартний режим. Подібно до «Синхронного режиму сторінки», він також
+    збільшує споживання пам'яті, тому ви можете вимкнути його, якщо ваші скрипти
+    працюють коректно без цієї опції.
 labelFeedback:
   description: Label of link to feedback page.
   message: Зворотній зв'язок

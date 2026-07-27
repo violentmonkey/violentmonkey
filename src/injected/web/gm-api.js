@@ -1,6 +1,5 @@
 import { isEmpty } from '../util';
-import bridge from './bridge';
-import { commands, storages } from './store';
+import * as bridge from './bridge';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
@@ -26,14 +25,14 @@ export const GM_API_CTX_GM4ASYNC = {
   },
   /** @this {GMContext} */
   GM_getValue(key, def) {
-    const raw = storages[this.id][key];
+    const raw = bridge.storages[this.id][key];
     return resolveOrReturn(this, raw ? decodeValue(raw) : def);
   },
   /** @this {GMContext} */
   GM_getValues(what) {
     const res = {};
     const isArr = arrayIsArray(what);
-    const values = storages[this.id];
+    const values = bridge.storages[this.id];
     for (const key of isArr ? what : objectKeys(what)) {
       const raw = values[key];
       if (raw) setOwnProp(res, key, decodeValue(raw));
@@ -43,7 +42,7 @@ export const GM_API_CTX_GM4ASYNC = {
   },
   /** @this {GMContext} */
   GM_listValues() {
-    return resolveOrReturn(this, objectKeys(storages[this.id]));
+    return resolveOrReturn(this, objectKeys(bridge.storages[this.id]));
   },
   /** @this {GMContext} */
   GM_setValue(key, val) {
@@ -96,7 +95,7 @@ export const GM_API_CTX = {
   GM_addValueChangeListener(key, fn) {
     if (!isString(key)) key = `${key}`;
     if (!isFunction(fn)) return;
-    const hooks = ensureNestedProp(changeHooks, this.id, key);
+    const hooks = (changeHooks[this.id] ||= createNullObj())[key] ||= createNullObj();
     const i = objectValues(hooks)::indexOf(fn);
     let listenerId = i >= 0 && objectKeys(hooks)[i];
     if (!listenerId) {
@@ -137,7 +136,7 @@ export const GM_API_CTX = {
     if (!text) throw new SafeError('Menu caption text is required!');
     const { id } = this;
     const key = opts.id || text;
-    const cmd = ensureNestedProp(commands, id, key);
+    const cmd = (bridge.commands[id] ||= createNullObj())[key] ||= createNullObj();
     cmd.cb = cb;
     cmd.text = text;
     bridge.post('RegisterMenu', { id, key, val: opts });
@@ -146,7 +145,7 @@ export const GM_API_CTX = {
   /** @this {GMContext} */
   GM_unregisterMenuCommand(key) {
     const { id } = this;
-    const hub = commands[id];
+    const hub = bridge.commands[id];
     if (hub && (hub[key] || (key = findCommandIdByText(key, hub)))) {
       delete hub[key];
       bridge.post('UnregisterMenu', { id, key });
@@ -236,11 +235,10 @@ function getResource(context, name, isBlob, isBlobAuto) {
     // data URIs aren't cached in bridge, so we'll send them
     const isData = key::slice(0, 5) === 'data:';
     const bucketKey = isBlob == null ? 0 : 1 + (isBlob = isBlobAuto ? !isData : isBlob);
-    res = isData && isBlob === false || ensureNestedProp(resCache, bucketKey, key, false);
-    if (!res) {
-      res = bridge.call('GetResource', { id, isBlob, key, raw: isData && key });
-      ensureNestedProp(resCache, bucketKey, key, res);
-    }
+    const bucket = resCache[bucketKey] ||= createNullObj();
+    res = isData && isBlob === false || (
+      bucket[key] ||= bridge.call('GetResource', { id, isBlob, key, raw: isData && key })
+    );
   }
   return resolveOrReturn(context, res === true ? key : res);
 }

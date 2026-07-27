@@ -8,6 +8,7 @@ import {
   TIMEOUT_WEEK, TL_AWAIT, VALUE_IDS,
 } from '@/common/consts';
 import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
+import { isGmStorageGranted } from '@/common/script';
 import pluginEvents from '../plugin/events';
 import broadcast from './broadcast';
 import {
@@ -296,7 +297,6 @@ const makeEnv = () => ({
   [RUN_AT]: {},
   [SCRIPTS]: [],
 });
-const GMVALUES_RE = /^GM[_.](listValues|([gs]et|delete)Values?)$/;
 const STORAGE_ROUTES = {
   [S_CACHE]: CACHE_KEYS,
   [S_CODE]: IDS,
@@ -355,7 +355,7 @@ export function getScriptsByURL(url, isTop, errors, prevIds) {
     const { depsMap } = env;
     env[IDS].push(id);
     env[RUN_AT][id] = runAt;
-    if (meta.grant.some(GMVALUES_RE.test, GMVALUES_RE)) {
+    if (isGmStorageGranted(meta)) {
       env[VALUE_IDS].push(id);
     }
     if (!clipboardChecked) {

@@ -204,7 +204,7 @@ editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: >-
     Documentație cu privire la blockurile metadatelor usescripturilor și
-    API-urile <code>GM</code>: 
+    API-urile <code>GM</code>:
 editHelpKeyboard:
   description: Label in the editor help tab for the keyboard shortcuts.
   message: Comenzi rapide de la tastatură
@@ -335,7 +335,7 @@ headerRecycleBin:
   message: Coș de reciclare
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Afișează instrucțiunile pentru scripturile locale trase și plasate
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: pentru $1 scripturi coincidente
@@ -480,17 +480,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Expune versiunea instalată pe site-urile de catalog ale userscripturilor: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Mod $1 alternativ în Firefox
-labelFastFirefoxInjectHint:
+  message: Mod $1 alternativ
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    O metodă alternativă de injectare pentru scripturile<document-start>
-    începând cu Firefox 59, mai rapidă decât modul implicit. Similar cu „Mod
-    page sincron”, crește și consumul de memorie, astfel încât este posibil să
-    vrei să îl dezactivezi dacă scripturile tale funcționează corect fără
-    această opțiune.
+    O metodă alternativă de injectare pentru scripturile<document-start>, mai
+    rapidă decât modul implicit. Similar cu „Mod page sincron”, crește și
+    consumul de memorie, astfel încât este posibil să vrei să îl dezactivezi
+    dacă scripturile tale funcționează corect fără această opțiune.
 labelFeedback:
   description: Label of link to feedback page.
   message: Feedback

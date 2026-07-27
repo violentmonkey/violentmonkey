@@ -335,9 +335,7 @@ headerRecycleBin:
   message: Cestino
 helpForLocalFile:
   description: Label of the checkbox.
-  message: >-
-    Mostra le istruzioni per gli script locali che vengono trascinati nella
-    finestra di Violentmonkey
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: per $1 script corrispondenti
@@ -484,16 +482,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Esponi la versione installata sui siti catalogo di script utente: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Modalità alternativa $1 in Firefox
-labelFastFirefoxInjectHint:
+  message: Modalità alternativa $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Una modalità alternativa di iniezione per <document-start> gli script da
-    Firefox 59, più veloce di quella predefinita. Così come "Modalità a pagina
-    sincrona" aumenta anche il consumo di memoria, quindi potresti volerla
-    disattivare se i tuoi script funzionano bene senza questa opzione.
+    Una modalità alternativa di iniezione per <document-start> gli script, più
+    veloce di quella predefinita. Così come "Modalità a pagina sincrona" aumenta
+    anche il consumo di memoria, quindi potresti volerla disattivare se i tuoi
+    script funzionano bene senza questa opzione.
 labelFeedback:
   description: Label of link to feedback page.
   message: Segnala problemi o invia un tuo parere

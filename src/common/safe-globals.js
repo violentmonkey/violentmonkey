@@ -16,6 +16,9 @@ const {
   chrome,
   performance,
 } = global;
+export const {
+  defineProperty,
+} = Object;
 export const SafePromise = Promise; // alias used by browser.js
 export const SafeError = Error; // alias used by browser.js
 export const { apply: safeApply } = Reflect;

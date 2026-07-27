@@ -35,3 +35,22 @@ export const isFunction = val => typeof val === 'function';
 export const isObject = val => val != null && typeof val === 'object';
 export const kFileName = 'fileName';
 export const kUseMenu = 'useMenu';
+
+/**
+ * @param {T} obj
+ * @param {string|Symbol} key
+ * @param {?} value
+ * @param {boolean} [mutable]
+ * @param {'set' | 'get'} [valueKey]
+ * @return {T}
+ * @template T
+ */
+export const setOwnProp = (obj, key, value, mutable = true, valueKey) => (
+  defineProperty(obj, key, {
+    __proto__: null,
+    [valueKey || 'value']: value,
+    [!valueKey && 'writable']: mutable, // only allowed for 'value'
+    configurable: mutable,
+    enumerable: mutable,
+  })
+);

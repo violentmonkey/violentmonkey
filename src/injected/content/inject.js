@@ -1,13 +1,12 @@
-import bridge, { addHandlers, grantless } from './bridge';
-import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util';
+import * as bridge from './bridge';
 import { Run } from './cmd-run';
+import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
 
-const bridgeIds = bridge[IDS];
 const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
-export let bridgeInfo;
-export let bridgeRealms;
+export let injectedInfo;
+export let injectedRealms;
 /** @type {{[runAt: VMScriptRunAt]: VMInjection.Script[]}} */
 let contLists, pageLists;
 /** @type {?boolean} */
@@ -21,12 +20,12 @@ let getAttribute;
 let querySelector;
 
 // https://bugzil.la/1408996
-let VMInitInjection = window[INIT_FUNC_NAME];
+let VMInitInjection = window[__.INIT_FUNC_NAME];
 /** Avoid running repeatedly due to new `documentElement` or with declarativeContent in Chrome.
  * The prop's mode is overridden to be unforgeable by a userscript in content mode. */
-setOwnProp(window, INIT_FUNC_NAME, 1, false);
+setOwnProp(window, __.INIT_FUNC_NAME, 1, false);
 
-if (!__.MV3) addHandlers({
+if (!__.MV3) bridge.addHandlers({
   /**
    * FF bug workaround to enable processing of sourceURL in injected page scripts
    */
@@ -106,7 +105,7 @@ export function injectPageSandbox(data) {
      * otherwise a same-origin parent page could use it to spoof the handshake. */
     window::on(handshakeId, handshaker, { capture: true, once: true });
     inject({
-      code: `(${VMInitInjection}(${IS_FIREFOX},'${handshakeId}','${vaultId}'))()`
+      code: `(${VMInitInjection})(${IS_FIREFOX},'${handshakeId}','${vaultId}')()`
         + `\n//# sourceURL=${VM_UUID}sandbox/injected-web.js`,
     });
     // Clean up in case CSP prevented the script from running
@@ -115,7 +114,8 @@ export function injectPageSandbox(data) {
   function handshaker(evt) {
     pageInjectable = true;
     evt::stopImmediatePropagation();
-    bindEvents(contentId, webId, bridge);
+    // eslint-disable-next-line no-import-assign
+    bridge.post = bindEvents(contentId, webId, bridge.onHandle, true);
     fireBridgeEvent(`${handshakeId}*`, [webId, contentId]);
   }
 }
@@ -132,11 +132,10 @@ export async function injectScripts(data, info, isXml) {
   if (errors) {
     logging.warn(errors);
   }
-  bridgeInfo = createNullObj();
-  bridgeInfo[PAGE] = info;
-  bridgeInfo[CONTENT] = info;
-  bridgeRealms = createNullObj();
-  assign(bridge[CACHE], data[CACHE]);
+  injectedInfo = { __proto: null, [PAGE]: info, [CONTENT]: info };
+  injectedRealms = createNullObj();
+  setPrototypeOf(bridge.cache = data[CACHE], null); // eslint-disable-line no-import-assign
+  bridge.pathMaps = createNullObj(); // eslint-disable-line no-import-assign
   if (isXml || data[FORCE_CONTENT]) {
     pageInjectable = false;
   } else if (data[PAGE] && pageInjectable == null) {
@@ -148,7 +147,7 @@ export async function injectScripts(data, info, isXml) {
   const moreData = (more || toContent.length)
     && sendFeedback(toContent, more);
   const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
-  const wasInjectableFF = IS_FIREFOX && !nonce && pageInjectable;
+  const wasInjectableFF = !__.MV3 && IS_FIREFOX && !nonce && pageInjectable;
   const pageBodyScripts = pageLists?.[BODY];
   if (wasInjectableFF) {
     getAttribute = Element[PROTO].getAttribute;
@@ -174,7 +173,7 @@ export async function injectScripts(data, info, isXml) {
     }, BODY);
   }
   if (more && (data = await moreData)) {
-    assign(bridge[CACHE], data[CACHE]);
+    assign(bridge.cache, data[CACHE]);
     if (document::getReadyState() === 'loading') {
       await new SafePromise(resolve => {
         /* Since most sites listen to DOMContentLoaded on `document`, we let them run first
@@ -193,7 +192,7 @@ export async function injectScripts(data, info, isXml) {
     await injectAll('idle');
   }
   // release for GC
-  bridgeInfo = contLists = pageLists = VMInitInjection = null;
+  injectedInfo = contLists = pageLists = VMInitInjection = null;
 }
 
 function didPageLoseInjectability(toContent, scripts) {
@@ -211,7 +210,7 @@ function didPageLoseInjectability(toContent, scripts) {
   for (const scr of scripts) {
     const realm = scr[INJECT_INTO];
     if (realm === PAGE
-    || realm === AUTO && bridge[INJECT_INTO] !== CONTENT) {
+    || realm === AUTO && bridge.injectInto !== CONTENT) {
       if (toContent) safePush(toContent, [scr.id, scr.key.data]);
       else scr[INJECT_INTO] = CONTENT;
     }
@@ -254,7 +253,7 @@ function triageScript(script) {
     delete script[META_STR];
     if (pathMap) bridge.pathMaps[script.id] = pathMap;
   } else {
-    bridgeIds[script.id] = ID_BAD_REALM;
+    bridge.ids[script.id] = ID_BAD_REALM;
   }
   return realm;
 }
@@ -331,12 +330,12 @@ function injectAll(runAt) {
     const lists = inPage ? pageLists : contLists;
     const items = lists?.[runAt];
     if (items) {
-      bridge.post('ScriptData', { items, info: bridgeInfo[realm] }, realm);
-      bridgeInfo[realm] = false; // must be a sendable value to have own prop in the receiver
-      bridgeRealms[realm] = true;
+      bridge.post('ScriptData', { items, info: injectedInfo[realm] }, realm);
+      injectedInfo[realm] = false; // must be a sendable value to have own prop in the receiver
+      injectedRealms[realm] = true;
       for (const { id, meta: { grant } } of items) {
         tardyQueue[id] = 1;
-        if (!grant.length) grantless[realm] = 1;
+        if (!grant.length) bridge.grantless[realm] = 1;
       }
       if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
       else if (__.MV3 || !IS_FIREFOX) res = injectPageList(runAt);
@@ -364,11 +363,9 @@ async function injectPageList(runAt) {
 function setupContentInvoker() {
   invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
+  // eslint-disable-next-line no-import-assign
   bridge.post = (cmd, params, realm, node) => {
-    const fn = realm === CONTENT
-      ? invokeContent
-      : postViaBridge;
-    fn(cmd, params, undefined, node);
+    (realm === CONTENT ? invokeContent : postViaBridge)(cmd, params, undefined, node);
   };
 }
 
@@ -379,16 +376,15 @@ function setupContentInvoker() {
 function tardyQueueCheck(scripts) {
   for (const { id } of scripts) {
     if (tardyQueue[id]) {
-      if (bridgeIds[id] === 1) bridgeIds[id] = ID_INJECTING;
+      if (bridge.ids[id] === 1) bridge.ids[id] = ID_INJECTING;
       delete tardyQueue[id];
     }
   }
 }
 
 function tellBridgeToWriteVault(vaultId, wnd) {
-  const { post } = bridge;
-  if (post) { // may be absent if this page doesn't have scripts
-    post('WriteVault', vaultId, PAGE, wnd);
+  if (bridge.post) { // may be absent if this page doesn't have scripts
+    bridge.post('WriteVault', vaultId, PAGE, wnd);
     return true;
   }
 }

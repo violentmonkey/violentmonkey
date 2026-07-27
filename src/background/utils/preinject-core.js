@@ -1,5 +1,5 @@
 import { noop, sendTabCmd } from '@/common';
-import { executeScript, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
+import { executeScript, INJECTED_API_ID, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
 import initCache from '@/common/cache';
 import {
   __CODE, BLACKLIST, CACHE_KEYS, GLOB_ALL, kDownloadMode, kMainFrame, kSubFrame, REQ_KEYS, UNWRAP,
@@ -27,6 +27,8 @@ export let downloadMode;
 export let ffCsp;
 export let ffInject;
 export let xhrInject = false; // must be initialized for proper comparison when toggling
+export let lastRegDuration = 0;
+export let lastRegTime = 0;
 let xhrInjectKey;
 
 const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
@@ -120,7 +122,7 @@ const OPT_HANDLERS = {
   },
   [kGmDownloadViaApi]: updateDownloadMode,
 };
-if (contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastFirefoxInject;
+if (__.MV3 || contentScriptsAPI) OPT_HANDLERS.ffInject = toggleFastForwardInject;
 onPermissionChanged.add(() => updateDownloadMode(getOption(kGmDownloadViaApi)));
 hookOptionsInit(onOptionChanged);
 
@@ -170,7 +172,7 @@ function togglePreinject(enable) {
   }
 }
 
-function toggleFastFirefoxInject(enable) {
+function toggleFastForwardInject(enable) {
   ffInject = enable;
   if (!enable) {
     cache.some(v => { unregisterScript(v); /* must return falsy! */ });
@@ -214,6 +216,7 @@ export function injectContentRealm(toContent, tabId, frameId) {
 // TODO: rework the whole thing to register scripts individually with real `matches`
 // (this will also allow proper handling of @noframes)
 export function registerScriptData(inject, url) {
+  const t = performance.now();
   addMenuConfig(inject);
   (/**@type{VMInjection}*/inject).info.gmi[kDownloadMode] = downloadMode;
   for (const scr of inject[SCRIPTS]) {
@@ -227,12 +230,22 @@ export function registerScriptData(inject, url) {
     matches: [url.split('#', 1)[0].replace(/\*/g, '\\$&')], // escape `*` in the URL itself
     [RUN_AT]: 'document_start',
   };
-  if (__.MV3) {
-    inject.id = INJECTED_DATA_ID + url;
-    inject = [inject];
-    chrome.userScripts.update(inject).catch(noop);
-  }
-  return (__.MV3 ? chrome.userScripts : contentScriptsAPI).register(inject).catch(noop);
+  lastRegTime = performance.now();
+  lastRegDuration = lastRegTime - t;
+  return (__.MV3
+    ? registerScriptDataMV3(inject, url)
+    : contentScriptsAPI.register(inject)
+  ).catch(__.DEV ? console.warn : noop);
+}
+
+async function registerScriptDataMV3(inject, url) {
+  try {
+    await chrome.userScripts.unregister({ ids: [inject.id = INJECTED_DATA_ID + url] });
+  } catch {/*ignore*/}
+  // Chrome runs scripts in the order of register & update
+  const res = chrome.userScripts.register([inject]);
+  chrome.userScripts.update([{ id: INJECTED_API_ID, matches: ['<all_urls>', url] }]);
+  return res;
 }
 
 /** @param {VMInjection.Bag} bag */

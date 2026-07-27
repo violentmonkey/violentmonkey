@@ -1,4 +1,4 @@
-import bridge, { addBackgroundHandlers, addHandlers, onScripts } from './bridge';
+import * as bridge from './bridge';
 import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
@@ -8,8 +8,6 @@ import { sendCmd } from './util';
 import { isEmpty, XHR_COOKIE_RE } from '../util';
 import { Run, finish } from './cmd-run';
 
-const { [IDS]: ids } = bridge;
-
 // Make sure to call obj::method() in code that may run after CONTENT userscripts
 async function init() {
   const isXml = document instanceof XMLDocument;
@@ -17,7 +15,7 @@ async function init() {
   /** Could be a DOM element with an `id` attribute equal to ours */
   const regRaw = canReg && global[VIOLENTMONKEY];
   const regData = regRaw?.[kSessionId] && delete global[VIOLENTMONKEY] && regRaw;
-  const xhrData = !regData && getXhrInjection();
+  const xhrData = getXhrInjection(regData);
   const dataPromise = sendCmd('GetInjected', {
     /* In FF93 sender.url is wrong: https://bugzil.la/1734984,
      * in Chrome sender.url is ok, but location.href is wrong for text selection URLs #:~:text= */
@@ -32,8 +30,8 @@ async function init() {
   /** @type {VMInjection} */
   const data = regData || xhrData || await (canReg ? getRegistration(dataPromise) : dataPromise);
   const info = data.info;
-  const injectInto = bridge[INJECT_INTO] = data[INJECT_INTO];
-  assign(ids, data[IDS]);
+  const injectInto = bridge.injectInto = data[INJECT_INTO]; // eslint-disable-line no-import-assign
+  assign(bridge.ids, data[IDS]);
   if (!__.MV3 && IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
   }
@@ -41,38 +39,38 @@ async function init() {
     IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
   if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
-    addHandlers({ GetScriptVer: true });
+    bridge.addHandlers({ GetScriptVer: true });
     bridge.post('Expose', data[EXPOSE]);
   }
-  if (objectKeys(ids).length) {
-    bridge[kUseMenu] = data[kUseMenu];
-    onScripts.forEach(fn => fn(data));
+  if (objectKeys(bridge.ids).length) {
+    bridge.useMenu = data[kUseMenu]; // eslint-disable-line no-import-assign
+    bridge.onScripts.forEach(fn => fn(data));
     await injectScripts(data, info, isXml);
   }
-  onScripts.length = 0;
+  bridge.onScripts = null; // eslint-disable-line no-import-assign
   finish(injectInto);
 }
 
-addBackgroundHandlers({
+bridge.addBackgroundHandlers({
   [VIOLENTMONKEY]: () => true,
   Stop: stop,
 }, true);
 
-addBackgroundHandlers({
-  Command: data => bridge.post('Command', data, ids[data.id]),
+bridge.addBackgroundHandlers({
+  Command: data => bridge.post('Command', data, bridge.ids[data.id]),
   Run: id => Run(id, CONTENT),
   UpdatedValues(data) {
     const dataPage = createNullObj();
     const dataContent = createNullObj();
     objectKeys(data)::forEach((id) => {
-      (ids[id] === CONTENT ? dataContent : dataPage)[id] = data[id];
+      (bridge.ids[id] === CONTENT ? dataContent : dataPage)[id] = data[id];
     });
     if (!isEmpty(dataPage)) bridge.post('UpdatedValues', dataPage);
     if (!isEmpty(dataContent)) bridge.post('UpdatedValues', dataContent, CONTENT);
   },
 });
 
-addHandlers({
+bridge.addHandlers({
   CookieDelete: REIFY,
   CookieList: REIFY,
   CookieSet: REIFY,
@@ -95,7 +93,7 @@ async function getRegistration(viaMessaging) {
   return data;
 }
 
-function getXhrInjection() {
+function getXhrInjection(regData) {
   try {
     const key = VM_UUID.match(XHR_COOKIE_RE)[1];
     // Accessing document.cookie may throw due to CSP sandbox
@@ -103,6 +101,7 @@ function getXhrInjection() {
     const blobId = cookieValue && cookieValue.split(';', 1)[0];
     if (blobId) {
       document.cookie = `${key}=0; max-age=0; SameSite=Lax`; // this removes our cookie
+      if (regData) return;
       const xhr = new XMLHttpRequest();
       const url = `blob:${VM_UUID}${blobId}`;
       xhr.open('get', url, false); // `false` = synchronous

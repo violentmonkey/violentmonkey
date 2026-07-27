@@ -1,14 +1,14 @@
-import bridge, { addHandlers } from './bridge';
+import * as bridge from './bridge';
 
 let lastId = 0;
 const tabs = createNullObj();
 
-addHandlers({
+bridge.addHandlers({
   TabClosed(key) {
     const item = tabs[key];
     if (item) {
-      item.closed = true;
       delete tabs[key];
+      item.closed = true;
       item.onclose?.();
     }
   },
@@ -18,6 +18,7 @@ export function onTabCreate(data) {
   lastId += 1;
   const key = lastId;
   const item = {
+    __proto__: null,
     onclose: null,
     closed: false,
     close() {

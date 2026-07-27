@@ -3,6 +3,7 @@ import { kContentType, kMainFrame } from '@/common/consts';
 import { DNR, DNR_ID_INSTALL } from './dnr';
 import { inIncognitoContext } from './init';
 import { kAlarmRemove, kAlarmUpdate } from './session-data';
+import { CHROME } from './ua';
 import { getUpdateInterval } from './update';
 
 export const NEW_INSTALL = '0';
@@ -19,19 +20,21 @@ chrome.runtime.onInstalled.addListener(({reason, previousVersion}) => {
       ]);
       DNR.getDynamicRules().then(rules => DNR.updateDynamicRules({
         removeRuleIds: rules.map(r => r.id),
-        addRules: [{
+        // Suppressing the userjs installation error in Chrome < 152
+        // https://chromiumdash.appspot.com/commit/38b617ca5ade59243d01170a8f4a744692983f19
+        addRules: CHROME < 152 ? [{
           id: DNR_ID_INSTALL,
           condition: {
-            regexFilter: '\\.user\\.js(\\[?#].*)?$',
+            regexFilter: '\\.user\\.js([?#].*)?$',
             requestMethods: ['get'],
             resourceTypes: [kMainFrame],
-            responseHeaders: [{ header: kContentType, values: ['*/javascript*'] }],
+            responseHeaders: [{ header: kContentType, values: ['*/javascript*', 'text/plain*'] }],
           },
           action: {
             type: 'modifyHeaders',
             responseHeaders: [{ header: kContentType, value: 'text/html', operation: 'set' }],
           },
-        }],
+        }] : undefined,
       }));
     }
   }

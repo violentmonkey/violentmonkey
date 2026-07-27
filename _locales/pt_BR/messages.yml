@@ -334,7 +334,7 @@ headerRecycleBin:
   message: Lixeira
 helpForLocalFile:
   description: Label of the checkbox.
-  message: Mostrar as instruções para scripts locais arrastados e soltos
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: para $1 scripts correspondentes
@@ -481,16 +481,16 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'Expor a versão instalada em sites de catálogo de script do usuário: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: Modo alternativo de $1 no Firefox
-labelFastFirefoxInjectHint:
+  message: Modo alternativo de $1
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Um método alternativo de injeção <document-start> para scripts desde o
-    Firefox 59, mais rápido que o modo padrão. Da mesma forma que o "Modo de
-    página síncrona", também aumenta o consumo de memória, portanto, você pode
-    desativá-lo se seus scripts funcionarem corretamente sem essa opção.
+    Um método alternativo de injeção <document-start> para scripts, mais rápido
+    que o modo padrão. Da mesma forma que o "Modo de página síncrona", também
+    aumenta o consumo de memória, portanto, você pode desativá-lo se seus
+    scripts funcionarem corretamente sem essa opção.
 labelFeedback:
   description: Label of link to feedback page.
   message: Comentários

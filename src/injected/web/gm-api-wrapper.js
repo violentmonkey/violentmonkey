@@ -1,4 +1,4 @@
-import bridge from './bridge';
+import * as bridge from './bridge';
 import { GM4_ALIAS, GM_API, GM_API_CTX, GM_API_CTX_GM4ASYNC, gmCookieInvoker } from './gm-api';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils, safeCopy, thisObjectProto } from './util';
@@ -12,7 +12,7 @@ const componentUtils = makeComponentUtils();
 const kResources = 'resources';
 const getUA = () => bridge.call('UA');
 const getUAHints = hints => bridge.promise('UAH', hints);
-const getUAData = () => bridge.uad
+const getUAData = () => bridge.info.uad
   && setOwnProp(bridge.call('UAD'), 'getHighEntropyValues', getUAHints);
 const sendTabClose = () => bridge.post('TabClose');
 const sendTabFocus = () => bridge.post('TabFocus');
@@ -96,9 +96,9 @@ export function makeGmApiWrapper(script) {
       name = arr[i];
       arr[i] = { name, url: resources[name] };
     }
-    assign(gmInfo, bridge.gmi);
+    assign(gmInfo, bridge.info.gmi);
     gmInfo[INJECT_INTO] = bridge.mode;
-    gmInfo.platform = safeCopy(bridge.ua);
+    gmInfo.platform = safeCopy(bridge.info.ua);
     gmInfo.script = meta;
     gmInfo.scriptHandler = VIOLENTMONKEY;
     gmInfo.version = __.VM_VER;

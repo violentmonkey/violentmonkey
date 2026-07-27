@@ -306,7 +306,7 @@ headerRecycleBin:
   message: 回收站
 helpForLocalFile:
   description: Label of the checkbox.
-  message: 显示拖放本地脚本的详细说明
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: 对 $1 匹配的脚本
@@ -445,13 +445,13 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 在用户脚本收录站点上暴露已安装的版本信息：$1
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: 在 Firefox 中切换 $1 模式
-labelFastFirefoxInjectHint:
+  message: 中切换 $1 模式
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    从 Firefox 59 开始，可以切换到此种比默认方案更快的 <document-start> 注入方式。和“同步 page
+    可以切换到此种比默认方案更快的 <document-start> 注入方式。和“同步 page
     模式”类似，它也会增加内存消耗，所以如果在不开启此功能的情况下你的脚本依然正常运行，则可以考虑禁用。
 labelFeedback:
   description: Label of link to feedback page.

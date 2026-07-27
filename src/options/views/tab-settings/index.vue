@@ -76,8 +76,9 @@
               <ruby v-text="i18n('labelXhrInjectNote')" class="ml-1"/>
             </setting-check>
           </tooltip>
-          <tooltip :content="i18n('labelFastFirefoxInjectHint')" align="start">
-            <setting-check name="ffInject" :label="i18n('labelFastFirefoxInject', '<page>')"/>
+          <tooltip :content="i18n('labelFastInjectHint')" align="start">
+            <setting-check name="ffInject" :label="i18n('labelFastInject', '<page>')"
+                           :disabled="!CAN_FAST_INJECT"/>
           </tooltip>
           <tooltip :content="i18n('labelFirefoxPatchCspHint', ['<page>', '<wrappedJSObject>'])" align="start">
             <setting-check name="ffCsp" :label="i18n('labelFirefoxPatchCsp')"/>
@@ -145,10 +146,11 @@ const items = {
   [kGmDownloadViaApi]: value => value,
 };
 const ctrlS = () => getActiveElement().dispatchEvent(new Event('ctrl-s'));
+const CAN_FAST_INJECT = __.MV3 || browser.contentScripts;
 </script>
 
 <script setup>
-import { noop } from '@/common';
+import { noop, sendCmdDirectly } from '@/common';
 import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import LocaleGroup from '@/common/ui/locale-group';
@@ -194,6 +196,9 @@ async function requestDownloadsPermission() {
       permissions: [kDownloads]
     }).catch(noop);
     granting.value = false;
+    if (!__.MV3 && !browser.permissions.onAdded) {
+      sendCmdDirectly('SetPermissions', { [kDownloads]: store[kDownloads] });
+    }
   }
 }
 </script>
@@ -234,6 +239,7 @@ async function requestDownloadsPermission() {
   section {
     display: flex;
     flex-flow: column;
+    > .flex-col > *,
     > :not(h3):not([class*="flex"]):not(.setting-text) {
       align-self: flex-start;
     }

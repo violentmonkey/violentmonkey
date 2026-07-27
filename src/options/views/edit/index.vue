@@ -115,6 +115,7 @@ import { externalEditorInfoUrl, focusMe, getActiveElement, showMessage } from '@
 import { keyboardService } from '@/common/keyboard';
 import options from '@/common/options';
 import { getUnloadSentry } from '@/common/router';
+import { isGmStorageGranted } from '@/common/script';
 import { EXTERNAL_LINK_PROPS } from '@/common/ui';
 import {
   kDownloadURL, kExclude, kExcludeMatch, kHomepageURL, kIcon, kInclude, kMatch, kName, kOrigExclude, kOrigExcludeMatch,
@@ -248,7 +249,7 @@ const navItems = computed(() => {
   return {
     code: i18n('editNavCode'),
     settings: i18n('editNavSettings'),
-    ...id && {
+    ...id && (size || isGmStorageGranted(meta)) && {
       values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
     },
     ...(req || res) && { [EXTERNALS]: [req, res]::trueJoin('/') },

@@ -274,7 +274,10 @@ fileInstallBlocked:
     محلي.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    افتح صفحة about:addons، انقر فوق "Violentmonkey"، انقر فوق "الأذونات
+    والبيانات"، وقم بتمكين "الوصول إلى الملفات المحلية على جهاز الكمبيوتر الخاص
+    بك".
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: أبجدي
@@ -329,7 +332,7 @@ headerRecycleBin:
   message: سلة المحذوفات
 helpForLocalFile:
   description: Label of the checkbox.
-  message: عرض التعليمات الخاصة بالسكربتات المحلية التي تم سحبها وإفلاتها
+  message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: لـ $1 سكربتًا مطابقًا
@@ -471,44 +474,46 @@ labelExportScriptData:
 labelExposeStatus:
   description: Option in advanced settings.
   message: 'إظهار الإصدار المثبت على مواقع كتالوج سكربتات المستخدم: $1'
-labelFastFirefoxInject:
+labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: وضع $1 بديل في Firefox
-labelFastFirefoxInjectHint:
+  message: ''
+labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: >-
-    طريقة حقن بديلة لسكربتات <document-start> بدءًا من Firefox 59، أسرع من الوضع
-    الافتراضي. مثل "وضع الصفحة المتزامن"، فإنه يزيد أيضًا من استهلاك الذاكرة،
-    لذا قد ترغب في تعطيله إذا كانت سكربتاتك تعمل بشكل صحيح دونه.
+  message: ''
 labelFeedback:
   description: Label of link to feedback page.
   message: ملاحظات
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: تجاوز سياسة أمان المحتوى في فايرفوكس
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: >-
+    يُضيف قيمة عشوائية إلى CSP لصفحات الويب، لا يمكن لـ Violentmonkey استخدامها
+    إلا لتشغيل السكربتات في وضع الحقن،$1 وإلا فسيكون من الضروري تعديل السكربتات
+    لاستخدام $2.
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: قد يحد$1 الوضع المعزول من الوظائف، راجع "$2" في الخيارات.
 labelGeneral:
   description: Label for general settings.
   message: عام
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: استخدم واجهة برمجة تطبيقات تنزيل المتصفح
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: >-
+    يسمح هذا البرنامج للبرامج النصية بحفظ الملفات في مجلدات فرعية داخل دليل
+    التنزيلات الخاص بك، ويعرض تقدم التنزيل في شريط التنزيل الخاص بالمتصفح.
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: منح الإذن
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: المساعدة في الترجمة
