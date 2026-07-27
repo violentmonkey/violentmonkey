@@ -47,7 +47,7 @@ export const promiseResolve = async val => val;
 
 export const safeGetUniqId = (prefix = 'VM') => prefix + (
   U8_toBase64 // minimum_chrome_version>=140, strict_min_version>=133
-  ? getRandomValues(new SafeUint8Array(16))::U8_toBase64()
+  ? getRandomValues(new SafeUint8Array(12))::U8_toBase64()
   : safeBtoa(safeApply(stringFromCharCode, null, getRandomValues(new SafeUint8Array(16))))
 );
 

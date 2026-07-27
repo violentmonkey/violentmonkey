@@ -64,7 +64,7 @@ export function throttle(func, time) {
 export function noop() {}
 
 export function getUniqId(prefix = 'VM', idSafe) {
-  let res = crypto.getRandomValues(new Uint8Array(16));
+  let res = crypto.getRandomValues(new Uint8Array(12));
   if (U8_fromBase64) { // minimum_chrome_version>=140, strict_min_version>=133
     res = res.toBase64({ alphabet: 'base64url', omitPadding: true });
     if (idSafe) res = res.replaceAll('-', '$');
