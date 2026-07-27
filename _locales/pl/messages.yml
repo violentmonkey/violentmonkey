@@ -330,7 +330,7 @@ headerRecycleBin:
   message: Kosz
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Pokaż pomoc, gdy nie można zainstalować skryptu lokalnego
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: dla $1 pasujących skryptów
