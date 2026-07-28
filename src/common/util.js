@@ -113,7 +113,7 @@ export function blob2base64(blob, offset = 0, length = 1e99) {
     return '';
   }
   if (U8_fromBase64) {
-    return blob.arrayBuffer().then(buf => new Uint8Array(buf).toBase64());
+    return blob.arrayBuffer().then(buf => new Uint8Array(buf).toBase64({ alphabet: 'base64url' }));
   }
   return readBlob(blob).then(res => res.slice(res.indexOf(',') + 1));
 }
