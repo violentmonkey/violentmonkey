@@ -44,7 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.60.0",
     "@violentmonkey/types": "^0.3.4",
-    "@vue/compiler-sfc": "^3.5.35",
+    "@vue/compiler-sfc": "^3.5.40",
     "@vue/eslint-config-typescript": "^13.0.0",
     "amo-upload": "^1.1.0",
     "autoprefixer": "^10.5.0",
@@ -119,8 +119,8 @@
     "@violentmonkey/xml-parser": "^1.0.0",
     "codemirror": "^5.65.20",
     "fflate": "^0.8.3",
-    "tldts": "^7.4.0",
-    "vue": "^3.5.35",
+    "tldts": "^7.4.9",
+    "vue": "^3.5.40",
     "vueleton": "^2.0.2"
   },
   "engines": {
