@@ -140,8 +140,8 @@ importers:
         specifier: ^8.60.0
         version: 8.60.0(eslint@8.57.1)(typescript@6.0.3)
       '@violentmonkey/types':
-        specifier: ^0.3.3
-        version: 0.3.3
+        specifier: ^0.3.4
+        version: 0.3.4
       '@vue/compiler-sfc':
         specifier: ^3.5.35
         version: 3.5.35
@@ -2098,8 +2098,8 @@ packages:
   '@violentmonkey/shortcut@1.4.4':
     resolution: {integrity: sha512-rS+qi/WhYQEKpoH/l8c+lBHppVIZDnbQxxSATE6zeKkKv4rbsV7aD9YAkJvSD1Jq6N96UT9grjhmA8huDGC+uA==}
 
-  '@violentmonkey/types@0.3.3':
-    resolution: {integrity: sha512-ISaLOU7tBR8WiSgHAzrYj5GHU99YP+ZAB0YNwaN7vvK9TZLm4LjxOLHnqy9O7dd0LAEVAa60r8jLd6VSZfsjLA==}
+  '@violentmonkey/types@0.3.4':
+    resolution: {integrity: sha512-4i8/8X4Dk/py+RWTdfJbQcQGOx7COossGrw3uhrNegqwuAtC6pBXpJMKcdkPxxJklxmnWPaX4kvB5hypZfhY4g==}
 
   '@violentmonkey/xml-parser@1.0.0':
     resolution: {integrity: sha512-b85soSVIrN23l2WXeMUSsUiHQr7GFUgbmbYOuKDQEgM+uRmHf/gCY+P49IhzmnGO0ME0wTaAVRvlkksxcfZ+kA==}
@@ -8046,7 +8046,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  '@violentmonkey/types@0.3.3':
+  '@violentmonkey/types@0.3.4':
     dependencies:
       user-agent-data-types: 0.4.2
 

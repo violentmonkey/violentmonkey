@@ -43,7 +43,7 @@
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.60.0",
-    "@violentmonkey/types": "^0.3.3",
+    "@violentmonkey/types": "^0.3.4",
     "@vue/compiler-sfc": "^3.5.35",
     "@vue/eslint-config-typescript": "^13.0.0",
     "amo-upload": "^1.1.0",
