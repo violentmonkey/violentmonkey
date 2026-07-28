@@ -95,7 +95,7 @@ importers:
         specifier: ^7.29.7
         version: 7.29.7(supports-color@8.1.1)
       '@babel/eslint-parser':
-        specifier: ^7.22.15
+        specifier: ^7.29.7
         version: 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(eslint@8.57.1(supports-color@8.1.1))
       '@babel/helper-plugin-utils':
         specifier: ^7.29.7
@@ -9258,7 +9258,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 9.0.5
+      minimatch: 10.2.5
       once: 1.4.0
       path-is-absolute: 1.0.1
 

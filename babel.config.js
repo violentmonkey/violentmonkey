@@ -17,11 +17,11 @@ module.exports = {
     }],
   ],
   plugins: [
-    ['@babel/plugin-transform-runtime', {
-      useESModules: !isTest,
+    isTest && ['@babel/plugin-transform-runtime', {
+      useESModules: false,
       version: '^7.5.0',
     }],
-    ['babel-plugin-module-resolver', {
+    isTest && ['babel-plugin-module-resolver', {
       alias,
       extensions,
     }],
@@ -30,5 +30,5 @@ module.exports = {
       removeImport: true,
       disableUnicodeSets: true,
     }],
-  ],
+  ].filter(Boolean),
 };

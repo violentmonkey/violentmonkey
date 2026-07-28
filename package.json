@@ -28,7 +28,7 @@
     "@actions/github": "^9.1.1",
     "@automattic/webpack-inline-constant-exports-plugin": "^1.0.0",
     "@babel/core": "^7.29.7",
-    "@babel/eslint-parser": "^7.22.15",
+    "@babel/eslint-parser": "^7.29.7",
     "@babel/helper-plugin-utils": "^7.29.7",
     "@babel/plugin-syntax-function-bind": "^7.29.7",
     "@babel/plugin-transform-for-of": "^7.29.7",
