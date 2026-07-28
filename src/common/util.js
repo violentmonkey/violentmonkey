@@ -77,21 +77,22 @@ export function getUniqId(prefix = 'VM', idSafe) {
 
 /**
  * @param {ArrayBuffer|Uint8Array|Array} buf
- * @param {number} [offset]
- * @param {number} [length]
  * @return {string} a binary string i.e. one byte per character
  */
-export function buffer2string(buf, offset = 0, length = 1e99) {
+export function buffer2string(buf) {
+  const arrayLen = buf.length; // present on Uint8Array/Array
+  if (U8_fromBase64) { // 3x faster even with the extra string for GC
+    return atob((arrayLen != null ? buf : new Uint8Array(buf)).toBase64());
+  }
   // The max number of arguments varies between JS engines but it's >32k so we're safe
   const sliceSize = 8192;
   const slices = [];
-  const arrayLen = buf.length; // present on Uint8Array/Array
-  const end = Math.min(arrayLen || buf.byteLength, offset + length);
-  const needsSlicing = arrayLen == null || offset || end > sliceSize;
-  for (; offset < end; offset += sliceSize) {
+  const end = arrayLen || buf.byteLength;
+  const needsSlicing = arrayLen == null || end > sliceSize;
+  for (let offset = 0; offset < end; offset += sliceSize) {
     slices.push(String.fromCharCode.apply(null,
       needsSlicing
-        ? new Uint8Array(buf, offset, Math.min(sliceSize, end - offset))
+        ? new Uint8Array(arrayLen ? buf.buffer : buf, offset, Math.min(sliceSize, end - offset))
         : buf));
   }
   return slices.join('');
