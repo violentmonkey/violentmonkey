@@ -26,6 +26,9 @@ module.exports = {
       extensions,
     }],
     './scripts/babel-plugin-safe-bind.js',
-    ['transform-modern-regexp', { useRe: true }],
+    ['babel-plugin-transform-regex', {
+      removeImport: true,
+      disableUnicodeSets: true,
+    }],
   ],
 };

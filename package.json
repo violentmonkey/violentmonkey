@@ -51,7 +51,7 @@
     "babel-jest": "^30.4.1",
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
-    "babel-plugin-transform-modern-regexp": "^0.0.6",
+    "babel-plugin-transform-regex": "^6.1.0",
     "cross-env": "^10.1.0",
     "cross-spawn": "^7.0.3",
     "css-loader": "^7.1.4",

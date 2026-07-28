@@ -477,4 +477,5 @@ declare var __: {
   VM_VER: string,
 };
 
+declare const regex: import('regex').RegexTag<RegExp>;
 //#endregion Generic

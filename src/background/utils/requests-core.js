@@ -7,7 +7,7 @@ let encoder;
 /** @type {Object<string,GMReq.BG>} */
 export const requests = { __proto__: null };
 export const verify = { __proto__: null };
-export const FORBIDDEN_HEADER_RE = re`/
+export const FORBIDDEN_HEADER_RE = regex('i')`
 ^(
   # prefix matches
   proxy-|
@@ -33,7 +33,7 @@ export const FORBIDDEN_HEADER_RE = re`/
   transfer-encoding|
   upgrade|
   via
-)$/ix`;
+)$`;
 /** @type {chrome.webRequest.RequestFilter} */
 const API_FILTER = {
   urls: ['<all_urls>'],
@@ -46,10 +46,10 @@ const EXTRA_HEADERS = [
 const headersToInject = {};
 export const kCookie = 'cookie';
 export const kSetCookie = 'set-cookie';
-const SET_COOKIE_VALUE_RE = re`
-  /^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:<-[\]-~]*)  \3(.*)  /x`;
-const SET_COOKIE_ATTR_RE = re`
-  /\s*  ;?\s*  (\w+)  (?:= (")?  ([!#-+\--:<-[\]-~]*)  \2)?  /xy`;
+const SET_COOKIE_VALUE_RE = regex({ disable: { n: true } })`
+  ^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:\<-\[\]-~]*)  \3(.*)`;
+const SET_COOKIE_ATTR_RE = regex({ disable: { n: true }, flags: 'y' })`
+  \s*  ;?\s*  (\w+)  (?:= (")?  ([!#-+\--:\<-\[\]-~]*)  \2)?`;
 const SAME_SITE_MAP = {
   strict: 'strict',
   lax: 'lax',

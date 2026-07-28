@@ -220,24 +220,24 @@ export function ensureArray(data) {
 
 const isDataUriRe = /^data:/i;
 const isHttpOrHttpsRe = /^https?:\/\//i;
-const isLocalUrlRe = re`/^(
+const isLocalUrlRe = regex('i')`^(
   file:|
   about:|
   data:|
-  https?:\/\/
-    ([^@/]*@)?
+  https?://
+    ([^@\/]*@)?
     (
       localhost|
       127\.0\.0\.1|
       (192\.168|172\.16|10\.0)\.\d+\.\d+|
-      \[(::1|(fe80|fc00)::[.:0-9a-f]+)]|
-      [^/:]+\.(test|example|invalid|localhost)
+      \[(::1|(fe80|fc00)::[.:0-9a-f]+)\]|
+      [^\/:]+\.(test|example|invalid|localhost)
     )
-    (:\d+|\/|$)
-)/ix`;
+    (:\d+|/|$)
+)`;
 /** Cherry-picked from https://greasyfork.org/en/help/cdns */
-export const isCdnUrlRe = re`/^https:\/\/(
-  (\w+-)?cdn(js)?(-\w+)?\.[^/]+ |
+export const isCdnUrlRe = regex('i')`^https://(
+  (\w+-)?cdn(js)?(-\w+)?\.[^\/]+ |
   bundle\.run |
   (www\.)?gitcdn\.\w+ |
   (
@@ -261,11 +261,11 @@ export const isCdnUrlRe = re`/^https:\/\/(
     bowercdn |
     craig\.global\.ssl\.fastly
   )\.net |
-  [^/.]+\.(
+  [^\/.]+\.(
     github\.(io | com) |
     zstatic\.net
   )
-)\//ix`;
+)/`;
 export const isDataUri = /*@__PURE__*/isDataUriRe.test.bind(isDataUriRe);
 export const isValidHttpUrl = url => isHttpOrHttpsRe.test(url) && tryUrl(url);
 export const isRemote = url => url && !isLocalUrlRe.test(decodeURI(url));
