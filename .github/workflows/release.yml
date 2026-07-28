@@ -25,7 +25,7 @@ jobs:
           node-version-file: 'package.json'
 
       - name: Prepare
-        run: pnpm i && node scripts/action-helper.js
+        run: pnpm ci && node scripts/action-helper.js
         env:
           ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}

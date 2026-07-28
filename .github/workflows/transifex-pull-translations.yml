@@ -21,7 +21,7 @@ jobs:
           node-version-file: 'package.json'
 
       - name: Install deps
-        run: pnpm i
+        run: pnpm ci
 
       - name: Update translations
         run: node scripts/transifex.mjs pull

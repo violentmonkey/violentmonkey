@@ -26,7 +26,7 @@ The version of Node.js should match `"node"` key in `package.json`.
 
 ``` sh
 # Install dependencies
-$ pnpm i
+$ pnpm ci
 
 # Watch and compile
 $ pnpm dev

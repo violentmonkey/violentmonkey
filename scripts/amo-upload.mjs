@@ -40,7 +40,7 @@ async function handleAddon() {
             : join(process.env.ASSETS_DIR, process.env.ASSET_ZIP),
           sourceFile: join(process.env.TEMP_DIR, process.env.SOURCE_ZIP),
           approvalNotes: `\
-corepack enable pnpm && pnpm i && pnpm run ci && pnpm build
+corepack enable pnpm && pnpm ci && pnpm run ci && pnpm build
 `,
           releaseNotes: {
             'en-US': `\
