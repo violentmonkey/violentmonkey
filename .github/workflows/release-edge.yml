@@ -60,6 +60,6 @@ jobs:
             echo Skip BETA for Edge
           fi
         env:
-          CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
-          API_KEY: ${{ secrets.EDGE_API_KEY }}
-          PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
