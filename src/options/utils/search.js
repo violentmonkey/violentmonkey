@@ -1,7 +1,8 @@
 import { escapeStringForRegExp } from '@/common';
 import { kTag } from '@/common/consts';
 
-const reToken = re`/\s*
+const reToken = regex({ disable: { n: true }, flags: 'y' })`
+  \s*
   (!)?
   (
     \# |
@@ -15,7 +16,7 @@ const reToken = re`/\s*
     \S+
   )
   (?:\s+|$)
-/yx`;
+`;
 const reTwoSingleQuotes = /''/g;
 const reTwoDoubleQuotes = /""/g;
 

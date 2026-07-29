@@ -233,16 +233,16 @@ function inferScriptHome(script) {
  * @returns {string | undefined}
  */
 function inferScriptSupportUrl(script, home = getScriptHome(script)) {
-  let u = home && home.match(re`/
-    ^https:\/\/(?:
-      (?:
-        (greas|sleaz)yfork\.(?:org|cc)(?:\/(?!scripts)[^/]+)? |
+  let u = home && home.match(regex('i')`
+    ^https://(
+      (
+        (?<GF>greas|sleaz)yfork\.(org|cc)(/(?!scripts)[^\/]+)? |
         openuserjs\.org
-      )(?=\/scripts\/) |
+      )(?=/scripts/) |
       github\.com
-    )\/[^/]+\/[^/]+/x`);
+    )/[^\/]+/[^\/]+`);
   if (u) {
-    return `${u[0]}/${u[1] ? 'feedback' : 'issues'}`;
+    return `${u[0]}/${u.groups.GF ? 'feedback' : 'issues'}`;
   }
 }
 

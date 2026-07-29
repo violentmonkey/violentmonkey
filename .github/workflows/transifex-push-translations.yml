@@ -19,7 +19,7 @@ jobs:
         with:
           node-version-file: 'package.json'
       - name: Install deps
-        run: pnpm i
+        run: pnpm ci
       - name: Upload translations
         run: node scripts/transifex.mjs push
         env:

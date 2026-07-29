@@ -18,13 +18,13 @@ const cacheResultInc = initCache({ lifetime: 60e3 });
 export const ERR_GLOB_HOST_SUFFIX = 'top-level domain with "*" should be replaced with ".tld" or @include';
 const RE_GLOB_HOST_SUFFIX = /\*[^.]*\.?$/;
 /** Simple matching for valid patterns */
-const RE_MATCH_PARTS = re`/^
-  (\*|http([s*])?|file|ftp|urn):\/\/
-  ([^/]*)\/
+const RE_MATCH_PARTS = regex({ disable: { n: true } })`^
+  (\*|http([s*])?|file|ftp|urn)://
+  ([^\/]*)/
   (.*)
-/x`;
+`;
 /** Resilient matching for broken patterns allows reporting errors with a helpful message */
-const RE_MATCH_BAD = re`/^
+const RE_MATCH_BAD = regex({ disable: { n: true } })`^
   (
     \*|
     # allowing the incorrect http* scheme which is the same as *
@@ -36,11 +36,11 @@ const RE_MATCH_BAD = re`/^
     ([^:]*?)(?=:)
   )
   # detecting a partially missing ://
-  (:(?:\/(?:\/)?)?)?
-  ([^/]*)
+  (:(?:/(?:/)?)?)?
+  ([^\/]*)
   # detecting a missing / for path
-  (?:\/(.*))?
-/x`;
+  (?:/(.*))?
+`;
 /** Case-sensitive because it's an internal URL */
 const RE_ABOUT_URL_PARTS = /^(about):()(.*)/;
 /** Simpler matching for a valid URL */

@@ -1,7 +1,7 @@
 {
   "name": "violentmonkey",
   "description": "Violentmonkey",
-  "version": "2.45.0",
+  "version": "2.46.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky",
@@ -28,7 +28,7 @@
     "@actions/github": "^9.1.1",
     "@automattic/webpack-inline-constant-exports-plugin": "^1.0.0",
     "@babel/core": "^7.29.7",
-    "@babel/eslint-parser": "^7.22.15",
+    "@babel/eslint-parser": "^7.29.7",
     "@babel/helper-plugin-utils": "^7.29.7",
     "@babel/plugin-syntax-function-bind": "^7.29.7",
     "@babel/plugin-transform-for-of": "^7.29.7",
@@ -43,15 +43,15 @@
     "@types/jest": "^30.0.0",
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.60.0",
-    "@violentmonkey/types": "^0.3.3",
-    "@vue/compiler-sfc": "^3.5.35",
+    "@violentmonkey/types": "^0.3.4",
+    "@vue/compiler-sfc": "^3.5.40",
     "@vue/eslint-config-typescript": "^13.0.0",
     "amo-upload": "^1.1.0",
     "autoprefixer": "^10.5.0",
     "babel-jest": "^30.4.1",
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
-    "babel-plugin-transform-modern-regexp": "^0.0.6",
+    "babel-plugin-transform-regex": "^6.1.0",
     "cross-env": "^10.1.0",
     "cross-spawn": "^7.0.3",
     "css-loader": "^7.1.4",
@@ -119,19 +119,18 @@
     "@violentmonkey/xml-parser": "^1.0.0",
     "codemirror": "^5.65.20",
     "fflate": "^0.8.3",
-    "tldts": "^7.4.0",
-    "vue": "^3.5.35",
+    "tldts": "^7.4.9",
+    "vue": "^3.5.40",
     "vueleton": "^2.0.2"
   },
   "engines": {
     "node": ">= 24"
   },
-  "packageManager": "pnpm@10.34.1+sha512.b58fbde6dca66a929538021581f648b4570b6ca19b18e7cbd7f2c07a7b24454155388dacdf08f2af3678e88a6d1fe04f9d609df24bf51735a060ea041b374ab7",
+  "packageManager": "pnpm@11.17.0+sha512.cca3cea332ad254bb84145f966d19f4879615210346fc92c79a047f23a0d7b3cca3c3792f0076ba1f1831d277efbcf0a9119b31a9a60eca7fb3d6231f331ef72",
   "jest": {
     "setupFilesAfterEnv": [
       "./test/mock/index.js"
     ],
     "testEnvironment": "./test/mock/env.js"
-  },
-  "beta": 5
+  }
 }

@@ -167,7 +167,7 @@ function makeOverrides() {
     GLOBALS_COMMON: {
       ...GLOBALS_SHARED,
       ...getGlobals('common'),
-      re: false, // transform-modern-regexp with useRe option
+      regex: false, // babel-plugin-transform-regex
     },
     GLOBALS_CONTENT: {
       ...GLOBALS_SHARED,

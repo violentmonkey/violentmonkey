@@ -32,7 +32,7 @@ jobs:
           node-version-file: 'package.json'
 
       - name: Install
-        run: pnpm i
+        run: pnpm ci
       - name: Test & Build
         run: |
           pnpm exec run-p ci build

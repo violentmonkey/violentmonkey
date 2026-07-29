@@ -51,24 +51,24 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
   }
 }
 
-const whitelistRe = re`/^https:\/\/(
-  (greas|sleaz)yfork\.(org|cc)\/scripts\/[^/]*\/code|
-  update\.(greas|sleaz)yfork\.(org|cc)\/scripts|
-  openuserjs\.org\/install\/[^/]*|
-  github\.com\/[^/]*\/[^/]*\/(
-    raw\/[^/]*|
-    releases\/(
-      download\/[^/]* |
-      latest\/download
+const whitelistRe = regex('i')`^https://(
+  (greas|sleaz)yfork\.(org|cc)/scripts/[^\/]*/code|
+  update\.(greas|sleaz)yfork\.(org|cc)/scripts|
+  openuserjs\.org/install/[^\/]*|
+  github\.com/[^\/]*/[^\/]*/(
+    raw/[^\/]*|
+    releases/(
+      download/[^\/]* |
+      latest/download
     )
   )|
-  raw\.githubusercontent\.com(\/[^/]*){3}|
-  gist\.github\.com\/.*?
-)\/[^/]*?\.user\.js  ([?#]|$)  /ix`;
-const blacklistRe = re`/^https?:\/\/(
+  raw\.githubusercontent\.com(/[^\/]*){3}|
+  gist\.github\.com/.*?
+)/[^\/]*?\.user\.js  ([?#]|$)`;
+const blacklistRe = regex('i')`^https?://(
   (gist\.)?github\.com|
   ((greas|sleaz)yfork|openuserjs)\.(org|cc)
-)\//ix`;
+)/`;
 export const resolveVirtualUrl = url => (
   `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`
 );

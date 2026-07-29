@@ -45,7 +45,8 @@ export const safePickInto = (dst, src, keys) => {
 
 export const promiseResolve = async val => val;
 
-export const safeGetUniqId = (prefix = 'VM') => prefix + (
+/** Not adding any prefix by default to make Spectre exfiltration harder */
+export const safeGetUniqId = (prefix = '') => prefix + (
   U8_toBase64 // minimum_chrome_version>=140, strict_min_version>=133
   ? getRandomValues(new SafeUint8Array(12))::U8_toBase64()
   : safeBtoa(safeApply(stringFromCharCode, null, getRandomValues(new SafeUint8Array(16))))

@@ -1,4 +1,5 @@
 /* tslint:disable:no-namespace */
+/// <reference types="@violentmonkey/types" />
 //#region Generic
 
 declare type NumBool = 0 | 1
@@ -32,7 +33,7 @@ declare namespace GMReq {
   type EventType = keyof XMLHttpRequestEventMap;
   type EventTypeMap = { [name: EventType]: boolean };
   type Response = string | Blob | ArrayBuffer;
-  type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails;
+  type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails<any>;
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     cbe?: (err: string|Error) => Promise<void>;
@@ -69,7 +70,7 @@ declare namespace GMReq {
   interface Web {
     id: string;
     scriptId: number;
-    cb: { [name: EventType]: typeof VMScriptGMXHRDetails.onload }[];
+    cb: { [name: EventType]: VMScriptGMXHRDetails<any>['onload'] }[];
     context?: any;
     raw?: Response;
     response?: Response;
@@ -84,7 +85,7 @@ declare namespace GMReq {
       blobbed: boolean;
       chunked: boolean;
       contentType: string;
-      data: VMScriptResponseObject;
+      data: VMScriptResponseObject<any>;
       id: string;
       type: EventType;
       upload: 0 | 1;
@@ -476,4 +477,5 @@ declare var __: {
   VM_VER: string,
 };
 
+declare const regex: import('regex').RegexTag<RegExp>;
 //#endregion Generic

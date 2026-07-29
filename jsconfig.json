@@ -8,8 +8,8 @@
       "@/*": ["./src/*"]
     }
   },
-  "typeAcquisition": {
-    "include": ["./types.d.ts"]
-  },
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": ["dist", "dist-mv3"]
 }

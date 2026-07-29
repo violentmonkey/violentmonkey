@@ -25,7 +25,7 @@ jobs:
           node-version-file: 'package.json'
 
       - name: Prepare
-        run: pnpm i && node scripts/action-helper.js
+        run: pnpm ci && node scripts/action-helper.js
         env:
           ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           DISCORD_WEBHOOK_RELEASE: ${{ secrets.DISCORD_WEBHOOK_RELEASE }}
@@ -91,6 +91,7 @@ jobs:
           if ! node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
             export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
             ERROR="${ERROR:-AMO publish failed}"
+            echo "$ERROR"
           fi
           export TARGET=AMO
           node scripts/notify-release.mjs
@@ -117,6 +118,7 @@ jobs:
           if ! npx chrome-webstore-upload-cli@4 --extension-id $CWS_EXT_ID --source $CWS_SOURCE 2>"$TEMP_DIR/stderr.log"; then
             export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
             ERROR="${ERROR:-CWS publish failed}"
+            echo "$ERROR"
 
             # Ignore pending review error: "❌ You may not edit or publish an item that is in review."
             if [[ "$ERROR" == *"is in review"* ]]; then
