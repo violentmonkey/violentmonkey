@@ -52,6 +52,7 @@ jobs:
             if ! deno run -A https://raw.githubusercontent.com/violentmonkey/publish-edge-ext/main/main.ts $ASSETS_DIR/$ASSET_ZIP 2>"$TEMP_DIR/stderr.log"; then
               export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
               ERROR="${ERROR:-Edge publish failed}"
+              echo "$ERROR"
             fi
             export TARGET=Edge
             node scripts/notify-release.mjs
