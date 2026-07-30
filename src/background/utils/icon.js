@@ -205,7 +205,7 @@ export function setBadge(ids, reset, { tab, [kFrameId]: frameId, [kTop]: isTop }
 }
 
 function updateBadge({ id: tabId }, data = badges[tabId]) {
-  if (data) {
+  if (data && tabId >= 0) {
     browserAction.setBadgeText({
       text: `${data[showBadge] || ''}`,
       tabId,
@@ -214,7 +214,7 @@ function updateBadge({ id: tabId }, data = badges[tabId]) {
 }
 
 function updateBadgeColor({ id: tabId }, data = badges[tabId]) {
-  if (data) {
+  if (data && tabId >= 0) {
     browserAction.setBadgeBackgroundColor({
       color: data[INJECT] ? badgeColor : badgeColorBlocked,
       tabId,
@@ -224,6 +224,7 @@ function updateBadgeColor({ id: tabId }, data = badges[tabId]) {
 
 function updateState(tab, data, title) {
   const tabId = tab.id;
+  if (tabId < 0) return;
   if (!data) data = badges[tabId] || resetBadgeData(tabId);
   if (!title) [title] = getFailureReason(getTabUrl(tab), data);
   browserAction.setTitle({ tabId, title }).catch(noop);
@@ -235,7 +236,9 @@ async function setIcon({ id: tabId } = {}, data = badges[tabId] || {}) {
   const mod = !isApplied ? 'w'
     : data[INJECT] !== true ? 'b'
       : '';
-  if (data.icon === mod) return;
+  if (data.icon === mod || tabId < 0) {
+    return;
+  }
   data.icon = mod;
   const pathData = {};
   const iconData = {};
