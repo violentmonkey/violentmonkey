@@ -53,7 +53,7 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
 
 const whitelistRe = regex('i')`^https://(
   (greas|sleaz)yfork\.(org|cc)/scripts/[^\/]*/code|
-  update\.(greas|sleaz)yfork\.(org|cc)/scripts|
+  update\.(greas|sleaz)yfork\.(org|cc)/scripts(/\d+)?| # old version part is optional
   openuserjs\.org/install/[^\/]*|
   github\.com/[^\/]*/[^\/]*/(
     raw/[^\/]*|
