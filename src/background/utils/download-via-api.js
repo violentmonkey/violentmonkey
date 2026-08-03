@@ -8,8 +8,8 @@ const reReferer = /^referer$/i; // allowed since Firefox 70
 const reUA = /^user-agent$/i; // allowed since Firefox 43
 const objEntryToApiHeader = ([k, v]) => (
   FORBIDDEN_HEADER_RE.test(k)
-    ? !__.MV3 && IS_FIREFOX && (reUA.test(k) || reReferer.test(k) && FIREFOX >= 70)
-    : !reUA.test(k) || !__.MV3 && IS_FIREFOX
+    ? IS_FIREFOX && (reUA.test(k) || reReferer.test(k) && FIREFOX >= 70)
+    : !reUA.test(k) || IS_FIREFOX
 ) && { name: k, value: v };
 
 /**

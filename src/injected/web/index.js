@@ -30,7 +30,7 @@ VMInitInjection = (invokeHost, console) => {
       },
     });
     /* Can't use a detached `console` in Chrome 109+ due to https://crrev.com/1063194 */
-    if (__.MV3 || !IS_FIREFOX) {
+    if (!IS_FIREFOX) {
       for (const m of CONSOLE_METHODS) {
         logging[m] = (...args) => bridge.post('Log', [m, args]);
       }
@@ -112,7 +112,7 @@ bridge.addHandlers({
       }
     }
     if (!PAGE_MODE_HANDSHAKE) toRunNow::forEach(onCodeSet);
-    else if (!__.MV3 && IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
+    else if (IS_FIREFOX) bridge.post('InjectList', items[0][RUN_AT]);
   },
   SetGMI(data) {
     assign(bridge.info.gmi, data);

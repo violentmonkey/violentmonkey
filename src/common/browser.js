@@ -8,7 +8,7 @@ if (__.INJECTED === 'injected-web') {
 // for DOM elements with 'id' attribute which is a standard feature, more info:
 // https://github.com/mozilla/webextension-polyfill/pull/153
 // https://html.spec.whatwg.org/multipage/window-object.html#named-access-on-the-window-object
-} else if (__.MV3 || !IS_FIREFOX && !browser?.runtime) {
+} else if (!IS_FIREFOX && !browser?.runtime) {
   const { Proxy: SafeProxy } = global;
   const { bind } = SafeProxy;
   const safeObjectCreate = Object.create; // eslint-disable-line no-restricted-syntax

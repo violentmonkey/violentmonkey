@@ -41,7 +41,7 @@ export function injectPageSandbox(data) {
   const contentId = safeGetUniqId();
   const webId = safeGetUniqId();
   nonce = data.nonce;
-  if (!__.MV3 && IS_FIREFOX) {
+  if (IS_FIREFOX) {
     // In FF, content scripts running in a same-origin frame cannot directly call parent's functions
     window::on(VAULT_WRITER, evt => {
       evt::stopImmediatePropagation();
@@ -69,7 +69,7 @@ export function injectPageSandbox(data) {
      * to use an iframe to extract the safe globals. Detection via document.referrer won't work
      * is it can be emptied by the opener page, too. */
     inject({ code: `parent["${vaultId}"] = [this, 0]`/* DANGER! See addVaultExports */ }, () => {
-      if (__.MV3 || !IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
+      if (!IS_FIREFOX || addVaultExports(window[kWrappedJSObject][vaultId])) {
         startHandshake();
       }
     });
@@ -80,7 +80,7 @@ export function injectPageSandbox(data) {
     let ok = opener && (isFrame ? frameElement : describeProperty(opener.location, 'href').get);
     if (ok) {
       ok = false;
-      if (!__.MV3 && IS_FIREFOX) {
+      if (IS_FIREFOX) {
         const setOk = evt => { ok = evt::getDetail(); };
         window::on(VAULT_WRITER_ACK, setOk, true);
         try {
@@ -147,7 +147,7 @@ export async function injectScripts(data, info, isXml) {
   const moreData = (more || toContent.length)
     && sendFeedback(toContent, more);
   const getReadyState = more && describeProperty(Document[PROTO], 'readyState').get;
-  const wasInjectableFF = !__.MV3 && IS_FIREFOX && !nonce && pageInjectable;
+  const wasInjectableFF = IS_FIREFOX && !nonce && pageInjectable;
   const pageBodyScripts = pageLists?.[BODY];
   if (wasInjectableFF) {
     getAttribute = Element[PROTO].getAttribute;
@@ -263,7 +263,7 @@ function inject(item, iframeCb) {
   const isCodeArray = isObject(code);
   const script = makeElem('script', !isCodeArray && code);
   // Firefox ignores sourceURL comment when a syntax error occurs so we'll print the name manually
-  const onError = !__.MV3 && IS_FIREFOX && !iframeCb && (e => {
+  const onError = IS_FIREFOX && !iframeCb && (e => {
     const { stack } = e[ERROR];
     if (!stack || `${stack}`.includes(VM_UUID)) {
       log(ERROR, [item.displayName + ':' + e.lineno + ':' + e.colno], e[ERROR]);
@@ -287,7 +287,7 @@ function inject(item, iframeCb) {
       style: 'display:none!important',
     });
     /* In FF the opener receives DOMNodeInserted attached at creation so it can see window[0] */
-    if (__.MV3 || !IS_FIREFOX) {
+    if (!IS_FIREFOX) {
       divRoot::appendChild(iframe);
     }
   } else {
@@ -305,7 +305,7 @@ function inject(item, iframeCb) {
   }
   if (iframeCb) {
     injectedRoot = divRoot;
-    if (!__.MV3 && IS_FIREFOX) divRoot::appendChild(iframe);
+    if (IS_FIREFOX) divRoot::appendChild(iframe);
     // Can be removed in DOMNodeInserted by a hostile web page or CSP forbids iframes(?)
     if ((iframeDoc = iframe.contentDocument)) {
       iframeDoc::getElementsByTagName('*')[0]::appendChild(script);
@@ -338,7 +338,7 @@ function injectAll(runAt) {
         if (!grant.length) bridge.grantless[realm] = 1;
       }
       if (!inPage) nextTask()::then(() => tardyQueueCheck(items));
-      else if (__.MV3 || !IS_FIREFOX) res = injectPageList(runAt);
+      else if (!IS_FIREFOX) res = injectPageList(runAt);
     }
   }
   return res;

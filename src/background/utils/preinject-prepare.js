@@ -169,7 +169,7 @@ function prepareScript(script, env) {
   const displayName = getScriptName(script);
   const pathMap = custom.pathMap || {};
   const wrap = !meta[UNWRAP];
-  const wrapTryCatch = !__.MV3 && wrap && IS_FIREFOX; // FF doesn't show errors for content scripts
+  const wrapTryCatch = wrap && IS_FIREFOX; // FF doesn't show errors for content scripts
   const { grant, [TL_AWAIT]: topLevelAwait } = meta;
   const startIIFE = topLevelAwait ? 'await(async' : '(';
   const grantNone = grant.includes('none');

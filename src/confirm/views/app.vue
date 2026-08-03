@@ -221,7 +221,7 @@ onMounted(async () => {
   }
   if (infoVal.fs) {
     const parts = i18n('fileInstallBlocked').split(/<\d+>/);
-    if (!__.MV3 && IS_FIREFOX) {
+    if (IS_FIREFOX) {
       parts[1] = i18n('fileInstallBlockedFF'); // replace drag'n'drop part
       parts.pop(); // drop chrome://extensions part
     }

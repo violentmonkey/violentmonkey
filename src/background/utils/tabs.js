@@ -7,7 +7,7 @@ import { testScript } from './tester';
 import { CHROME } from './ua';
 import { vetUrl } from './url';
 
-const openerTabIdSupported = __.MV3 || !IS_FIREFOX // supported in Chrome
+const openerTabIdSupported = !IS_FIREFOX // supported in Chrome
   || !!(global.AbortSignal && browserWindows); // and FF57+ except mobile
 const EDITOR_ROUTE = extensionOptionsPage + ROUTE_SCRIPTS + '/'; // followed by id
 export const NEWTAB_URL_RE = regex`

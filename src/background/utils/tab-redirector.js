@@ -12,7 +12,7 @@ import { request } from './url';
 
 addPublicCommands({
   async CheckInstallerTab(tabId, src) {
-    const tab = !__.MV3 && IS_FIREFOX && (src.url || '').startsWith('file:') && await getTab(tabId);
+    const tab = IS_FIREFOX && (src.url || '').startsWith('file:') && await getTab(tabId);
     return tab && getTabUrl(tab).startsWith(CONFIRM_URL_BASE);
   },
   ConfirmInstall: confirmInstall,
@@ -73,7 +73,7 @@ export const resolveVirtualUrl = url => (
   `${extensionOptionsPage}${ROUTE_SCRIPTS}/${+url.split('#')[1]}`
 );
 // FF can't intercept virtual .user.js URL via webRequest, so we redirect it explicitly
-const virtualUrlRe = !__.MV3 && IS_FIREFOX && new RegExp((
+const virtualUrlRe = IS_FIREFOX && new RegExp((
   `^(view-source:)?(${extensionRoot.replace('://', '$&)?')}[^/]*\\.user\\.js#\\d+`
 ));
 async function maybeInstallUserJs(tabId, url, isWhitelisted) {
@@ -110,7 +110,7 @@ tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
   if (url === 'about:blank' && virtualUrlRe && virtualUrlRe.test(title)) {
     browser.tabs.update(id, { url: resolveVirtualUrl(title) });
   } else if (isUserJS && isFile && getOption('helpForLocalFile') && (
-    IS_FIREFOX && !__.MV3
+    IS_FIREFOX
       // FF153 requires user explicitly enabling file: access (without reloading the extension)
       ? IDBIndex.prototype.getAllRecords &&
         !await browser.extension.isAllowedFileSchemeAccess()

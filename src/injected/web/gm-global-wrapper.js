@@ -218,7 +218,7 @@ function setWindowEvent(desc, name, events, wrapper) {
       // like console.log set by another script
       window::on(name, events[name] = (
         // FF chokes on safeBind because the result belongs to Vault's window
-        !__.MV3 && IS_FIREFOX && PAGE_MODE_HANDSHAKE
+        IS_FIREFOX && PAGE_MODE_HANDSHAKE
           ? evt => wrapper::fn(evt)
           : safeBind(fn, wrapper)
       ));
