@@ -65,18 +65,15 @@ bridge.addHandlers({
       realm,
       [kXhrType]: msg[kXhrType],
     };
-    if (IS_FIREFOX) {
-      // Not using Promise.all as it depends on Iterator which isn't trivial to guard,
-      // but letting the browser start fetch() or FileReader in a separate process/thread.
-      const blobJob = msg.url::slice(0, 5) === 'blob:'
-        && importBlob(msg.url, true);
-      // In Firefox we recreate FormData in bg::decodeBody
-      // TODO: support huge data by splitting it to multiple messages
-      const bodyJob = data && data.length > 1 && data[1] !== 'usp'
-        && encodeBody(data[0], data[1]);
-      if (blobJob) msg.url = await blobJob;
-      if (bodyJob) msg.data = await bodyJob;
-    }
+    // Not using Promise.all as it depends on Iterator which isn't trivial to guard,
+    // but letting the browser start fetch() or FileReader in a separate process/thread.
+    const blobJob = IS_FIREFOX && msg.url::slice(0, 5) === 'blob:'
+      && importBlob(msg.url, true);
+    // TODO: support huge data by splitting it to multiple messages
+    const bodyJob = data && data.length > 1 && data[1] !== 'usp'
+      && encodeBody(data[0], data[1]);
+    if (blobJob) msg.url = await blobJob;
+    if (bodyJob) msg.data = await bodyJob;
     msg.ua = getUAProps::map((fn, i) => (!i ? navigator : uaData)::fn());
     return sendCmd('HttpRequest', msg);
   },
