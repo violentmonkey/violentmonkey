@@ -10,6 +10,7 @@ const { getBaseConfig, getPageConfig, isProd } = require('./webpack-base');
 
 // Avoiding collisions with globals of a content-mode userscript
 const INIT_FUNC_NAME = '**VMInitInjection**';
+const IS_FIREFOX_MV2 = 'IS_FIREFOX_MV2';
 const VAULT_ID = 'VAULT_ID';
 const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
 const VM_VER = getVersion();
@@ -56,7 +57,7 @@ const defsObj = {
   __VUE_OPTIONS_API__: true,
   __VUE_PROD_DEVTOOLS__: false,
   __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
-  IS_FIREFOX: !MV3 && 'IS_FIREFOX_MV2',
+  IS_FIREFOX: !MV3 && IS_FIREFOX_MV2,
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts
@@ -127,7 +128,7 @@ module.exports = [
 
   buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
     header: () => `${skipReinjectionHeader} window["${INIT_FUNC_NAME}"] = ` +
-      `(IS_FIREFOX, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}` +
+      `(${IS_FIREFOX_MV2}, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}` +
       'let VMInitInjection;\n',
     footer: 'return VMInitInjection};1',
   }), (config) => {
