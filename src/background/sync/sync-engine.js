@@ -43,7 +43,28 @@ const serviceNames = [];
 const serviceClasses = [];
 const services = {};
 const syncLater = !__.MV3 && debounce(autoSync, TIMEOUT_HOUR);
-const xmlParser = { parse: str => parseXml(str, { removeNSPrefix: true }).node };
+// Some servers encode DAV:displayname unexpectedly (e.g. `vm%40` for `vm@`),
+// so post-process the parsed XML to decode such displaynames.
+const xmlParser = { parse: str => postProcessXml(parseXml(str, { removeNSPrefix: true }).node) };
+
+function postProcessXml(node) {
+  if (Array.isArray(node)) {
+    node.forEach(postProcessXml);
+  } else if (isObject(node)) {
+    node::forEachEntry(([key, value]) => {
+      if (key === 'displayname' && typeof value === 'string' && value.startsWith('vm%40')) {
+        try {
+          node[key] = decodeURIComponent(value);
+        } catch {
+          // Keep the original value
+        }
+      } else {
+        postProcessXml(value);
+      }
+    });
+  }
+  return node;
+}
 const getDrive = (provider, opts, ctx) => new DriveProviders[provider](opts, { ...ctx, xmlParser });
 let syncConfig;
 let syncMode = SYNC_MERGE;

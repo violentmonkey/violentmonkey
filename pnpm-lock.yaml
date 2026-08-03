@@ -64,8 +64,8 @@ importers:
   .:
     dependencies:
       '@usync/drive':
-        specifier: ^0.2.3
-        version: 0.2.3
+        specifier: ^0.2.4
+        version: 0.2.4
       '@usync/oauth2':
         specifier: ^0.1.7
         version: 0.1.7
@@ -2110,8 +2110,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@usync/drive@0.2.3':
-    resolution: {integrity: sha512-LpOpbsUbZbHHQI6D0SruJwb/YdnJBFrm/fVZ8OR3YM2NkCj8w9jLQAMEijj50aqF+Hc36GVBRWSgDxrbNEDF9w==}
+  '@usync/drive@0.2.4':
+    resolution: {integrity: sha512-X0DOkg0ajSpFf+wSPMJ6CP2YwW4pBnEF7K+qyu3DiO3Cnzxpk799mEp+2heYUp3kdlxBJMp6o3VgdL2Cs0TeIQ==}
 
   '@usync/oauth2@0.1.7':
     resolution: {integrity: sha512-95/fQRjRCkMo9DZlMebAklkiHEQMQGNnA8rBclRkshieN+SikTOk0N13VT6IFOUwQ6NB1pStUaY3nL+FujRF/Q==}
@@ -7952,7 +7952,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@usync/drive@0.2.3':
+  '@usync/drive@0.2.4':
     dependencies:
       '@usync/oauth2': 0.1.7
 
