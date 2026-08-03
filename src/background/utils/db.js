@@ -22,7 +22,7 @@ import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
 import { permissionDownloads } from './permissions';
 import { initOptions, kVersion, setOption } from './options';
-import sessionData from './session-data';
+import sessionData, { flushSession, kScriptSizes, scriptSizes } from './session-data';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
@@ -36,8 +36,6 @@ let maxScriptId = 0;
 let maxScriptPosition = 0;
 /** @type {Map<string,number>} */
 export let dbKeys = new Map(); // 1: exists, 0: known to be absent
-/** @type {{ [url:string]: number }} */
-export let scriptSizes = {};
 /** Ensuring slow icons don't prevent installation/update */
 const ICON_TIMEOUT = 1000;
 export const kTryVacuuming = 'Try vacuuming database in options.';
@@ -122,16 +120,17 @@ addOwnCommands({
   Vacuum: vacuum,
 });
 
-export async function initializeDatabase() {
-  maxScriptId = 0;
-  maxScriptPosition = 0;
-  dbKeys.clear();
-  aliveScripts.length = 0;
-  removedScripts.length = 0;
-  for (const key in scriptMap) delete scriptMap[key];
-  for (const key in scriptSizes) delete scriptSizes[key];
-  for (const key in scriptSiteVisited) delete scriptSiteVisited[key];
-
+export async function initializeDatabase(reset) {
+  if (reset) {
+    maxScriptId = 0;
+    maxScriptPosition = 0;
+    dbKeys.clear();
+    aliveScripts.length = 0;
+    removedScripts.length = 0;
+    scriptSizes = {}; // eslint-disable-line no-import-assign
+    for (const key in scriptMap) delete scriptMap[key];
+    for (const key in scriptSiteVisited) delete scriptSiteVisited[key];
+  }
   /** @type {string[]} */
   let keys;
   let [allKeys, data] = await Promise.all([
@@ -203,14 +202,12 @@ export async function initializeDatabase() {
     });
   }
   if (!__.MV3 || !sessionData.init) {
-    setTimeout(async () => {
-      if (allKeys?.length) {
-        const set = new Set(keys); // much faster lookup
-        const data2 = await storage.api.get(allKeys.filter(k => !set.has(k)));
-        Object.assign(data, data2);
-      }
-      vacuum(data);
-    }, 100);
+    if (allKeys?.length) {
+      const set = new Set(keys); // much faster lookup
+      const data2 = await storage.api.get(allKeys.filter(k => !set.has(k)));
+      Object.assign(data, data2);
+    }
+    vacuum(data); // also calculates `scriptSizes`
     checkRemove();
     sortScripts();
   }
@@ -880,7 +877,8 @@ export async function vacuum(data) {
       status[key] = -1;
     }
   });
-  scriptSizes = sizes;
+  scriptSizes = sizes; // eslint-disable-line no-import-assign
+  if (__.MV3) flushSession(kScriptSizes, scriptSizes);
   getScriptsByIdsOrAll().forEach((script) => {
     const { meta, props } = script;
     const icon = script.custom.icon || meta.icon;

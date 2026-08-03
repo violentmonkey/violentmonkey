@@ -3,9 +3,10 @@ import initCache from '@/common/cache';
 import { INFERRED, WATCH_STORAGE } from '@/common/consts';
 import { deepCopy, deepCopyDiff, deepSize, forEachEntry } from '@/common/object';
 import { S_MSG_IN, S_MSG_OUT } from './broadcast';
-import { dbKeys, initializeDatabase, scriptSizes, sizesPrefixRe } from './db';
+import { dbKeys, initializeDatabase, sizesPrefixRe } from './db';
 import { incognitoAllowed, init } from './init';
 import { scriptSiteVisited, updateScriptMap } from './script';
+import { flushSession, kScriptSizes, scriptSizes } from './session-data';
 import storage, {
   fireStorageChanged, S_MOD_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
@@ -191,6 +192,7 @@ async function updateScriptSizeContributor(key, val) {
     if (size === 2 && area[0] === S_VALUE_PRE) {
       scriptSizes[key] = 0; // don't count an empty {}
     }
+    if (__.MV3) flushSession(kScriptSizes, scriptSizes);
   }
 }
 
@@ -253,7 +255,7 @@ async function undoImport(port) {
     await cachedStorageApi.set(old);
     port.postMessage(true);
     clearStorageCache();
-    await initializeDatabase();
+    await initializeDatabase(true);
     undoing = false;
   });
   old = await api.get();
