@@ -1,5 +1,6 @@
 import { keepAlive, noop, sendTabCmd, string2uint8array } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS, UPLOAD } from '@/common/consts';
+import { downloadBlob } from '@/common/download';
 import { deepEqual, forEachEntry, forEachValue } from '@/common/object';
 import { kGmDownloadViaApi } from '@/common/options-defaults';
 import { initXHR } from '@/offscreen/xhr';
@@ -69,6 +70,8 @@ addPublicCommands({
     )(opts, events, id, req, src, fileName).catch(cbError);
   },
   AbortRequest: abortRequest,
+  /** Used by injected/content for a page's `blob:` URL, which only it can read */
+  DownloadBlob: __.MV3 ? callOffscreen : args => downloadBlob(args[0], args[1]),
   // TODO: check if the content script can revoke it
   RevokeBlob: __.MV3 ? callOffscreen : URL.revokeObjectURL,
 });

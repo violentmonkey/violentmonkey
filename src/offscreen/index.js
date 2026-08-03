@@ -1,5 +1,6 @@
 import { leaseBlobUrl } from '@/common';
 import setClipboard from '@/common/clipboard';
+import { downloadBlob } from '@/common/download';
 import handlers from '@/common/handlers';
 import { sendCmdToSW } from '@/common/messaging-sw';
 import { initXHR, xhrs } from './xhr';
@@ -7,6 +8,7 @@ import { initXHR, xhrs } from './xhr';
 let autoCloseTimer;
 
 Object.assign(handlers, {
+  DownloadBlob: args => downloadBlob(args[0], args[1]),
   LeaseBlob: leaseBlobUrl,
   async Fetch([url, init, get = 'text']) {
     const req = await fetch(url, init);

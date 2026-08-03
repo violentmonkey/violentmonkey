@@ -1,10 +1,11 @@
 import { U8_fromBase64, UA_PROPS, UPLOAD } from '../util';
 import * as bridge from './bridge';
-import { makeSafeBlob, sendCmd } from './util';
+import { createObjectURL, makeSafeBlob, sendCmd } from './util';
 
 const CHUNKS = 'chunks';
 const LOAD = 'load';
 const LOADEND = 'loadend';
+const READYSTATECHANGE = 'readystatechange';
 /** @type {{ [id:string]: GMReq.Content }} */
 const requests = createNullObj();
 let BlobProto, getArrayBuffer, getBlob, getBlobType, getTypedArrayBuffer;
@@ -58,6 +59,10 @@ bridge.addHandlers({
   async HttpRequest(msg, realm) {
     if (IS_FIREFOX) msg = nullObjFrom(msg); // copying into our realm to set its props freely
     else setPrototypeOf(msg, null);
+    const fileName = msg[kFileName];
+    if (fileName && msg.url::slice(0, 5) === 'blob:') {
+      return downloadPageBlob(msg, fileName, realm);
+    }
     const data = !IS_FIREFOX && msg.data;
     const uaData = getUAData && navigator::getUAData();
     requests[msg.id] = {
@@ -144,6 +149,49 @@ bridge.addBackgroundHandlers({
 function sendHttpRequested(msg, realm) {
   bridge.post('HttpRequested', msg, realm);
 }
+
+/**
+ * A `blob:` URL is only valid in the context that created it, so a page's blob can't be
+ * re-fetched in bg/offscreen (Firefox fails it with status 0). Only a content script can
+ * read it, hence this shortcut for `GM_download` of such URLs.
+ * @param {GMReq.Message.Web} msg
+ * @param {string} fileName
+ * @param {VMScriptInjectInto} realm
+ * @return {Promise<void>}
+ */
+async function downloadPageBlob(msg, fileName, realm) {
+  const { id, url } = msg;
+  const events = msg.events[0];
+  let blob;
+  try {
+    blob = await importBlob(url, true);
+  } catch (err) {
+    sendHttpRequested({
+      id,
+      type: ERROR,
+      data: null,
+      [ERROR]: [err && err.message || `${err}`, err && err.name],
+    }, realm);
+    sendHttpRequested({ id, type: LOADEND, data: makeVirtualResponse(url, 0) }, realm);
+    return;
+  }
+  // download in bg to a) circumvent CSP in Firefox and b) use a single throttled download chain
+  sendCmd('DownloadBlob', [IS_FIREFOX ? blob : createObjectURL(blob), fileName]);
+  for (const type of [READYSTATECHANGE, LOAD, LOADEND]) {
+    if (!(type === LOADEND/*to forget the request*/ || events[type]))
+      continue;
+    sendHttpRequested({ id, type, data: makeVirtualResponse(url, 200) }, realm);
+  }
+}
+
+/** `response` is null to match the browser downloads API mode and the spec, see db1b5c3e */
+const makeVirtualResponse = (url, status) => ({
+  finalUrl: url,
+  readyState: 4,
+  status,
+  [kResponse]: null,
+  [kResponseHeaders]: '',
+});
 
 /**
  * Only a content script can read blobs from an extension:// URL
