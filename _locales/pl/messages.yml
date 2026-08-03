@@ -244,7 +244,9 @@ editValueAllHint:
   message: Pokaż/edytuj całą pamięć wartości skryptu
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: "Menedżer skryptów użytkownika o\_otwartym kodzie źródłowym, który obsługuje wiele przeglądarek."
+  message: >-
+    Menedżer skryptów użytkownika o otwartym kodzie źródłowym, który  obsługuje
+    wiele przeglądarek.
 extName:
   description: Name of this extension.
   message: Violentmonkey

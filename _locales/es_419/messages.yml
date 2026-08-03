@@ -338,7 +338,7 @@ headerRecycleBin:
   message: Papelera de reciclaje
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Mostrar ayuda cuando no se pueda instalar un script local
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: para $1 scripts coincidentes

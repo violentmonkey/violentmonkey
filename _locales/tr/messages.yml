@@ -491,7 +491,11 @@ labelFastInject:
   message: Alternatif $1 modu
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    <document-start> betikler için varsayılan moddan daha hızlı olan alternatif
+    bir yükleme yöntemi. “Senkron sayfa modu”na benzer şekilde bu da bellek
+    tüketimini artırır; bu nedenle, betikleriniz bu seçenek olmadan düzgün
+    çalışıyorsa, bu özelliği devre dışı bırakmak isteyebilirsiniz.
 labelFeedback:
   description: Label of link to feedback page.
   message: Geri bildirim
@@ -502,12 +506,17 @@ labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: >-
+    Web sayfalarının CSP’sine, yalnızca Violentmonkey’in $1 enjeksiyon modunda
+    betikleri çalıştırmak için kullanabileceği rastgele bir değer ekler; aksi
+    takdirde betiklerin $2 kullanacak şekilde düzenlenmesi gerekir.
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: >-
+    Yalıtılmış $1 modu işlevselliği kısıtlayabilir; seçenekler bölümündeki “$2”
+    seçeneğine bakınız.
 labelGeneral:
   description: Label for general settings.
   message: Genel
@@ -517,7 +526,9 @@ labelGmDownloadViaApi:
   message: Tarayıcının indirme API'sini kullan
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: >-
+    Betiklerin, indirme dizininizdeki alt klasörlere dosya kaydetmesine olanak
+    tanır ve indirme ilerlemesini tarayıcının indirme çubuğunda gösterir.
 labelGrantPermission:
   description: Button to request the API permission.
   message: İzin ver
