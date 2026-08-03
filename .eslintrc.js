@@ -119,6 +119,7 @@ function makeOverrides() {
     PAGE_MODE_HANDSHAKE: false,
     VAULT_ID: false,
   };
+  GLOBALS_SHARED.IS_FIREFOX = // added in webpack's DefinePlugin
   GLOBALS_SHARED.__ = GLOBALS_INJECTED.__ = false;
   function getGlobals(path) {
     const res = {};

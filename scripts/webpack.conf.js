@@ -56,7 +56,7 @@ const defsObj = {
   __VUE_OPTIONS_API__: true,
   __VUE_PROD_DEVTOOLS__: false,
   __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
-  IS_FIREFOX: !MV3 && 'IS_FIREFOX',
+  IS_FIREFOX: !MV3 && 'IS_FIREFOX_MV2',
 };
 // avoid running webpack bootstrap in a potentially hacked environment
 // after documentElement was replaced which triggered reinjection of content scripts

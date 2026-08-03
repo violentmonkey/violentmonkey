@@ -35,7 +35,7 @@ export const extensionOptionsPage = __.EXT &&
 export const ICON_PREFIX = __.EXT &&
   /*@__PURE__*/chrome.runtime.getURL(extensionManifest.icons[16].replace('16.png', ''));
 export const CONFIRM_URL_BASE = `${extensionRoot}confirm/index.html#`;
-export const IS_FIREFOX = !__.MV3 && extensionRoot.startsWith('moz-');
+export const IS_FIREFOX_MV2 = !__.MV3 && extensionRoot.startsWith('moz-');
 export const TAB_SETTINGS = 'settings';
 export const TAB_ABOUT = 'about';
 export const TAB_RECYCLE = 'recycleBin';

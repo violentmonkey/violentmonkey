@@ -36,7 +36,8 @@ async function init() {
     off('copy', onClipboardCopy, true);
   }
   if (IS_FIREFOX && info) { // must redefine now as it's used by injectPageSandbox
-    IS_FIREFOX = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
+    // In MV2 build `IS_FIREFOX` is compiled to `IS_FIREFOX_MV2`
+    IS_FIREFOX_MV2 = parseFloat(info.ua.browserVersion); // eslint-disable-line no-global-assign
   }
   if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
     bridge.addHandlers({ GetScriptVer: true });
