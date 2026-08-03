@@ -144,7 +144,7 @@ confirmUndoImport:
     редактирование, настройка)
 descBlacklist:
   description: Description for the global injection blacklist.
-  message: Чёрный список инъекций (скрипты не будут запускаться на указанных сайтах)
+  message: Чёрный список внедрения (скрипты не будут запускаться на указанных сайтах)
 descBlacklistNet:
   description: Description for the global network blacklist.
   message: >-
@@ -189,13 +189,13 @@ disabledScriptsGroup:
   message: группировать
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: скрыть
+  message: скрывать
 disabledScriptsSelector:
   description: Label of the option.
   message: 'Отключённые скрипты:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: показать
+  message: показывать
 editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: 'Документация по блоку метаданных скриптов и <code>GM</code> API:'
@@ -281,7 +281,7 @@ fileInstallBlockedFF:
     данные», включите «Доступ к локальным файлам на вашем компьютере».
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: алфавитному порядку
+  message: алфавиту
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
   message: порядку выполнения
@@ -1139,7 +1139,7 @@ titleSearchHintV2:
     <code>name:/\w+?/</code>, <code>name+re:"\w+? с пробелом"</code>
 toggleInjection:
   description: Label for a keyboard shortcut.
-  message: Переключить инъекцию пользовательского скрипта
+  message: Переключить внедрение пользовательского скрипта
 trackEdits:
   description: Button in a script installation dialog.
   message: Отслеживать внешние правки

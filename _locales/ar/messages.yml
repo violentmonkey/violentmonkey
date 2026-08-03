@@ -332,7 +332,7 @@ headerRecycleBin:
   message: سلة المحذوفات
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: عرض المساعدة عند تعذر تثبيت برنامج نصي محلي
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: لـ $1 سكربتًا مطابقًا
@@ -476,10 +476,14 @@ labelExposeStatus:
   message: 'إظهار الإصدار المثبت على مواقع كتالوج سكربتات المستخدم: $1'
 labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: ''
+  message: الوضع $1البديل
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    طريقة حقن بديلة للبرامج<document-start> النصية، أسرع من الوضع الافتراضي.
+    وكما هو الحال مع "وضع الصفحة المتزامن"، فإنها تزيد أيضًا من استهلاك الذاكرة،
+    لذا قد ترغب في تعطيلها إذا كانت برامجك النصية تعمل بشكل صحيح بدون هذا
+    الخيار.
 labelFeedback:
   description: Label of link to feedback page.
   message: ملاحظات
