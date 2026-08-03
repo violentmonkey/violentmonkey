@@ -15,7 +15,8 @@ import storage, { S_MOD_PRE, S_SCRIPT_PRE } from './storage';
 import { injectableRe } from './tabs';
 
 addOwnCommands({
-  async NewScript(tabId) {
+  async NewScript({ code, tabId }) {
+    if (code) return newScriptFromCode(code);
     const tab = tabId >= 0 && await getTab(tabId) || {};
     const tabUrl = tab.url;
     const url = injectableRe.test(tabUrl) && `${tabUrl.split(/[#?]/)[0]}*`;
@@ -153,6 +154,7 @@ export function getDefaultCustom() {
   };
 }
 
+/** @return {VMScript & { code?: string }} */
 export function newScript(data) {
   const state = {
     url: GLOB_ALL,
@@ -165,7 +167,14 @@ export function newScript(data) {
       : format ? formatDate(format)
         : new Date().toLocaleString()
   ));
-  const script = {
+  const script = newScriptFromCode(code);
+  if (data) script.code = code;
+  return script;
+}
+
+/** @return {VMScript} */
+function newScriptFromCode(code) {
+  return {
     custom: getDefaultCustom(),
     config: {
       enabled: 1,
@@ -174,7 +183,6 @@ export function newScript(data) {
     meta: parseMeta(code, { retDefault: true }),
     props: {},
   };
-  return { script, code };
 }
 
 export function getNameURI(script) {

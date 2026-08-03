@@ -315,7 +315,7 @@ export function leaseBlobUrl(blob) {
 
 /**
  * @param {Blob} blob
- * @param {boolean} [asBuffer]
+ * @param {boolean | 'text'} [asBuffer]
  * @return {Promise<string|ArrayBuffer>}
  */
 export function readBlob(blob, asBuffer) {
@@ -323,7 +323,8 @@ export function readBlob(blob, asBuffer) {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
-    if (asBuffer) reader.readAsArrayBuffer(blob);
+    if (asBuffer === 'text') reader.readAsText(blob);
+    else if (asBuffer) reader.readAsArrayBuffer(blob);
     else reader.readAsDataURL(blob);
   });
 }

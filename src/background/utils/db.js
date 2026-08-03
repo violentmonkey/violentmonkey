@@ -640,7 +640,7 @@ export async function parseScript(src) {
     script = oldScript;
     id = script.props.id;
   } else {
-    ({ script } = newScript());
+    script = newScript();
     maxScriptId++;
     id = script.props.id = maxScriptId;
     result.isNew = true;

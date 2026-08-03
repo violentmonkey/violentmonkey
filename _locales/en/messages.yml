@@ -61,6 +61,9 @@ buttonInstallOptions:
 buttonNew:
   description: Button to create a new script.
   message: New
+buttonNewFromFile:
+  description: Button to create a new script from a local file.
+  message: New from file
 buttonOK:
   description: OK button on dialog.
   message: OK

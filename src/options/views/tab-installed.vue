@@ -166,6 +166,7 @@
       <KeepAlive :key="store.route.hash" :max="5">
       <edit
         v-if="state.script"
+        :dirty="state.dirty"
         :initial="state.script"
         :initial-code="state.code"
         :read-only="!!state.script.config.removed"
@@ -180,7 +181,7 @@
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
-import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength } from '@/common';
+import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength, readBlob } from '@/common';
 import { INFERRED } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
@@ -215,9 +216,12 @@ import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
 
+const handleNewScript = () => handleEditScript('_new');
 const NEW_LINKS = [
   [i18n('buttonNew'),
-    { tabIndex: 0, onclick: () => handleEditScript('_new') }],
+    { tabIndex: 0, onclick: handleNewScript }],
+  [i18n('buttonNewFromFile'),
+    { tabIndex: 0, onclick: handleNewScriptFromFile }],
   [i18n('installFrom', 'OpenUserJS'),
     { href: 'https://openuserjs.org/', ...EXTERNAL_LINK_PROPS }],
   [i18n('installFrom', 'GreasyFork'),
@@ -306,6 +310,8 @@ let step = 0;
 let columnsForTableMode = [];
 let columnsForCardsMode = [];
 let scrollTop1, scrollTop2;
+
+let newScriptCode;
 
 const $menuNew = ref();
 const isEmpty = ref();
@@ -459,8 +465,31 @@ async function handleInstallFromURL() {
       await sendCmdDirectly('ConfirmInstall', { url });
     }
   } catch (err) {
-    showMessage({ text: err.message || err });
+    showErrorMessage(err);
   }
+}
+function handleNewScriptFromFile() {
+  /** @type {HTMLInputElement} */
+  const el = document.createElement('input');
+  el.type = 'file';
+  el.accept = 'application/javascript,text/javascript,text/plain,.js';
+  el.style = 'display:none !important';
+  document.body.appendChild(el);
+  el.onchange = async () => {
+    if (el.value) {
+      try {
+        newScriptCode = await readBlob(el.files[0], 'text');
+        handleNewScript();
+      } catch (err) {
+        showErrorMessage(err);
+      }
+    }
+    el.remove();
+  };
+  el.click();
+}
+function showErrorMessage(err) {
+  showMessage({ text: err.message || err });
 }
 async function moveScript(from, to) {
   if (from === to) return;
@@ -493,8 +522,11 @@ function handleEditScript(id) {
 async function onHashChange() {
   const [tab, id, cacheId] = store.route.paths;
   if (__.MV3 && id) store.busyId = id;
-  const newData = id === '_new' && await sendCmdDirectly('NewScript', +cacheId);
-  const script = newData ? newData.script : +id && getCurrentList().find(s => s.props.id === +id);
+  const _new = id === '_new' && await sendCmdDirectly('NewScript', {
+    code: newScriptCode,
+    tabId: +cacheId,
+  });
+  const script = _new || +id && getCurrentList().find(s => s.props.id === +id);
   const scrollElem1 = scroller.value;
   const scrollElem2 = document.scrollingElement; // for compact layout
   if (script && !state.script) { // going into editor
@@ -502,9 +534,12 @@ async function onHashChange() {
     scrollTop2 = scrollElem2[kScrollTop];
   }
   if (script) {
-    state.code = newData ? newData.code : await sendCmdDirectly('GetScriptCode', id);
+    state.code = newScriptCode || _new.code || await sendCmdDirectly('GetScriptCode', id);
+    state.dirty = !!newScriptCode;
+    if (_new) delete script.code;
     state.script = script;
   }
+  newScriptCode = '';
   if (__.MV3 && id) store.busyId = 0;
   if (script) return;
   // Strip the invalid id from the URL so |App| can render the aside,
