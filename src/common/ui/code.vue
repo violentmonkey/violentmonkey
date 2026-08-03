@@ -5,34 +5,33 @@
          @keydown.esc.exact.stop="clearSearch">
       <form @submit.prevent="goToLine()">
         <span v-text="i18n('labelLineNumber')"></span>
-        <input type="text" class="w-1" v-model="jumpPos">
+        <input type="text" class="w-1" v-model="jumpPos" style="max-width: 9ch">
       </form>
-      <form class="flex-1" @submit.prevent="findNext()">
+      <form class="flex-1 fit" @submit.prevent="findNext()">
         <span v-text="i18n('labelSearch')"></span>
-        <tooltip :content="tooltips.find" class="flex-1">
+        <tooltip :content="tooltips.find" class="flex-1 fit">
           <!-- id is required for the built-in autocomplete using entered values -->
           <input
-            :class="{ 'is-error': !search.hasResult }"
+            :class="{ 'is-error': !search.num }"
             :title="search.error"
             type="search"
             id="editor-search"
             ref="$search"
             v-model="search.query"
-            v-bind="!FIELD_SIZING && { style: { width: search.query.length + INPUT_EXTRA + 'ch' } }"
           />
         </tooltip>
+        <span class="mx-1" v-text="search.num"/>
         <tooltip :content="tooltips.findPrev" align="end">
-          <button type="button" @click="findNext(1)">&lt;</button>
+          <button type="button" @click="findNext(1)" :disabled="!search.num">&lt;</button>
         </tooltip>
         <tooltip :content="tooltips.findNext" align="end">
-          <button type="submit">&gt;</button>
+          <button type="submit" :disabled="!search.num">&gt;</button>
         </tooltip>
       </form>
-      <form class="flex-1" @submit.prevent="replace()" v-if="!readOnly">
+      <form class="flex-1" @submit.prevent="replace()" v-if="!readOnly" style="max-width: 100%">
         <span v-text="i18n('labelReplace')"></span>
         <!-- id is required for the built-in autocomplete using entered values -->
-        <input class="flex-1" type="search" id="editor-replace" v-model="search.replace"
-               v-bind="!FIELD_SIZING && { style: { width: search.replace.length + INPUT_EXTRA + 'ch' } }">
+        <input class="flex-1" type="search" id="editor-replace" v-model="search.replace">
         <tooltip :content="tooltips.replace" align="end">
           <button type="submit" v-text="i18n('buttonReplace')"></button>
         </tooltip>
@@ -47,10 +46,10 @@
         <tooltip :content="i18n('searchCaseSensitive')" align="end">
           <toggle-button v-model="search.options.caseSensitive">Aa</toggle-button>
         </tooltip>
+        <tooltip content="Esc" align="end" class="ml-1">
+          <button @click="clearSearch">&times;</button>
+        </tooltip>
       </div>
-      <tooltip content="Esc" align="end">
-        <button @click="clearSearch">&times;</button>
-      </tooltip>
     </div>
   </div>
 </template>
@@ -74,13 +73,13 @@ import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
-import CodeMirror from 'codemirror';
-import { debounce, getUniqId, i18n, sendCmdDirectly } from '@/common';
-import { GM_API_NAMES, GM4_ALIAS } from '@/common/consts';
-import { deepEqual, forEachEntry, objectPick } from '@/common/object';
+import { debounce, escapeStringForRegExp, getUniqId, i18n, sendCmdDirectly } from '@/common';
+import { GM4_ALIAS, GM_API_NAMES } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
+import { deepEqual, forEachEntry, objectPick } from '@/common/object';
 import options from '@/common/options';
 import './code-autocomplete';
+import CodeMirror from 'codemirror';
 import cmDefaults from './code-defaults';
 import './code-js-mixed-mode';
 import { killTrailingSpaces } from './code-trailing-spaces';
@@ -98,8 +97,6 @@ const { insertTab, insertSoftTab } = cmCommands;
 /** Using space prefix to show the command at the top of Help list */
 const Esc = ' back / cancel / close / singleSelection';
 const GM4_API_NAMES = GM_API_NAMES.map(s => GM4_ALIAS[s = s.slice(3)] || s);
-const FIELD_SIZING = CSS.supports('field-sizing', 'content');
-const INPUT_EXTRA = 1.5 + (IS_FIREFOX ? 0 : 3);
 Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
@@ -162,7 +159,7 @@ const search = reactive({
   show: false,
   query: '',
   replace: '',
-  hasResult: false,
+  num: 0,
   options: {
     useRegex: false,
     caseSensitive: false,
@@ -349,44 +346,60 @@ function findFillQuery(force) {
 }
 /** @param {VMSearchOptions} opts */
 function doSearch(opts) {
-  search.hasResult = !search.query || !!doSearchInternal({ ...opts, wrapAround: true });
+  if (!doSearchInternal({ ...opts, wrapAround: true })) {
+    search.num = 0;
+  }
 }
 /**
  * @param {VMSearchOptions} opts
- * @returns {?true}
+ * @returns {true | void}
  */
-function doSearchInternal({ reversed, wrapAround, pos, reuseCursor } = {}) {
+function doSearchInternal({ reversed, wrapAround, pos } = {}) {
   const { caseSensitive, useRegex } = search.options;
+  const gen = cm.doc.history.generation;
   let retry = wrapAround ? 2 : 1;
+  let { query } = search;
+  let cur, error;
+  if (!query) {
+    search.prevQuery = query;
+    return;
+  }
   if (!pos || typeof pos === 'string') {
     pos = cm.getCursor(pos || (reversed ? 'from' : 'to'));
   }
   do {
-    let cur;
-    if (reuseCursor) {
-      cur = search.cursor;
-    } else {
-      let { query } = search;
+    const queryChanged = query !== search.prevQuery;
+    if (queryChanged) {
       if (useRegex) {
         try {
-          query = new RegExp(query, caseSensitive ? '' : 'gi');
-          search.error = null;
+          query = search.prevRe = RegExp(query, (caseSensitive ? '' : 'i') + 'gu');
         } catch (err) {
-          search.error = err;
-          return;
+          error = err;
         }
       }
+      search.error = error;
+      if (error) return;
       cur = cm.getSearchCursor(query, pos, { caseFold: !caseSensitive });
       search.cursor = cur;
+      search.prevQuery = query;
+    } else if (useRegex) {
+      query = search.prevRe;
     }
-    while (cur.find(reversed)) {
+    cur ||= search.cursor;
+    if (queryChanged || gen !== search.prevGen) {
+      search.prevGen = gen;
+      search.num = getRealContent().normalize('NFD').match(
+        useRegex ? query : RegExp(escapeStringForRegExp(query), (caseSensitive ? '' : 'i') + 'gu')
+      )?.length || 0;
+    }
+    if (cur.find(reversed)) {
       const from = cur.from();
       const to = cur.to();
+      reveal(from, to);
       if (!cm.findMarks(from, to, m => m[PLACEHOLDER_SYM]).length) {
-        reveal(from, to);
         cm.setSelection(from, to, { scroll: false });
-        return true;
       }
+      return true;
     }
     retry -= 1;
     if (retry) {
@@ -394,6 +407,7 @@ function doSearchInternal({ reversed, wrapAround, pos, reuseCursor } = {}) {
         line: reversed ? cm.doc.size : 0,
         ch: 0,
       };
+      cur.pos = { from: pos, to: pos };
     }
   } while (retry);
 }
@@ -424,13 +438,14 @@ function replace(all) {
     return;
   }
   if (all) {
+    let opts = { pos: { line: 0, ch: 0 } };
     cm.operation(() => {
-      let opts = { pos: { line: 0, ch: 0 } };
       while (doSearchInternal(opts)) {
         search.cursor.replace(replace);
-        opts = { reuseCursor: true };
+        opts = undefined;
       }
     });
+    if (!opts) doSearch();
   } else {
     const { sel } = cm.doc;
     doSearch({ pos: 'from' });
@@ -590,19 +605,21 @@ $selectionDarkBg: rgba(80, 75, 65, .99);
 .editor-search {
   white-space: pre;
   flex-wrap: wrap; // wrap fields in a narrow window
+  gap: .5rem 1rem;
   > form,
   > div {
     display: flex;
     align-items: center;
-    margin-right: .5rem;
   }
   input {
-    min-width: 3ch;
-    max-width: 50vw;
-    @supports (field-sizing: content) {
-      field-sizing: content;
-      width: auto;
-    }
+    height: 1.5rem; // same as button in @/options/style.css
+    min-width: 5ch;
+    field-sizing: content;
+    width: auto;
+  }
+  .fit  {
+    overflow: hidden;
+    min-width: fit-content;
   }
   span > input { // a tooltip'ed input
     width: 100%;

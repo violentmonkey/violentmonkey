@@ -432,7 +432,6 @@ declare namespace VMReq {
 declare type VMSearchOptions = {
   reversed?: boolean;
   wrapAround?: boolean;
-  reuseCursor?: boolean;
   pos?: { line: number, ch: number };
 }
 
