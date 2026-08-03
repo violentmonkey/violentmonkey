@@ -120,7 +120,8 @@ declare namespace GMReq {
       saveAs?: boolean;
       timeout?: number;
       ua?: string[];
-      url: string;
+      /** Blob in Firefox */
+      url: string | Blob;
       user?: string;
       /** responseType to use in the actual XHR */
       xhrType: XMLHttpRequestResponseType;

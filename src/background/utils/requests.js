@@ -1,4 +1,4 @@
-import { keepAlive, noop, sendTabCmd, string2uint8array } from '@/common';
+import { keepAlive, leaseBlobUrl, noop, sendTabCmd, string2uint8array } from '@/common';
 import { CHARSET_UTF8, FORM_URLENCODED, UA_PROPS, UPLOAD } from '@/common/consts';
 import { deepEqual, forEachEntry, forEachValue } from '@/common/object';
 import { kGmDownloadViaApi } from '@/common/options-defaults';
@@ -62,6 +62,9 @@ addPublicCommands({
       cbError: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
+    if (IS_FIREFOX && opts.url instanceof Blob) {
+      opts.url = leaseBlobUrl(opts.url);
+    }
     return (
       fileName && permissionDownloads && getOption(kGmDownloadViaApi)
       ? downloadViaApi
