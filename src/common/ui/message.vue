@@ -48,9 +48,9 @@ export default {
       dismissers.length = 0;
       context.emit('dismiss');
     };
-    const onButtonClick = onClick => {
+    const onButtonClick = async onClick => {
       if (onClick) {
-        if (onClick(props.message.input) !== false) dismiss();
+        if ((await onClick(props.message.input)) !== false) dismiss();
       }
     };
     const onBackdropClick = () => {

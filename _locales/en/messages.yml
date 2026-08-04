@@ -8,6 +8,9 @@ buttonCheckForUpdates:
   description: Button to check a script for updates.
   message: Check for updates
   touched: false
+buttonClear:
+  description: Button to clear the domain input box.
+  message: Clear
 buttonClose:
   description: Button to close window.
   message: Close
@@ -19,6 +22,9 @@ buttonConfirmReinstallation:
   description: Button to confirm re-installation when the script is already installed.
   message: Confirm re-installation
   touched: false
+buttonCurrentTab:
+  description: Button to fill the domain input with the current/last-viewed tab's domain.
+  message: Current tab
 buttonDisable:
   description: Button to disable a script.
   message: Disable
@@ -749,6 +755,20 @@ learnInjectionMode:
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
   message: Manage remote files
+menuAddMatch:
+  description: Button/tooltip to add a domain to a script's @match lines.
+  message: Add domain to @match
+menuAddMatchModal:
+  description: Description line shown in the table-view "add domain" modal, under the script name.
+  message: Add a domain to @match...
+menuAddMatchPlaceholder:
+  description: Placeholder text for the empty add-domain input box (not a real example value).
+  message: Enter domain
+menuAddMatchHint:
+  description: Hint shown under the add-domain box.
+  message: >-
+    Paste or type a bare domain (e.g. example.com or *.example.com) - it will
+    be completed into a full @match line automatically.
 menuCommands:
   description: Menu item to list script commands.
   message: Script commands
@@ -863,6 +883,14 @@ msgLoadingData:
 msgLoadingDependency:
   description: Message shown on confirm page when the requirements are being downloaded.
   message: Loading dependencies... ($1/$2)
+msgMatchAdded:
+  description: >-
+    Toast shown after a pattern is added to a script's @match.
+    $1 = the pattern, $2 = the (possibly truncated) script name.
+  message: $1 added to $2
+msgMatchExists:
+  description: Shown when the @match pattern being added already exists in the script.
+  message: The domain is already added.
 msgMissingResources:
   description: >-
     Notification title shown for a missing @require or other resource when

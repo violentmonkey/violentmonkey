@@ -129,6 +129,107 @@ export function parseMeta(code, { errors, retDefault, retMetaStr } = {}) {
   return meta;
 }
 
+/** Standard alignment used by our default script template, e.g. `// @match       `. */
+const MATCH_LINE_RE = /^([^\n]*?\/\/[\x20\t]*@match\b[\x20\t]*)(.+)$/;
+const MATCH_LINE_PREFIX = '// @match        ';
+
+/**
+ * Completes a bare domain/host into a full `@match` pattern, e.g.
+ * `example.com` -> `*://example.com/*`, `*.example.com` -> `*://*.example.com/*`.
+ * Already-complete patterns (containing `://` and a path) are returned unchanged.
+ * @param {string} raw
+ * @return {string} empty string if `raw` is empty/whitespace
+ */
+export function wrapMatchPattern(raw) {
+  let p = (raw || '').trim();
+  if (!p) return '';
+  if (!/:\/\//.test(p)) p = `*://${p}`;
+  const after = p.slice(p.indexOf('://') + 3);
+  if (!after.includes('/')) p += '/*';
+  return p;
+}
+
+/**
+ * A bare host typed as shorthand (no scheme, no wildcard of its own) defaults to the
+ * wildcard-subdomain form, same as the popup/list-UI add-domain box: `y.com` -> `*.y.com`.
+ * Anything that already has a scheme or a `*` in it (incl. a leading `*.`) is left alone.
+ * @param {string} piece
+ * @return {string}
+ */
+function defaultShorthandToSubdomain(piece) {
+  return /:\/\/|\*/.test(piece) ? piece : `*.${piece}`;
+}
+
+/**
+ * Expands shorthand `@match` directives at save time so mobile users can type
+ * `// @match example.com,xyz.*` instead of fiddling with `*://.../*` boilerplate.
+ * - splits comma-separated values into one `@match` line per pattern
+ * - a bare host defaults to the wildcard-subdomain form (see `defaultShorthandToSubdomain`)
+ * - completes each piece via `wrapMatchPattern`
+ * - leaves already-valid single-pattern lines untouched (no-op, preserves formatting)
+ * Only affects `@match`; not used by the programmatic "add domain" features,
+ * which already write a single fully-qualified pattern per call.
+ * @param {string} code
+ * @return {string}
+ */
+export function expandMatchShorthand(code) {
+  const meta = matchUserScript(code);
+  if (!meta) return code;
+  const body = meta[4];
+  const bodyStart = meta.index + meta[1].length;
+  let changed = false;
+  const outLines = body.split('\n').map(line => {
+    const m = MATCH_LINE_RE.exec(line);
+    if (!m) return line;
+    const prefix = m[1];
+    const pieces = m[2].split(',').map(s => s.trim()).filter(Boolean);
+    if (!pieces.length) return line;
+    const wrapped = pieces.map(p => wrapMatchPattern(defaultShorthandToSubdomain(p)));
+    if (wrapped.length === 1 && wrapped[0] === pieces[0]) return line;
+    changed = true;
+    return wrapped.map(w => prefix + w).join('\n');
+  });
+  if (!changed) return code;
+  const newBody = outLines.join('\n');
+  return code.slice(0, bodyStart) + newBody + code.slice(bodyStart + body.length);
+}
+
+/**
+ * Inserts a new `@match` line (right after the last existing one) into a script's code.
+ * Skips the insertion if an identical pattern already exists.
+ * @param {string} code
+ * @param {string} pattern - already-complete, e.g. from `wrapMatchPattern`
+ * @return {{ code: string, added: boolean, duplicate: boolean }}
+ */
+export function insertMatchLine(code, pattern) {
+  const meta = matchUserScript(code);
+  if (!meta || !pattern) return { code, added: false, duplicate: false };
+  const body = meta[4];
+  const bodyStart = meta.index + meta[1].length;
+  const lineRe = /^[^\n]*?\/\/[\x20\t]*@match\b[\x20\t]*(.+)$/;
+  const lines = body.split('\n');
+  let lastIdx = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const m = lineRe.exec(lines[i]);
+    if (m) {
+      if (m[1].trim() === pattern) return { code, added: false, duplicate: true };
+      lastIdx = i;
+    }
+  }
+  const newLine = MATCH_LINE_PREFIX + pattern;
+  if (lastIdx < 0) {
+    lines.unshift(newLine, '');
+  } else {
+    lines.splice(lastIdx + 1, 0, newLine);
+  }
+  const newBody = lines.join('\n');
+  return {
+    code: code.slice(0, bodyStart) + newBody + code.slice(bodyStart + body.length),
+    added: true,
+    duplicate: false,
+  };
+}
+
 function checkMetaItemErrors(parts, index, errors) {
   let clipped;
   if (parts[index + 1].match(/\S/)) {

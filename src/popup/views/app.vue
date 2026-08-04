@@ -93,6 +93,7 @@
             runs: item.runs,
             'extras-shown': extras === item,
             'excludes-shown': item.excludes,
+            'add-match-shown': addMatchId === item.props.id,
           }"
           class="script">
           <div
@@ -130,6 +131,10 @@
                  :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
+            <div class="submenu-button vm-add-match-btn" :tabIndex @click="onAddMatch(item, $event)"
+                 :title="i18n('menuAddMatch')">
+              <icon name="plus"></icon>
+            </div>
             <div
               class="submenu-button"
               :tabIndex
@@ -155,6 +160,23 @@
                 v-text="i18n('labelExcludeMatch')" target="_blank"
                 :href="VM_DOCS_MATCHING"/>
               </small>
+            </details>
+          </div>
+          <div v-if="addMatchId === item.props.id" class="add-match-menu mb-1c mr-1c">
+            <button v-for="(val, key) in addMatchChips" :key
+                    v-text="val" class="ellipsis" :title="val"
+                    @click="onAddMatchSave(item, val)"/>
+            <input v-model="addMatchInput" spellcheck="false"
+                   :placeholder="i18n('menuAddMatchPlaceholder')"
+                   @keypress.enter="onAddMatchSave(item)"
+                   @keydown.esc.exact.stop.prevent="onAddMatchClose(item)"/>
+            <button v-text="i18n('buttonOK')" @click="onAddMatchSave(item)"/>
+            <button v-text="i18n('buttonClear')" @click="onAddMatchClear(item)"/>
+            <button v-text="i18n('buttonCancel')" @click="onAddMatchClose(item)"/>
+            <div class="add-match-note" v-if="addMatchNote" v-text="addMatchNote"/>
+            <details class="mb-1">
+              <summary><icon name="info"/></summary>
+              <small v-text="i18n('menuAddMatchHint')"/>
             </details>
           </div>
           <div v-if="item.cmds" class="submenu-commands pos-rel">
@@ -232,11 +254,11 @@ import optionsDefaults, {
 } from '@/common/options-defaults';
 import {
   getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl, i18n, makePause,
-  sendCmdDirectly, sendTabCmd,
+  sendCmdDirectly, sendTabCmd, truncateText,
 } from '@/common';
 import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
-import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
+import { EXTERNAL_LINK_PROPS, getActiveElement, showToast } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { getSortCollator } from '@/common/ui/util';
@@ -267,6 +289,12 @@ const optionsData = reactive(objectPick(optionsDefaults, [
 const activeMenu = ref(SCRIPTS);
 const showSettings = ref();
 const extras = ref();
+/** id of the script whose add-match panel is open (not the item itself: comparing
+ * by a primitive id can't go stale, unlike comparing object references). */
+const addMatchId = ref(null);
+const addMatchInput = ref('');
+const addMatchChips = ref({});
+const addMatchNote = ref('');
 const focusedItem = ref();
 const message = ref();
 const note = ref();
@@ -523,6 +551,55 @@ async function onExclude() {
 function onExcludeClose(item) {
   item.excludes = null;
   focus(item);
+}
+function onAddMatch(item, evt) {
+  evt.stopPropagation(); // mirrors showExtras: don't let the root @click close us right back
+  item.el = evt.currentTarget.closest(SCRIPT_CLS) || item.el;
+  const { id } = item.props;
+  if (addMatchId.value === id) { // clicking + again on the already-open item just closes it
+    onAddMatchClose(item);
+    return;
+  }
+  // Open IMMEDIATELY and synchronously: the panel's visibility must never depend on an
+  // awaited round-trip finishing, or a slow/late background response can leave it stuck closed.
+  addMatchInput.value = '';
+  addMatchChips.value = {};
+  addMatchNote.value = '';
+  addMatchId.value = id;
+  focusAddMatchInput(item);
+  sendCmdDirectly('GetTabDomain', item.pageUrl).then(({ domain, anyTld } = {}) => {
+    if (addMatchId.value !== id) return; // closed or switched to another item meanwhile
+    const sub = domain && `*.${domain}`;
+    // Default to the wildcard-subdomain form: it's almost always what's wanted,
+    // and the bare-domain/TLD-wildcard forms remain one tap away as chips.
+    addMatchInput.value = sub || '';
+    addMatchChips.value = domain ? { domain, sub, tld: anyTld } : {};
+  });
+}
+async function focusAddMatchInput(item) {
+  await makePause(); // $nextTick runs too early
+  item.el?.querySelector('.add-match-menu input')?.focus();
+}
+function onAddMatchClose(item) {
+  addMatchId.value = null;
+  focus(item);
+}
+function onAddMatchClear(item) {
+  addMatchInput.value = '';
+  addMatchNote.value = '';
+  item.el?.querySelector('.add-match-menu input')?.focus();
+}
+async function onAddMatchSave(item, btn) {
+  const pattern = btn || addMatchInput.value.trim();
+  if (!pattern) return;
+  const res = await sendCmdDirectly('AddScriptMatch', { id: item.props.id, pattern });
+  if (res.duplicate) {
+    addMatchNote.value = i18n('msgMatchExists');
+  } else {
+    showToast(i18n('msgMatchAdded', [res.pattern, truncateText(item.name)]));
+    onAddMatchClose(item);
+  }
+  checkReload();
 }
 async function onExcludeSave(item, btn) {
   await sendCmdDirectly('UpdateScriptInfo', {

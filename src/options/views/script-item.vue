@@ -8,6 +8,7 @@
       error: script.error,
       focused: focused,
       hotkeys: focused && showHotkeys,
+      'has-add-match': addMatchOpen,
     }"
     :tabIndex
     @focus="setScriptFocus(true)"
@@ -112,6 +113,11 @@
               <icon name="refresh" :invert.attr="canUpdate === -1 ? '' : null" />
             </a>
           </tooltip>
+          <tooltip :content="i18n('menuAddMatch')" :disabled="addMatchOpen" align="start">
+            <a class="btn-ghost" :tabIndex @click="onAddMatchToggle">
+              <icon name="plus"></icon>
+            </a>
+          </tooltip>
         </template>
         <span class="sep"></span>
         <tooltip :disabled="!description" :content="description" align="start">
@@ -131,7 +137,7 @@
         </tooltip>
         <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
         <div class="script-message" v-if="script.message" v-text="script.message"
-             :title="script.error"/>
+             :title="script.error || script.message"/>
       </template>
     </div>
     <div class="script-buttons script-buttons-right">
@@ -152,13 +158,39 @@
         </tooltip>
       </template>
     </div>
+    <div v-if="addMatchOpen" class="add-match-panel">
+      <div class="add-match-chips" v-if="tabInfo.domain">
+        <button v-for="(val, key) in tabInfo.chips" :key
+                v-text="val" class="ellipsis" :title="val"
+                @click="onAddMatchSave(val)"/>
+      </div>
+      <input v-model="matchInput" spellcheck="false"
+             :placeholder="i18n('menuAddMatchPlaceholder')"
+             @keypress.enter="onAddMatchSave()"
+             @keydown.esc.exact.stop.prevent="addMatchOpen = false"/>
+      <div class="add-match-buttons">
+        <button v-text="i18n('buttonCurrentTab')" @click="onAddMatchCurrentTab"/>
+        <button v-text="i18n('buttonOK')" @click="onAddMatchSave()"/>
+        <button v-text="i18n('buttonClear')" @click="matchInput = ''; matchNote = ''"/>
+        <button v-text="i18n('buttonCancel')" @click="addMatchOpen = false"/>
+      </div>
+      <div class="add-match-note" v-if="matchNote" v-text="matchNote"/>
+      <details class="mb-1">
+        <summary><icon name="info"/></summary>
+        <small v-text="i18n('menuAddMatchHint')"/>
+      </details>
+    </div>
   </div>
 </template>
 
 <script>
-import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
+import {
+  formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n, sendCmdDirectly, truncateText,
+} from '@/common';
 import { INFERRED, kTag } from '@/common/consts';
-import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
+import {
+  EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation, showMessage, showToast,
+} from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
@@ -172,7 +204,7 @@ let visitedRecentlyInterval;
 </script>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import Icon from '@/common/ui/icon';
@@ -258,6 +290,86 @@ const onRemove = () => emitScript('remove');
 const onRestore = () => emitScript('restore');
 const onTagClick = item => emit('clickTag', item);
 const onToggle = () => emitScript('toggle');
+const addMatchOpen = ref(false);
+const matchInput = ref('');
+const matchNote = ref('');
+const tabInfo = ref({});
+async function onAddMatchToggle() {
+  if (props.viewTable) {
+    onAddMatchModal();
+    return;
+  }
+  addMatchOpen.value = !addMatchOpen.value;
+  if (addMatchOpen.value) {
+    matchInput.value = '';
+    matchNote.value = '';
+    const res = await sendCmdDirectly('GetLastPopupDomain');
+    const sub = res?.domain && `*.${res.domain}`;
+    tabInfo.value = res?.domain ? {
+      domain: res.domain,
+      chips: { domain: res.domain, sub, tld: res.anyTld },
+    } : {};
+    // Default to the wildcard-subdomain form: it's almost always what's wanted,
+    // and the bare-domain/TLD-wildcard forms remain one tap away as chips.
+    matchInput.value = sub || '';
+  }
+}
+async function onAddMatchModal() {
+  const id = props.script.props.id;
+  const initial = await sendCmdDirectly('GetLastPopupDomain');
+  const message = reactive({
+    text: `${cache.value.name}\n\n${i18n('menuAddMatchModal')}`,
+    input: initial?.domain ? `*.${initial.domain}` : '',
+    buttons: [
+      {
+        text: i18n('buttonCurrentTab'),
+        async onClick() {
+          const res = await sendCmdDirectly('GetLastPopupDomain');
+          message.input = res?.domain ? `*.${res.domain}` : '';
+          return false;
+        },
+      },
+      {
+        text: i18n('buttonOK'),
+        async onClick(val) {
+          const pattern = (val || '').trim();
+          if (!pattern) return false;
+          const res = await sendCmdDirectly('AddScriptMatch', { id, pattern });
+          if (res.duplicate) {
+            showMessage({ text: i18n('msgMatchExists') });
+            return false;
+          }
+          showToast(i18n('msgMatchAdded', [res.pattern, truncateText(cache.value.name)]));
+          return true;
+        },
+      },
+      {
+        text: i18n('buttonClear'),
+        onClick() {
+          message.input = '';
+          return false;
+        },
+      },
+      { text: i18n('buttonCancel'), onClick: () => true },
+    ],
+  });
+  showMessage(message);
+}
+const onAddMatchCurrentTab = () => {
+  if (tabInfo.value.chips?.sub) matchInput.value = tabInfo.value.chips.sub;
+  matchNote.value = '';
+};
+const onAddMatchSave = async btn => {
+  const pattern = (typeof btn === 'string' ? btn : matchInput.value).trim();
+  if (!pattern) return;
+  const res = await sendCmdDirectly('AddScriptMatch', { id: props.script.props.id, pattern });
+  if (res.duplicate) {
+    matchNote.value = i18n('msgMatchExists');
+  } else {
+    addMatchOpen.value = false;
+    showToast(i18n('msgMatchAdded', [res.pattern, truncateText(cache.value.name)]));
+  }
+};
 const onUpdate = async evt => {
   evt.preventDefault(); // for contextmenu
   let what = props.script;
@@ -359,6 +471,9 @@ $removedItemHeight: calc(
   background: var(--bg);
   width: calc((100% - $itemMargin) / var(--num-columns) - $itemMargin);
   height: $itemHeight;
+  &.has-add-match {
+    height: auto;
+  }
   &:hover {
     border-color: var(--fill-5);
   }
@@ -390,6 +505,14 @@ $removedItemHeight: calc(
     &:focus {
       box-shadow: 1px 2px 9px var(--fill-9);
     }
+  }
+  .script-message {
+    display: inline-block;
+    max-width: 14em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
   }
   &.error {
     border-color: #f008;
@@ -686,5 +809,35 @@ svg[invert] {
   fill: transparent;
   stroke: currentColor;
   stroke-width: $strokeWidth;
+}
+.add-match-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  margin-top: .5rem;
+  padding-top: .5rem;
+  border-top: 1px solid var(--fill-3);
+  input {
+    width: 100%;
+  }
+  .add-match-chips,
+  .add-match-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    button {
+      max-width: 100%;
+    }
+  }
+  small {
+    color: var(--fill-7);
+  }
+  .add-match-note {
+    padding: .3rem .5rem;
+    border-radius: 2px;
+    background: hsl(0, 100%, 95%);
+    color: #c00;
+  }
 }
 </style>

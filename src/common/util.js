@@ -4,6 +4,10 @@ import { BLOB_LIFE, U8_fromBase64 } from '@/common/consts';
 import { makePause } from '.';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
+/** Caps a string for one-line toasts/banners where there's no room for the full name. */
+export function truncateText(text, max = 24) {
+  return text && text.length > max ? `${text.slice(0, max - 1)}\u2026` : text || '';
+}
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
 const NON_ASCII_RE = /[\x80-\xFF]/;
 

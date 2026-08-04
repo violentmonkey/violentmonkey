@@ -11,11 +11,15 @@ import { badges } from './session-data';
 /** @type {{[tabId: string]: chrome.runtime.Port}} */
 export const popupTabs = {};
 const getCacheKey = tabId => 'SetPopup' + tabId;
+/** Cached host/domain of the last tab a popup was opened for, used by the dashboard's
+ * "Current tab" button since it has no direct access to the tab the popup was opened on. */
+let lastPopupDomain = null;
 
 export async function initPopup() {
   const tab = await getActiveTab() || {};
   const { url = '', id: tabId } = tab;
   const data = commands.GetTabDomain(url);
+  if (data.host) lastPopupDomain = { host: data.host, domain: data.domain, anyTld: data.anyTld };
   const badgeData = badges[tabId] || {};
   let failure = getFailureReason(url, badgeData, '');
   // FF injects content scripts after update/install/reload
@@ -45,6 +49,8 @@ export async function initPopup() {
 }
 
 addOwnCommands({
+  /** @return {{host: string, domain: string} | null} */
+  GetLastPopupDomain: () => lastPopupDomain,
   InitPopup: initPopup,
 });
 

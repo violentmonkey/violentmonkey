@@ -1,5 +1,5 @@
 import { browserWindows, getActiveTab, i18n, makePause, noop, sendTabCmd } from '@/common';
-import { getDomain } from '@/common/tld';
+import { getDomain, getPublicSuffix } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands, init } from './init';
 import { getOption } from './options';
 import sessionData, { flushSession, kTabOpeners, tabOpeners } from './session-data';
@@ -60,9 +60,15 @@ try {
 addOwnCommands({
   GetTabDomain(url) {
     const host = url && new URL(url).hostname;
+    const domain = host && getDomain(host) || host;
+    const suffix = host && getPublicSuffix(host);
+    const anyTld = domain && suffix && domain.endsWith(`.${suffix}`)
+      ? `${domain.slice(0, -(suffix.length + 1))}.*`
+      : domain && `${domain}.*`;
     return {
       host,
-      domain: host && getDomain(host) || host,
+      domain,
+      anyTld,
     };
   },
   /**

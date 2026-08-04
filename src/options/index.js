@@ -14,6 +14,7 @@ import App from './views/app';
 
 const NON_WS_RE = /\S/;
 let updateThrottle;
+const msgTimers = new Map(); // per-script-id timer to auto-clear a transient script.message
 
 render(App);
 loadData();
@@ -130,9 +131,19 @@ Object.assign(handlers, {
     if (!script) return; // We're in editor that doesn't have data for all scripts
     const removed = update.config?.removed;
     const oldTags = oldScript ? getUniqTags(oldScript) : '';
-    const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
+    // Apply `update` (e.g. script.message) right away so the row reflects it instantly;
+    // sizes are fetched after and aren't needed for that to be visible.
     Object.assign(script, update);
     if (script.error && !update.error) script.error = null;
+    if (update.message != null) {
+      clearTimeout(msgTimers.get(where.id));
+      if (script.message) {
+        msgTimers.set(where.id, setTimeout(() => { script.message = ''; }, 2500));
+      } else {
+        msgTimers.delete(where.id);
+      }
+    }
+    const [sizes] = await sendCmdDirectly('GetSizes', [where.id]);
     initScript(script, sizes, code);
     if (removed != null) {
       if (removed) {

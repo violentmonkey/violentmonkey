@@ -12,8 +12,9 @@ import { isGmStorageGranted } from '@/common/script';
 import pluginEvents from '../plugin/events';
 import broadcast from './broadcast';
 import {
-  aliveScripts, getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta,
-  removedScripts, scriptMap, scriptSiteVisited,
+  aliveScripts, expandMatchShorthand, getDefaultCustom, getNameURI, inferScriptProps,
+  insertMatchLine, newScript, parseMeta, removedScripts, scriptMap, scriptSiteVisited,
+  wrapMatchPattern,
 } from './script';
 import { testBlacklist, testerBatch, testScript } from './tester';
 import { getImageData } from './icon';
@@ -75,6 +76,27 @@ addOwnCommands({
       items: scripts.map(script => ({ script, code: codeMap[script.props.id] })),
       values: values ? await storage[S_VALUE].getMulti(ids) : undefined,
     };
+  },
+  /**
+   * Adds a single fully-qualified `@match` pattern to a script's code, right after
+   * its last existing `@match` line. Used by the popup "+" button and the dashboard's
+   * domain-add box. `pattern` may be a bare domain; it's completed via `wrapMatchPattern`.
+   * @return {Promise<{ duplicate: boolean, pattern: string } | (ReturnType<typeof parseScript> & { pattern: string })>}
+   */
+  async AddScriptMatch({ id, pattern }) {
+    const wrapped = wrapMatchPattern(pattern);
+    if (!wrapped) throw i18n('msgInvalidScript');
+    const code = await storage[S_CODE].getOne(id);
+    const result = insertMatchLine(code, wrapped);
+    if (!result.added) return { duplicate: result.duplicate, pattern: wrapped };
+    const res = await parseScript({
+      id,
+      code: result.code,
+      bumpDate: true,
+      message: '', // shown as a toast by the caller instead of the easily-truncated row text
+    });
+    res.pattern = wrapped;
+    return res;
   },
   /** @return {Promise<string>} */
   GetScriptCode(id) {
@@ -622,6 +644,9 @@ function parseMetaWithErrors(src) {
  * }>}
  */
 export async function parseScript(src) {
+  if (src.code != null && !src.meta) {
+    src.code = expandMatchShorthand(src.code);
+  }
   const { meta, errors } = src.meta ? src : parseMetaWithErrors(src);
   if (!meta.name) throw `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`;
   const update = {

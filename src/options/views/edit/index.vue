@@ -344,9 +344,10 @@ async function save() {
   const { noframes } = custom;
   try {
     const id = scr.props.id;
+    const codeSent = $codeComp.getRealContent();
     const res = await sendCmdDirectly('ParseScript', {
       id,
-      code: $codeComp.getRealContent(),
+      code: codeSent,
       config: {
         enabled: +config.enabled,
         httpOnly: +config.httpOnly,
@@ -368,6 +369,10 @@ async function save() {
     });
     const newId = res.where.id;
     const newScript = res.update;
+    if (res.code != null && res.code !== codeSent) {
+      // backend expanded shorthand `@match` lines (commas/bare domains); reflect it in the editor
+      CM.operation(() => { CM.setValue(res.code); CM.clearHistory(); });
+    }
     CM.markClean();
     codeDirty.value = false; // triggers onDirty which sets canSave
     canSave.value = false; // ...and set it explicitly in case codeDirty was false

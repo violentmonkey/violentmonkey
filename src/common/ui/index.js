@@ -1,4 +1,4 @@
-import { createApp, h } from 'vue';
+import { createApp, h, reactive } from 'vue';
 import Modal from 'vueleton/lib/modal';
 import { trueJoin } from '@/common';
 import { i18n } from '@/common/util';
@@ -47,6 +47,7 @@ export function showUnhandledError(a, b, c, d, err = a?.reason || a) {
 }
 
 export function showMessage(message) {
+  message = reactive(message);
   const modal = Modal.show(() => h(Message, {
     message,
     onDismiss() {
@@ -64,6 +65,30 @@ export function showMessage(message) {
       }
     }, message.timeout || 2000);
   }
+}
+
+let toastEl;
+let toastTimer;
+/**
+ * A simple top banner, NOT a modal: no backdrop dim, no focus trap, just a flat bar
+ * that slides in over the top of the page and auto-dismisses. For brief confirmations
+ * (e.g. "Added to @match.") where `showMessage`'s dialog styling is overkill.
+ * @param {string} text
+ */
+export function showToast(text) {
+  if (!toastEl) {
+    toastEl = document.createElement('div');
+    toastEl.className = 'vm-toast';
+    document.body.appendChild(toastEl);
+  }
+  clearTimeout(toastTimer);
+  toastEl.textContent = text;
+  toastEl.classList.remove('show');
+  void toastEl.offsetHeight; // restart the slide-in transition even if already showing
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(() => {
+    toastEl.classList.remove('show');
+  }, 2500);
 }
 
 /**
