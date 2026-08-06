@@ -97,13 +97,13 @@ addOwnCommands({
     const [script] = list.splice(i, 1);
     (removed ? removedScripts : aliveScripts).push(script);
   },
-  /** @return {Promise<number>} */
+  /** @return {boolean} */
   Move({ id, offset }) {
     const script = getScriptById(id);
     const index = aliveScripts.indexOf(script);
     aliveScripts.splice(index, 1);
     aliveScripts.splice(index + offset, 0, script);
-    return normalizePosition();
+    return !!normalizePosition();
   },
   ParseMeta: parseMetaWithErrors,
   ParseMetaErrors: data => parseMetaWithErrors(data).errors,
@@ -234,31 +234,32 @@ function updateLastModified() {
   setOption('lastModified', Date.now());
 }
 
-/** @return {Promise<boolean>} */
-export async function normalizePosition() {
-  const updates = aliveScripts.reduce((res, script, index) => {
+/** @return {void | Promise<Object>} */
+function normalizePosition(positions) {
+  let updates;
+  maxScriptPosition = aliveScripts.length;
+  for (let index = 0; index < maxScriptPosition; index++) {
+    const script = aliveScripts[index];
     const { props } = script;
     const position = index + 1;
     if (props.position !== position) {
       props.position = position;
-      (res || (res = {}))[props.id] = script;
+      (updates ||= {})[props.id] = script;
+      if (positions) positions[props.id] = position;
     }
-    return res;
-  }, null);
-  maxScriptPosition = aliveScripts.length;
-  if (updates) {
-    await storage[S_SCRIPT].set(updates);
-    updateLastModified();
   }
-  return !!updates;
+  if (updates) {
+    updateLastModified();
+    return storage[S_SCRIPT].set(updates);
+  }
 }
 
 /** @return {Promise<Boolean>} */
 export async function sortScripts() {
-  const old = [...aliveScripts];
   aliveScripts.sort((a, b) => (a.props.position || 0) - (b.props.position || 0));
-  if (await normalizePosition() || old.some((val, i) => val !== aliveScripts[i])) {
-    broadcast('ScriptsUpdated');
+  const positions = {};
+  if (normalizePosition(positions)) {
+    broadcast('ScriptsSorted', positions);
     return true;
   }
 }

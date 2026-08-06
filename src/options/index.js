@@ -104,8 +104,11 @@ function getUniqTags(script, custom = script.custom, meta) {
 }
 
 Object.assign(handlers, {
-  ScriptsUpdated() {
-    loadData();
+  ScriptsSorted(changes) {
+    for (const { props } of /**@type{VMScript[]}*/store.scripts) {
+      const pos = changes[props.id];
+      if (pos != null) props.position = pos;
+    }
   },
   SetPermissions(data) {
     Object.assign(store, data);
