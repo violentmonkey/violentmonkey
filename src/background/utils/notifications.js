@@ -28,7 +28,9 @@ addPublicCommands({
       ...!IS_FIREFOX && {
         requireInteraction: !!onclick,
       },
-      silent,
+      ...!IS_FIREFOX && {
+        silent,
+      }
     });
     if (src) {
       const op = notifications[notificationId] = {
