@@ -245,9 +245,7 @@ const visit = computed(() => {
     title: new Date(time).toLocaleString() + '. ' + i18n('filterLastVisitOrderTooltip'),
   } : {};
 });
-const url = computed(() => `#${
-  isRemoved.value ? TAB_RECYCLE : SCRIPTS}/${props.script.props.id}
-`);
+const url = computed(() => `#${isRemoved.value ? TAB_RECYCLE : SCRIPTS}/${props.script.props.id}`);
 const urls = computed(() => ({
   home: [i18n('buttonHome'), getScriptHome(props.script)],
   question: [i18n('buttonSupport'), getScriptSupportUrl(props.script)],
