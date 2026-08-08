@@ -4,9 +4,6 @@ import { isTouch } from '@/common/ui';
 export const emptyStore = () => ({
   /** [top, frames] */
   [SCRIPTS]: [[], []],
-  /** [top, frames] */
-  menus: [{}, {}],
-  idMap: {},
   domain: '',
   injectionFailure: null,
   injectable: true,
