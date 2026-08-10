@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: ''
+  message: Pielietot
 buttonCancel:
   description: Cancel button on dialog.
   message: Atcelt
@@ -28,19 +28,21 @@ buttonDownloadThemes:
   touched: false
 buttonEdit:
   description: Button to edit a script.
-  message: Rediģēt
+  message: Labot
 buttonEditClickHint:
   description: Tooltip for the Edit button in popup.
-  message: ''
+  message: >-
+    Var arī ar labo klikšķi, Ctrl-klikšķi, ritentiņa klikšķi uz skripta
+    nosaukuma.
 buttonEmptyRecycleBin:
   description: Button to empty the recycle bin.
-  message: ''
+  message: Iztukšot atkritni tagad.
 buttonEnable:
   description: Button to enable a script.
   message: Iespējot
 buttonExportData:
   description: Button to open the data export dialog.
-  message: Eksportēt kā zip arhīvu
+  message: Izgūt kā zip
 buttonFilter:
   description: Button to show filters menu.
   message: ''
@@ -50,7 +52,7 @@ buttonHome:
   message: Mājas lapa
 buttonImportData:
   description: Button to choose a file for data import.
-  message: Importēt zip arhīvu
+  message: Ievietot no zip
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: Uzstādīt no URL
@@ -61,27 +63,30 @@ buttonInstallOptions:
 buttonNew:
   description: Button to create a new script.
   message: Jauns
+buttonNewFromFile:
+  description: Button to create a new script from a local file.
+  message: Jauns no datnes
 buttonOK:
   description: OK button on dialog.
   message: Labi
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
-  message: ''
+  message: Atkritne
 buttonRemove:
   description: Button to remove a script.
-  message: ''
+  message: Noņemt
 buttonReplace:
   description: Button to replace the current match.
-  message: ''
+  message: Aizvietot
 buttonReplaceAll:
   description: Button to replace all matches.
-  message: ''
+  message: Visi
 buttonReset:
   description: Button to reset to default values.
-  message: ''
+  message: Atiestatīt
 buttonResetSettings:
   description: Button in settings page to reset all settings
-  message: ''
+  message: Atiestatīt iestatījumus
 buttonRestore:
   description: Button to restore a removed script.
   message: Atjaunot
@@ -90,13 +95,13 @@ buttonSave:
   message: Saglabāt
 buttonSaveClose:
   description: Button to save modifications of a script and then close the editing page.
-  message: Saglabāt & Aizvērt
+  message: Saglabāt un aizvērt
 buttonSaved:
   description: Button text after saving.
   message: Saglabāts
 buttonShowEditorState:
   description: Button to show the list of currently used CodeMirror options.
-  message: ''
+  message: Rādīt redaktora stāvokli
 buttonSupport:
   description: Button to open support page.
   message: Atbalsta lapa
@@ -135,13 +140,17 @@ confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
     is also shown as a confirmation dialog after clicking this button.
-  message: ''
+  message: >-
+    Atsaukt visas datubāzē veiktās izmaiņas (ievietošana, atjaunināšana,
+    labošana, pielāgošana)
 descBlacklist:
   description: Description for the global injection blacklist.
   message: ''
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: ''
+  message: >-
+    Tīkla liegumu saraksts (skripti nesavienosies ar atbilstošajām vietnēm un to
+    sīkdatnēm)
 descCustomCSS:
   description: Description of custom CSS section.
   message: ''
@@ -162,13 +171,13 @@ disabledScriptsGroup:
   message: ''
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
-  message: ''
+  message: paslēpt
 disabledScriptsSelector:
   description: Label of the option.
   message: 'Atspējotie skripti:'
 disabledScriptsShow:
   description: 'Used as "Disabled scripts: show"'
-  message: ''
+  message: parādīt
 editHelpDocumentation:
   description: Label in the editor help tab for the documentation link.
   message: ''
@@ -177,10 +186,10 @@ editHelpKeyboard:
   message: 'Īsinājumtaustiņi:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: ''
+  message: Izmantot citu redaktoru?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
-  message: ''
+  message: Pielāgoti metadati
 editLabelSettings:
   description: Settings section in settings tab of script editor.
   message: Skripta iestatījumi
@@ -205,7 +214,7 @@ editValueAll:
   touched: false
 editValueAllHint:
   description: Tooltip for the 'all' button.
-  message: ''
+  message: Rādīt/labotu visas skripta vērtības krātuvi
 extDescription:
   description: Description for this extension, will be displayed in web store
   message: ''
@@ -219,7 +228,11 @@ failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
     failureBlacklistedUrl)
-  message: ''
+  message: >-
+    Violentmonkey šajā lapā nevar izpildīt lietotāju skriptus
+
+    (izplatīti piemēri: pārlūka saskarne, paplašinājums, liegts ar
+    pamatnostādnēm, meklētāja vietne Opera pārlūkā)
 failureReasonRestarted:
   description: Shown in the popup.
   message: ''
@@ -234,7 +247,7 @@ filterAlphabeticalOrder:
   message: alfabētiski
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: ''
+  message: izpilde
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
   message: ''
@@ -284,7 +297,7 @@ helpForLocalFile:
   message: ''
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
-  message: ''
+  message: $1 atbilstošus skriptus
 hintGrantNone:
   description: Don't translate back-quoted terms.
   message: ''
@@ -347,10 +360,10 @@ labelAutoUpdate:
   message: ''
 labelBackup:
   description: Label of the import/export section in settings.
-  message: ''
+  message: Rezerves kopēšana
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
-  message: Dublēšana un apkope
+  message: Rezerves kopēšana un apkope
 labelBadge:
   description: Label for option to show number on badge.
   message: ''
@@ -398,13 +411,13 @@ labelDownloadURL:
   message: 'Lejupielādes URL:'
 labelEditValue:
   description: Label shown in the panel to edit a script value.
-  message: ''
+  message: Labo skripta vērtību
 labelEditValueAll:
   description: Label shown in the panel to edit the entire script value storage.
-  message: ''
+  message: Labo skripta krātuvi
 labelEditor:
   description: Label for Editor settings
-  message: ''
+  message: Redaktors
 labelEnabledScriptsOnly:
   description: Sub-option for autoupdate option, begins with a lowercase letter.
   message: tikai iespējotos skriptus
@@ -416,7 +429,7 @@ labelExcludeMatch:
   message: ''
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: Eksportēt skripta datus
+  message: Izgūt skripta datus
 labelExposeStatus:
   description: Option in advanced settings.
   message: ''
@@ -478,7 +491,7 @@ labelImportScriptData:
   message: Ievietot skripta datus
 labelImportSettings:
   description: Label for option to import settings from zip file.
-  message: Importēt iestatījumus
+  message: Ievietot iestatījumus
 labelInclude:
   description: Label of @include rules.
   message: ''
@@ -566,13 +579,13 @@ labelSearch:
   message: ''
 labelSearchScript:
   description: Placeholder for script search box.
-  message: ''
+  message: Meklēt skriptus...
 labelSettings:
   description: Label shown on the top of settings page
   message: Iestatījumi
 labelShowOrder:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: Rādīt izpildes secības vietas
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: ''
@@ -759,7 +772,7 @@ msgImported:
   description: >-
     Message shown after import. There is an argument referring to the count of
     scripts imported.
-  message: ''
+  message: $1 vienums(i) ievietoti
 msgIncognitoChanges:
   description: >-
     Message shown in popup and installation tab when opened in an incognito
@@ -940,10 +953,12 @@ readonly:
   message: ''
 readonlyNote:
   description: Warning when trying to type in the editor.
-  message: ''
+  message: >-
+    Automātiski atjaunināts skripts ir tikai lasāms, kamēr nav atspējoti
+    atjauninājumi vai atļauta labošana.
 readonlyOpt:
   description: Option label in the editor, displayed along with readonlyOptWarn.
-  message: ''
+  message: Atļaut labojumus
 readonlyOptWarn:
   description: Text next to readonlyOpt label in the editor.
   message: ''
@@ -1016,10 +1031,11 @@ toggleInjection:
   message: ''
 trackEdits:
   description: Button in a script installation dialog.
-  message: ''
+  message: |
+    Sekot ārējiem labojumiem
 trackEditsNote:
   description: Text shown in installer when starting to track a local file.
-  message: ''
+  message: Šī lapa jātur atvērta, lai sekotu saviem labojumiem vietējā datnē
 updateListedCmd:
   description: >-
     Command to update scripts e.g. in the extension popup, number of scripts in

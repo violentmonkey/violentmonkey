@@ -50,7 +50,7 @@ buttonHome:
   message: 홈페이지
 buttonImportData:
   description: Button to choose a file for data import.
-  message: ZIP 파일에서 불러오기
+  message: ZIP 파일에서 가져오기
 buttonInstallFromURL:
   description: Button to ask for URL of a user script.
   message: URL에서 설치
@@ -60,7 +60,10 @@ buttonInstallOptions:
   touched: false
 buttonNew:
   description: Button to create a new script.
-  message: 새로운 유저스크립트
+  message: 새로 만들기
+buttonNewFromFile:
+  description: Button to create a new script from a local file.
+  message: 파일에서 새로 만들기
 buttonOK:
   description: OK button on dialog.
   message: 확인
@@ -254,7 +257,9 @@ fileInstallBlocked:
     모든 유저스크립트에서 모든 파일에 접근할 수 있게 되므로 위험합니다.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    about:addons 페이지를 열고 "Violentmonkey"와 "권한 및 데이터"를 순서대로 클릭한 후, "컴퓨터의 로컬 파일
+    접근"을 활성화하세요.
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 가나다 순
@@ -307,7 +312,7 @@ headerRecycleBin:
   message: 휴지통
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: 로컬 스크립트를 설치할 수 없을 때 도움말 표시
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: 일치하는 스크립트 $1개
@@ -445,7 +450,7 @@ labelExcludeMatch:
   message: '@exclude-match 규칙'
 labelExportScriptData:
   description: Option to export script data along with scripts.
-  message: 스크립트 데이터 불러오기
+  message: 스크립트 데이터 내보내기
 labelExposeStatus:
   description: Option in advanced settings.
   message: '유저스크립트 카탈로그 사이트에 설치된 버전 표시: $1'
@@ -462,30 +467,32 @@ labelFeedback:
   message: 피드백
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: Firefox에서 CSP 우회
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: >-
+    웹페이지의 CSP에 무작위 값을 추가하여 Violentmonkey가 $1 주입 모드에서 스크립트를 실행할 수 있게 합니다. 그렇지 않으면
+    스크립트를 수정하여 $2을(를) 사용해야 합니다.
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: 격리된 $1 모드에서는 기능이 제한될 수 있습니다. 설정의 "$2" 옵션을 참고하세요.
 labelGeneral:
   description: Label for general settings.
   message: 일반
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: 브라우저 다운로드 API 사용
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: 스크립트가 다운로드 폴더의 하위 폴더에 파일을 저장할 수 있도록 허용하고, 브라우저 다운로드 바에 진행 상황을 표시합니다.
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: 권한 허용
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 번역 도와주기
