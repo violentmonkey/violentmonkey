@@ -19,7 +19,7 @@ const envs = {
   PRERELEASE: !!beta,
   TEMP_DIR: 'tmp',
   ASSETS_DIR: 'dist-assets',
-  GIT_DESCRIBE: ci ? exec('git describe --abbrev=7') : `v${version}`,
+  GIT_DESCRIBE: ci ? exec('git', ['describe', '--abbrev=7']) : `v${version}`,
   ACTION_BUILD_URL: process.env.ACTION_BUILD_URL,
   DISCORD_WEBHOOK_RELEASE: process.env.DISCORD_WEBHOOK_RELEASE,
 };
