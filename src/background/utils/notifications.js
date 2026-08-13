@@ -27,8 +27,6 @@ addPublicCommands({
       iconUrl: image || defaultImage,
       ...!IS_FIREFOX && {
         requireInteraction: !!onclick,
-      },
-      ...!IS_FIREFOX && {
         silent,
       }
     });

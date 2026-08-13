@@ -16,12 +16,16 @@ $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
 $hoverColor: var(--bg);
 $hoverBack: cornflowerblue;
 $hoverButtonInactiveBack: #a0c1fd;
-$DARKhoverColor: var(--fill-15);
-$DARKhoverBack: #404c5c;
-$DARKhoverButtonInactiveBack: #5b6979;
 
 html {
   scrollbar-width: none; /* Vivaldi: preventing the full-body scrollbar before size-adjustment kicks in */
+  @media (prefers-color-scheme: dark) {
+    --failure-bg: hsla(20, 100%, 50%, .5);
+    --menu-hover-bg: #404c5c;
+    --menu-hover-color: var(--fill-15);
+    --menu-group-color: #eee;
+    --button-hover-inactive-bg: #5b6979;
+  }
 }
 body {
   width: 320px;
@@ -83,12 +87,8 @@ footer {
   cursor: pointer;
   &:hover,
   &:focus {
-    background: $hoverBack;
-    color: $hoverColor;
-    @media (prefers-color-scheme: dark) {
-      background: $DARKhoverBack;
-      color: $DARKhoverColor;
-    }
+    background: var(--menu-hover-bg, $hoverBack);
+    color: var(--menu-hover-color, $hoverColor);
   }
   .script:not(.disabled):not(.runs) & .script-name,
   .disabled:not(.runs) > & {
@@ -215,10 +215,7 @@ footer {
   }
   &-group {
     padding-left: $findIconML;
-    color: #4a7792;
-    @media (prefers-color-scheme: dark) {
-      color: #eee;
-    }
+    color: var(--menu-group-color, #4a7792);
     & [data-totals]::after {
       content: ": " attr(data-totals);
     }
@@ -271,10 +268,7 @@ footer {
       background: $hoverBack;
     }
     .menu-item:hover + .submenu-buttons &:not(:focus):not(:hover) {
-      background: $hoverButtonInactiveBack;
-      @media (prefers-color-scheme: dark) {
-        background: $DARKhoverButtonInactiveBack;
-      }
+      background: var(--button-hover-inactive-bg, $hoverButtonInactiveBack);
     }
     .icon {
       display: block;
@@ -322,7 +316,7 @@ footer {
 .page-popup:not(.noninjectable):not(.blacklisted) {
   .failure-reason {
     // Making the warning noticeable
-    background: hsla(30, 100%, 50%, .2);
+    background: var(--failure-bg, hsla(30, 100%, 50%, .2));
   }
   .settings {
     background: none;

@@ -158,7 +158,7 @@
             </details>
           </div>
           <div v-if="item.cmds" class="submenu-commands pos-rel">
-            <details v-show="item.cmds.length > 1" :open="!item.config[kNoCmdNames]" :item.prop="item"
+            <details v-show="item.cmds.size > 1" :open="!item.config[kNoCmdNames]" :item.prop="item"
                      class="abs-full flex center-items"
                      @click.prevent="onCmdNamesToggled"><summary/></details>
             <div
@@ -337,7 +337,6 @@ function makeInjectionScopes() {
     if (groupByEnabled != null) {
       list = list.filter(script => !script.config.enabled === !groupByEnabled);
     }
-    const menus = store.menus[depth];
     const numTotal = list.length;
     const numEnabled = groupByEnabled == null
       ? list.reduce((num, script) => num + script.config.enabled, 0)
@@ -350,7 +349,6 @@ function makeInjectionScopes() {
       const { id } = script.props;
       const { enabled, removed, shouldUpdate } = script.config;
       const upd = !removed && getScriptUpdateUrl(script, { enabledOnly });
-      const cmds = menus[id];
       /** @namespace ScopeListItem */
       const item = {
         ...script,
@@ -366,7 +364,6 @@ function makeInjectionScopes() {
           1e6 + script.props.position
         }`,
         excludes: null,
-        cmds: cmds && Object.entries(cmds),
       };
       if (upd) item.upd = null;
       if (upd && shouldUpdate) {
@@ -458,14 +455,12 @@ function onCommand(evt) {
     evt.preventDefault();
   } else if (type === 'keydown' || mousedownElement === el) {
     const [id, key, autoClose] = el.cmd;
-    const idMap = store.idMap;
-    const frameId = +Object.keys(idMap).find(frameIdStr => id in idMap[frameIdStr]);
     sendTabCmd(store.tab.id, 'Command', {
       id,
       key,
       evt: objectPick(evt, ['type', 'button', 'shiftKey', 'altKey', 'ctrlKey', 'metaKey',
         'key', 'keyCode', 'code']),
-    }, { [kFrameId]: frameId }).then(autoClose && close);
+    }).then(autoClose && close);
   }
 }
 function onToggleScript(item) {

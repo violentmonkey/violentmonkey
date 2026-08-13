@@ -156,6 +156,7 @@ if (__.INJECTED === 'injected-web') {
     }
   );
   if (__.MV3) {
+    browser = chrome;
     let obj;
     runtime[kSendMessage] = wrapSendMessage(runtime, runtime[kSendMessage]);
     if (__.EXT) {

@@ -1,4 +1,5 @@
 import { i18n, ignoreChromeErrors, makeDataUri, noop } from '@/common';
+import { registerInjector } from '@/common/browser-scripts-api';
 import { BLACKLIST } from '@/common/consts';
 import loadIconData from '@/common/load-icon-data';
 import { addOwnCommands, commands, init } from './init';
@@ -145,6 +146,7 @@ async function onTabUpdated(tabId, { url, status }, tab) {
     && getFailureReason(url)[0];
   // A known failure reason or no script ran since tab started to load
   if (title || status === 'complete' && !badges[tabId]) {
+    if (__.MV3 && isApplied && !title) registerInjector(); // tab loaded but scripts didn't run
     updateState(
       tab || { id: tabId },
       resetBadgeData(tabId, title ? null : undefined),

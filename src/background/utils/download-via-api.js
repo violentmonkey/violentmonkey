@@ -29,6 +29,9 @@ export default async function downloadViaApi(opts, events, id, req, src, fileNam
     method: opts.method || 'GET',
     saveAs: opts.saveAs,
     url: opts.url,
+    ...IS_FIREFOX && {
+      incognito: src.tab?.incognito,
+    },
   });
   if (isEmpty(downloads)) {
     browser.downloads.onChanged.addListener(onDownloadChanged);

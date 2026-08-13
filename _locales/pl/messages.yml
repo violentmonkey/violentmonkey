@@ -63,6 +63,9 @@ buttonInstallOptions:
 buttonNew:
   description: Button to create a new script.
   message: Nowy skrypt
+buttonNewFromFile:
+  description: Button to create a new script from a local file.
+  message: "Nowy z\_pliku"
 buttonOK:
   description: OK button on dialog.
   message: OK
@@ -149,14 +152,10 @@ descBlacklist:
   message: Czarna lista wstrzykiwań (skrypty nie będą działać w pasujących witrynach)
 descBlacklistNet:
   description: Description for the global network blacklist.
-  message: >-
-    Czarna lista sieci (skrypty nie będą łączyć się z pasującymi witrynami i ich
-    plikami cookie)
+  message: "Czarna lista sieci (skrypty nie będą łączyć się z\_pasującymi witrynami i\_ich plikami ciasteczek)"
 descCustomCSS:
   description: Description of custom CSS section.
-  message: >-
-    Niestandardowy CSS dla stron z opcjami i instalacją skryptu. Jeśli nie
-    jesteś pewien/pewna co to jest, to nie edytuj tego.
+  message: "Niestandardowy CSS dla stron z\_opcjami i\_instalacją skryptu. Jeśli nie masz pewności, do czego służy, nie edytuj tego."
 descEditorOptions:
   description: Description of editor options JSON section.
   message: >-
@@ -184,7 +183,7 @@ descScriptTemplate:
   description: Description of script template section.
   message: >-
     Obsługiwane zmienne: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
-    <{{date:format}}> w formacie zgodnym z MomentJS, np <{{date:YYYY-MM-DD}}>.
+    <{{date:format}}> w formacie zgodnym z MomentJS, np. <{{date:YYYY-MM-DD}}>.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: grupuj
@@ -207,7 +206,7 @@ editHelpKeyboard:
   message: 'Skróty klawiaturowe:'
 editHowToHint:
   description: The text of the how-to link in the editor header.
-  message: Użycie innego edytora?
+  message: Użyć innego edytora?
 editLabelMeta:
   description: Metadata section in settings tab of script editor.
   message: Niestandardowe metadane

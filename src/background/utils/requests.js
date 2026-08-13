@@ -59,7 +59,7 @@ addPublicCommands({
     });
     Object.defineProperties(req, { // non-enumerable props won't be messaged
       cb: {value: cb},
-      cbError: {value: cbError},
+      cbe: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
     if (IS_FIREFOX && opts.url instanceof Blob) {
@@ -174,7 +174,7 @@ async function httpRequest(opts, events, id, req, src) {
     mime: overrideMimeType,
     props: xhrProps,
   };
-  toggleHeaderInjector(id, vmHeaders, xhrUrl);
+  toggleHeaderInjector(id, vmHeaders);
   if (__.MV3) {
     let responseHeaders;
     let ruleId = DNR_ID_XHR; while (xhrRules[++ruleId]) {/**/}

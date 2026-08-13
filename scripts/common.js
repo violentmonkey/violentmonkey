@@ -5,9 +5,9 @@ const isProd = process.env.NODE_ENV === 'production';
 const MV3 = process.env.MV3 === '1';
 const DIST = MV3 ? 'dist-mv3' : 'dist';
 
-function exec(cmd) {
+function exec(cmd, args = []) {
   try {
-    return childProcess.execSync(cmd, { encoding: 'utf8' }).trim();
+    return childProcess.execFileSync(cmd, args, { encoding: 'utf8' }).trim();
   } catch (e) {
     // ignore
   }

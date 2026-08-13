@@ -60,13 +60,17 @@ const API_EVENTS = {
   onBeforeSendHeaders: [onBeforeSendHeaders, kRequestHeaders, ...EXTRA_HEADERS],
   onHeadersReceived: [onHeadersReceived, kResponseHeaders, ...EXTRA_HEADERS],
 };
+/** Chrome leaks empty dynamic registrations, https://crbug.com/526929792 */
+const CHROME_REG_LEAK_BUG = __.MV3 && CHROME >= 146;
 
 /** @param {chrome.webRequest.WebRequestDetails} details */
-function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
+function onHeadersReceived({ [kResponseHeaders]: headers, requestId, tabId, url }) {
+  if (CHROME_REG_LEAK_BUG && tabId !== -1) return;
   const req = requests[verify[requestId]];
   if (req) {
     // Populate responseHeaders for GM_xhr's `response`
     req[kResponseHeaders] = headers.map(encodeWebRequestHeader).join('');
+    if (__.MV3) return;
     const { storeId } = req;
     // Drop Set-Cookie headers if anonymous or using a custom storeId
     if (!req[kSetCookie] || storeId) {
@@ -80,7 +84,8 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId, url }) {
 }
 
 /** @param {chrome.webRequest.WebRequestDetails} details */
-function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
+function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, tabId, url }) {
+  if (CHROME_REG_LEAK_BUG && tabId !== -1) return;
   let req;
   let reqId = verify[requestId];
   if (reqId) {
@@ -121,9 +126,6 @@ function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, url }) {
 
 export function toggleHeaderInjector(reqId, headers) {
   if (headers) {
-    /* Listening even if `headers` array is empty to get the request's id.
-     * Registering just once to avoid a bug in Chrome:
-     * it adds a new internal registration even if the function reference is the same */
     if (isEmpty(headersToInject)) {
       API_EVENTS::forEachEntry(([name, [listener, ...options]]) => {
         browser.webRequest[name].addListener(listener, API_FILTER, options);
@@ -133,7 +135,7 @@ export function toggleHeaderInjector(reqId, headers) {
     headersToInject[reqId] = headers;
   } else if (reqId in headersToInject) {
     delete headersToInject[reqId];
-    if (isEmpty(headersToInject)) {
+    if (!CHROME_REG_LEAK_BUG && isEmpty(headersToInject)) {
       API_EVENTS::forEachEntry(([name, [listener]]) => {
         browser.webRequest[name].removeListener(listener);
       });
@@ -200,3 +202,5 @@ function string2byteString(str) {
 if (!__.MV3 && CHROME >= 74 && CHROME <= 91) {
   browser.webRequest.onBeforeSendHeaders.addListener(noop, API_FILTER, EXTRA_HEADERS);
 }
+// Attaching globally will see all XHRs in all tabs because tabId:-1 in addListener is ignored
+if (CHROME_REG_LEAK_BUG) toggleHeaderInjector('', []);

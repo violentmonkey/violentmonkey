@@ -120,7 +120,7 @@ import {
   debounce, getFullUrl, getLocaleString, getScriptHome, i18n, isRemote, makePause, sendCmdDirectly,
   trueJoin,
 } from '@/common';
-import { keyboardService, modifiers } from '@/common/keyboard';
+import { keyboardService, isMacintosh } from '@/common/keyboard';
 import initCache from '@/common/cache';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { deepEqual, objectPick } from '@/common/object';
@@ -134,7 +134,7 @@ const KEEP_INFO_DELAY = 5000;
 const RETRY_DELAY = 3000;
 const RETRY_COUNT = 2;
 const MAX_TITLE_NAME_LEN = 100;
-const CONFIRM_HOTKEY = `${modifiers.ctrlcmd === 'm' ? '⌘' : 'Ctrl-'}Enter`;
+const CONFIRM_HOTKEY = `${isMacintosh ? '⌘' : 'Ctrl-'}Enter`;
 const DROP_PREFIX = `file:///*drag-n-drop*/`;
 const cache = initCache({ lifetime: RETRY_DELAY * (RETRY_COUNT + 1) });
 const labelDefault = i18n('labelRunAtDefault');

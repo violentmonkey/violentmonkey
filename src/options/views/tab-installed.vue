@@ -520,11 +520,11 @@ function handleEditScript(id) {
   }
 }
 async function onHashChange() {
-  const [tab, id, cacheId] = store.route.paths;
+  const [tab, id, tabId] = store.route.paths;
   if (__.MV3 && id) store.busyId = id;
   const _new = id === '_new' && await sendCmdDirectly('NewScript', {
     code: newScriptCode,
-    tabId: +cacheId,
+    .../^\d+$/.test(tabId) && { tabId: +tabId },
   });
   const script = _new || +id && getCurrentList().find(s => s.props.id === +id);
   const scrollElem1 = scroller.value;

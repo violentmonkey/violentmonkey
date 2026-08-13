@@ -1,5 +1,6 @@
 /* tslint:disable:no-namespace */
 /// <reference types="@violentmonkey/types" />
+/// <reference types="@types/chrome" />
 //#region Generic
 
 declare type NumBool = 0 | 1
@@ -36,7 +37,7 @@ declare namespace GMReq {
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails<any>;
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
-    cbe?: (err: string|Error) => Promise<void>;
+    cbe: (err: string|Error) => Promise<void>;
     /** use browser's `Cookie` header */
     cookie?: boolean;
     /** allow Set-Cookie header to affect browser */

@@ -18,7 +18,7 @@ module.exports = {
     }),
     // Calculate at compile time
     require('postcss-calc'),
-    require('postcss-nested'),
+    require('postcss-nested').default,
     require('postcss-preset-env')({
       browsers: getBrowserTargets(),
       /** disabling the built-in postcss-nesting plugin because is uses :is() for correctness,

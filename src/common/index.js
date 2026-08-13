@@ -28,8 +28,12 @@ export function initHooks() {
 }
 
 /** @return {chrome.tabs.Tab | void} */
-export function getTab(tabId) {
-  return browser.tabs.get(tabId).catch(noop);
+export async function getTab(tabId) {
+  try {
+    return await browser.tabs.get(tabId);
+  } catch {
+    // Also throws synchronously if tabId is not a valid integer.
+  }
 }
 
 /** @return {Promise<chrome.tabs.Tab | void>} */
