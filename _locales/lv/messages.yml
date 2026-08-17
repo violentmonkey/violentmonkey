@@ -132,10 +132,14 @@ buttonVacuuming:
   message: ''
 confirmManualUpdate:
   description: Confirm message shown when clicking update button for a single script.
-  message: ''
+  message: |-
+    Šim skriptam ir atspējot automātiskā atjaunināšana.
+    Klikšķināt “Labi”, lai vienalga to atjauninātu.
 confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
-  message: ''
+  message: |-
+    Izmaiņas nav saglabātas.
+    Klikšķināt “Labi”, lai tās atmestu, vai “Atcelt”, lai paliktu.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
@@ -168,7 +172,7 @@ descScriptTemplate:
   message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
-  message: ''
+  message: kopa
 disabledScriptsHide:
   description: 'Used as "Disabled scripts: hide"'
   message: paslēpt
@@ -201,13 +205,13 @@ editLongLineTooltip:
   message: ''
 editNavCode:
   description: Label of code tab in script editor.
-  message: ''
+  message: Kods
 editNavSettings:
   description: Label of settings tab in script editor.
   message: Iestatījumi
 editNavValues:
   description: Label of values tab in script editor.
-  message: ''
+  message: Vērtības
 editValueAll:
   description: Button to show/edit the entire script value storage.
   message: ''
@@ -217,13 +221,13 @@ editValueAllHint:
   message: Rādīt/labotu visas skripta vērtības krātuvi
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: ''
+  message: Atvērta pirmkoda lietotāja skriptu pārvaldnieks, kas atbalsta daudz pārlūku
 extName:
   description: Name of this extension.
   message: Violentmonkey
 failureReasonBlacklisted:
   description: Shown for blacklisted URLs (in the extension icon tooltip, in the popup)
-  message: ''
+  message: Liegumu sarakstā Vieoletmonkey iestatījumos
 failureReasonNoninjectable:
   description: >-
     Shown for URLs that cannot be processed (same places as
@@ -250,12 +254,12 @@ filterExecutionOrder:
   message: izpilde
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: ''
+  message: pēdējā atjaunināšanas reize
 filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: pēdējā apmeklēšanas reize
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
   message: ''
@@ -285,22 +289,22 @@ genericOn:
   message: ieslēgts
 genericUseGlobal:
   description: To indicate some per-script option will use its analog in global settings.
-  message: ''
+  message: izmantot visaptverošo iestatījumu
 hashPatternWarning:
   description: Warning shown in the editor, $1 is the pattern(s).
   message: ''
 headerRecycleBin:
   description: Text shown in the header when scripts in recycle bin are listed.
-  message: ''
+  message: Atkritne
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Rādīt palīdzību, kad vietēju skriptu nevar uzstādīt
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: $1 atbilstošus skriptus
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` atspējo visas citas `@grant` atslēgas.'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
@@ -384,13 +388,13 @@ labelBlacklist:
   message: ''
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: Piebilde
 labelContributors:
   description: Label for link to contributors.
-  message: ''
+  message: Līdzdalībnieki
 labelCurrentLang:
   description: Label of current language.
-  message: ''
+  message: Pašreizējā valoda
 labelCustomCSS:
   description: Label for custom CSS section.
   message: ''
@@ -470,7 +474,7 @@ labelGrantPermission:
   message: ''
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
-  message: Palīdziet iztulkot
+  message: Palīdzēt ar tulkošanu
 labelHomepage:
   description: Label for home page in about tab.
   message: Mājas lapa
@@ -700,7 +704,7 @@ menuCommands:
   touched: false
 menuDashboard:
   description: Label for menu item to open dashboard.
-  message: ''
+  message: Atvērt pārskata paneli
 menuExclude:
   description: >-
     Shown in popup menu after clicking script's "..." dropdown so try to keep
@@ -716,7 +720,7 @@ menuFeedback:
   message: ''
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: ''
+  message: Atrast skriptus šai vietnei
 menuInjectionFailed:
   description: Injection error.
   message: ''
@@ -947,7 +951,7 @@ popupSettings:
   message: Uznirstošo logu iestatījumi
 popupSettingsHint:
   description: Hint for the config button in the popup
-  message: ''
+  message: 'Labais klikšķis: parādīt iestatījumus'
 readonly:
   description: Text in the editor's header for non-editable scripts.
   message: ''
@@ -964,7 +968,7 @@ readonlyOptWarn:
   message: ''
 reinstall:
   description: Button to reinstall a script
-  message: ''
+  message: Uzstādīt no jauna
 reloadTab:
   description: Label of action to reload the tab
   message: Pārlādēt cilni
@@ -999,12 +1003,12 @@ sideMenuSettings:
   message: Iestatījumi
 skipScripts:
   description: Title of the hotkey in the browser UI for customizing the hotkeys.
-  message: Pārlādēt lapu bez lietotājskriptiem
+  message: Pārlādēt lapu bez lietotāja skriptiem
 skipScriptsMsg:
   description: Message shown in the popup if the tab was reloaded without scripts.
   message: >-
-    Jūs atspējojāt lietotājskriptus šai lapai. Lai tos izmantotu, atkārtoti
-    ielādējiet vai pārvietojieties pa cilni.
+    Šai lapai ir atspējoti lietotāja skripti. Lai tos izpildītu, atkārtoti
+    jāielādē vai jāpārvietojas pa cilni.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
   message: 'Kārtot pēc:'
@@ -1052,6 +1056,12 @@ updateScriptsAll:
   message: ''
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
+  message: ''
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: ''
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
   message: ''
 valueLabelKey:
   description: Label for key of a script value.

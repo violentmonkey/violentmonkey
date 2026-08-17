@@ -63,7 +63,7 @@ buttonNew:
   message: 新建
 buttonNewFromFile:
   description: Button to create a new script from a local file.
-  message: ''
+  message: 从文件安装
 buttonOK:
   description: OK button on dialog.
   message: 完成
@@ -256,7 +256,7 @@ fileInstallBlocked:
     URL”。但这是危险的，因为任何用户脚本都可以读取任何本地文件。
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: 打开 about:addons，点击 “Violentmonkey”，点击“权限和数据”，启用 “访问计算机上的本地文件”。
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母顺序
@@ -309,18 +309,21 @@ headerRecycleBin:
   message: 回收站
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: 无法安装本地脚本时显示帮助
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: 对 $1 匹配的脚本
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` 禁用所有其他 `@grant` 键。'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: |-
+    沙盒脚本无法更改这些全局属性：$1。
+    要修复脚本，请添加 `@grant none` 以禁用沙盒，
+    或使用 `unsafeWindow` 代替 `window`。
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：
@@ -399,7 +402,7 @@ labelBlacklist:
   message: 黑名单
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: 备注
 labelContributors:
   description: Label for link to contributors.
   message: 贡献者
@@ -461,30 +464,30 @@ labelFeedback:
   message: 反馈
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: 在 Firefox 中绕过 CSP
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: 在网页的 CSP 添加一个随机值，只有 Violentmonkey 可以使用该值在$1注入模式下运行脚本，否则必须编辑脚本才能使用 $2。
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: 隔离模式$1可能会限制功能，请参阅选项中的“$2”。
 labelGeneral:
   description: Label for general settings.
   message: 通用
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: 使用浏览器下载 API
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: 允许脚本将文件保存到下载目录内的子文件夹中，并在浏览器的下载栏中显示下载进度。
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: 授予权限
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 帮助翻译
@@ -496,10 +499,12 @@ labelHomepageURL:
   message: 主页地址：
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: 允许 GM_cookie 访问 HTTP-only 的 cookie
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    启用后，脚本可以使用 HTTP-only 标志读取和写入 cookie。这允许脚本访问无法通过 JavaScript 访问的
+    cookie。请谨慎使用，因为它可能会带来安全风险。
 labelIconURL:
   description: Label for the input.
   message: 图标地址：
@@ -584,10 +589,10 @@ labelRunAtDefault:
   message: （默认）
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: （仅适用于在其设置中启用此选项的脚本）
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: （此选项还须在全局设置中启用）
 labelScriptTemplate:
   description: Label for custom script template.
   message: 自定义脚本模板
@@ -636,22 +641,22 @@ labelSyncRevoke:
   message: 取消授权
 labelSyncS3AccessKeyId:
   description: Label for S3 access key ID input.
-  message: ''
+  message: 访问密钥 ID：
 labelSyncS3Bucket:
   description: Label for S3 bucket name input.
-  message: ''
+  message: 存储桶：
 labelSyncS3Endpoint:
   description: Label for custom S3-compatible endpoint URL input (leave blank for AWS).
-  message: ''
+  message: 自定义端点：
 labelSyncS3Prefix:
   description: Label for S3 key prefix input (folder within the bucket).
-  message: ''
+  message: 密钥前缀：
 labelSyncS3Region:
   description: Label for S3 region input.
-  message: ''
+  message: 区域：
 labelSyncS3SecretAccessKey:
   description: Label for S3 secret access key input.
-  message: ''
+  message: 秘密访问密钥：
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: 同步脚本状态
@@ -713,7 +718,7 @@ learnInjectionMode:
   message: 了解更多注入模式。
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: 管理远程文件
 menuCommands:
   description: Menu item to list script commands.
   message: 脚本命令
@@ -1019,7 +1024,7 @@ sideMenuInstalled:
   message: 已安装的脚本
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: 脚本
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 设置
@@ -1089,13 +1094,19 @@ updateScript:
   message: 更新
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: 右键单击或长按以强制更新（包括依赖项）
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: 更新所有脚本
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: 更新当前选项卡的脚本
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: 请在 chrome://extensions 中为 Violentmonkey 详情页启用“允许运行用户脚本”并重新加载标签页
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: 请在 chrome://extensions 中启用“开发者模式”并重新加载标签页
 valueLabelKey:
   description: Label for key of a script value.
   message: 键名（字符串）
@@ -1107,10 +1118,10 @@ valueLabelValueAll:
   message: 所有数据（JSON格式）
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: Value（序列化为 JSON 或 $1）
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1字符串
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: 访问网站

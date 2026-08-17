@@ -1179,6 +1179,16 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Actualizar scripts de la pestaña actual
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: >-
+    Activa la opción "Permitir scripts de usuario" en los detalles de
+    Violentmonkey en chrome://extensions y recarga la pestaña
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: >-
+    Activa la opción "Modo desarrollador" en chrome://extensions y recarga la
+    pestaña
 valueLabelKey:
   description: Label for key of a script value.
   message: Clave (cadena)
