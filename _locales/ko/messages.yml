@@ -1107,10 +1107,12 @@ updateScriptsInTab:
   message: 현재 탭에서 실행 중인 스크립트 업데이트
 userScriptsPermissionNote:
   description: Text in the popup or dashboard.
-  message: ''
+  message: >-
+    chrome://extensions 페이지에서 Violentmonkey의 세부정보로 들어간 뒤 '사용자 스크립트 허용'을 활성화하고 탭을
+    새로고침해 주세요.
 userScriptsPermissionNoteOld:
   description: Text in the popup or dashboard in older browsers.
-  message: ''
+  message: chrome://extensions에서 '개발자 모드'를 활성화하고 탭을 새로고침해 주세요.
 valueLabelKey:
   description: Label for key of a script value.
   message: 키 (문자열)
