@@ -133,5 +133,10 @@
       "./test/mock/index.js"
     ],
     "testEnvironment": "./test/mock/env.js"
+  },
+  "pnpm": {
+    "overrides": {
+      "nanoid": "3.3.18"
+    }
   }
 }
