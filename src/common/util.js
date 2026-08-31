@@ -1,7 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
 import { BLOB_LIFE, U8_fromBase64 } from '@/common/consts';
-import { makePause } from '.';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
@@ -303,14 +302,44 @@ export function normalizeTag(tag) {
   return tag.replace(/[^\w.-]/g, '');
 }
 
-export function escapeStringForRegExp(str) {
-  return str.replace(/[\\.?+[\]{}()|^$]/g, '\\$&');
+let keepAliveChain, keepAliveTimer;
+
+/**
+ * @template T
+ * @param {T} [promise]
+ * @return {T | ((v?: any) => void)} original promise or a new promise's resolver
+ */
+export function keepAlive(promise) {
+  let res = promise;
+  if (!res) ({ promise, resolve: res } = Promise.withResolvers());
+  const chain = keepAliveChain = keepAliveChain ? keepAliveChain.finally(() => promise) : promise;
+  keepAliveChain.finally(() => {
+    if (keepAliveChain === chain) {
+      clearInterval(keepAliveTimer);
+      keepAliveChain = keepAliveTimer = 0;
+    }
+  });
+  keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 25e3);
+  return res;
 }
 
 export function leaseBlobUrl(blob) {
   const url = URL.createObjectURL(blob);
   makePause(BLOB_LIFE, url).then(URL.revokeObjectURL);
   return url;
+}
+
+/**
+ * @template T
+ * @param {number} [ms]
+ * @param {T} [arg] - resolved value of the Promise
+ * @return {Promise<T>}
+ */
+export function makePause(ms, arg) {
+  const res = ms < 0
+    ? Promise.resolve(arg)
+    : new Promise(resolve => setTimeout(resolve, ms, arg));
+  return __.SW && ms > 0 ? keepAlive(res) : res;
 }
 
 /**

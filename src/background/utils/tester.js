@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
-import { escapeStringForRegExp, getScriptPrettyUrl } from '@/common';
-import { ERR_BAD_PATTERN, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
+import { getScriptPrettyUrl } from '@/common';
+import { ERR_BAD_PATTERN, ESC_GLOB_RE, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
 import { getPublicSuffix } from '@/common/tld';
 import { hookOptionsInit } from './options';
@@ -88,9 +88,9 @@ export class MatchTest {
     this.path = path === '*' ? null : pathMatcher(path);
     if (!isWildHost && host.match(RE_GLOB_HOST_SUFFIX)) {
       this.err = `${ERR_BAD_PATTERN} ${rule}: ${ERR_GLOB_HOST_SUFFIX} /^${
-        escapeStringForRegExp(scheme).replace(/\*/g, '[^:]*?')
+        scheme.replace(ESC_GLOB_RE, '\\$&').replace(/\*/g, '[^:]*?')
       }://${
-        escapeStringForRegExp(host).replace(/\*/g, '[^/]*?')
+        host.replace(ESC_GLOB_RE, '\\$&').replace(/\*/g, '[^/]*?')
       }/${
         str2RE(path)
       }$/`;
@@ -258,7 +258,7 @@ function testRules(url, script, ...list) {
 }
 
 function str2RE(str) {
-  return escapeStringForRegExp(str).replace(/\*/g, '.*?');
+  return str.replace(ESC_GLOB_RE, '\\$&').replace(/\*/g, '.*?');
 }
 
 function autoReg(str) {

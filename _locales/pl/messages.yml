@@ -1170,6 +1170,12 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Zaktualizuj skrypty bieżącej karty
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: "Włącz opcję „Zezwalaj na skrypty użytkownika” w\_szczegółach Violentmonkey w\_chrome://extensions i\_odśwież kartę"
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: "Włącz „Tryb dewelopera” w\_chrome://extensions i\_odśwież kartę"
 valueLabelKey:
   description: Label for key of a script value.
   message: Klucz (ciąg)

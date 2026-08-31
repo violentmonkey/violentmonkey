@@ -1,7 +1,7 @@
 {
   "name": "violentmonkey",
   "description": "Violentmonkey",
-  "version": "2.47.0",
+  "version": "2.48.0",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky",
@@ -54,6 +54,7 @@
     "babel-plugin-transform-regex": "^6.1.0",
     "cross-env": "^10.1.0",
     "cross-spawn": "^7.0.3",
+    "crx3": "^2.0.0",
     "css-loader": "^7.1.4",
     "css-minimizer-webpack-plugin": "^8.0.0",
     "deepmerge": "^4.3.1",
@@ -132,6 +133,5 @@
       "./test/mock/index.js"
     ],
     "testEnvironment": "./test/mock/env.js"
-  },
-  "beta": 1
+  }
 }

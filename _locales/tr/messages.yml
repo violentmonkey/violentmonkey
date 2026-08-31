@@ -1176,6 +1176,17 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Geçerli sekmedeki betikleri güncelle
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: >-
+    Lütfen chrome://extensions adresinde Violentmonkey’in ayrıntılar bölümünden
+    “Kullanıcı Komut Dosyalarına İzin Ver” seçeneğini etkinleştirin ve sekmeyi
+    yeniden yükleyin
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: >-
+    Lütfen chrome://extensions adresinde “Geliştirici Modu”nu etkinleştirin ve
+    sekmeyi yeniden yükleyin
 valueLabelKey:
   description: Label for key of a script value.
   message: Anahtar (string)

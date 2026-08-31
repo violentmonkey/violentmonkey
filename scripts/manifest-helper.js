@@ -44,6 +44,9 @@ function buildManifest(base) {
   data.version = getVersion();
   if (process.env.TARGET === 'selfHosted') {
     data.browser_specific_settings.gecko.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/updates/updates.json';
+    if (!MV3) {
+      data.update_url = 'https://raw.githubusercontent.com/violentmonkey/violentmonkey/updates/updates-crx.xml';
+    }
   }
   if (isBeta()) {
     // Do not support i18n in beta version

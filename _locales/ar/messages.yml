@@ -65,7 +65,7 @@ buttonNew:
   message: جديد
 buttonNewFromFile:
   description: Button to create a new script from a local file.
-  message: ''
+  message: جديد من الملف
 buttonOK:
   description: OK button on dialog.
   message: موافق
@@ -1155,6 +1155,14 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: تحديث سكربتات علامة التبويب الحالية
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: >-
+    يرجى تمكين "السماح بسكربتات المستخدم" في تفاصيل Violentmonkey عبر
+    chrome://extensions وإعادة تحميل علامة التبويب.
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: يرجى تفعيل "وضع المطور" في chrome://extensions وإعادة تحميل علامة التبويب
 valueLabelKey:
   description: Label for key of a script value.
   message: المفتاح (نص)

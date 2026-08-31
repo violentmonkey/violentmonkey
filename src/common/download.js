@@ -1,4 +1,4 @@
-import { leaseBlobUrl, makePause } from '@/common';
+import { leaseBlobUrl, makePause } from '@/common/util';
 
 let chain = Promise.resolve();
 

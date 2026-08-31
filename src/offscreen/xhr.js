@@ -1,7 +1,7 @@
 import { UPLOAD } from '@/common/consts';
-import { blob2base64, leaseBlobUrl } from '@/common';
 import { downloadBlob } from '@/common/download';
 import { objectPick } from '@/common/object';
+import { blob2base64, leaseBlobUrl } from '@/common/util';
 
 /* 1MB takes ~20ms to encode/decode so it doesn't block the process of the extension and web page,
  * which lets us and them be responsive to other events or user input. */

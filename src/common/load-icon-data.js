@@ -1,5 +1,4 @@
-import { keepAlive } from '.';
-import { blob2base64 } from './util';
+import { blob2base64, keepAlive } from './util';
 
 export default async function loadIconData(url, isOwn) {
   let res;

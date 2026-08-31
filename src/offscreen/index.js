@@ -1,12 +1,11 @@
-import { leaseBlobUrl } from '@/common';
 import setClipboard from '@/common/clipboard';
-import handlers from '@/common/handlers';
-import { sendCmdToSW } from '@/common/messaging-sw';
+import { handlersSW, sendCmdToSW } from '@/common/messaging-sw';
+import { leaseBlobUrl } from '@/common/util';
 import { initXHR, xhrs } from './xhr';
 
 let autoCloseTimer;
 
-Object.assign(handlers, {
+Object.assign(handlersSW, {
   LeaseBlob: leaseBlobUrl,
   async Fetch([url, init, get = 'text']) {
     const req = await fetch(url, init);

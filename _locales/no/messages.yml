@@ -1038,6 +1038,12 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: ''
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: ''
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: ''
 valueLabelKey:
   description: Label for key of a script value.
   message: ''

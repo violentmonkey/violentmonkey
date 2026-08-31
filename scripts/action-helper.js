@@ -29,6 +29,7 @@ envs.ASSET_ZIP = `${envs.RELEASE_PREFIX}-webext-v${envs.VERSION}.zip`;
 envs.ASSET_CWS_ZIP = `${envs.RELEASE_PREFIX}-mv3-v${envs.VERSION}.zip`;
 envs.ASSET_CWS_BETA_ZIP = `${envs.RELEASE_PREFIX}-mv3-beta-v${envs.VERSION}.zip`;
 envs.ASSET_SELF_HOSTED_ZIP = `${envs.RELEASE_PREFIX}-webext-ffself-v${envs.VERSION}.zip`;
+envs.ASSET_CRX = `${envs.RELEASE_PREFIX}-mv2-v${envs.VERSION}.crx`;
 
 Object.entries(envs).forEach(([key, value]) => {
   core.exportVariable(key, value);

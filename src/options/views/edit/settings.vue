@@ -106,8 +106,8 @@
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, ref, shallowRef } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
-import { escapeStringForRegExp, getScriptHome, i18n } from '@/common';
-import { KNOWN_INJECT_INTO, kOrigTag, kTag } from '@/common/consts';
+import { getScriptHome, i18n } from '@/common';
+import { ESC_STR_RE, KNOWN_INJECT_INTO, kOrigTag, kTag } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
 import { objectPick } from '@/common/object';
 import { kGmCookieHttpOnly } from '@/common/options-defaults';
@@ -185,7 +185,7 @@ function onTagClicked({ target }) {
   /** @type {string} */
   let text = obj[kTag];
   let pos = text.includes(tag)
-    ? text.search(RegExp(`^\\s*${escapeStringForRegExp(tag)}\\s*$`, 'm'))
+    ? text.search(RegExp(`^\\s*${(tag.replace(ESC_STR_RE, '\\$&'))}\\s*$`, 'm'))
     : -1;
   if (pos < 0) {
     if (text && !text.endsWith('\n')) text += '\n';

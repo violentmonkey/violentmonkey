@@ -432,7 +432,7 @@ export function createSyncService({
       authorizer.setRefreshToken(null);
     }
     serviceConfig.set({ token: null, refresh_token: null });
-    prepare();
+    prepare().catch(noop);
   }
 
   // --- Drive operations ---
@@ -546,6 +546,7 @@ export function createSyncService({
   async function _sync() {
     const currentSyncMode = syncMode;
     syncMode = SYNC_MERGE;
+    const isPull = currentSyncMode === SYNC_PULL;
     progress = { finished: 0, total: 0 };
 
     const [remoteMeta, remoteData, localData] = await getSyncData();
@@ -650,7 +651,7 @@ export function createSyncService({
       if (info && info.lastModified === item.props.lastModified) {
         const updates = {};
         if (info.position !== item.props.position) {
-          if (globalLastModified <= remoteLastModified) {
+          if (globalLastModified <= remoteLastModified || isPull) {
             updates.props = { position: info.position };
           } else {
             info.position = item.props.position;
@@ -676,7 +677,7 @@ export function createSyncService({
         info.lastModified = now;
         remoteChanged = true;
       }
-      if (enableSync) {
+      if (enableSync && !isPull) {
         const local = localData.find((i) => i.props.uri === item.uri);
         const localEnabled = local?.config.enabled ?? 1;
         if (localEnabled !== info.enabled) {
@@ -767,7 +768,7 @@ export function createSyncService({
             remoteChanged = true;
           }
         }
-        if (remoteChanged) {
+        if (remoteChanged && !isPull) {
           const timestamp = Date.now();
           remoteMetaData.metadata.lastModified = timestamp;
           // Convert back to VM file format
@@ -802,7 +803,8 @@ export function createSyncService({
     try {
       await prepare();
     } catch {
-      // Sync in progress, ignore
+      // Prepare failed (e.g. another sync in progress), abort
+      return;
     }
     if (getSyncState().status !== SYNC_AUTHORIZED || getCurrent() !== name)
       return;
@@ -964,7 +966,7 @@ export function sync() {
 export function autoSync() {
   if (getOption('syncAutomatically')) return sync();
   const service = getService();
-  service?.prepare();
+  service?.prepare().catch(noop);
   console.info('[sync] auto-sync disabled, check later');
   if (!__.MV3) syncLater();
 }

@@ -1157,8 +1157,7 @@ userScriptsPermissionNote:
     chrome://extensions and reload the tab
 userScriptsPermissionNoteOld:
   description: Text in the popup or dashboard in older browsers.
-  message: >-
-    Please enable "Developer Mode" in chrome://extensions and reload the tab
+  message: Please enable "Developer Mode" in chrome://extensions and reload the tab
 valueLabelKey:
   description: Label for key of a script value.
   message: Key (string)

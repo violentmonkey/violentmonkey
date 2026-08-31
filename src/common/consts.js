@@ -22,6 +22,8 @@ export const METABLOCK_RE = regex({ disable: { n: true } })`
   ((.*?)\/\/([\x20\t]*)==\/UserScript==)
 `;
 export const META_STR = 'metaStr';
+export const ESC_GLOB_RE = /[\\.?+[\]{}()|^$]/g;
+export const ESC_STR_RE = /[*\\.?+[\]{}()|^$]/g;
 export const NEWLINE_END_RE = /\n((?!\n)\s)*$/;
 export const WATCH_STORAGE = 'watchStorage';
 

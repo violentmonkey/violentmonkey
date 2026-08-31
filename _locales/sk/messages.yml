@@ -1173,6 +1173,14 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Aktualizovať skripty pre aktuálnu kartu
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: >-
+    V podrobnostiach rozšírenia Violentmonkey na stránke chrome://extensions
+    povoľte možnosť "Povoliť skripty používateľa" a obnovte kartu
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: Zapnite "Režim vývojára" v chrome://extensions a obnovte kartu
 valueLabelKey:
   description: Label for key of a script value.
   message: Kľúč (reťazec)

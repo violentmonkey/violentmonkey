@@ -1,5 +1,4 @@
-import { escapeStringForRegExp } from '@/common';
-import { kTag } from '@/common/consts';
+import { ESC_STR_RE, kTag } from '@/common/consts';
 
 const reToken = regex({ disable: { n: true }, flags: 'y' })`
   \s*
@@ -59,7 +58,7 @@ export function createSearchRules(search) {
         str = reStr;
       } else {
         if (!quoted) flags = 'i';
-        str = escapeStringForRegExp(str);
+        str = str.replace(ESC_STR_RE, '\\$&');
       }
       /** @namespace VMSearchRule */
       rules.push({
@@ -74,7 +73,7 @@ export function createSearchRules(search) {
       rules.unshift({
         scope: kTag,
         // searching anywhere in a tag to enable incremental search
-        re: RegExp(tags.map(escapeStringForRegExp).join('|'), 'i'),
+        re: RegExp(tags.join('\n').replace(ESC_STR_RE, '\\$&').replace(/\n/g, '|'), 'i'),
         negative: !!negative,
       });
     }

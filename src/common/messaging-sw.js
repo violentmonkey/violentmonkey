@@ -1,4 +1,4 @@
-import handlers from './handlers';
+export const handlersSW = { __proto__: null };
 
 /** @return {Promise<WindowClient[]>} */
 export const getClients = () => global.clients.matchAll({ includeUncontrolled: true });
@@ -86,10 +86,10 @@ export function rejectPending(msg) {
 
 if (__.SW_CLIENT) {
   broadcaster.onmessage = ({data: { cmd, data }}) => {
-    handlers[cmd]?.(data);
+    handlersSW[cmd]?.(data);
   };
   // Receiver for a response from handleCommandMessage -> sw.onmessage
   swContainer.onmessage = onClientMessage.bind(null, ({ cmd, data }, ...args) => (
-    handlers[cmd](data, ...args)
+    handlersSW[cmd](data, ...args)
   ));
 }

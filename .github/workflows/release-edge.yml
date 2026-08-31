@@ -39,8 +39,8 @@ jobs:
           SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
         run: |
           mkdir -p $ASSETS_DIR $TEMP_DIR
-          pnpm build
-          cd dist && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
+          pnpm build:mv3
+          cd dist-mv3 && zip -r ../$ASSETS_DIR/$ASSET_ZIP . && cd ..
 
       - uses: denoland/setup-deno@v2
         with:

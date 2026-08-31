@@ -1170,6 +1170,16 @@ updateScriptsAll:
 updateScriptsInTab:
   description: Command/button to update scripts that run in current tab.
   message: Обновить скрипты текущей вкладки
+userScriptsPermissionNote:
+  description: Text in the popup or dashboard.
+  message: >-
+    Пожалуйста, включите «Разрешить пользовательские скрипты» в настройках
+    Violentmonkey на странице chrome://extensions и перезагрузите вкладку
+userScriptsPermissionNoteOld:
+  description: Text in the popup or dashboard in older browsers.
+  message: >-
+    Пожалуйста, включите «Режим разработчика» на странице chrome://extensions и
+    перезагрузите вкладку
 valueLabelKey:
   description: Label for key of a script value.
   message: Ключ (строка)

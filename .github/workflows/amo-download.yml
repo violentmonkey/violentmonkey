@@ -41,6 +41,7 @@ jobs:
         with:
           branch: updates
           folder: ${{ env.TEMP_DIR }}/updates
+          clean: false
           commit-message: Update to ${{ env.VERSION }} 🚀
 
       - name: Upload assets
