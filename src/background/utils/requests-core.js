@@ -100,7 +100,8 @@ function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, tabId, url
   }
   if (req) {
     // remember redirected URL with #hash as it's stripped in XHR.responseURL
-    if (url !== req.xhrUrl) req.url = url;
+    // browsers re-append our #reqId to redirected URL if the server didn't redirect to a new #hash
+    if (url !== req.xhrUrl) req.url = url.replace('#' + reqId, '');
     if (__.MV3) return;
     const headersMap = {};
     const headers2 = headersToInject[reqId];
