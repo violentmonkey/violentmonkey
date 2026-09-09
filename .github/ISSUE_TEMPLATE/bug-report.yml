@@ -1,0 +1,84 @@
+name: 🐛 Bug Report
+description: For bugs that also exist in beta
+title: "[BUG] "
+labels: ["bug"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        Please search the existing issues first as the problem may be already reported.
+
+        Please verify the bug is not fixed in the latest beta:
+        https://github.com/violentmonkey/violentmonkey/releases
+
+  - type: textarea
+    id: problem
+    validations:
+      required: true
+    attributes:
+      label: ❌ Problem Behaviour
+      description: Describe the problematic behaviour you are encountering
+
+  - type: textarea
+    id: expectedResult
+    validations:
+      required: true
+    attributes:
+      label: ✅ Expected Result
+      description: Describe what the expected behaviour should be
+
+  - type: textarea
+    id: sequenceOfActions
+    validations:
+      required: true
+    attributes:
+      label: ✏️ Sequence of Actions
+      description: The steps that were taken to produce the problem
+      placeholder: |
+        1. Install UserScript
+        2. Open example.com
+        3. Click Page
+
+  - type: input
+    id: envOS
+    validations:
+      required: true
+    attributes:
+      label: 🖥️ Operating System
+      description: Specify your operating system and version number
+      placeholder: Windows 11
+
+  - type: input
+    id: envBrowser
+    validations:
+      required: true
+    attributes:
+      label: 🌐 Browser
+      description: Specify your browser and version number
+      placeholder: Chrome v123
+
+  - type: input
+    id: envVMVersion
+    validations:
+      required: true
+    attributes:
+      label: 🐵 Violentmonkey Version
+      placeholder: v2.5
+
+  - type: textarea
+    id: consoleMessages
+    validations:
+      required: false
+    attributes:
+      label: 📄 Console Messages
+      description: This will be automatically formatted into code, so no need for backticks.
+      render: shell
+
+  - type: checkboxes
+    id: userConfirmation
+    attributes:
+      label: Confirm New Issue
+      options:
+        - label: To the best of my knowledge, I have searched through the existing issues and verified the bug has not been fixed in the latest beta
+          required: true
