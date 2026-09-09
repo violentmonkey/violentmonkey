@@ -90,10 +90,10 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const cmds = data.menus[id];
     const scope = store[SCRIPTS][isTop || id in idMapMain ? 0 : 1];
     const script = scope.find(({ props }) => props.id === +id) || {};
-    const menu = script.cmds ||= new Map();
+    const menu = script.cmds = new Map();
     for (const cmd in cmds) {
       v = cmds[cmd];
-      menu.set(cmd, v); // updating the command with new text/icon
+      menu.set(cmd, v);
       loadCommandIcon(v, store);
     }
   }
