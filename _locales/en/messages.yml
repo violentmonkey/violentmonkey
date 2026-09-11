@@ -187,6 +187,11 @@ descScriptTemplate:
     Supported variables: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> with MomentJS-compatible format, for example
     <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: Note explaining the repository must already exist; Violentmonkey never creates it.
+  message: >-
+    The repository must already exist — Violentmonkey never creates or
+    initializes it for you.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: group
@@ -656,6 +661,24 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: None
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: 'API Base URL: '
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: 'Branch: '
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: 'Owner: '
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: 'Path Prefix: '
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: 'Repository: '
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: 'Access Token: '
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Password: '
@@ -939,6 +962,9 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: Sync will start soon...
   touched: false
+msgSyncRepoNotFound:
+  description: Message shown when the configured Git repository was not found, or the token can't access it. Violentmonkey never creates it automatically.
+  message: Repository not found. Create it first, then make sure your token has access to it.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sync in progress...
@@ -1124,6 +1150,12 @@ titleSearchHintV2:
 
     * Regular expressions: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: Sync into this subfolder of the repo instead of its root. Optional.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: Needs read/write access to the repo's contents (repo must already exist).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Toggle userscript injection

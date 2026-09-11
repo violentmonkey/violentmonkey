@@ -156,6 +156,58 @@
         />
       </div>
     </fieldset>
+    <fieldset v-if="rService && rAuthType === GIT_AUTH" class="mt-1c">
+      <div class="mr-2c">
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncGitOwner')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[OWNER]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncGitRepo')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[REPO]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncGitBranch')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[BRANCH]"
+            :disabled="!rCanUpdateConfig"
+            placeholder="main"
+          />
+        </label>
+      </div>
+      <label
+        v-for="{ key, label, type, placeholder, hint } in GIT_FIELDS"
+        :key="key"
+        class="sync-server-url flex pre"
+        :title="hint"
+      >
+        <span v-text="label"></span>
+        <input
+          :type="type"
+          class="flex-1"
+          v-model="rUserConfig[key]"
+          :disabled="!rCanUpdateConfig"
+          :placeholder="placeholder"
+        />
+      </label>
+      <p class="text-sm" v-text="i18n('descSyncGitRepoPreexisting')"></p>
+      <div>
+        <button
+          v-text="i18n('buttonSave')"
+          @click.prevent="onSaveUserConfig"
+          :disabled="!rCanUpdateConfig"
+        />
+      </div>
+    </fieldset>
     <div class="flex mr-2c">
       <setting-check
         name="syncAutomatically"
@@ -177,9 +229,15 @@ import { i18n, sendCmdDirectly } from '@/common';
 import {
   ACCESS_KEY_ID,
   ANONYMOUS,
+  API_BASE,
+  BRANCH,
   BUCKET,
+  GIT_AUTH,
+  OWNER,
   PASSWORD,
+  PATH_PREFIX,
   REGION,
+  REPO,
   S3_AUTH,
   S3_ENDPOINT,
   S3_PREFIX,
@@ -203,6 +261,7 @@ import {
   SYNC_ERROR,
   SYNC_ERROR_AUTH,
   SYNC_ERROR_INIT,
+  SYNC_ERROR_REPO_NOT_FOUND,
   SYNC_IN_PROGRESS,
   SYNC_INITIALIZING,
   SYNC_UNAUTHORIZED,
@@ -223,6 +282,27 @@ const S3_FIELDS = [
     placeholder: 'https://s3.example.com',
   },
   { key: S3_PREFIX, label: i18n('labelSyncS3Prefix'), type: 'text' },
+];
+const GIT_FIELDS = [
+  {
+    key: API_BASE,
+    label: i18n('labelSyncGitApiBase'),
+    type: 'url',
+    placeholder: 'https://api.github.com',
+  },
+  {
+    key: PATH_PREFIX,
+    label: i18n('labelSyncGitPathPrefix'),
+    type: 'text',
+    placeholder: 'optional, e.g. userscripts',
+    hint: i18n('titleSyncGitPathPrefix'),
+  },
+  {
+    key: PASSWORD,
+    label: i18n('labelSyncGitToken'),
+    type: 'password',
+    hint: i18n('titleSyncGitToken'),
+  },
 ];
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
@@ -287,9 +367,12 @@ function setRefs(srv) {
     [SYNC_AUTHORIZED, SYNC_ERROR, SYNC_ERROR_INIT, SYNC_ERROR_AUTH].includes(
       status,
     );
-  rCanSync.value = [SYNC_AUTHORIZED, SYNC_ERROR, SYNC_ERROR_INIT].includes(
-    status,
-  );
+  rCanSync.value = [
+    SYNC_AUTHORIZED,
+    SYNC_ERROR,
+    SYNC_ERROR_INIT,
+    SYNC_ERROR_REPO_NOT_FOUND,
+  ].includes(status);
   rCanUpdateConfig.value = status !== SYNC_IN_PROGRESS;
   rAuthType.value = srv?.properties?.authType;
   rLabelAuthorize.value =
@@ -303,6 +386,8 @@ function setRefs(srv) {
     if (status === SYNC_INITIALIZING) res = i18n('msgSyncInit');
     else if (status === SYNC_UNAUTHORIZED) res = i18n('msgSyncNoAuthYet');
     else if (status === SYNC_ERROR_INIT) err = i18n('msgSyncInitError');
+    else if (status === SYNC_ERROR_REPO_NOT_FOUND)
+      err = i18n('msgSyncRepoNotFound');
     else if (status === SYNC_ERROR_AUTH) err = i18n('msgSyncInitError');
     else if (status === SYNC_ERROR) err = i18n('msgSyncError');
     else if (status === SYNC_IN_PROGRESS) {
