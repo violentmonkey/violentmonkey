@@ -185,9 +185,10 @@
         </label>
       </div>
       <label
-        v-for="{ key, label, type, placeholder } in GIT_FIELDS"
+        v-for="{ key, label, type, placeholder, hint } in GIT_FIELDS"
         :key="key"
         class="sync-server-url flex pre"
+        :title="hint"
       >
         <span v-text="label"></span>
         <input
@@ -293,11 +294,14 @@ const GIT_FIELDS = [
     key: PATH_PREFIX,
     label: i18n('labelSyncGitPathPrefix'),
     type: 'text',
+    placeholder: 'optional, e.g. userscripts',
+    hint: i18n('titleSyncGitPathPrefix'),
   },
   {
     key: PASSWORD,
     label: i18n('labelSyncGitToken'),
     type: 'password',
+    hint: i18n('titleSyncGitToken'),
   },
 ];
 const SYNC_NONE = {

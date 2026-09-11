@@ -1150,6 +1150,12 @@ titleSearchHintV2:
 
     * Regular expressions: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: Sync into this subfolder of the repo instead of its root. Optional.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: Needs read/write access to the repo's contents (repo must already exist).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Toggle userscript injection
