@@ -13,6 +13,7 @@ import {
   sync,
 } from './sync-engine';
 import './dropbox';
+import './gitcontents';
 import './googledrive';
 import './onedrive';
 import './webdav';

@@ -16,6 +16,14 @@ export const ACCESS_KEY_ID = 'accessKeyId';
 export const SECRET_ACCESS_KEY = 'secretAccessKey';
 export const S3_PREFIX = 'prefix';
 //#endregion
+//#region Git (GitHub / GitHub Enterprise / Gitea / Forgejo)
+export const GIT_AUTH = 'git';
+export const API_BASE = 'apiBase';
+export const OWNER = 'owner';
+export const REPO = 'repo';
+export const BRANCH = 'branch';
+export const PATH_PREFIX = 'pathPrefix';
+//#endregion
 //#region SyncMode
 export const SYNC_MERGE = 'merge';
 export const SYNC_PUSH = 'push';

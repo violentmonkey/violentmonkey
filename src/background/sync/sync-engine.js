@@ -24,6 +24,7 @@ import {
   SYNC_ERROR,
   SYNC_ERROR_AUTH,
   SYNC_ERROR_INIT,
+  SYNC_ERROR_REPO_NOT_FOUND,
   SYNC_IN_PROGRESS,
   SYNC_INITIALIZING,
   SYNC_UNAUTHORIZED,
@@ -35,7 +36,7 @@ import {
   OAUTH2_UNAUTHORIZED,
   OAuth2Authorizers,
 } from '@usync/oauth2';
-import { DriveProviders } from '@usync/drive';
+import { DriveProviders, RepoNotFoundError } from '@usync/drive';
 
 // --- Module-level state ---
 
@@ -401,7 +402,17 @@ export function createSyncService({
     }
     if (prepareError) {
       logError(prepareError);
-      setSyncState({ status: SYNC_UNAUTHORIZED });
+      // gitcontents (and any future provider reusing the same guard) throws
+      // this distinct error when the repo/project itself doesn't exist or
+      // isn't accessible to the token — as opposed to a merely-empty path,
+      // which the provider already treats as a normal, non-error listing.
+      // See the RepoNotFoundError docs in @usync/drive's gitcontents.ts.
+      setSyncState({
+        status:
+          prepareError instanceof RepoNotFoundError
+            ? SYNC_ERROR_REPO_NOT_FOUND
+            : SYNC_UNAUTHORIZED,
+      });
     } else {
       setSyncState({ status: SYNC_AUTHORIZED });
     }
