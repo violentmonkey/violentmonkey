@@ -183,6 +183,13 @@
             placeholder="main"
           />
         </label>
+        <label class="inline-block" :title="i18n('titleSyncGitCreateMethod')">
+          <span v-text="i18n('labelSyncGitCreateMethod')"></span>
+          <select v-model="rUserConfig[CREATE_METHOD]" :disabled="!rCanUpdateConfig">
+            <option value="put">GitHub / GHES</option>
+            <option value="post">Gitea / Forgejo</option>
+          </select>
+        </label>
       </div>
       <label
         v-for="{ key, label, type, placeholder, hint } in GIT_FIELDS"
@@ -232,6 +239,7 @@ import {
   API_BASE,
   BRANCH,
   BUCKET,
+  CREATE_METHOD,
   GIT_AUTH,
   OWNER,
   PASSWORD,

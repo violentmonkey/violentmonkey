@@ -23,6 +23,7 @@ export const OWNER = 'owner';
 export const REPO = 'repo';
 export const BRANCH = 'branch';
 export const PATH_PREFIX = 'pathPrefix';
+export const CREATE_METHOD = 'createMethod';
 //#endregion
 //#region SyncMode
 export const SYNC_MERGE = 'merge';

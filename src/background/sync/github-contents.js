@@ -1,6 +1,7 @@
 import {
   API_BASE,
   BRANCH,
+  CREATE_METHOD,
   GIT_AUTH,
   OWNER,
   PASSWORD,
@@ -9,25 +10,25 @@ import {
 } from '@/common/consts-sync';
 import { createSyncService, register } from './sync-engine';
 
-// Covers any host that speaks the same "Contents API" GitHub does:
-// GitHub.com, GitHub Enterprise Server, Gitea, and Forgejo (the latter two
-// deliberately mirror GitHub's REST shape). Host independence comes from the
-// user-configurable API base URL rather than any per-host code here — see
-// @usync/drive's gitcontents provider.
+// Covers any host implementing GitHub's "contents API": GitHub.com, GHES,
+// Gitea, and Forgejo. Host independence comes from the user-configurable API
+// base URL — see @usync/drive's github-contents provider. createMethod
+// exists because Gitea/Forgejo require POST (not PUT) to create a file.
 const DEFAULT_CONFIG = {
   [API_BASE]: 'https://api.github.com',
   [OWNER]: '',
   [REPO]: '',
   [BRANCH]: 'main',
   [PATH_PREFIX]: '',
+  [CREATE_METHOD]: 'put',
   [PASSWORD]: '',
 };
 
 register(
   createSyncService({
-    name: 'gitcontents',
+    name: 'github-contents',
     displayName: 'GitHub / Gitea',
-    driveProvider: 'gitcontents',
+    driveProvider: 'github-contents',
     authProvider: 'password',
     defaultUserConfig: DEFAULT_CONFIG,
     properties: {
@@ -49,6 +50,7 @@ register(
           repo,
           branch: uc[BRANCH]?.trim() || 'main',
           pathPrefix: uc[PATH_PREFIX]?.trim() || '',
+          createMethod: uc[CREATE_METHOD] === 'post' ? 'post' : 'put',
         },
       };
     },
