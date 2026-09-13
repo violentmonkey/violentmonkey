@@ -259,7 +259,7 @@ import {
 } from '@/common/consts-sync';
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import { store } from '../../utils';
@@ -291,27 +291,6 @@ const S3_FIELDS = [
   },
   { key: S3_PREFIX, label: i18n('labelSyncS3Prefix'), type: 'text' },
 ];
-const GIT_FIELDS = [
-  {
-    key: API_BASE,
-    label: i18n('labelSyncGitApiBase'),
-    type: 'url',
-    placeholder: 'https://api.github.com',
-  },
-  {
-    key: PATH_PREFIX,
-    label: i18n('labelSyncGitPathPrefix'),
-    type: 'text',
-    placeholder: 'optional, e.g. userscripts',
-    hint: i18n('titleSyncGitPathPrefix'),
-  },
-  {
-    key: PASSWORD,
-    label: i18n('labelSyncGitToken'),
-    type: 'password',
-    hint: i18n('titleSyncGitToken'),
-  },
-];
 const SYNC_NONE = {
   displayName: i18n('labelSyncDisabled'),
   name: '',
@@ -332,6 +311,30 @@ const rService = ref();
 const rSyncServices = ref();
 const rUserConfig = ref();
 //#endregion
+const GIT_FIELDS = computed(() => [
+  {
+    key: API_BASE,
+    label: i18n('labelSyncGitApiBase'),
+    type: 'url',
+    placeholder:
+      rUserConfig.value?.[CREATE_METHOD] === 'post'
+        ? 'https://your-gitea-host/api/v1'
+        : 'https://api.github.com',
+  },
+  {
+    key: PATH_PREFIX,
+    label: i18n('labelSyncGitPathPrefix'),
+    type: 'text',
+    placeholder: 'optional, e.g. userscripts',
+    hint: i18n('titleSyncGitPathPrefix'),
+  },
+  {
+    key: PASSWORD,
+    label: i18n('labelSyncGitToken'),
+    type: 'password',
+    hint: i18n('titleSyncGitToken'),
+  },
+]);
 hookSetting(SYNC_CURRENT, (value) => {
   rCurrentName.value = value || '';
 });
