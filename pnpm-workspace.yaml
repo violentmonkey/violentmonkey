@@ -3,6 +3,11 @@ allowBuilds:
   unrs-resolver: false
   vueleton: false
 
+minimumReleaseAgeExclude:
+  - '@usync/drive@0.3.1'
+  - '@usync/oauth2@0.1.8'
+  - '@usync/util@0.1.0'
+
 overrides:
   braces@<3.0.3: ^3.0.3
   micromatch@<4.0.8: ^4.0.8

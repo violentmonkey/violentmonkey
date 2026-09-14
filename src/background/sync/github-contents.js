@@ -27,7 +27,7 @@ const DEFAULT_CONFIG = {
 register(
   createSyncService({
     name: 'github-contents',
-    displayName: 'GitHub / Gitea',
+    displayName: 'GitHub Compatible',
     driveProvider: 'github-contents',
     authProvider: 'password',
     defaultUserConfig: DEFAULT_CONFIG,

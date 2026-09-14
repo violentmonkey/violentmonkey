@@ -668,8 +668,8 @@ labelSyncGitBranch:
   description: Label for the Git branch input.
   message: 'Branch: '
 labelSyncGitCreateMethod:
-  description: Label for the Git host-type select, which controls how new files are created.
-  message: 'Host type: '
+  description: Label for the Git file-creation-method select, matching the createMethod option key.
+  message: 'File creation method: '
 labelSyncGitOwner:
   description: Label for the Git repository owner input.
   message: 'Owner: '
@@ -1154,8 +1154,8 @@ titleSearchHintV2:
     * Regular expressions: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 titleSyncGitCreateMethod:
-  description: Hover title for the Git host-type select, explaining why it matters.
-  message: GitHub accepts one request style for creating a file; Gitea/Forgejo require a different one. Pick to match your host.
+  description: Hover title for the Git file-creation-method select, explaining when to change it.
+  message: If sync fails when creating the file for the first time, try the other method.
 titleSyncGitPathPrefix:
   description: Hover title for the Git path-prefix input, clarifying what it does.
   message: Sync into this subfolder of the repo instead of its root. Optional.
