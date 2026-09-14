@@ -453,7 +453,7 @@ labelExposeStatus:
   message: 在用户脚本收录站点上暴露已安装的版本信息：$1
 labelFastInject:
   description: (`$1` will be shown as `page`) Option in Advanced settings.
-  message: 中切换 $1 模式
+  message: 备用 $1 模式
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
