@@ -186,8 +186,8 @@
         <label class="inline-block" :title="i18n('titleSyncGitCreateMethod')">
           <span v-text="i18n('labelSyncGitCreateMethod')"></span>
           <select v-model="rUserConfig[CREATE_METHOD]" :disabled="!rCanUpdateConfig">
-            <option value="put">GitHub / GHES</option>
-            <option value="post">Gitea / Forgejo</option>
+            <option value="put">PUT - GitHub / GHES</option>
+            <option value="post">POST - Gitea / Forgejo</option>
           </select>
         </label>
       </div>
