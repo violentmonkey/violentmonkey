@@ -110,7 +110,6 @@ jobs:
           path: .
 
       - name: Publish to AMO
-        continue-on-error: true
         env:
           AMO_KEY: ${{ secrets.AMO_KEY }}
           AMO_SECRET: ${{ secrets.AMO_SECRET }}
@@ -161,10 +160,7 @@ jobs:
           path: .
 
       - name: Publish to CWS
-        continue-on-error: true
         env:
-          EXTENSION_ID_BETA: opokoaglpekkimldnlggpoagmjegichg
-          EXTENSION_ID_RELEASE: jinjaccalgpekkimldnlggpoagmjegichg
           PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
@@ -173,11 +169,9 @@ jobs:
           set -x
           if [ "$PRERELEASE" != "true" ]; then
             echo Publish release
-            CWS_EXT_ID=$EXTENSION_ID_RELEASE
             CWS_SOURCE=$ASSETS_DIR/$ASSET_CWS_ZIP
           else
             echo Publish prerelease
-            CWS_EXT_ID=$EXTENSION_ID_BETA
             CWS_SOURCE=$TEMP_DIR/$ASSET_CWS_BETA_ZIP
           fi
           if ! npx chrome-webstore-upload-cli@4 --extension-id $CWS_EXT_ID --source $CWS_SOURCE 2>"$TEMP_DIR/stderr.log"; then
@@ -224,7 +218,7 @@ jobs:
           EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
         run: |
-          if ! deno run -A https://raw.githubusercontent.com/violentmonkey/publish-edge-ext/main/main.ts $ASSETS_DIR/$ASSET_ZIP 2>"$TEMP_DIR/stderr.log"; then
+          if ! deno run -A https://raw.githubusercontent.com/violentmonkey/publish-edge-ext/main/main.ts $ASSETS_DIR/$ASSET_CWS_ZIP 2>"$TEMP_DIR/stderr.log"; then
             export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
             ERROR="${ERROR:-Edge publish failed}"
             echo "$ERROR"
@@ -268,7 +262,7 @@ jobs:
           node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';
 
       - name: Update CRX manifest on updates branch
-        uses: JamesIves/github-pages-deploy-action@4.1.0
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: updates
           folder: ${{ env.TEMP_DIR }}/updates
