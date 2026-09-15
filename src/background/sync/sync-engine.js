@@ -24,6 +24,7 @@ import {
   SYNC_ERROR,
   SYNC_ERROR_AUTH,
   SYNC_ERROR_INIT,
+  SYNC_ERROR_REPO_NOT_FOUND,
   SYNC_IN_PROGRESS,
   SYNC_INITIALIZING,
   SYNC_UNAUTHORIZED,
@@ -35,7 +36,30 @@ import {
   OAUTH2_UNAUTHORIZED,
   OAuth2Authorizers,
 } from '@usync/oauth2';
-import { DriveProviders } from '@usync/drive';
+import {
+  Dropbox,
+  GithubContents,
+  GoogleDrive,
+  OneDrive,
+  RepoNotFoundError,
+  S3,
+  WebDav,
+} from '@usync/drive';
+
+// @usync/drive only exports a `connectDrive(config, { providers })` factory
+// plus the individual provider classes — not an aggregate map — because its
+// own internal `builtinProviders` is intentionally unexported (extra
+// providers like `git` register through `options.providers` instead). We
+// don't use `connectDrive` here since this file already does its own
+// OAuth2Authorizer wiring below, so rebuild the lookup map ourselves.
+const DriveProviders = {
+  googledrive: GoogleDrive,
+  dropbox: Dropbox,
+  onedrive: OneDrive,
+  s3: S3,
+  webdav: WebDav,
+  'github-contents': GithubContents,
+};
 
 // --- Module-level state ---
 
@@ -401,7 +425,14 @@ export function createSyncService({
     }
     if (prepareError) {
       logError(prepareError);
-      setSyncState({ status: SYNC_UNAUTHORIZED });
+      // Thrown when the repo/project itself doesn't exist or isn't
+      // accessible to the token, distinct from a merely-empty path.
+      setSyncState({
+        status:
+          prepareError instanceof RepoNotFoundError
+            ? SYNC_ERROR_REPO_NOT_FOUND
+            : SYNC_UNAUTHORIZED,
+      });
     } else {
       setSyncState({ status: SYNC_AUTHORIZED });
     }
