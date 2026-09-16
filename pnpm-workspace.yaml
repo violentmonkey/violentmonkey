@@ -4,7 +4,7 @@ allowBuilds:
   vueleton: false
 
 minimumReleaseAgeExclude:
-  - '@usync/drive@0.3.1'
+  - '@usync/drive@0.3.1 || 0.3.2'
   - '@usync/oauth2@0.1.8'
   - '@usync/util@0.1.0'
 

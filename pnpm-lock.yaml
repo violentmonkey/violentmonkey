@@ -21,8 +21,8 @@ importers:
   .:
     dependencies:
       '@usync/drive':
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.3.2
+        version: 0.3.2
       '@usync/oauth2':
         specifier: ^0.1.7
         version: 0.1.7
@@ -2086,8 +2086,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@usync/drive@0.3.1':
-    resolution: {integrity: sha512-iHm9Rs0H5sD7kYt0bEXhdlguCPVJdOPu5OK7BdhLttTjoQjFaolBipmlok4yM7NJizs91z+o7HcAAOsnQKCtvQ==}
+  '@usync/drive@0.3.2':
+    resolution: {integrity: sha512-TQiuTYJgPpbdeClkwz3oODcwq/x6sjRwo2jmYiKMR74aLwXqBqqjOow2CdGxRcPzDIv25vTBk44kXpLy2dhXig==}
 
   '@usync/oauth2@0.1.7':
     resolution: {integrity: sha512-95/fQRjRCkMo9DZlMebAklkiHEQMQGNnA8rBclRkshieN+SikTOk0N13VT6IFOUwQ6NB1pStUaY3nL+FujRF/Q==}
@@ -3563,6 +3563,10 @@ packages:
     resolution: {integrity: sha512-ej4AhfhfL2Q2zpMmLo7U1Uv9+PyhIZpgQLGT1F9miIGmiCJIoCgSmczFdrc97mWT4kVY72KA+WnnhJ5pghSvSg==}
     engines: {node: '>= 0.4'}
 
+  hasown@2.0.4:
+    resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
+    engines: {node: '>= 0.4'}
+
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
@@ -4279,6 +4283,9 @@ packages:
 
   minimist@1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
+
+  minimist@1.2.8:
+    resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
 
   minimisted@2.0.1:
     resolution: {integrity: sha512-1oPjfuLQa2caorJUM8HV8lGgWCc0qqAO1MNv/k05G4qslmsndV/5WdNZrqCiyqiz3wohia2Ij2B7w2Dr7/IyrA==}
@@ -8190,7 +8197,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@usync/drive@0.3.1':
+  '@usync/drive@0.3.2':
     dependencies:
       '@usync/oauth2': 0.1.8
       '@usync/util': 0.1.0
@@ -9650,7 +9657,7 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.3
+      hasown: 2.0.4
       math-intrinsics: 1.1.0
 
   get-package-type@0.1.0: {}
@@ -9837,7 +9844,7 @@ snapshots:
 
   has-tostringtag@1.0.2:
     dependencies:
-      has-symbols: 1.0.3
+      has-symbols: 1.1.0
 
   has@1.0.3:
     dependencies:
@@ -9846,6 +9853,10 @@ snapshots:
   hash-sum@2.0.0: {}
 
   hasown@2.0.3:
+    dependencies:
+      function-bind: 1.1.2
+
+  hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
 
@@ -10728,9 +10739,11 @@ snapshots:
 
   minimist@1.2.6: {}
 
+  minimist@1.2.8: {}
+
   minimisted@2.0.1:
     dependencies:
-      minimist: 1.2.6
+      minimist: 1.2.8
 
   minimizer-webpack-plugin@5.6.1(clean-css@5.3.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.109.2):
     dependencies:

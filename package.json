@@ -113,7 +113,7 @@
   "homepage": "https://github.com/violentmonkey/violentmonkey",
   "license": "MIT",
   "dependencies": {
-    "@usync/drive": "^0.3.1",
+    "@usync/drive": "^0.3.2",
     "@usync/oauth2": "^0.1.7",
     "@usync/sync": "^0.1.1",
     "@violentmonkey/shortcut": "^1.4.4",
