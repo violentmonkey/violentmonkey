@@ -6,7 +6,8 @@ import {
   SYNC_PUSH,
   USER_CONFIG,
 } from '@/common/consts-sync';
-import { forEachEntry, objectPick, objectSet } from '@/common/object';
+import { forEachEntry, objectSet } from '@/common/object';
+import { getScriptData, parseScriptData, serializeScriptData } from './script-format';
 import { getOption, setOption } from '../utils';
 import broadcast from '../utils/broadcast';
 import { sortScripts, updateScriptInfo } from '../utils/db';
@@ -200,57 +201,6 @@ export function getStates() {
       [USER_CONFIG]: service.getUserConfig(),
     };
   });
-}
-
-// --- Script data serialization ---
-
-function getScriptData(script, extra) {
-  const data = {
-    version: 2,
-    custom: script.custom,
-    config: script.config,
-    props: objectPick(script.props, ['lastUpdated']),
-  };
-  return Object.assign(data, extra);
-}
-
-function parseScriptData(raw) {
-  const data = {};
-  try {
-    const obj = JSON.parse(raw);
-    data.code = obj.code;
-    if (obj.version === 2) {
-      data.config = obj.config;
-      data.custom = obj.custom;
-      data.props = obj.props;
-    } else if (obj.version === 1) {
-      if (obj.more) {
-        data.custom = obj.more.custom;
-        data.config = objectPurify({
-          enabled: obj.more.enabled,
-          shouldUpdate: obj.more.update,
-        });
-        data.props = objectPurify({
-          lastUpdated: obj.more.lastUpdated,
-        });
-      }
-    }
-  } catch (e) {
-    data.code = raw;
-  }
-  return data;
-}
-
-function objectPurify(obj) {
-  if (Array.isArray(obj)) {
-    obj.forEach(objectPurify);
-  } else if (isObject(obj)) {
-    obj::forEachEntry(([key, value]) => {
-      if (typeof value === 'undefined') delete obj[key];
-      else objectPurify(value);
-    });
-  }
-  return obj;
 }
 
 // --- State change listener ---
@@ -786,7 +736,7 @@ export function createSyncService({
               uri: local.props.uri,
               name: null,
             }),
-            JSON.stringify(data),
+            serializeScriptData(data),
           );
         });
       }),
