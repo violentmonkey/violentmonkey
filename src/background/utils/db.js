@@ -579,6 +579,12 @@ export function checkRemove({ force } = {}) {
  */
 export async function updateScriptInfo(id, data) {
   const script = scriptMap[id];
+  // A toggle bumps the global clock so sync merges `config.enabled` like `position`:
+  // last syncer wins by comparing global `lastModified` with the remote meta timestamp.
+  if (data.config?.enabled != null
+  && getInt(script.config.enabled) !== getInt(data.config.enabled)) {
+    updateLastModified();
+  }
   for (const key in data) { // shallow merge
     if (script[key]) Object.assign(script[key], data[key]);
   }
@@ -656,6 +662,7 @@ export async function parseScript(src) {
   }
   props.lastModified = now;
   props.uuid = props.uuid || crypto.randomUUID();
+  const oldEnabled = getInt(config.enabled);
   // Overwriting inner data by `src`, deleting keys for which `src` specifies `null`
   for (const key of ['config', 'custom', 'props']) {
     const dst = script[key];
@@ -663,6 +670,11 @@ export async function parseScript(src) {
       if (srcVal == null) delete dst[srcKey];
       else dst[srcKey] = srcVal;
     });
+  }
+  // A toggle bumps the global clock so sync merges `config.enabled` like `position`.
+  if (src.config?.enabled != null
+  && oldEnabled !== getInt(config.enabled)) {
+    updateLastModified();
   }
   const pos = +src.position;
   if (pos) {
