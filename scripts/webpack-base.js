@@ -1,7 +1,6 @@
 const { resolve } = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
 const webpack = require('webpack');
-const progressBarPlugin = require('progress-bar-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -125,6 +124,9 @@ const getBaseConfig = (page) => ({
   mode: isProd ? 'production' : 'development',
   target: 'web', // required by live reloading
   devtool: isProd ? false : page.startsWith('injected') ? 'inline-source-map' : 'source-map',
+  infrastructureLogging: {
+    progress: 'auto',
+  },
   output: {
     path: resolve(DIST),
     publicPath: '/',
@@ -237,10 +239,6 @@ const getBaseConfig = (page) => ({
   plugins: [
     page === 'sw' && MV3 && new webpack.NormalModuleReplacementPlugin(/\/common\/tld$/, (r) => {
       r.request += '-mv3';
-    }),
-    !process.env.GITHUB_ACTIONS && new progressBarPlugin({
-      format: '[:bar] :percent (:elapsed seconds), :msg',
-      summary: false,
     }),
     !page && new VueLoaderPlugin(),
     !page && new GroupAssetsPlugin(),
