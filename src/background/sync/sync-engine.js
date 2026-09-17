@@ -1001,6 +1001,14 @@ function getService(name) {
   return services[name || getCurrent()];
 }
 
+// Explicit entry points (startup, credential save): run a sync when auto-sync
+// is on — which also kicks off the MV2 hourly chain — otherwise just refresh
+// the status with a single request.
+function syncOrRefresh() {
+  if (getOption('syncAutomatically')) return sync();
+  return getService()?.prepare().catch(noop);
+}
+
 export function initialize() {
   if (!syncConfig) {
     syncConfig = initConfig();
@@ -1013,7 +1021,7 @@ export function initialize() {
   }
   resetSyncState();
   if (!__.MV3 || !sessionData.init) {
-    autoSync();
+    syncOrRefresh();
   }
   return !!getService();
 }
@@ -1026,11 +1034,11 @@ export function sync() {
 }
 
 export function autoSync() {
-  if (getOption('syncAutomatically')) return sync();
-  const service = getService();
-  service?.prepare().catch(noop);
-  console.info('[sync] auto-sync disabled, check later');
-  if (!__.MV3) syncLater();
+  // No-op when auto-sync is off: even `prepare()` hits the network
+  // (e.g. PROPFIND on WebDAV), so storage changes and the hourly alarm
+  // must not trigger any request in that case.
+  if (!getOption('syncAutomatically')) return;
+  return sync();
 }
 
 export function authorize() {
@@ -1047,6 +1055,6 @@ export function setConfig(cfg) {
   const service = getService();
   if (service) {
     service.setUserConfig(cfg);
-    return autoSync();
+    return syncOrRefresh();
   }
 }
