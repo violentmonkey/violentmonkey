@@ -43,7 +43,7 @@ addPublicCommands({
     const cb = res => {
       if (!requests[id]) return;
       const { data } = res;
-      if (__.MV3 && data && req.url) {
+      if (__.MV3 && req.url && data?.finalUrl) {
         data.finalUrl = req.url; // from onBeforeSendHeaders
       }
       if (res.type === 'loadend' && !data?.[UPLOAD]) {
