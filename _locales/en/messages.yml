@@ -758,7 +758,7 @@ labelXhrInjectHint:
     loading and currently it's running too late. Just like Instant injection
     mode in Tampermonkey, this option is using the deprecated synchronous XHR,
     so in Chrome/Chromium you'll see warnings in devtools console, although you
-    can safely ignore them as the adverse affects are negligible in this case.
+    can safely ignore them as the adverse effects are negligible in this case.
     You can hide the warnings for good by right-clicking one.
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
