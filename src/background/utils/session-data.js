@@ -42,3 +42,7 @@ export async function flushSession(key, val) {
     flushing = null;
   }
 }
+
+export function setScriptSizes(val) {
+  scriptSizes = val;
+}

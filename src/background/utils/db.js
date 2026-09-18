@@ -22,7 +22,9 @@ import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
 import { permissionDownloads } from './permissions';
 import { initOptions, kVersion, setOption } from './options';
-import sessionData, { flushSession, kScriptSizes, scriptSizes } from './session-data';
+import sessionData, {
+  flushSession, kScriptSizes, scriptSizes, setScriptSizes,
+} from './session-data';
 import storage, {
   S_CACHE, S_CODE, S_REQUIRE, S_SCRIPT, S_VALUE,
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
@@ -127,7 +129,7 @@ export async function initializeDatabase(reset) {
     dbKeys.clear();
     aliveScripts.length = 0;
     removedScripts.length = 0;
-    scriptSizes = {}; // eslint-disable-line no-import-assign
+    setScriptSizes({});
     for (const key in scriptMap) delete scriptMap[key];
     for (const key in scriptSiteVisited) delete scriptSiteVisited[key];
   }
@@ -890,7 +892,7 @@ export async function vacuum(data) {
       status[key] = -1;
     }
   });
-  scriptSizes = sizes; // eslint-disable-line no-import-assign
+  setScriptSizes(sizes);
   if (__.MV3) flushSession(kScriptSizes, scriptSizes);
   getScriptsByIdsOrAll().forEach((script) => {
     const { meta, props } = script;
