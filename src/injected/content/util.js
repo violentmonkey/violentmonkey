@@ -17,7 +17,7 @@ const kTextContent = 'textContent';
 // required in FF to circumvent CSP style-src https://bugzil.la/1706787
 const setTextContent = describeProperty(Node[PROTO], kTextContent).set;
 const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
-export const { createObjectURL } = URL;
+export const { createObjectURL, revokeObjectURL } = URL;
 
 /**
  * @param {string} tag

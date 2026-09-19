@@ -12,8 +12,9 @@ import { permissionDownloads } from './permissions';
 import {
   FORBIDDEN_HEADER_RE, kCookie, kRequestHeaders, kSetCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
+import { badges } from './session-data';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
-import { navUA, navUAD } from './ua';
+import { FIREFOX, navUA, navUAD, ua } from './ua';
 import { vetUrl } from './url';
 
 if (__.MV3) addOwnCommands({
@@ -36,15 +37,23 @@ addPublicCommands({
       id,
       tabId,
       [kFrameId]: frameId,
-      [kFileName]: fileName,
+      dl: !!fileName,
       frame: getFrameDocIdAsObj(frameId),
     };
+    // 1. downloads via background page DOM are ignored in mobile Firefox
+    // 2. browser.downloads API was removed in mobile Firefox 79
+    const dlInTab = fileName && IS_FIREFOX && FIREFOX >= 79 && ua.mobile;
+    const dlInApi = fileName && !dlInTab && permissionDownloads && getOption(kGmDownloadViaApi);
     /** @param {GMReq.Message.BGAny} res */
     const cb = res => {
       if (!requests[id]) return;
       const { data } = res;
       if (__.MV3 && req.url && data?.finalUrl) {
         data.finalUrl = req.url; // from onBeforeSendHeaders
+      }
+      if (res.type === 'load' && dlInTab && data && !data[UPLOAD]
+      && !(res.dl = !frameId || !badges[tabId]?.[INJECT])) {
+        sendTabCmd(tabId, 'Download', [data.response, fileName], { [kFrameId]: 0 });
       }
       if (res.type === 'loadend' && !data?.[UPLOAD]) {
         clearRequest(req);
@@ -62,14 +71,16 @@ addPublicCommands({
       cbe: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
+    if (dlInTab) {
+      events[0].load = true;
+    } else {
+      req[kFileName] = fileName;
+    }
     if (IS_FIREFOX && opts.url instanceof Blob) {
       opts.url = leaseBlobUrl(opts.url);
     }
-    return (
-      fileName && permissionDownloads && getOption(kGmDownloadViaApi)
-      ? downloadViaApi
-      : httpRequest
-    )(opts, events, id, req, src, fileName).catch(cbError);
+    return (dlInApi ? downloadViaApi : httpRequest)(opts, events, id, req, src, fileName)
+      .catch(cbError);
   },
   AbortRequest: abortRequest,
   // TODO: check if the content script can revoke it
@@ -230,7 +241,7 @@ export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(/**@param{GMReq.BG}req*/req => {
     if ((tabId == null || req.tabId === tabId)
     && (!frameId || req[kFrameId] === frameId)
-    && !req[kFileName]) {
+    && !req.dl) {
       abortRequest(req.id);
     }
   });
