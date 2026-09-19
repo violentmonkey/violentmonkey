@@ -1,6 +1,6 @@
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import spawn from 'cross-spawn';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 
 const PROJECT_ID = 'o:violentmonkey:p:violentmonkey-nex';
 const RESOURCE_ID = `${PROJECT_ID}:r:messagesjson`;
