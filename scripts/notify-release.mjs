@@ -2,12 +2,16 @@ const {
   ACTION_BUILD_URL,
   DISCORD_WEBHOOK_RELEASE,
   ERROR,
+  MESSAGE,
   RELEASE_NAME,
   TARGET,
   VERSION,
 } = process.env;
 
 const success = !ERROR;
+let message = MESSAGE || '';
+if (message.length > 500) message = message.slice(0, 500) + '...';
+const messageLines = message.split('\n').filter(Boolean);
 
 if (!TARGET) {
   console.error('TARGET is not set');
@@ -23,13 +27,16 @@ if (DISCORD_WEBHOOK_RELEASE) {
   let title, description;
   if (success) {
     title = `${TARGET} Release Success: ${RELEASE_NAME}`;
-    description = `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${VERSION}.`;
+    description = [
+      ...messageLines.map((line) => `> ${line}`),
+      `See the changelog at https://github.com/violentmonkey/violentmonkey/releases/tag/v${VERSION}.`,
+    ].join('\n');
   } else {
     title = `${TARGET} Release Failure: ${RELEASE_NAME}`;
     description = [
       'An error occurred:',
       '',
-      ...ERROR.split('\n').map((line) => `> ${line}`),
+      ...messageLines.map((line) => `> ${line}`),
       ...(ACTION_BUILD_URL
         ? ['', `See ${ACTION_BUILD_URL} for more details.`]
         : []),

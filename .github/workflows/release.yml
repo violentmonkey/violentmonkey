@@ -125,19 +125,14 @@ jobs:
             echo Publish listed version
           fi
           if ! node scripts/amo-upload.mjs 2>"$TEMP_DIR/stderr.log"; then
-            export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-            ERROR="${ERROR:-AMO publish failed}"
-            echo "$ERROR"
+            export ERROR=1
+            export MESSAGE=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+            MESSAGE="${MESSAGE:-AMO publish failed}"
+            echo "$MESSAGE"
           fi
           export TARGET=AMO
+          export MESSAGE="${MESSAGE:-The release is pending review.}"
           node scripts/notify-release.mjs
-
-      - name: Upload AMO asset
-        if: success() || failure()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node -e 'import("./scripts/release-helper.mjs").then(({ uploadAssets }) => uploadAssets())';
 
   publish-cws:
     name: Publish to Chrome Web Store
@@ -175,12 +170,13 @@ jobs:
             CWS_SOURCE=$TEMP_DIR/$ASSET_CWS_BETA_ZIP
           fi
           if ! npx chrome-webstore-upload-cli@4 --extension-id $CWS_EXT_ID --source $CWS_SOURCE 2>"$TEMP_DIR/stderr.log"; then
-            export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-            ERROR="${ERROR:-CWS publish failed}"
-            echo "$ERROR"
+            export ERROR=1
+            export MESSAGE=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+            MESSAGE="${MESSAGE:-CWS publish failed}"
+            echo "$MESSAGE"
 
             # Ignore pending review error: "❌ You may not edit or publish an item that is in review."
-            if [[ "$ERROR" == *"is in review"* ]]; then
+            if [[ "$MESSAGE" == *"is in review"* ]]; then
               echo "::warning::PENDING_REVIEW: skipping CWS publish notification"
               exit 0
             fi
@@ -219,9 +215,10 @@ jobs:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
         run: |
           if ! deno run -A https://raw.githubusercontent.com/violentmonkey/publish-edge-ext/main/main.ts $ASSETS_DIR/$ASSET_CWS_ZIP 2>"$TEMP_DIR/stderr.log"; then
-            export ERROR=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
-            ERROR="${ERROR:-Edge publish failed}"
-            echo "$ERROR"
+            export ERROR=1
+            export MESSAGE=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
+            MESSAGE="${MESSAGE:-Edge publish failed}"
+            echo "$MESSAGE"
           fi
           export TARGET=Edge
           node scripts/notify-release.mjs
