@@ -241,7 +241,7 @@ export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(/**@param{GMReq.BG}req*/req => {
     if ((tabId == null || req.tabId === tabId)
     && (!frameId || req[kFrameId] === frameId)
-    && !req.dl) {
+    && !req[kFileName]/* also aborts dlInTab because the tab is closed or navigated */) {
       abortRequest(req.id);
     }
   });
