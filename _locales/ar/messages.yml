@@ -189,6 +189,13 @@ descScriptTemplate:
     المتغيرات المدعومة: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> بصيغة متوافقة مع MomentJS، على سبيل المثال
     <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: >-
+    يجب أن يكون المستودع موجودًا بالفعل — لا يقوم Violentmonkey أبدًا بإنشائه أو
+    تهيئته نيابةً عنك.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: مجموعة
@@ -664,6 +671,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: بدون
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: 'عنوان URL الأساسي لواجهة API:'
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: 'الفرع:'
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: 'طريقة إنشاء الملف:'
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: 'المالك:'
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: 'بادئة المسار: '
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: 'المستودع:'
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: 'رمز الوصول:'
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'كلمة المرور: '
@@ -950,6 +980,13 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: ستبدأ المزامنة قريبًا...
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: >-
+    لم يتم العثور على المستودع. قم بإنشائه أولاً، ثم تأكد من أن رمز الوصول الخاص
+    بك لديه صلاحية الوصول إليه.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: المزامنة قيد التنفيذ...
@@ -1129,6 +1166,19 @@ titleSearchHintV2:
 
     * التعبيرات النمطية: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: إذا فشلت المزامنة عند إنشاء الملف لأول مرة، جرّب الطريقة الأخرى.
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: المزامنة إلى هذا المجلد الفرعي داخل المستودع بدلاً من جذره. اختياري.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: >-
+    يحتاج إلى صلاحية قراءة/كتابة لمحتويات المستودع (يجب أن يكون المستودع موجودًا
+    بالفعل).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: تبديل حقن سكربتات المستخدم

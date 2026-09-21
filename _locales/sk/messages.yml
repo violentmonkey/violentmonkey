@@ -189,6 +189,13 @@ descScriptTemplate:
     Podporované premenné: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> formát kompatibilný s MomentJS, napríklad
     <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: >-
+    Repozitár už musí existovať  Violentmonkey ho za vás nikdy nevytvorí ani
+    neinicializuje.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: skupina
@@ -673,6 +680,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Zakázané
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: 'Základná adresa URL API:'
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: 'Vetva:'
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: 'Spôsob vytvorenia súboru:'
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: 'Vlastník:'
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: 'Predpona cesty:'
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: 'Repozitár:'
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: 'Prístupový token:'
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Heslo: '
@@ -955,6 +985,13 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: Synchronizácia sa spustí o chvíľu...
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: >-
+    Repozitár sa nenašiel. Najprv ho vytvorte, a potom sa uistite, že váš token
+    má k nemu prístup.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Prebieha synchronizácia...
@@ -1143,6 +1180,23 @@ titleSearchHintV2:
 
     * Regulárne výrazy: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? s medzerou"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: >-
+    Ak sa synchronizácia pri prvom vytvorení súboru nepodarí, vyskúšajte druhý
+    spôsob.
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: >-
+    Synchronizujte do tohto podpriečinka repozitára namiesto jeho koreňového
+    priečinka. Voliteľné.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: >-
+    Vyžaduje prístup na čítanie a zápis k obsahu repozitára (repozitár už musí
+    existovať).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Prepnúť injektovanie používateľského skriptu

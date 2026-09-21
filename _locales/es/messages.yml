@@ -65,7 +65,7 @@ buttonNew:
   message: Nuevo
 buttonNewFromFile:
   description: Button to create a new script from a local file.
-  message: ''
+  message: Nuevo desde un archivo
 buttonOK:
   description: OK button on dialog.
   message: OK
@@ -192,6 +192,13 @@ descScriptTemplate:
     Variables compatibles: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> con un formato compatible con MomentJS, por ejemplo
     <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: >-
+    El repositorio debe existir previamente — Violentmonkey nunca lo crea ni lo
+    inicializa por ti.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: agrupar
@@ -286,7 +293,9 @@ fileInstallBlocked:
     leer cualquier archivo local.
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    Abre about:addons, selecciona "Violentmonkey", entra en "Permisos y datos" y
+    activa la opción "Acceso a archivos locales en tu computadora".
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: orden alfabético
@@ -341,7 +350,7 @@ headerRecycleBin:
   message: Papelera de reciclaje
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: Mostrar ayuda cuando no se pueda instalar un script local
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: para $1 scripts coincidentes
@@ -504,17 +513,22 @@ labelFeedback:
   message: Comentarios
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: Omitir CSP en Firefox
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: >-
+    Agrega un valor aleatorio al CSP de las páginas web que solo Violentmonkey
+    puede usar para ejecutar scripts en el modo de inyección $1; de lo
+    contrario, los scripts deben editarse para usar $2.
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: >-
+    El modo aislado $1 puede limitar la funcionalidad, consulta "$2" en las
+    opciones.
 labelGeneral:
   description: Label for general settings.
   message: General
@@ -673,6 +687,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Nada
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: 'URL base de la API: '
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: 'Rama: '
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: 'Método de creación de archivos: '
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: 'Propietario: '
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: 'Prefijo de ruta: '
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: 'Repositorio: '
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: 'Token de acceso: '
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Contraseña:'
@@ -961,6 +998,13 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: La sincronización iniciará pronto...
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: >-
+    Repositorio no encontrado. Créalo primero y asegúrate de que tu token tenga
+    acceso a él.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sincronización en progreso...
@@ -1147,6 +1191,23 @@ titleSearchHintV2:
 
     * Expresiones regulares: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: >-
+    Si la sincronización falla al crear el archivo por primera vez, prueba el
+    otro método.
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: >-
+    Sincroniza dentro de esta subcarpeta del repositorio en lugar de en su raíz.
+    Opcional.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: >-
+    Requiere acceso de lectura y escritura al contenido del repositorio (el
+    repositorio debe existir previamente).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Activar o desactivar inyección de userscripts
@@ -1177,10 +1238,14 @@ updateScriptsInTab:
   message: Actualizar scripts de la pestaña actual
 userScriptsPermissionNote:
   description: Text in the popup or dashboard.
-  message: ''
+  message: >-
+    Activa la opción "Permitir scripts de usuario" en los detalles de
+    Violentmonkey en chrome://extensions y recarga la pestaña
 userScriptsPermissionNoteOld:
   description: Text in the popup or dashboard in older browsers.
-  message: ''
+  message: >-
+    Activa la opción "Modo desarrollador" en chrome://extensions y recarga la
+    pestaña
 valueLabelKey:
   description: Label for key of a script value.
   message: Clave (cadena)

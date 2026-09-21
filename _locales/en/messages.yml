@@ -188,7 +188,9 @@ descScriptTemplate:
     <{{date:format}}> with MomentJS-compatible format, for example
     <{{date:YYYY-MM-DD}}>.
 descSyncGitRepoPreexisting:
-  description: Note explaining the repository must already exist; Violentmonkey never creates it.
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
   message: >-
     The repository must already exist — Violentmonkey never creates or
     initializes it for you.
@@ -668,7 +670,9 @@ labelSyncGitBranch:
   description: Label for the Git branch input.
   message: 'Branch: '
 labelSyncGitCreateMethod:
-  description: Label for the Git file-creation-method select, matching the createMethod option key.
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
   message: 'File creation method: '
 labelSyncGitOwner:
   description: Label for the Git repository owner input.
@@ -966,8 +970,12 @@ msgSyncReady:
   message: Sync will start soon...
   touched: false
 msgSyncRepoNotFound:
-  description: Message shown when the configured Git repository was not found, or the token can't access it. Violentmonkey never creates it automatically.
-  message: Repository not found. Create it first, then make sure your token has access to it.
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: >-
+    Repository not found. Create it first, then make sure your token has access
+    to it.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sync in progress...
@@ -1154,8 +1162,12 @@ titleSearchHintV2:
     * Regular expressions: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 titleSyncGitCreateMethod:
-  description: Hover title for the Git file-creation-method select, explaining when to change it.
-  message: If sync fails when creating the file for the first time, try the other method.
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: >-
+    If sync fails when creating the file for the first time, try the other
+    method.
 titleSyncGitPathPrefix:
   description: Hover title for the Git path-prefix input, clarifying what it does.
   message: Sync into this subfolder of the repo instead of its root. Optional.

@@ -192,6 +192,13 @@ descScriptTemplate:
     Variables compatibles: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> con un formato compatible con MomentJS, por ejemplo
     <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: >-
+    El repositorio debe existir previamente — Violentmonkey nunca lo crea ni lo
+    inicializa por ti.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: agrupar
@@ -681,6 +688,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Nada
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: 'URL base de la API: '
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: 'Rama: '
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: 'Método de creación de archivos: '
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: 'Propietario: '
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: 'Prefijo de ruta: '
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: 'Repositorio: '
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: 'Token de acceso: '
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Contraseña: '
@@ -966,6 +996,13 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: La sincronización iniciará pronto...
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: >-
+    Repositorio no encontrado. Créalo primero y asegúrate de que tu token tenga
+    acceso a él.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Sincronización en progreso...
@@ -1151,6 +1188,23 @@ titleSearchHintV2:
 
     * Expresiones regulares: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: >-
+    Si la sincronización falla al crear el archivo por primera vez, prueba el
+    otro método.
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: >-
+    Sincroniza dentro de esta subcarpeta del repositorio en lugar de en su raíz.
+    Opcional.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: >-
+    Requiere acceso de lectura y escritura al contenido del repositorio (el
+    repositorio debe existir previamente).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Activar o desactivar inyección de userscripts
