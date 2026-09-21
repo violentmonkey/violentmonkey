@@ -187,6 +187,11 @@ descScriptTemplate:
     ตัวแปรที่รองรับ: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> พร้อมกับ รูปแบบที่เข้ากันได้กับ MomentJS ตัวอย่างเช่น
     <{{date:YYYY-MM-DD}}>
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: กลุ่ม
@@ -646,6 +651,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: ''
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: ''
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: ''
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: ''
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: ''
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: ''
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: ''
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: ''
 labelSyncPassword:
   description: Label for input to hold password.
   message: ''
@@ -911,6 +939,11 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: ''
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: ''
 msgSyncing:
   description: Message shown when sync is in progress.
   message: ''
@@ -1062,6 +1095,17 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
+  message: ''
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: ''
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: ''
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
   message: ''
 toggleInjection:
   description: Label for a keyboard shortcut.

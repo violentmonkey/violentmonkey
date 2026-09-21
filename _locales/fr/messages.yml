@@ -65,7 +65,7 @@ buttonNew:
   message: Nouveau
 buttonNewFromFile:
   description: Button to create a new script from a local file.
-  message: ''
+  message: Nouveau depuis un fichier
 buttonOK:
   description: OK button on dialog.
   message: OK
@@ -199,6 +199,11 @@ descScriptTemplate:
     Variables supportées : <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> avec un format compatible avec MomentJS, par exemple
     <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: grouper
@@ -256,7 +261,9 @@ editValueAllHint:
   message: Montrer/éditer toutes les données stockées du script
 extDescription:
   description: Description for this extension, will be displayed in web store
-  message: Un gestionnaire de scripts utilisateur qui supporte beaucoup de navigateurs
+  message: >-
+    Un gestionnaire open source de scripts utilisateur compatible avec de
+    nombreux navigateurs
 extName:
   description: Name of this extension.
   message: Violentmonkey
@@ -423,7 +430,7 @@ labelAutoUpdate:
     désactiver
 labelBackup:
   description: Label of the import/export section in settings.
-  message: Backup
+  message: Sauvegarde
 labelBackupMaintenance:
   description: Label of the import/export/maintenance section in settings.
   message: Sauvegarde et maintenance
@@ -450,7 +457,7 @@ labelComment:
   message: How
 labelContributors:
   description: Label for link to contributors.
-  message: Contributors
+  message: Contributeurs
 labelCurrentLang:
   description: Label of current language.
   message: "Langue actuelle\_: "
@@ -509,15 +516,18 @@ labelFastInjectHint:
     cette option.
 labelFeedback:
   description: Label of link to feedback page.
-  message: Retour d’expérience
+  message: Donner votre avis
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: Contourner la politique CSP dans Firefox
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: >-
+    Ajoute une valeur aléatoire à la CSP des pages web que seul Violentmonkey
+    peut utiliser pour exécuter des scripts en mode d'injection $1 ; sinon, les
+    scripts doivent être modifiés pour utiliser $2.
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
@@ -529,13 +539,16 @@ labelGeneral:
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: Utiliser l'API de téléchargement du navigateur
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: >-
+    Autorise les scripts à enregistrer des fichiers dans des sous-dossiers de
+    votre répertoire de téléchargement et affiche la progression dans la barre
+    de téléchargement du navigateur.
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: Accorder la permission
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Aider à traduire
@@ -547,7 +560,7 @@ labelHomepageURL:
   message: "URL de la page d’accueil\_: "
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: Autoriser GM_cookie à accéder aux cookies HttpOnly
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
   message: >-
@@ -598,7 +611,7 @@ labelNoName:
   message: Pas de nom
 labelNoSearchScripts:
   description: Message shown when no script is found in search results.
-  message: Pas de script trouvé
+  message: Aucun script trouvé.
 labelNotifyThisUpdated:
   description: >-
     A per-script option in editor to enable notification when this script is
@@ -653,7 +666,7 @@ labelSearch:
   message: "Rechercher\_: "
 labelSearchScript:
   description: Placeholder for script search box.
-  message: Chercher des scripts…
+  message: Rechercher des scripts…
 labelSettings:
   description: Label shown on the top of settings page
   message: Configuration
@@ -681,6 +694,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Aucun
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: ''
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: ''
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: ''
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: ''
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: ''
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: ''
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: ''
 labelSyncPassword:
   description: Label for input to hold password.
   message: "Mot de passe\_: "
@@ -805,7 +841,7 @@ menuFeedback:
   message: Retour d’expérience
 menuFindScripts:
   description: Menu item to find scripts for a site.
-  message: Chercher des scripts pour ce site
+  message: Rechercher des scripts pour ce site
 menuInjectionFailed:
   description: Injection error.
   message: Impossible d’injecter certains scripts.
@@ -965,6 +1001,11 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: La synchronisation va bientôt démarrer…
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: ''
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Synchronisation en cours…
@@ -1004,7 +1045,7 @@ optionEditorWindowSimple:
   message: Cacher l’omnibox
 optionPopup:
   description: Label of the popup menu section in settings.
-  message: Menu et icône popup
+  message: Menu contextuel et icône
 optionPopupEnabledFirst:
   description: Option to show enabled scripts first in popup.
   message: Scripts activés en premier
@@ -1028,7 +1069,7 @@ optionShowEnabledFirst:
   message: Montrer les scripts activés en premier
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: 'Thème UI :'
+  message: 'Thème de l’interface :'
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: automatique
@@ -1042,7 +1083,7 @@ optionUpdate:
   description: >-
     Label of the update section in settings and notification title for script
     updates.
-  message: Mettre à jour
+  message: Mise à jour
 popupSettings:
   description: Item inside the popup's "⋮" menu
   message: Paramètres des fenêtres popup
@@ -1111,7 +1152,7 @@ skipScriptsMsg:
     exécuter, rechargez la page ou naviguez dans l'onglet.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: 'Ordre de tri :'
+  message: "Ordre de tri\_:"
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Arrêter le suivi
@@ -1131,34 +1172,18 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: >-
-    * La touche <kbd>Entrée</kbd> ajoute le texte à l'historique de
-    l'autocomplétion.
-
-
-    * Toutes les conditions sont insensibles à la casse
-
-
-    * Les conditions séparées par des espaces peuvent être combinées
-
-
-    * Recherche par métadonnées : <code>"Awesome Script" "Description"</code>
-
-
-    * Recherche par tags : <code>#tag1 #tag2</code>
-
-
-    * Recherche par nom de script : <code>name : "awesome name"</code>
-
-
-    * Recherche par code du script : <code>code : "awesome code"</code>
-
-
-    * Recherche négative : <code>!#tag2 !name : "unwanted"
-
-
-    * Expressions régulières : <code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re :"\w+ ? avec espace"</code>
+  message: "* La touche <kbd>Entrée</kbd> ajoute le texte à l'historique de l'autocomplétion.\n* Toutes les conditions sont insensibles à la casse\n* Les conditions séparées par des espaces peuvent être combinées\n* Recherche par métadonnées\_: \"Awesome Script\" \"Description\"* Recherche par étiquettes : <code>#étiquette1 #étiquette2</code>\n* Recherche par nom de script\_: <code>name : \"awesome name\"</code>\n* Recherche par code du script : code : \"awesome code\"\n* Recherche négative : !#étiquette2 !name : \"indésirable\"\n* Expressions régulières\_: <code>/\\w+?/</code>, <code>/\\w+?/gi</code>, <code>name:/\\w+?/</code>, <code>name+re :\"\\w+ ? avec espace\"</code>"
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: ''
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: ''
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: ''
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Activer/désactiver l'injection de scripts utilisateur
@@ -1189,7 +1214,9 @@ updateScriptsInTab:
   message: Mettre à jour les scripts de l'onglet actuel
 userScriptsPermissionNote:
   description: Text in the popup or dashboard.
-  message: ''
+  message: >-
+    Veuillez activer « Autoriser les scripts utilisateur » dans les détails de
+    Violentmonkey dans chrome://extensions et recharger l'onglet.
 userScriptsPermissionNoteOld:
   description: Text in the popup or dashboard in older browsers.
   message: ''

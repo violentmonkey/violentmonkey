@@ -176,6 +176,11 @@ descScriptTemplate:
   message: >-
     使用可能な変数: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>, <{{date:format}}>
     はMomentJS互換、例 <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: グループ
@@ -453,8 +458,7 @@ labelFastInject:
   message: 別の $1 モード
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: >-
-    <document-start>スクリプトの別の挿入方法で、標準の方法より高速です。同期ページモードと同じくメモリ消費量が増加するので、このオプションを使わずにスクリプトが正常に動作するなら無効にします。
+  message: <document-start>スクリプトの別の挿入方法で、標準の方法より高速です。同期ページモードと同じくメモリ消費量が増加するので、このオプションを使わずにスクリプトが正常に動作するなら無効にします。
 labelFeedback:
   description: Label of link to feedback page.
   message: 意見や報告
@@ -623,6 +627,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: なし
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: ''
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: ''
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: ''
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: ''
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: ''
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: ''
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: ''
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'パスワード: '
@@ -694,8 +721,7 @@ labelXhrInject:
   message: $1同期モード
 labelXhrInjectHint:
   description: Tooltip of the `Synchronous page mode` option in Advanced settings.
-  message: >-
-    スクリプトがページの読み込み前に実行される必要があり、現在その実行が遅い場合のみ有効化します。Tampermonkeyの挿入方法「即時」と同じく、これも非推奨のXHRの同期を使うため、Chrome/Chromiumでは開発者ツールのコンソールに警告が表示されます。警告は右クリックで非表示にできます。
+  message: スクリプトがページの読み込み前に実行される必要があり、現在その実行が遅い場合のみ有効化します。Tampermonkeyの挿入方法「即時」と同じく、これも非推奨のXHRの同期を使うため、Chrome/Chromiumでは開発者ツールのコンソールに警告が表示されます。警告は右クリックで非表示にできます。
 labelXhrInjectNote:
   description: Shown to the right of "synchronous page mode" in options.
   message: (シークレットモードやクッキー無効中のサイトを除く)
@@ -894,6 +920,11 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: 同期を開始中…
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: ''
 msgSyncing:
   description: Message shown when sync is in progress.
   message: 同期中…
@@ -1068,6 +1099,17 @@ titleSearchHintV2:
 
     * 正規表現: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: ''
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: ''
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: ''
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: ユーザースクリプト挿入の切替

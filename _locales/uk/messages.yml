@@ -1,6 +1,6 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
-  message: Застосувати
+  message: Apply
 buttonCancel:
   description: Cancel button on dialog.
   message: Скасувати
@@ -39,7 +39,7 @@ buttonEmptyRecycleBin:
   message: Очистити кошик зараз
 buttonEnable:
   description: Button to enable a script.
-  message: Ввімкнути
+  message: Enable
 buttonExportData:
   description: Button to open the data export dialog.
   message: Експорт в zip-файл
@@ -188,6 +188,11 @@ descEditorOptionsVM:
     крапки.
 descScriptTemplate:
   description: Description of script template section.
+  message: ''
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
   message: ''
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
@@ -658,6 +663,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: нічим
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: ''
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: ''
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: ''
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: ''
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: ''
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: ''
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: ''
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Пароль:'
@@ -939,6 +967,11 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: Синхронізація скоро почнеться...
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: ''
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Синхронізація...
@@ -1125,6 +1158,17 @@ titleSearchHintV2:
 
     * Регулярні вирази: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: ''
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: ''
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: ''
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Увімкнути/вимкнути ін'єкцію юзерскрипт

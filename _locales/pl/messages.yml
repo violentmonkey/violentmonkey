@@ -184,6 +184,13 @@ descScriptTemplate:
   message: >-
     Obsługiwane zmienne: <{{name}}>, <{{url}}>, <{{icon}}>, <{{date}}>,
     <{{date:format}}> w formacie zgodnym z MomentJS, np. <{{date:YYYY-MM-DD}}>.
+descSyncGitRepoPreexisting:
+  description: >-
+    Note explaining the repository must already exist; Violentmonkey never
+    creates it.
+  message: >-
+    Repozytorium musi już istnieć — Violentmonkey nigdy go za Ciebie nie utworzy
+    ani nie zainicjuje.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: grupuj
@@ -583,7 +590,7 @@ labelName:
   message: 'Nazwa skryptu:'
 labelNoFrames:
   description: Label of script @noframes properties in custom meta data.
-  message: 'Uruchom w ramkach:'
+  message: 'Uruchom w ramkach: '
 labelNoName:
   description: Text as the name of a script when no @name is assigned.
   message: Bez nazwy
@@ -620,7 +627,7 @@ labelRelated:
   message: 'Powiązane linki: '
 labelRemovedAt:
   description: Label for the time when the script is removed.
-  message: 'Usunięto  $1 '
+  message: Usunięto $1
 labelReplace:
   description: Label for replace input in search box.
   message: 'Zamień na: '
@@ -672,6 +679,29 @@ labelSyncAutomatically:
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: Żaden
+labelSyncGitApiBase:
+  description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
+  message: 'Bazowy adres URL API: '
+labelSyncGitBranch:
+  description: Label for the Git branch input.
+  message: 'Gałąź:'
+labelSyncGitCreateMethod:
+  description: >-
+    Label for the Git file-creation-method select, matching the createMethod
+    option key.
+  message: 'Metoda tworzenia pliku:'
+labelSyncGitOwner:
+  description: Label for the Git repository owner input.
+  message: 'Właściciel:'
+labelSyncGitPathPrefix:
+  description: Label for the Git path-prefix input (folder within the repo).
+  message: 'Prefiks ścieżki:'
+labelSyncGitRepo:
+  description: Label for the Git repository name input.
+  message: 'Repozytorium:'
+labelSyncGitToken:
+  description: Label for the Git access token input.
+  message: 'Token dostępu:'
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Hasło:'
@@ -684,40 +714,40 @@ labelSyncRevoke:
   message: Unieważnij
 labelSyncS3AccessKeyId:
   description: Label for S3 access key ID input.
-  message: 'Identyfikator klucza dostępu:'
+  message: 'Identyfikator klucza dostępu: '
 labelSyncS3Bucket:
   description: Label for S3 bucket name input.
   message: 'Kontener: '
 labelSyncS3Endpoint:
   description: Label for custom S3-compatible endpoint URL input (leave blank for AWS).
-  message: 'Własny punkt końcowy:'
+  message: 'Własny punkt końcowy: '
 labelSyncS3Prefix:
   description: Label for S3 key prefix input (folder within the bucket).
-  message: 'Przedrostek klucza:'
+  message: 'Przedrostek klucza: '
 labelSyncS3Region:
   description: Label for S3 region input.
   message: 'Region: '
 labelSyncS3SecretAccessKey:
   description: Label for S3 secret access key input.
-  message: 'Tajny klucz dostępu:'
+  message: 'Tajny klucz dostępu: '
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: Synchronizuj stan skryptu
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'Adres serwera:'
+  message: 'Adres URL serwera: '
 labelSyncService:
   description: Label for sync service select.
   message: Synchronizuj z
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 'Nazwa użytkownika:'
+  message: 'Nazwa użytkownika: '
 labelTags:
   description: Label for custom tags. Don't translate @tag.
   message: '@tag / tagi'
 labelTheme:
   description: Label for the visual theme option.
-  message: 'Motyw:'
+  message: 'Motyw: '
 labelTranslator:
   description: Label of translator.
   message: 'Tłumacze: '
@@ -956,6 +986,13 @@ msgSyncReady:
   description: Message shown when sync will start soon.
   message: Synchronizacja rozpocznie się wkrótce...
   touched: false
+msgSyncRepoNotFound:
+  description: >-
+    Message shown when the configured Git repository was not found, or the token
+    can't access it. Violentmonkey never creates it automatically.
+  message: >-
+    Nie znaleziono repozytorium. Najpierw je utwórz, a następnie upewnij się, że
+    Twój token ma do niego dostęp.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Trwa synchronizacja...
@@ -1016,7 +1053,7 @@ optionPopupShowDisabled:
   touched: false
 optionShowEnabledFirst:
   description: Option to show enabled scripts first in alphabetical order.
-  message: Pokaź najpierw włączone skrypty
+  message: Pokaż najpierw włączone skrypty
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
   message: 'Motyw interfejsu:'
@@ -1087,7 +1124,7 @@ sideMenuInstalled:
   message: Zainstalowane skrypty
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: Scripts
+  message: Skrypty
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: Ustawienia
@@ -1142,6 +1179,23 @@ titleSearchHintV2:
 
     * Wyrażenia regularne: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
     <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+titleSyncGitCreateMethod:
+  description: >-
+    Hover title for the Git file-creation-method select, explaining when to
+    change it.
+  message: >-
+    Jeśli synchronizacja nie powiedzie się podczas pierwszego tworzenia pliku,
+    spróbuj użyć drugiej metody.
+titleSyncGitPathPrefix:
+  description: Hover title for the Git path-prefix input, clarifying what it does.
+  message: >-
+    Synchronizuj z tym podkatalogiem repozytorium zamiast z jego katalogiem
+    głównym. Opcjonalne.
+titleSyncGitToken:
+  description: Hover title for the Git access token input, clarifying required permissions.
+  message: >-
+    Wymaga uprawnień do odczytu i zapisu zawartości repozytorium (repozytorium
+    musi już istnieć).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Przełącz tryb wstrzykiwania skryptu użytkownika
