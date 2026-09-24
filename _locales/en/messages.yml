@@ -928,6 +928,9 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Please re-save or reinstall these script(s):'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: Violentmonkey must be restarted to finish updating from $1 to $2.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (code is the same)'

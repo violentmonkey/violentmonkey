@@ -7,7 +7,10 @@ import storage from './storage';
 
 let changes;
 
-export const getAllOptions = () => ({ ...defaults, ...options });
+export const getAllOptions = () => [
+  __.VM_VER,
+  { ...defaults, ...options },
+];
 const options = {};
 export const kOptions = 'options';
 export const kVersion = 'version';

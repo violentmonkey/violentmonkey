@@ -1,20 +1,28 @@
-import { initHooks } from '.';
+import { i18n, initHooks } from '.';
 import handlers from './handlers';
 import { sendCmdDirectly } from './messaging';
 import { forEachEntry, objectGet, objectSet } from './object';
 import defaults from './options-defaults';
 
 let options = {};
-const { hook, fire } = initHooks(() => options);
+const { hook, fire } = initHooks();
 const ready = (async () => {
+  let res, ver, vBG;
   if (__.MV3 && (
-    options = BGDATA.opts
+    res = BGDATA.opts
   )) {
     await 0; // let the app attach its hooks
   } else {
-    options = await sendCmdDirectly('GetAllOptions', null, { retry: true });
+    res = await sendCmdDirectly('GetAllOptions', null, { retry: true });
   }
-  if (options) fire(options);
+  if (res) {
+    [vBG, options] = res;
+    if (__.MV3 && vBG !== (ver = __.VM_VER) && confirm(i18n('msgRestartToUpdate', [vBG, ver]))) {
+      chrome.runtime.reload();
+      close();
+    }
+    fire(options);
+  }
 })();
 
 Object.assign(handlers, {
