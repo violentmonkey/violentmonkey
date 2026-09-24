@@ -329,6 +329,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URLを入力:'
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: 削除したスクリプトはここに7日間表示されます。
@@ -378,6 +381,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: スクリプト更新を $1 日ごとに確認 (0 で無効)
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: バックアップ
@@ -700,6 +704,18 @@ labelTranslator:
   description: Label of translator.
   message: '翻訳者: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: '更新を確認するURL:'

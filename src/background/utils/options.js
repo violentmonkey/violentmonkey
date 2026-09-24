@@ -1,6 +1,7 @@
 import { compareVersion, debounce, initHooks, normalizeKeys } from '@/common';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
-import defaults, { kScriptTemplate } from '@/common/options-defaults';
+import defaults, { kScriptTemplate, kUpdateCron } from '@/common/options-defaults';
+import { migrateAutoUpdate, normalizeUpdateCron } from '@/common/cron';
 import broadcast from './broadcast';
 import { addOwnCommands, init, initDependency } from './init';
 import storage from './storage';
@@ -34,6 +35,9 @@ addOwnCommands({
    * @return {void}
    * @throws {?} hooks can throw after the option was set */
   SetOptions(data) {
+    if (data[kUpdateCron] == null && data.autoUpdate != null) {
+      data = { ...data, [kUpdateCron]: migrateAutoUpdate(data.autoUpdate) };
+    }
     for (const key in data) setOption(key, data[key], true);
     callHooks(); // exceptions will be sent to the caller
   },
@@ -43,6 +47,10 @@ export function initOptions(data, lastVersion, versionChanged) {
   for (const key in options) delete options[key];
   data = data[kOptions] || {};
   Object.assign(options, data);
+  if (options[kUpdateCron] == null && options.autoUpdate != null) {
+    options[kUpdateCron] = migrateAutoUpdate(options.autoUpdate);
+    writeOptionsLater();
+  }
   if (__.DEBUG) console.info('options:', options);
   if (!options[kVersion]) {
     setOption(kVersion, 1);
@@ -112,6 +120,7 @@ export function setOption(key, value, silent) {
   const keys = normalizeKeys(key);
   const mainKey = keys[0];
   key = keys.join('.'); // must be a string for addChange()
+  if (key === kUpdateCron) value = normalizeUpdateCron(value);
   if (!hasOwnProperty(defaults, mainKey)) {
     if (__.DEBUG) console.info('Unknown option:', key, value, options);
     return;

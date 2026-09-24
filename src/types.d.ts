@@ -421,6 +421,7 @@ declare namespace VMReq {
   interface OptionsMulti extends Options {
     /** truthy = multi script update, 'auto' = autoUpdate, falsy = single */
     multi?: boolean | 'auto';
+    updateLastCheck?: number;
   }
   type Response = (ResponseOK | Error) & {
     url: string;

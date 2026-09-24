@@ -331,6 +331,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 請輸入網址：
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: 本區域會顯示所有被移除的腳本，這些腳本將會被保留 7 天。
@@ -380,6 +383,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 每 $1 天檢查腳本更新，設定為 0 則停用
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: 備份
@@ -702,6 +706,18 @@ labelTranslator:
   description: Label of translator.
   message: 翻譯者：
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 更新網址：

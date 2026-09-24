@@ -1,4 +1,5 @@
 import { BLACKLIST, BLACKLIST_NET, FILE_GLOB_ALL } from '@/common/consts';
+import { DEFAULT_UPDATE_CRON } from './cron';
 
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
 export const kEditAsString = 'editAsString';
@@ -11,6 +12,7 @@ export const kPopupWidth = 'popupWidth';
 export const kShowTrailingSpace = 'showTrailingSpace';
 export const kScriptTemplate = 'scriptTemplate';
 export const kUpdateEnabledScriptsOnly = 'updateEnabledScriptsOnly';
+export const kUpdateCron = 'updateCron';
 export const kValueEditor = 'valueEditor';
 const defaultsEditorCommon = {
   [kAutocompleteOnTyping]: 100,
@@ -35,7 +37,9 @@ export default {
   [kGmCookieHttpOnly]: false,
   [kGmDownloadViaApi]: false,
   [kPageMenuCommands]: false,
-  autoUpdate: 1, // days, 0 = disable
+  /** @deprecated Kept for backward compatibility; will be removed in the future. */
+  autoUpdate: 1,
+  [kUpdateCron]: DEFAULT_UPDATE_CRON,
   // ignoreGrant: false,
   lastUpdate: 0,
   lastModified: 0,

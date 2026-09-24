@@ -359,6 +359,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Wprowadź adres URL:'
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Usunięte skrypty są wymienione tutaj i będą przechowywane przez 7 dni.
@@ -412,6 +415,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Sprawdzaj aktualizacje skryptów co $1 dni; użyj 0, aby wyłączyć
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Kopia zapasowa
@@ -752,6 +756,18 @@ labelTranslator:
   description: Label of translator.
   message: 'Tłumacze: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Adres URL aktualizacji:'

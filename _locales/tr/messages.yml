@@ -364,6 +364,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL''yi girin:'
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Kaldırdığınız betikler burada listelenir ve 7 gün boyunca tutulur.
@@ -419,6 +422,7 @@ labelAutoUpdate:
   message: >-
     Her $1 günde bir betik güncellemelerini kontrol edin; devre dışı bırakmak
     için 0 değerini kullanın
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Yedekle
@@ -756,6 +760,18 @@ labelTranslator:
   description: Label of translator.
   message: 'Çeviren: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Güncelleme URL''si:'

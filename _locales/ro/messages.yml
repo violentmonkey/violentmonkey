@@ -358,6 +358,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Introdu URL-ul:'
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Scripturile eliminate sunt listate aici și vor fi păstrate timp de 7 zile.
@@ -413,6 +416,7 @@ labelAutoUpdate:
   message: >-
     Caută actualizări pentru scripturi la fiecare  $1 zi(le), folosește 0 pentru
     a dezactiva
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
@@ -739,6 +743,18 @@ labelTranslator:
   description: Label of translator.
   message: 'Traducător: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL pentru actualizare:'

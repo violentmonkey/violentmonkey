@@ -350,6 +350,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URL đầu vào:'
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Các tập lệnh bị xóa được liệt kê ở đây và sẽ được lưu giữ trong 7 ngày.
@@ -399,6 +402,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Kiểm tra cập nhật mỗi  $1 ngày, 0 = tắt
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Sao lưu
@@ -732,6 +736,18 @@ labelTranslator:
   description: Label of translator.
   message: 'Dịch bởi: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL Cập nhật:'
