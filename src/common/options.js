@@ -16,7 +16,7 @@ const ready = (async () => {
     res = await sendCmdDirectly('GetAllOptions', null, { retry: true });
   }
   if (res) {
-    [vBG, options] = res;
+    [vBG, options] = !__.MV3 || Array.isArray(res) ? res : ['*', res];
     if (__.MV3 && vBG !== (ver = __.VM_VER) && confirm(i18n('msgRestartToUpdate', [vBG, ver]))) {
       chrome.runtime.reload();
       close();
