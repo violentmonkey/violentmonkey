@@ -405,6 +405,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Check for script updates every $1 day(s), use 0 to disable
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Backup
@@ -435,6 +436,30 @@ labelComment:
 labelContributors:
   description: Label for link to contributors.
   message: Contributors
+labelCronDaily:
+  description: Shortcut for a daily cron schedule.
+  message: daily
+labelCronDayOfMonth:
+  description: Label for the day-of-month field in a cron expression.
+  message: Day of Month
+labelCronDayOfWeek:
+  description: Label for the day-of-week field in a cron expression.
+  message: Day of Week
+labelCronHour:
+  description: Label for the hour field in a cron expression.
+  message: Hour
+labelCronHourly:
+  description: Shortcut for an hourly cron schedule.
+  message: hourly
+labelCronMinute:
+  description: Label for the minute field in a cron expression.
+  message: Minute
+labelCronMonth:
+  description: Label for the month field in a cron expression.
+  message: Month
+labelCronTwiceADay:
+  description: Shortcut for a cron schedule that runs twice a day.
+  message: twice a day
 labelCurrentLang:
   description: Label of current language.
   message: 'Current Language: '
