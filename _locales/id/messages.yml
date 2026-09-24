@@ -339,6 +339,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'Masukkan URL:'
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Skrip yang dihapus ditampilkan di sini dan akan disimpan selama 7 hari.
@@ -392,6 +395,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: Periksa pembaruan skrip setiap $1 hari, gunakan 0 untuk menonaktifkan
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Cadangkan
@@ -422,6 +426,30 @@ labelComment:
 labelContributors:
   description: Label for link to contributors.
   message: Kontributor
+labelCronDaily:
+  description: Shortcut for a daily cron schedule.
+  message: ''
+labelCronDayOfMonth:
+  description: Label for the day-of-month field in a cron expression.
+  message: ''
+labelCronDayOfWeek:
+  description: Label for the day-of-week field in a cron expression.
+  message: ''
+labelCronHour:
+  description: Label for the hour field in a cron expression.
+  message: ''
+labelCronHourly:
+  description: Shortcut for an hourly cron schedule.
+  message: ''
+labelCronMinute:
+  description: Label for the minute field in a cron expression.
+  message: ''
+labelCronMonth:
+  description: Label for the month field in a cron expression.
+  message: ''
+labelCronTwiceADay:
+  description: Shortcut for a cron schedule that runs twice a day.
+  message: ''
 labelCurrentLang:
   description: Label of current language.
   message: 'Bahasa Saat Ini: '
@@ -718,6 +746,18 @@ labelTranslator:
   description: Label of translator.
   message: 'Penerjemah: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL Pembaruan:'

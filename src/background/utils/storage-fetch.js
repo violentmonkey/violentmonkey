@@ -1,7 +1,6 @@
 import { isCdnUrlRe, isDataUri, isRemote, makeRaw } from '@/common';
 import { NO_CACHE } from '@/common/consts';
 import storage from './storage';
-import { getUpdateInterval } from './update';
 import { request, requestLimited } from './url';
 
 storage.cache.fetch = cacheOrFetch({
@@ -59,7 +58,8 @@ export async function requestNewer(url, opts) {
   && isObject(modOld = await storage.mod.getOne(url))) {
     [modOld, modDate] = modOld;
   }
-  if (multi === AUTO && modDate > Date.now() - getUpdateInterval()) {
+  if (multi === AUTO && opts?.updateLastCheck
+  && modDate > opts.updateLastCheck) {
     return;
   }
   for (const get of multi ? [0, 1] : [1]) {

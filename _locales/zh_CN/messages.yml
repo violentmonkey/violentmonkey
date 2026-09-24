@@ -332,6 +332,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 请输入地址：
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: 此处列出已删除的脚本，并将保留7天。
@@ -381,6 +384,7 @@ labelAutoReloadCurrentTabDisabled:
 labelAutoUpdate:
   description: Option to allow automatically checking scripts for updates
   message: 每 $1 天检查一次脚本更新，0 表示禁用
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: 备份
@@ -411,6 +415,30 @@ labelComment:
 labelContributors:
   description: Label for link to contributors.
   message: 贡献者
+labelCronDaily:
+  description: Shortcut for a daily cron schedule.
+  message: ''
+labelCronDayOfMonth:
+  description: Label for the day-of-month field in a cron expression.
+  message: ''
+labelCronDayOfWeek:
+  description: Label for the day-of-week field in a cron expression.
+  message: ''
+labelCronHour:
+  description: Label for the hour field in a cron expression.
+  message: ''
+labelCronHourly:
+  description: Shortcut for an hourly cron schedule.
+  message: ''
+labelCronMinute:
+  description: Label for the minute field in a cron expression.
+  message: ''
+labelCronMonth:
+  description: Label for the month field in a cron expression.
+  message: ''
+labelCronTwiceADay:
+  description: Shortcut for a cron schedule that runs twice a day.
+  message: ''
 labelCurrentLang:
   description: Label of current language.
   message: 当前语言：
@@ -707,6 +735,18 @@ labelTranslator:
   description: Label of translator.
   message: 翻译者：
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 检查更新地址：

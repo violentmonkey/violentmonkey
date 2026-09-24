@@ -25,10 +25,14 @@
       <h3 v-text="i18n('optionUpdate')"/>
       <div class="ml-2c flex flex-col">
         <label>
-          <locale-group i18n-key="labelAutoUpdate">
-            <input v-model="settings.autoUpdate" type="number" min=0 max=365 step=1/>
-          </locale-group>
+          <span v-text="i18n('labelUpdateSchedule')"/>
+          <select class="ml-1" :value="updateMode" @change="onUpdateModeChange">
+            <option value="disabled" v-text="i18n('labelUpdateDisabled')"/>
+            <option value="daily" v-text="i18n('labelUpdateDaily')"/>
+            <option value="custom" v-text="i18n('labelUpdateCustom')"/>
+          </select>
         </label>
+        <setting-cron v-if="updateMode === 'custom'" :name="kUpdateCron"/>
         <setting-check :name="kUpdateEnabledScriptsOnly"
                        :label="i18n('labelEnabledScriptsOnly')" />
       </div>
@@ -126,7 +130,7 @@ import browser from '@/common/browser';
 import { kDownloads, KNOWN_INJECT_INTO, VM_DOCS_INJECT_INTO } from '@/common/consts';
 import options from '@/common/options';
 import {
-  kGmCookieHttpOnly, kGmDownloadViaApi, kScriptTemplate, kUpdateEnabledScriptsOnly,
+  kGmCookieHttpOnly, kGmDownloadViaApi, kScriptTemplate, kUpdateCron, kUpdateEnabledScriptsOnly,
 } from '@/common/options-defaults';
 import { keyboardService } from '@/common/keyboard';
 import { EXTERNAL_LINK_PROPS, focusMe, getActiveElement } from '@/common/ui';
@@ -134,7 +138,6 @@ import { hookSettingsForUI } from '@/common/ui/util';
 import { store } from '@/options/utils';
 
 const items = {
-  autoUpdate: value => Math.max(0, Math.min(365, +value || 0)),
   defaultInjectInto: { ...KNOWN_INJECT_INTO },
   showAdvanced: value => value,
   uiTheme: {
@@ -151,10 +154,12 @@ const CAN_FAST_INJECT = __.MV3 || browser.contentScripts;
 
 <script setup>
 import { noop, sendCmdDirectly } from '@/common';
+import { DEFAULT_UPDATE_CRON } from '@/common/cron';
 import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import LocaleGroup from '@/common/ui/locale-group';
 import SettingCheck from '@/common/ui/setting-check';
+import SettingCron from '@/common/ui/setting-cron.vue';
 import SettingText from '@/common/ui/setting-text';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import VmImport from './vm-import';
@@ -165,12 +170,14 @@ import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
 import VmDateInfo from './vm-date-info';
 import { kbdTypable } from '@/common/keyboard';
+import hookSetting from '@/common/hook-setting';
 
 const $el = ref();
 const $dlApi = ref();
 const granting = ref();
 const settings = reactive({});
 const expose = ref();
+const updateMode = ref('disabled');
 let revokers;
 let dlApiInput;
 
@@ -179,6 +186,11 @@ onActivated(() => {
   revokers = [
     keyboardService.register('ctrlcmd-KeyS', ctrlS, { condition: kbdTypable }),
     ...hookSettingsForUI(items, settings, watch, 50),
+    hookSetting(kUpdateCron, value => {
+      const schedule = value || '';
+      updateMode.value = !schedule ? 'disabled'
+        : schedule === DEFAULT_UPDATE_CRON ? 'daily' : 'custom';
+    }),
   ];
   expose.value = Object.keys(options.get(EXPOSE)).map(k => [k, decodeURIComponent(k)]);
   // TODO: find out why using @click on <setting-check> fires twice
@@ -189,6 +201,11 @@ onDeactivated(() => {
   revokers.forEach(r => r());
   revokers = null;
 });
+function onUpdateModeChange({ target: { value } }) {
+  updateMode.value = value;
+  if (value === 'disabled') options.set(kUpdateCron, '');
+  else if (value === 'daily') options.set(kUpdateCron, DEFAULT_UPDATE_CRON);
+}
 async function requestDownloadsPermission() {
   if (dlApiInput.checked) {
     granting.value = true;

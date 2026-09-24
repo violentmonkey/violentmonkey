@@ -369,6 +369,9 @@ hintGrantless:
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: "URL source\_: "
+hintInvalidCron:
+  description: Error shown for an invalid five-field cron expression
+  message: ''
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Les scripts supprimés sont listés ici et conservés pendant 7 jours.
@@ -428,6 +431,7 @@ labelAutoUpdate:
   message: >-
     Vérifier les mises à jour de scripts tous les $1 jour(s), renseigner 0 pour
     désactiver
+  touched: false
 labelBackup:
   description: Label of the import/export section in settings.
   message: Sauvegarde
@@ -458,6 +462,30 @@ labelComment:
 labelContributors:
   description: Label for link to contributors.
   message: Contributeurs
+labelCronDaily:
+  description: Shortcut for a daily cron schedule.
+  message: ''
+labelCronDayOfMonth:
+  description: Label for the day-of-month field in a cron expression.
+  message: ''
+labelCronDayOfWeek:
+  description: Label for the day-of-week field in a cron expression.
+  message: ''
+labelCronHour:
+  description: Label for the hour field in a cron expression.
+  message: ''
+labelCronHourly:
+  description: Shortcut for an hourly cron schedule.
+  message: ''
+labelCronMinute:
+  description: Label for the minute field in a cron expression.
+  message: ''
+labelCronMonth:
+  description: Label for the month field in a cron expression.
+  message: ''
+labelCronTwiceADay:
+  description: Shortcut for a cron schedule that runs twice a day.
+  message: ''
 labelCurrentLang:
   description: Label of current language.
   message: "Langue actuelle\_: "
@@ -767,6 +795,18 @@ labelTranslator:
   description: Label of translator.
   message: 'Traducteur·ice·s: '
   touched: false
+labelUpdateCustom:
+  description: Option to enter a custom five-field cron expression for script update checks
+  message: ''
+labelUpdateDaily:
+  description: Option to check for script updates every day at noon
+  message: ''
+labelUpdateDisabled:
+  description: Option to disable automatic script update checks
+  message: ''
+labelUpdateSchedule:
+  description: Option to configure automatic script update checks
+  message: ''
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: "URL de mise à jour\_: "
