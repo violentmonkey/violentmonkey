@@ -1,6 +1,7 @@
 import browser from './browser';
+import { handlersSW } from './messaging-sw';
 
-const handlers = {
+const handlers = __.MV3 ? handlersSW : {
   __proto__: null,
 };
 

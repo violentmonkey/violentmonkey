@@ -75,10 +75,7 @@ async function main() {
     await handleAddon();
   } catch (err) {
     if (err?.message === 'Polling skipped') {
-      if (beta) {
-        error = new Error('Pending review');
-        error.stack = '';
-      }
+      // Pending review
     } else {
       error = err;
     }

@@ -59,14 +59,23 @@ If you already use Violentmonkey, click \`Export to zip\` in settings before ins
 
 export async function createRelease() {
   console.info('Create release:', tag);
-  const result = await getOctokit().rest.repos.createRelease({
-    ...github.context.repo,
-    tag_name: tag,
-    name: process.env.RELEASE_NAME,
-    body: getReleaseNote(),
-    prerelease: process.env.PRERELEASE == 'true',
-  });
-  return result.data;
+  try {
+    const result = await getOctokit().rest.repos.createRelease({
+      ...github.context.repo,
+      tag_name: tag,
+      name: process.env.RELEASE_NAME,
+      body: getReleaseNote(),
+      prerelease: process.env.PRERELEASE == 'true',
+    });
+    return result.data;
+  } catch (err) {
+    // Release may have been created concurrently by another job
+    if (err?.status === 422) {
+      const existing = await getRelease();
+      if (existing) return existing;
+    }
+    throw err;
+  }
 }
 
 export async function ensureRelease() {
@@ -87,12 +96,21 @@ export async function uploadAssets() {
   );
   for (const asset of assets) {
     console.info(`> Upload asset: ${asset}`);
-    await getOctokit().rest.repos.uploadReleaseAsset({
-      ...github.context.repo,
-      release_id: release.id,
-      name: asset,
-      data: await readFile(join(ASSETS_DIR, asset)),
-    });
+    try {
+      await getOctokit().rest.repos.uploadReleaseAsset({
+        ...github.context.repo,
+        release_id: release.id,
+        name: asset,
+        data: await readFile(join(ASSETS_DIR, asset)),
+      });
+    } catch (err) {
+      // Another job may have uploaded the same asset concurrently
+      if (err?.status === 422) {
+        console.info(`> Asset already uploaded (skipped): ${asset}`);
+        continue;
+      }
+      throw err;
+    }
   }
   if (assets.length) console.info('Done');
   else console.info('No asset to upload');

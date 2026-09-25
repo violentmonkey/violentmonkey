@@ -1,0 +1,21 @@
+name: Setup release environment
+description: Install dependencies and export release env vars
+inputs:
+  discord-webhook:
+    description: Discord webhook URL for release notifications
+    required: false
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v6
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version-file: 'package.json'
+
+    - name: Install & export env
+      shell: bash
+      env:
+        ACTION_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        DISCORD_WEBHOOK_RELEASE: ${{ inputs.discord-webhook }}
+      run: pnpm ci && node scripts/action-helper.js

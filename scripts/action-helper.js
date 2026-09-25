@@ -6,6 +6,9 @@ const version = process.env.VERSION || getVersion();
 const beta = isBeta();
 const ci = process.argv.includes('ci');
 
+const CWS_EXT_ID_BETA = 'opokoaglpekkimldnlggpoagmjegichg';
+const CWS_EXT_ID_RELEASE = 'jinjaccalgkegednnccohejagnlnfdag';
+
 const envs = {
   VERSION: version,
   RELEASE_NAME: [
@@ -24,6 +27,7 @@ const envs = {
   DISCORD_WEBHOOK_RELEASE: process.env.DISCORD_WEBHOOK_RELEASE,
 };
 
+envs.CWS_EXT_ID = envs.PRERELEASE ? CWS_EXT_ID_BETA : CWS_EXT_ID_RELEASE;
 envs.SOURCE_ZIP = `${envs.RELEASE_PREFIX}-${envs.VERSION}-source.zip`;
 envs.ASSET_ZIP = `${envs.RELEASE_PREFIX}-webext-v${envs.VERSION}.zip`;
 envs.ASSET_CWS_ZIP = `${envs.RELEASE_PREFIX}-mv3-v${envs.VERSION}.zip`;

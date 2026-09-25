@@ -52,14 +52,12 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     .filter(Boolean);
   if (ids.length) {
     const scope = store[SCRIPTS][isTop ? 0 : 1];
-    const { menus } = data;
     const { grantless } = data;
     const metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id))
       || (Object.assign(data, await sendCmdDirectly('GetData', { ids })))[SCRIPTS];
     metas.forEach(script => {
       const { id } = script.props;
       const state = idMap[id];
-      const cmds = menus[id];
       const content = script.c = state === CONTENT && state;
       const more = state === MORE;
       const badRealm = state === ID_BAD_REALM;
@@ -86,20 +84,18 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
         store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
       }
       loadScriptIcon(script, data);
-      if (cmds) {
-        const menuScript = !isTop && id in idMapMain
-          && store[SCRIPTS][0].find(({ props }) => props.id === id)
-          || script;
-        const menu = menuScript.cmds ||= new Map();
-        for (const cmd in cmds) {
-          if (!menu.has(cmd)) { // Adding new commands at the end
-            v = cmds[cmd];
-            menu.set(cmd, v);
-            loadCommandIcon(v, store);
-          }
-        }
-      }
     });
+  }
+  for (const id in data.menus) {
+    const cmds = data.menus[id];
+    const scope = store[SCRIPTS][isTop || id in idMapMain ? 0 : 1];
+    const script = scope.find(({ props }) => props.id === +id) || {};
+    const menu = script.cmds = new Map();
+    for (const cmd in cmds) {
+      v = cmds[cmd];
+      menu.set(cmd, v);
+      loadCommandIcon(v, store);
+    }
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
   if (!hPrev) {

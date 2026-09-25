@@ -2,9 +2,9 @@ import { registerInjector } from '@/common/browser-scripts-api';
 import { kContentType, kMainFrame } from '@/common/consts';
 import { DNR, DNR_ID_INSTALL } from './dnr';
 import { inIncognitoContext } from './init';
-import { kAlarmRemove, kAlarmUpdate } from './session-data';
+import { kAlarmRemove } from './session-data';
 import { CHROME } from './ua';
-import { getUpdateInterval } from './update';
+import { autoUpdate } from './update';
 
 export const NEW_INSTALL = '0';
 export let installedOver;
@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener(({reason, previousVersion}) => {
       registerInjector(true);
       chrome.alarms.clearAll().then(() => [
         chrome.alarms.create(kAlarmRemove, { periodInMinutes: 24 * 60 }),
-        chrome.alarms.create(kAlarmUpdate, { periodInMinutes: getUpdateInterval() / 60e3 }),
+        autoUpdate(),
       ]);
       DNR.getDynamicRules().then(rules => DNR.updateDynamicRules({
         removeRuleIds: rules.map(r => r.id),

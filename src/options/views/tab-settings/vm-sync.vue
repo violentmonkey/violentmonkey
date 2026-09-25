@@ -156,6 +156,65 @@
         />
       </div>
     </fieldset>
+    <fieldset v-if="rService && rAuthType === GIT_AUTH" class="mt-1c">
+      <div class="mr-2c">
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncGitOwner')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[OWNER]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncGitRepo')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[REPO]"
+            :disabled="!rCanUpdateConfig"
+          />
+        </label>
+        <label class="inline-block">
+          <span v-text="i18n('labelSyncGitBranch')"></span>
+          <input
+            type="text"
+            v-model="rUserConfig[BRANCH]"
+            :disabled="!rCanUpdateConfig"
+            placeholder="main"
+          />
+        </label>
+        <label class="inline-block" :title="i18n('titleSyncGitCreateMethod')">
+          <span v-text="i18n('labelSyncGitCreateMethod')"></span>
+          <select v-model="rUserConfig[CREATE_METHOD]" :disabled="!rCanUpdateConfig">
+            <option value="put">PUT - GitHub / GHES</option>
+            <option value="post">POST - Gitea / Forgejo</option>
+          </select>
+        </label>
+      </div>
+      <label
+        v-for="{ key, label, type, placeholder, hint } in GIT_FIELDS"
+        :key="key"
+        class="sync-server-url flex pre"
+        :title="hint"
+      >
+        <span v-text="label"></span>
+        <input
+          :type="type"
+          class="flex-1"
+          v-model="rUserConfig[key]"
+          :disabled="!rCanUpdateConfig"
+          :placeholder="placeholder"
+        />
+      </label>
+      <p class="text-sm" v-text="i18n('descSyncGitRepoPreexisting')"></p>
+      <div>
+        <button
+          v-text="i18n('buttonSave')"
+          @click.prevent="onSaveUserConfig"
+          :disabled="!rCanUpdateConfig"
+        />
+      </div>
+    </fieldset>
     <div class="flex mr-2c">
       <setting-check
         name="syncAutomatically"
@@ -177,9 +236,16 @@ import { i18n, sendCmdDirectly } from '@/common';
 import {
   ACCESS_KEY_ID,
   ANONYMOUS,
+  API_BASE,
+  BRANCH,
   BUCKET,
+  CREATE_METHOD,
+  GIT_AUTH,
+  OWNER,
   PASSWORD,
+  PATH_PREFIX,
   REGION,
+  REPO,
   S3_AUTH,
   S3_ENDPOINT,
   S3_PREFIX,
@@ -193,7 +259,7 @@ import {
 } from '@/common/consts-sync';
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import { store } from '../../utils';
@@ -203,6 +269,7 @@ import {
   SYNC_ERROR,
   SYNC_ERROR_AUTH,
   SYNC_ERROR_INIT,
+  SYNC_ERROR_REPO_NOT_FOUND,
   SYNC_IN_PROGRESS,
   SYNC_INITIALIZING,
   SYNC_UNAUTHORIZED,
@@ -244,6 +311,30 @@ const rService = ref();
 const rSyncServices = ref();
 const rUserConfig = ref();
 //#endregion
+const GIT_FIELDS = computed(() => [
+  {
+    key: API_BASE,
+    label: i18n('labelSyncGitApiBase'),
+    type: 'url',
+    placeholder:
+      rUserConfig.value?.[CREATE_METHOD] === 'post'
+        ? 'https://your-gitea-host/api/v1'
+        : 'https://api.github.com',
+  },
+  {
+    key: PATH_PREFIX,
+    label: i18n('labelSyncGitPathPrefix'),
+    type: 'text',
+    placeholder: 'optional, e.g. userscripts',
+    hint: i18n('titleSyncGitPathPrefix'),
+  },
+  {
+    key: PASSWORD,
+    label: i18n('labelSyncGitToken'),
+    type: 'password',
+    hint: i18n('titleSyncGitToken'),
+  },
+]);
 hookSetting(SYNC_CURRENT, (value) => {
   rCurrentName.value = value || '';
 });
@@ -287,9 +378,12 @@ function setRefs(srv) {
     [SYNC_AUTHORIZED, SYNC_ERROR, SYNC_ERROR_INIT, SYNC_ERROR_AUTH].includes(
       status,
     );
-  rCanSync.value = [SYNC_AUTHORIZED, SYNC_ERROR, SYNC_ERROR_INIT].includes(
-    status,
-  );
+  rCanSync.value = [
+    SYNC_AUTHORIZED,
+    SYNC_ERROR,
+    SYNC_ERROR_INIT,
+    SYNC_ERROR_REPO_NOT_FOUND,
+  ].includes(status);
   rCanUpdateConfig.value = status !== SYNC_IN_PROGRESS;
   rAuthType.value = srv?.properties?.authType;
   rLabelAuthorize.value =
@@ -303,6 +397,8 @@ function setRefs(srv) {
     if (status === SYNC_INITIALIZING) res = i18n('msgSyncInit');
     else if (status === SYNC_UNAUTHORIZED) res = i18n('msgSyncNoAuthYet');
     else if (status === SYNC_ERROR_INIT) err = i18n('msgSyncInitError');
+    else if (status === SYNC_ERROR_REPO_NOT_FOUND)
+      err = i18n('msgSyncRepoNotFound');
     else if (status === SYNC_ERROR_AUTH) err = i18n('msgSyncInitError');
     else if (status === SYNC_ERROR) err = i18n('msgSyncError');
     else if (status === SYNC_IN_PROGRESS) {

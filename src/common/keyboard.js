@@ -3,35 +3,52 @@ import { getActiveElement } from '@/common/ui';
 
 export * from '@violentmonkey/shortcut';
 
+let prevBitState = 0;
 export const keyboardService = new KeyboardService();
 export const kbdEnterable = 'canEnter';
 export const kbdTypable = 'canType';
 export const kbdNavigatable = 'canNav';
+/** @param {HTMLElement} el */
+export const isInput = ({ localName: n } = {}) =>
+  n === 'button' ? ENTERABLE
+    : n === 'input' ? ENTERABLE + TYPABLE
+      : n === 'select' || n === 'textarea' ? ENTERABLE + TYPABLE + NAVIGATABLE
+        : 0;
+const ENTERABLE = 1;
+const TYPABLE = 2;
+const NAVIGATABLE = 4;
+const BIT_CTX = {
+  [ENTERABLE]: kbdEnterable,
+  [TYPABLE]: kbdTypable,
+  [NAVIGATABLE]: kbdNavigatable,
+};
 
 bindKeys();
 
-export function isInput({ localName: n } = {}) {
-  return n === 'button' ? 1
-    : n === 'input' ? 1 + 2
-      : n === 'select' || n === 'textarea' ? 1 + 2 + 4
-        : 0;
-}
-
-function handleFocus(e, state = true) {
-  if ((e = isInput(e.target))) {
-    if (e & 1) keyboardService.setContext(kbdEnterable, state);
-    if (e & 2) keyboardService.setContext(kbdTypable, state);
-    if (e & 4) keyboardService.setContext(kbdNavigatable, state);
-    return true;
+/**
+ * @param {FocusEvent} evt
+ * @param {boolean} [state]
+ * @return {number}
+ */
+function handleFocus(evt, state = true) {
+  const type = isInput(evt.target);
+  for (const bit in BIT_CTX) {
+    const bitState = +state && (type & bit);
+    if (bitState !== (prevBitState & bit)) {
+      keyboardService.setContext(BIT_CTX[bit], !!bitState);
+      if (state) prevBitState |= bit; else prevBitState &= ~bit;
+    }
   }
+  return type;
 }
 
-function handleBlur(e) {
-  if (!handleFocus(e, false)) {
+/** @param {FocusEvent} evt */
+function handleBlur(evt) {
+  if (evt.relatedTarget ? !isInput(evt.target) : !handleFocus(evt, false)) {
     const event = new CustomEvent('tiphide', {
       bubbles: true,
     });
-    e.target.dispatchEvent(event);
+    evt.target.dispatchEvent(event);
   }
 }
 

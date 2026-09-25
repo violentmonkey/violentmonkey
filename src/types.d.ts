@@ -43,6 +43,7 @@ declare namespace GMReq {
     /** allow Set-Cookie header to affect browser */
     'set-cookie'?: boolean;
     coreId: string;
+    dl: boolean;
     dlEvents?: EventTypeMap;
     dlId?: number;
     /** Firefox-only workaround for CSP blocking a blob: URL */
@@ -87,6 +88,7 @@ declare namespace GMReq {
       chunked: boolean;
       contentType: string;
       data: VMScriptResponseObject<any>;
+      dl?: boolean;
       id: string;
       type: EventType;
       upload: 0 | 1;
@@ -419,6 +421,7 @@ declare namespace VMReq {
   interface OptionsMulti extends Options {
     /** truthy = multi script update, 'auto' = autoUpdate, falsy = single */
     multi?: boolean | 'auto';
+    updateLastCheck?: number;
   }
   type Response = (ResponseOK | Error) & {
     url: string;
