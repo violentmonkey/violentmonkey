@@ -2,6 +2,8 @@ import {
   getScriptData,
   parseScriptData,
   serializeScriptData,
+  serializeScriptDataV2,
+  serializeScriptDataV3,
 } from '@/background/sync/script-format';
 
 const code = '// ==UserScript==\n// @name Test\n// ==/UserScript==\nconsole.log("hi {not json}");\n\nfunction f() {}\n';
@@ -27,13 +29,18 @@ describe('getScriptData', () => {
 describe('serializeScriptData', () => {
   const data = getScriptData(script, { code });
 
+  test('picks the writer its flag names', () => {
+    expect(serializeScriptData(data, false)).toBe(serializeScriptDataV2(data));
+    expect(serializeScriptData(data, true)).toBe(serializeScriptDataV3(data));
+  });
+
   test('old format: a single JSON object with code embedded', () => {
-    const raw = serializeScriptData(data, false);
+    const raw = serializeScriptDataV2(data);
     expect(raw).toBe(JSON.stringify(data));
   });
 
   test('new format: JSON header, blank line, then raw code', () => {
-    const raw = serializeScriptData(data, true);
+    const raw = serializeScriptDataV3(data);
     const i = raw.indexOf('\n\n');
     expect(i).toBeGreaterThan(-1);
     const header = JSON.parse(raw.slice(0, i));
@@ -51,7 +58,7 @@ describe('serializeScriptData', () => {
 describe('parseScriptData', () => {
   test('round-trips the old format', () => {
     const data = getScriptData(script, { code });
-    const raw = serializeScriptData(data, false);
+    const raw = serializeScriptDataV2(data);
     const parsed = parseScriptData(raw);
     expect(parsed.code).toBe(code);
     expect(parsed.config).toEqual(data.config);
@@ -61,7 +68,7 @@ describe('parseScriptData', () => {
 
   test('round-trips the new format', () => {
     const data = getScriptData(script, { code });
-    const raw = serializeScriptData(data, true);
+    const raw = serializeScriptDataV3(data);
     const parsed = parseScriptData(raw);
     expect(parsed.code).toBe(code);
     expect(parsed.config).toEqual(data.config);

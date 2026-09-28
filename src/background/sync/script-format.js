@@ -1,10 +1,8 @@
 import { objectPick } from '@/common/object';
 import { FILE_FORMAT } from './remote-name';
 
-// Whether newly-written sync files use the "JSON header + raw code" format
-// instead of embedding the code inside the JSON object. Both formats are
-// always readable (see `parseScriptData`); flip this to switch what's written.
-export const WRITE_NEW_SCRIPT_FORMAT = false;
+// Every writer here is gated on FILE_FORMAT, so flipping it switches the whole
+// layout at once; readers accept every version either way.
 
 export function getScriptData(script, extra) {
   const data = {
@@ -16,25 +14,32 @@ export function getScriptData(script, extra) {
   return Object.assign(data, extra);
 }
 
+/** @return {string} the contents for a newly written script file */
+export function serializeScriptData(data, newFormat = FILE_FORMAT >= 3) {
+  return newFormat ? serializeScriptDataV3(data) : serializeScriptDataV2(data);
+}
+
+/** @return {string} a single JSON object with `code` embedded */
+export function serializeScriptDataV2(data) {
+  return JSON.stringify(data);
+}
+
 /**
- * Old format (`newFormat` falsy): a single JSON object with `code` embedded.
- * New format (`newFormat` truthy): a JSON header (everything but `code`),
- * a blank line, then the raw script code:
+ * @return {string} a JSON header (everything but `code`), a blank line, then
+ * the raw script code:
  *   { "version": 2, ... }
  *
  *   // raw script content here
  */
-export function serializeScriptData(data, newFormat = WRITE_NEW_SCRIPT_FORMAT) {
-  if (!newFormat) return JSON.stringify(data);
+export function serializeScriptDataV3(data) {
   const { code, ...meta } = data;
   return `${JSON.stringify(meta, null, 2)}\n\n${code || ''}`;
 }
 
 /**
- * Reads both the old and new formats (see `serializeScriptData`). A header
- * is split off only when `\n\n` is present, since `JSON.stringify` without
- * an indent argument never emits one, so old-format files never contain it.
- * Content not starting with `{`, or with an invalid JSON header, is kept as `code`.
+ * Reads both the old and new formats. A header is split off only when `\n\n` is
+ * present, which `JSON.stringify` without an indent argument never emits, so
+ * old-format files never contain it.
  */
 export function parseScriptData(raw) {
   if (!raw.startsWith('{')) return { code: raw };

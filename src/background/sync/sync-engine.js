@@ -8,10 +8,12 @@ import {
 } from '@/common/consts-sync';
 import { forEachEntry, objectSet } from '@/common/object';
 import { getScriptData, parseScriptData, serializeScriptData } from './script-format';
+import { getItemFilename, getURI } from './remote-name';
 import { getOption, setOption } from '../utils';
 import broadcast from '../utils/broadcast';
 import { sortScripts, updateScriptInfo } from '../utils/db';
 import { DNR_ID_IDENTITY, updateSessionRules } from '../utils/dnr';
+import { getNameURI, parseMeta } from '../utils/script';
 import { script as pluginScript } from '../plugin';
 import { parseXml } from '@violentmonkey/xml-parser';
 import sessionData from '../utils/session-data';
@@ -107,32 +109,16 @@ function log(type, ...args) {
 const logInfo = log.bind(null, 'info');
 const logWarn = log.bind(null, 'warn');
 
+function isSameRecorded(a, b) {
+  const other = Array.isArray(b) ? b : [];
+  return a.length === other.length
+    && a.every((uri, i) => uri === other[i]);
+}
+
 // --- Public exports ---
 
 export function setSyncOnceMode(mode) {
   syncMode = mode;
-}
-
-export function getItemFilename({ name, uri }) {
-  if (name) return name;
-  return `vm@2-${uri}`;
-}
-
-export function isScriptFile(name) {
-  return /^vm(?:@\d+)?-/.test(name);
-}
-
-export function getURI(name) {
-  const i = name.indexOf('-');
-  const [, version] = name.slice(0, i).split('@');
-  if (version === '2') {
-    return name.slice(i + 1);
-  }
-  try {
-    return decodeURIComponent(name.slice(3));
-  } catch (err) {
-    return name.slice(3);
-  }
 }
 
 // --- Config ---
@@ -438,27 +424,107 @@ export function createSyncService({
     return enqueue(() => drive.get({ id: item.id }).then((b) => b.text()));
   }
 
-  function put(item, data) {
+  function put(item, data, scriptName) {
     const blob = new Blob([data], { type: 'text/plain' });
-    const itemName = getItemFilename(item);
-    return enqueue(() =>
-      drive
-        .put(item.id ? { id: item.id } : { parent: {}, name: itemName }, blob)
-        .then(normalize),
-    );
+    // A new file needs a name; the meta always keeps its own.
+    const fileName = item.name || getItemFilename(scriptName, item.uri);
+    return enqueue(async () => {
+      const res = await drive.put(
+        item.id ? { id: item.id } : { parent: {}, name: fileName },
+        blob,
+      );
+      return normalize(res, item.uri);
+    });
   }
 
   function remove(item) {
     return enqueue(() => drive.remove({ id: item.id }));
   }
 
-  function normalize(item) {
+  function normalize(item, uri = getURI(item.name)) {
     return {
       id: item.id,
       name: item.name,
       size: item.size,
-      uri: getURI(item.name),
+      uri,
     };
+  }
+
+  // --- Remote manifest ---
+
+  // A script is identified by its content, not by its file name. The meta records
+  // the name each uri was last seen under, so recognizing our own files is free.
+  const MAX_UNTRACKED_READS = 5;
+
+  /**
+   * Resolve every listed file to the script it holds, then pick one file per
+   * script. Returns the manifest entries, and the uris that have duplicates.
+   */
+  async function gatherManifest(files, info) {
+    const byName = new Map();
+    for (const [uri, item] of Object.entries(info)) {
+      if (item.filename) byName.set(item.filename, uri);
+    }
+    /** @type {Map<string, Object[]>} uri -> every file that holds it */
+    const found = new Map();
+    const add = (uri, file, isRecorded) => {
+      let group = found.get(uri);
+      if (!group) found.set(uri, group = []);
+      group.push({ ...file, isRecorded });
+    };
+    const untracked = [];
+    for (const file of files) {
+      // A folder is never a script; OneDrive labels them as files, so there they
+      // still cost a read and a warning.
+      if (file.kind === 'folder') continue;
+      // Anything else that isn't the meta may be a script, whatever it's named:
+      // a user may rename or add files, and vm3 names carry no uri.
+      if (file.name === metaFile) continue;
+      const recorded = byName.get(file.name);
+      const uri = recorded || getURI(file.name);
+      if (uri) add(uri, file, !!recorded);
+      else untracked.push(file);
+    }
+    // Reading a file is a request, so resolve a few untracked ones per sync and
+    // let the next one continue where this left off.
+    for (const file of untracked.slice(0, MAX_UNTRACKED_READS)) {
+      const uri = await readURI(file);
+      if (uri) {
+        logInfo('Adopted remote file:', file.name, 'as', uri);
+        add(uri, file, false);
+      }
+    }
+    const scripts = [];
+    /** @type {Set<string>} uris that have more than one file */
+    const extras = new Set();
+    for (const [uri, group] of found) {
+      // The name the meta points at wins, else the lowest id, so every client
+      // picks the same file. The listing's timestamps would tie-break better, but
+      // they come from the server and some providers omit them.
+      group.sort((a, b) => Number(b.isRecorded) - Number(a.isRecorded)
+        || String(a.id).localeCompare(String(b.id)));
+      const [winner, ...losers] = group;
+      scripts.push(normalize(winner, uri));
+      if (losers.length) extras.add(uri);
+    }
+    return { scripts, extras };
+  }
+
+  /** @return {?string} the uri of the script a remote file holds */
+  async function readURI(file) {
+    const raw = await get(file).catch((err) => {
+      logWarn('Failed to read remote file:', file.name, err);
+    });
+    if (!raw) return null;
+    let meta;
+    try {
+      meta = parseMeta(parseScriptData(raw).code);
+    } catch (err) {
+      logWarn('Failed to parse remote file:', file.name, err);
+    }
+    // A nameless script would collapse onto the same uri as every other nameless
+    // one, so leave it rather than merge them.
+    return meta && meta.name ? getNameURI({ meta }) : null;
   }
 
   // --- Unified sync data ---
@@ -474,31 +540,25 @@ export function createSyncService({
     // Counts, not names: the listing can hold hundreds of files.
     const metaListed = files.some((f) => f.name === metaFile);
     logInfo('Remote files:', files.length, 'meta found:', metaListed);
-    const scripts = [];
-    for (const file of files) {
-      if (file.name !== metaFile && isScriptFile(file.name)) {
-        scripts.push(normalize(file));
-      }
-    }
     let metadata;
     try {
-      // Read the meta by its known name rather than by the name the listing
-      // reports: a server may return a `DAV:displayname` that differs from the
-      // actual file name, in which case the meta would be silently skipped and
-      // every item would fall back to `now`, making each sync re-download
-      // everything and revert every deletion.
+      // Read the meta by its known name, not by the name the listing reports: a
+      // server may return a `DAV:displayname` that differs from the actual file
+      // name, and then the meta is silently skipped, so every item falls back to
+      // `now` and each sync re-downloads everything and reverts every deletion.
       const blob = await enqueue(() => drive.get({ path: metaFile }));
       const text = await blob.text();
       metadata = JSON.parse(text);
     } catch (err) {
-      // A missing meta is normal on a fresh remote; anything else means we
-      // silently sync against nothing, which is worth surfacing.
+      // A missing meta is normal on a fresh remote; anything else means we sync
+      // against nothing without saying so.
       if (err.response?.status !== 404) {
         logWarn('Failed to read meta file:', err);
       }
     }
-    // Convert VM file format to snapshot format and mark stale entries as tombstones
     const info = metadata?.info || {};
+    const { scripts, extras } = await gatherManifest(files, info);
+    // Convert VM file format to snapshot format and mark stale entries as tombstones
     const scriptSet = new Set(scripts.map((s) => s.uri));
     for (const [uri, item] of Object.entries(info)) {
       item.lastModified = item.modified || 0;
@@ -508,9 +568,33 @@ export function createSyncService({
         item.lastModified = Date.now();
       }
     }
+    // Remember the name each uri is stored under, so recognizing it next time is
+    // free. A duplicate is only ever ignored, never removed.
+    let renamed = false;
+    for (const script of scripts) {
+      const item = info[script.uri] ||= {};
+      if (item.deleted) continue;
+      if (item.filename !== script.name) {
+        item.filename = script.name;
+        renamed = true;
+      }
+    }
+    // Record the uris that have duplicate files, so a later version can remove
+    // them once every client is on the manifest. Nothing is removed here: a
+    // pre-manifest client finds no file for the uri, marks the script deleted and
+    // wipes it locally, so the format has to be flipped before a delete is safe.
+    // Sorted so the same set always serializes the same way, whatever order the
+    // listing arrived in. Only a changed set is written back, else the meta would
+    // be rewritten on every sync for as long as the duplicates are there.
+    const pendingDelete = [...extras].sort();
+    if (!isSameRecorded(pendingDelete, metadata?.pendingDelete)) {
+      renamed = true;
+    }
     metadata = {
       metadata: { lastModified: metadata?.timestamp || 0 },
       items: info,
+      pendingDelete,
+      renamed,
     };
     const localScripts = await pluginScript.list();
     return [
@@ -742,12 +826,15 @@ export function createSyncService({
           };
           remoteChanged = true;
           return put(
-            Object.assign({}, remote, {
-              uri: local.props.uri,
-              name: null,
-            }),
+            // Overwritten by id, so an existing file keeps the name the meta
+            // recorded; a new one is named here, then recorded below.
+            Object.assign({}, remote, { uri: local.props.uri, name: null }),
             serializeScriptData(data),
-          );
+            local.meta.name,
+          ).then((saved) => {
+            const info = items[local.props.uri];
+            if (info && saved.name) info.filename = saved.name;
+          });
         });
       }),
       ...delRemote.map(({ remote }) => {
@@ -793,6 +880,8 @@ export function createSyncService({
             remoteChanged = true;
           }
         }
+        const { renamed, pendingDelete } = remoteMetaData;
+        if (renamed) remoteChanged = true;
         if (remoteChanged && !isPull) {
           const timestamp = Date.now();
           remoteMetaData.metadata.lastModified = timestamp;
@@ -805,6 +894,7 @@ export function createSyncService({
               lastModified: undefined,
             };
           }
+          if (pendingDelete?.length) fileData.pendingDelete = pendingDelete;
           promises.push(put(remoteMeta, JSON.stringify(fileData)));
         }
         localMeta.timestamp = remoteMetaData.metadata.lastModified;
