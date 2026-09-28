@@ -478,23 +478,31 @@ export function createSyncService({
       files.push(...batch);
     }
     progress.finished += 1;
-    let metaFileItem;
+    // Counts, not names: the listing can hold hundreds of files.
+    const metaListed = files.some((f) => f.name === metaFile);
+    logInfo('Remote files:', files.length, 'meta found:', metaListed);
     const scripts = [];
     for (const file of files) {
-      if (file.name === metaFile) metaFileItem = file;
-      else if (isScriptFile(file.name)) scripts.push(normalize(file));
+      if (file.name !== metaFile && isScriptFile(file.name)) {
+        scripts.push(normalize(file));
+      }
     }
     let metadata;
     try {
-      if (metaFileItem) {
-        const blob = await enqueue(() =>
-          drive.get({ path: metaFileItem.name }),
-        );
-        const text = await blob.text();
-        metadata = JSON.parse(text);
-      }
+      // Read the meta by its known name rather than by the name the listing
+      // reports: a server may return a `DAV:displayname` that differs from the
+      // actual file name, in which case the meta would be silently skipped and
+      // every item would fall back to `now`, making each sync re-download
+      // everything and revert every deletion.
+      const blob = await enqueue(() => drive.get({ path: metaFile }));
+      const text = await blob.text();
+      metadata = JSON.parse(text);
     } catch (err) {
-      // Ignore meta error
+      // A missing meta is normal on a fresh remote; anything else means we
+      // silently sync against nothing, which is worth surfacing.
+      if (err.response?.status !== 404) {
+        logWarn('Failed to read meta file:', err);
+      }
     }
     // Convert VM file format to snapshot format and mark stale entries as tombstones
     const info = metadata?.info || {};
@@ -589,6 +597,15 @@ export function createSyncService({
     }
 
     // Content sync via @usync/sync
+    logInfo(
+      `Meta: local=${localMeta.timestamp ?? '-'}`
+      + ` remote=${remoteMetaData.metadata?.lastModified ?? '-'}`,
+    );
+    const logAction = (action, uri) => logInfo(
+      `${action}: local=${localSnapshot.items[uri]?.lastModified ?? '-'}`
+      + ` remote=${remoteSnapshot.items[uri]?.lastModified ?? '-'}`
+      + ` uri=${uri}`,
+    );
     const modeName =
       currentSyncMode === SYNC_PUSH
         ? 'push'
@@ -705,7 +722,7 @@ export function createSyncService({
 
     const promiseQueue = [
       ...putLocal.map(({ remote, info }) => {
-        logInfo('Download script:', remote.uri);
+        logAction('Download script', remote.uri);
         return get(remote).then((raw) => {
           const data = parseScriptData(raw);
           if (!data.code) return;
@@ -720,7 +737,7 @@ export function createSyncService({
         });
       }),
       ...putRemote.map(({ local, remote }) => {
-        logInfo('Upload script:', local.props.uri);
+        logAction('Upload script', local.props.uri);
         return pluginScript.get(local.props.id).then((code) => {
           const data = getScriptData(local, { code });
           items[local.props.uri] = {
@@ -741,13 +758,13 @@ export function createSyncService({
         });
       }),
       ...delRemote.map(({ remote }) => {
-        logInfo('Remove remote script:', remote.uri);
+        logAction('Remove remote script', remote.uri);
         items[remote.uri] = { deleted: true, lastModified: now };
         remoteChanged = true;
         return remove(remote);
       }),
       ...delLocal.map(({ local }) => {
-        logInfo('Remove local script:', local.props.uri);
+        logAction('Remove local script', local.props.uri);
         return pluginScript.remove(local.props.id);
       }),
       ...updateLocal.map(({ local, updates }) => {
