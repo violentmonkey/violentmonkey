@@ -966,6 +966,9 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Повторно збережіть або перевстановіть ці скрипти:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: ''
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (код такий самий)

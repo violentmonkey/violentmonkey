@@ -362,7 +362,7 @@ hintInputURL:
   message: 'أدخل عنوان URL:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: تعبير cron غير صالح المكوَّن من 5 حقول
 hintRecycleBin:
   description: Hint for recycle bin.
   message: السكربتات المحذوفة مدرجة هنا وستُحتفظ بها لمدة 7 أيام.
@@ -445,28 +445,28 @@ labelContributors:
   message: المساهمون
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: يوميًا
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: يوم الشهر
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: يوم الأسبوع
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: ساعة
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: كل ساعة
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: دقيقة
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: شهر
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: مرتين يومياً
 labelCurrentLang:
   description: Label of current language.
   message: 'اللغة الحالية: '
@@ -774,16 +774,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Custom cron expression
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: يوميًا
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: معطّل
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: التحقق من تحديثات السكربت
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'عنوان التحديث:'
@@ -979,6 +979,9 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'يرجى إعادة الحفظ أو إعادة تثبيت هذه السكربتات:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: يجب إعادة تشغيل Violentmonkey لإكمال التحديث من$1 إلى $2.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (الكود نفسه)'
