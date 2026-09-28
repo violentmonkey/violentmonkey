@@ -435,9 +435,7 @@ export function createSyncService({
   const enqueue = createQueue();
 
   function get(item) {
-    return enqueue(() =>
-      drive.get({ id: item.id, path: item.name }).then((b) => b.text()),
-    );
+    return enqueue(() => drive.get({ id: item.id }).then((b) => b.text()));
   }
 
   function put(item, data) {
@@ -445,18 +443,13 @@ export function createSyncService({
     const itemName = getItemFilename(item);
     return enqueue(() =>
       drive
-        .put(
-          item.id
-            ? { id: item.id, path: itemName }
-            : { parent: {}, name: itemName },
-          blob,
-        )
+        .put(item.id ? { id: item.id } : { parent: {}, name: itemName }, blob)
         .then(normalize),
     );
   }
 
   function remove(item) {
-    return enqueue(() => drive.remove({ id: item.id, path: item.name }));
+    return enqueue(() => drive.remove({ id: item.id }));
   }
 
   function normalize(item) {
