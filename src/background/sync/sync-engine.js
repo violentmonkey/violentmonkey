@@ -561,6 +561,7 @@ export function createSyncService({
       metadata: { lastModified: metadata?.timestamp || 0 },
       items: info,
     };
+    const localScripts = await pluginScript.list();
     return [
       {
         name: metaFile,
@@ -568,7 +569,8 @@ export function createSyncService({
         data: metadata,
       },
       scripts,
-      await pluginScript.list(),
+      localScripts.filter((s) => !s.config.removed),
+      localScripts.filter((s) => s.config.removed),
     ];
   }
 
@@ -581,7 +583,7 @@ export function createSyncService({
     const isPush = currentSyncMode === SYNC_PUSH;
     progress = { finished: 0, total: 0 };
 
-    const [remoteMeta, remoteData, localData] = await getSyncData();
+    const [remoteMeta, remoteData, localData, localRemoved] = await getSyncData();
     const remoteMetaData = remoteMeta.data || {};
     const items = remoteMetaData.items || {};
     const remoteLastModified = remoteMetaData.metadata?.lastModified || 0;
@@ -609,14 +611,15 @@ export function createSyncService({
       };
     });
     // Add tombstones for locally deleted scripts
-    for (const uri of Object.keys(items)) {
+    localRemoved.forEach((item) => {
+      const uri = item.props.uri;
       if (!localSnapshot.items[uri]) {
         localSnapshot.items[uri] = {
-          lastModified: localMeta.timestamp || 0,
+          lastModified: item.props.lastModified || 0,
           deleted: true,
         };
       }
-    }
+    });
     // Include active items from remoteData with metadata
     for (const item of remoteData) {
       remoteItemMap[item.uri] = item;

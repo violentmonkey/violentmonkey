@@ -1,5 +1,5 @@
 import { commands } from '../utils';
-import { getScripts, parseScript } from '../utils/db';
+import { getScriptsByIdsOrAll, parseScript } from '../utils/db';
 
 export const script = {
   /**
@@ -12,7 +12,7 @@ export const script = {
    * List all available scripts, without script code
    * @return {Promise<VMScript[]>}
    */
-  list: async () => getScripts(),
+  list: async () => getScriptsByIdsOrAll(),
   /**
    * Get script code of an existing script
    * @param {number} id
