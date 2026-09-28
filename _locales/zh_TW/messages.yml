@@ -653,7 +653,7 @@ labelSyncAuthorizing:
   message: 授權中
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: 自動同步
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: 無
@@ -781,7 +781,7 @@ learnInjectionMode:
   message: 了解更多插入模式。
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: 管理雲端檔案
 menuCommands:
   description: Menu item to list script commands.
   message: 腳本命令
@@ -927,6 +927,9 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 請重新儲存或重新安裝這些腳本：
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: ''
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: （程式碼未變更）

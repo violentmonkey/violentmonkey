@@ -455,7 +455,7 @@ labelContributors:
   message: Katkıda bulunanlar
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: her gün
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
   message: ''
@@ -464,19 +464,19 @@ labelCronDayOfWeek:
   message: ''
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: Saat
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: her saat
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: Dakika
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: Ay
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: günde iki kere
 labelCurrentLang:
   description: Label of current language.
   message: 'Geçerli Dil: '
@@ -713,10 +713,10 @@ labelSyncDisabled:
   message: Hiçbiri
 labelSyncGitApiBase:
   description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
-  message: ''
+  message: 'API baz URL''si:'
 labelSyncGitBranch:
   description: Label for the Git branch input.
-  message: ''
+  message: 'Dal:'
 labelSyncGitCreateMethod:
   description: >-
     Label for the Git file-creation-method select, matching the createMethod
@@ -727,13 +727,13 @@ labelSyncGitOwner:
   message: 'Sahibi:'
 labelSyncGitPathPrefix:
   description: Label for the Git path-prefix input (folder within the repo).
-  message: ''
+  message: 'Yol ön eki:'
 labelSyncGitRepo:
   description: Label for the Git repository name input.
-  message: ''
+  message: 'Depo:'
 labelSyncGitToken:
   description: Label for the Git access token input.
-  message: ''
+  message: 'Erişim token''ı:'
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'Parola: '
@@ -786,16 +786,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Özel cron ifadesi
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: Her gün
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: Devre dışı
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: Betik güncellemelerini denetle
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Güncelleme URL''si:'
@@ -989,6 +989,11 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Lütfen bu betikleri yeniden kaydedin veya yeniden yükleyin:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: >-
+    $1 sürümünden $2 sürümüne güncellemeyi tamamlamak için Violentmonkey yeniden
+    başlatılmalıdır.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kod aynı)

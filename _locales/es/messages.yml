@@ -370,7 +370,7 @@ hintInputURL:
   message: 'Introduce la URL:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: Expresión cron de 5 campos no válida
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Los scripts eliminados se muestran aquí y se conservarán durante 7 días.
@@ -459,28 +459,28 @@ labelContributors:
   message: Colaboradores
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: diario
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: Día del mes
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: Día de la semana
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: Hora
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: cada hora
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: Minuto
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: Mes
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: dos veces al día
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma actual:'
@@ -790,16 +790,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Expresión cron personalizada
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: Diario
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: Desactivado
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: Buscar actualizaciones del script
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL de actualización:'
@@ -997,6 +997,11 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Por favor, vuelve a guardar o reinstalar estos scripts:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: >-
+    Es necesario reiniciar Violentmonkey para completar la actualización de $1 a
+    $2.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (el código es el mismo)

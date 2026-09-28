@@ -297,12 +297,12 @@ filterExecutionOrder:
   message: порядку выполнения
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: времени обновления
+  message: времени послед. обновления
 filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: времени последнего обращения
+  message: времени послед. обращения
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
   message: Последний раз, когда вы посещали любой сайт, на который нацелен этот скрипт.
@@ -363,7 +363,7 @@ hintInputURL:
   message: 'Введите URL-адрес:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: Недопустимое выражение Крона из 5 полей
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Удалённые скрипты отображаются здесь и хранятся в течение 7 дней.
@@ -422,7 +422,7 @@ labelBackupMaintenance:
   message: Резервное копирование и обслуживание
 labelBadge:
   description: Label for option to show number on badge.
-  message: 'Счётчик на значке: '
+  message: 'Счётчик на значке:'
 labelBadgeColors:
   description: Label for option group to set badge colors.
   message: 'Цвета значка: '
@@ -446,28 +446,28 @@ labelContributors:
   message: Участники
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: ежедневно
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: День месяца
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: День недели
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: Час
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: ежечасно
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: Минута
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: Месяц
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: Дважды в день
 labelCurrentLang:
   description: Label of current language.
   message: 'Текущий язык: '
@@ -570,7 +570,7 @@ labelHomepageURL:
   message: 'Адрес домашней страницы:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: Разрешить GM_cookie доступ к куки, доступным только по протоколу HTTP
+  message: Разрешить GM_cookie доступ к куки только для HTTP
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
   message: >-
@@ -758,35 +758,35 @@ labelSyncScriptStatus:
   message: Синхронизировать состояние скриптов
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'URL-адрес сервера:'
+  message: 'URL-адрес сервера: '
 labelSyncService:
   description: Label for sync service select.
   message: Синхронизация через
 labelSyncUsername:
   description: Label for input to hold username.
-  message: 'Логин:'
+  message: 'Логин: '
 labelTags:
   description: Label for custom tags. Don't translate @tag.
   message: '@tag / метки'
 labelTheme:
   description: Label for the visual theme option.
-  message: 'Тема:'
+  message: 'Тема: '
 labelTranslator:
   description: Label of translator.
   message: 'Переводчики: '
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Своё выражение Крона
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: Ежедневно
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: Отключено
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: Проверить обновления скрипта
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL-адрес обновления:'
@@ -979,6 +979,11 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Пожалуйста, пересохраните или переустановите эти скрипты:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: >-
+    Violentmonkey необходимо перезапустить, чтобы завершить обновление с $1 до
+    $2.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (код такой же)'
@@ -1090,7 +1095,7 @@ optionShowEnabledFirst:
   message: Сначала показать включённые скрипты
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: 'Тема интерфейса:'
+  message: 'Тема интерфейса: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: автоматически
