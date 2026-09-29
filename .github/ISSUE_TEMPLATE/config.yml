@@ -1,0 +1,2 @@
+# Settings this options to 'false' will make it so that only maintainers can create blank issues
+blank_issues_enabled: true
