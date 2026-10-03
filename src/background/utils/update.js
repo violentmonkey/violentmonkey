@@ -3,7 +3,7 @@ import {
   __CODE, FETCH_OPTS, METABLOCK_RE, NO_CACHE, TIMEOUT_MAX,
 } from '@/common/consts';
 import {
-  getCronOccurrence, getNextCronTime, normalizeUpdateCron,
+  getMissedCronTime, getNextCronTime, normalizeUpdateCron,
 } from '@/common/cron';
 import broadcast from './broadcast';
 import { fetchResources, getScriptById, getScripts, notifyToOpenScripts, parseScript } from './db';
@@ -182,11 +182,11 @@ function canNotify(script) {
     : script.config.notifyUpdates ?? allowed;
 }
 
-export function autoUpdate(runNow = false, forceRun = false, expectedAt) {
+export function autoUpdate(runNow = false, forceRun = false) {
   autoUpdateTask = autoUpdateTask
     .then(async () => {
       if (init) await init;
-      return runNow ? runScheduledUpdate(forceRun, expectedAt) : scheduleAutoUpdate();
+      return runNow ? runScheduledUpdate(forceRun) : scheduleAutoUpdate();
     })
     .catch(err => {
       if (__.DEBUG) console.error('update scheduler', err);
@@ -194,19 +194,14 @@ export function autoUpdate(runNow = false, forceRun = false, expectedAt) {
   return autoUpdateTask;
 }
 
-async function runScheduledUpdate(forceRun, expectedAt) {
+async function runScheduledUpdate(forceRun) {
   const expression = getUpdateSchedule();
   if (!expression) return;
-  if (expectedAt != null) {
-    const occurrence = getCronOccurrence(expression, expectedAt, UPDATE_START_DELAY + 60e3);
-    if (!occurrence) {
-      await scheduleAutoUpdate();
-      return;
-    }
-    if (isCheckedOccurrence(occurrence)) {
-      await scheduleAutoUpdate(true);
-      return;
-    }
+  // An alarm is only worth acting on while the schedule is behind lastUpdate.
+  // A stale or duplicated alarm therefore reschedules instead of re-checking.
+  if (!getMissedCronTime(expression, getOption('lastUpdate'))) {
+    await scheduleAutoUpdate(true);
+    return;
   }
   if (!forceRun && scheduledAt != null && Date.now() + 1000 < scheduledAt) {
     await scheduleAutoUpdate();
@@ -226,29 +221,28 @@ async function scheduleAutoUpdate(skipCurrent = false) {
   const expression = getUpdateSchedule();
   if (!expression) return;
   const now = Date.now();
-  const current = !skipCurrent && getNextCronTime(expression, now - 60e3, true);
   const next = getNextCronTime(expression, now, !skipCurrent);
   if (next == null) {
     if (__.DEBUG) console.error('update schedule has no future occurrence', expression);
     return;
   }
-  const currentWasChecked = current != null && current <= now
-    && isCheckedOccurrence(current);
-  const target = current != null && current <= now && !currentWasChecked
-    ? now + UPDATE_START_DELAY
-    : next;
+  // An occurrence that elapsed while the browser was off or asleep is caught
+  // up right after startup, rather than being skipped for a whole period.
+  const missed = !skipCurrent && getMissedCronTime(expression, getOption('lastUpdate'), now);
+  const target = missed != null ? now + UPDATE_START_DELAY : next;
   scheduledAt = target;
   if (__.MV3) {
     await chrome.alarms.create(kAlarmUpdate, { when: target });
   } else {
     autoUpdateTimer = setTimeout(
-      () => autoUpdate(true, false, target),
+      () => autoUpdate(true),
       Math.min(TIMEOUT_MAX, target - Date.now()),
     );
   }
   if (__.DEBUG) console.info('update scheduled', {
     expression,
     next: new Date(target).toISOString(),
+    ...(missed != null && { missed: new Date(missed).toISOString() }),
   });
 }
 
@@ -260,10 +254,6 @@ async function clearAutoUpdate() {
     clearTimeout(autoUpdateTimer);
     autoUpdateTimer = 0;
   }
-}
-
-function isCheckedOccurrence(timestamp) {
-  return getOption('lastUpdate') >= timestamp;
 }
 
 function getUpdateSchedule() {

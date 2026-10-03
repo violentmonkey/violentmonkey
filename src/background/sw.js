@@ -55,14 +55,14 @@ global.oninstall = evt => {
 
 global.onmessage = onClientMessage.bind(null, handleCommandMessage);
 
-chrome.alarms.onAlarm.addListener(async ({ name, scheduledTime }) => {
+chrome.alarms.onAlarm.addListener(async ({ name }) => {
   if (init) await init;
   if (name === kAlarmRemove) {
     checkRemove();
   } else if (name === kAlarmSync) {
     autoSync();
   } else if (name === kAlarmUpdate) {
-    await autoUpdate(true, true, scheduledTime);
+    await autoUpdate(true, true);
   } else if (name.startsWith(kNotifications)) {
     removeNotification(name.slice(kNotifications.length));
   }
