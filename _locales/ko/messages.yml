@@ -181,7 +181,7 @@ descSyncGitRepoPreexisting:
   description: >-
     Note explaining the repository must already exist; Violentmonkey never
     creates it.
-  message: ''
+  message: 저장소가 이미 존재해야 합니다 — Violentmonkey는 저장소를 자동으로 생성하거나 초기화하지 않습니다.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: 그룹
@@ -337,7 +337,7 @@ hintInputURL:
   message: 'URL 입력:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: 유효하지 않은 5자리 cron 표현식
 hintRecycleBin:
   description: Hint for recycle bin.
   message: 삭제된 스크립트는 이 곳에 추가되고 7일 간 보관됩니다.
@@ -420,28 +420,28 @@ labelContributors:
   message: 기여자
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: 매일
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: 일
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: 요일
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: 시
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: 매시간
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: 분
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: 월
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: 하루에 두 번
 labelCurrentLang:
   description: Label of current language.
   message: '현재 언어: '
@@ -669,27 +669,27 @@ labelSyncDisabled:
   message: 없음
 labelSyncGitApiBase:
   description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
-  message: ''
+  message: 'API 기본 URL:'
 labelSyncGitBranch:
   description: Label for the Git branch input.
-  message: ''
+  message: '브랜치:'
 labelSyncGitCreateMethod:
   description: >-
     Label for the Git file-creation-method select, matching the createMethod
     option key.
-  message: ''
+  message: 'File creation method:'
 labelSyncGitOwner:
   description: Label for the Git repository owner input.
-  message: ''
+  message: '소유자:'
 labelSyncGitPathPrefix:
   description: Label for the Git path-prefix input (folder within the repo).
-  message: ''
+  message: '경로 접두사:'
 labelSyncGitRepo:
   description: Label for the Git repository name input.
-  message: ''
+  message: '저장소:'
 labelSyncGitToken:
   description: Label for the Git access token input.
-  message: ''
+  message: '액세스 토큰:'
 labelSyncPassword:
   description: Label for input to hold password.
   message: '비밀번호: '
@@ -742,16 +742,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: 사용자 지정 cron 표현식
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: 매일
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: 비활성화
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: 스크립트 업데이트 확인
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: '업데이트 URL:'
@@ -935,7 +935,7 @@ msgReinstallScripts:
   message: 스크립트를 재설치하거나 다시 저장하세요.
 msgRestartToUpdate:
   description: $1 is the old version, $2 is the new version.
-  message: ''
+  message: $1에서 $2(으)로 업데이트를 완료하려면 Violentmonkey를 다시 시작해야 합니다.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (변경 없음)'
@@ -981,7 +981,7 @@ msgSyncRepoNotFound:
   description: >-
     Message shown when the configured Git repository was not found, or the token
     can't access it. Violentmonkey never creates it automatically.
-  message: ''
+  message: 저장소를 찾을 수 없습니다. 저장소를 먼저 생성한 후 토큰에 접근 권한이 있는지 확인하세요.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: 동기화 진행 중...
@@ -1159,13 +1159,13 @@ titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to
     change it.
-  message: ''
+  message: 처음 파일을 생성할 때 동기화에 실패하면 다른 방식을 시도해 보세요.
 titleSyncGitPathPrefix:
   description: Hover title for the Git path-prefix input, clarifying what it does.
-  message: ''
+  message: 저장소의 루트 대신 이 하위 폴더로 동기화합니다. (선택 사항)
 titleSyncGitToken:
   description: Hover title for the Git access token input, clarifying required permissions.
-  message: ''
+  message: 저장소 콘텐츠에 대한 읽기/쓰기 권한이 필요합니다(저장소가 이미 존재해야 함).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: 유저스크립트 인젝션 토글
