@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: 套用
+buttonApprove:
+  description: Button to approve a request.
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: 停用
+buttonDisconnect:
+  description: Button to disconnect.
+  message: ''
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: 下載佈景主題
@@ -70,6 +76,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: 資源回收桶
+buttonReject:
+  description: Button to reject a request.
+  message: ''
 buttonRemove:
   description: Button to remove a script.
   message: 移除
@@ -565,6 +574,27 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: '@match 規則'
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: ''
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: ''
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: ''
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: ''
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: ''
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: ''
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: ''
 labelName:
   description: Label of script name.
   message: 名稱：

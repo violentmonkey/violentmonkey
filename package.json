@@ -115,6 +115,7 @@
     "@usync/drive": "^0.3.2",
     "@usync/oauth2": "^0.1.8",
     "@usync/sync": "^0.1.1",
+    "@violentmonkey/mcp-client": "^0.1.1",
     "@violentmonkey/shortcut": "^1.4.4",
     "@violentmonkey/xml-parser": "^1.0.1",
     "codemirror": "^5.65.20",

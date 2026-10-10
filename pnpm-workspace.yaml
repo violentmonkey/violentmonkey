@@ -6,6 +6,8 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - '@usync/drive@0.3.2'
+  - '@violentmonkey/mcp-client@0.1.1'
+  - '@violentmonkey/mcp-protocol@0.1.1'
 
 overrides:
   baseline-browser-mapping@>=2.0.0 <2.11.0: ^2.11.0

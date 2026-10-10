@@ -5,6 +5,7 @@ import { FILE_GLOB_ALL, kMainFrame, NO_CACHE } from '@/common/consts';
 import cache from './cache';
 import { addPublicCommands, commands } from './init';
 import { getOption } from './options';
+import { MCP_CONNECT_URL, openMcpAuthorization, requestMcpConnection } from './mcp';
 import { matchUserScript, parseMeta } from './script';
 import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
@@ -151,5 +152,15 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
     `${FILE_GLOB_ALL}.user.js?*`,
     !__.MV3 && `${extensionRoot}*.user.js`,
   ].filter(Boolean),
+  types: [kMainFrame],
+}, __.MV3 ? [] : ['blocking']);
+
+browser.webRequest.onBeforeRequest.addListener(({ tabId, url }) => {
+  if (tabId >= 0 && requestMcpConnection(url)) {
+    openMcpAuthorization(tabId);
+    return IS_FIREFOX ? { cancel: true } : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
+  }
+}, {
+  urls: [`${MCP_CONNECT_URL}*`],
   types: [kMainFrame],
 }, __.MV3 ? [] : ['blocking']);

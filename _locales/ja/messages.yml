@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: 適用
+buttonApprove:
+  description: Button to approve a request.
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
   message: キャンセル
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: 無効化
+buttonDisconnect:
+  description: Button to disconnect.
+  message: ''
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -70,6 +76,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: ゴミ箱
+buttonReject:
+  description: Button to reject a request.
+  message: ''
 buttonRemove:
   description: Button to remove a script.
   message: 削除
@@ -563,6 +572,27 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: 実行するページのURL (@match)
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: ''
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: ''
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: ''
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: ''
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: ''
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: ''
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: ''
 labelName:
   description: Label of script name.
   message: 'スクリプト名:'

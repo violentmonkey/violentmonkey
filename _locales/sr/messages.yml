@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Примени
+buttonApprove:
+  description: Button to approve a request.
+  message: ''
 buttonCancel:
   description: Cancel button on dialog.
   message: Откажи
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Онемогући
+buttonDisconnect:
+  description: Button to disconnect.
+  message: ''
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -72,6 +78,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Отпад
+buttonReject:
+  description: Button to reject a request.
+  message: ''
 buttonRemove:
   description: Button to remove a script.
   message: Уклони
@@ -578,6 +587,27 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: Правила подударања
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: ''
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: ''
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: ''
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: ''
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: ''
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: ''
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: ''
 labelName:
   description: Label of script name.
   message: Име

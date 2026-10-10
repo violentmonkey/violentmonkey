@@ -193,6 +193,9 @@ importers:
       '@usync/sync':
         specifier: ^0.1.1
         version: 0.1.1
+      '@violentmonkey/mcp-client':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@violentmonkey/shortcut':
         specifier: ^1.4.4
         version: 1.4.4
@@ -2410,6 +2413,13 @@ packages:
 
   '@usync/util@0.1.0':
     resolution: {integrity: sha512-PXB6rpAxtMEuj+mi7I11//urfMxZyH8hQ41wn1VG44nXr9wtIEeomo7OqilfG8kIWrB0jbeYtjE+IrakKLEByg==}
+
+  '@violentmonkey/mcp-client@0.1.1':
+    resolution: {integrity: sha512-JtXGUky+8bDBi1Nqx2fva0DW3ZXuaCygVOAiIg8pSCoYZ5lU2VAAjm++9sr94C4YtSr4AIJhXfQRrPtfI5wAGw==}
+
+  '@violentmonkey/mcp-protocol@0.1.1':
+    resolution: {integrity: sha512-R0w1HikeSquYQ8Hf1eZR1GDQL/ojBKkvHZnk1Q+pdZCS1pJ6Kud2jhmzluHAoe3pHkRngEOyVI7OT8IoozfnZA==}
+    engines: {node: '>=20'}
 
   '@violentmonkey/shortcut@1.4.4':
     resolution: {integrity: sha512-rS+qi/WhYQEKpoH/l8c+lBHppVIZDnbQxxSATE6zeKkKv4rbsV7aD9YAkJvSD1Jq6N96UT9grjhmA8huDGC+uA==}
@@ -6537,6 +6547,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+
 snapshots:
 
   '@aashutoshrathi/word-wrap@1.2.6': {}
@@ -8771,6 +8784,14 @@ snapshots:
   '@usync/sync@0.1.1': {}
 
   '@usync/util@0.1.0': {}
+
+  '@violentmonkey/mcp-client@0.1.1':
+    dependencies:
+      '@violentmonkey/mcp-protocol': 0.1.1
+
+  '@violentmonkey/mcp-protocol@0.1.1':
+    dependencies:
+      zod: 4.6.5
 
   '@violentmonkey/shortcut@1.4.4':
     dependencies:
@@ -13324,3 +13345,5 @@ snapshots:
       buffer-crc32: 1.0.0
 
   yocto-queue@0.1.0: {}
+
+  zod@4.6.5: {}
