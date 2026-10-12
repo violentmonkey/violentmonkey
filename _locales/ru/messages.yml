@@ -3,7 +3,7 @@ buttonApply:
   message: Применить
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Подтвердить
 buttonCancel:
   description: Cancel button on dialog.
   message: Отмена
@@ -27,7 +27,7 @@ buttonDisable:
   message: Отключить
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: Отключить
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Скачать темы
@@ -78,7 +78,7 @@ buttonRecycleBin:
   message: Корзина
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: Отклонить
 buttonRemove:
   description: Button to remove a script.
   message: Удалить
@@ -621,25 +621,29 @@ labelMatch:
   message: '@match правила соответствия'
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: Доступ для ИИ-агентов (MCP)
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: >-
+    Сервер MCP закрыл соединение. Откройте новый URL-адрес подключения, чтобы
+    повторить попытку.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'Сервер MCP на порту $1: подключён'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: Подключение к серверу MCP на порту $1…
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: Узнайте, как подключить ИИ-агента
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: Нет ожидающих запросов.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: >-
+    Сервер MCP на порту $1 хочет читать и изменять ваши скрипты. Подтверждайте
+    только в том случае, если вы его запустили.
 labelName:
   description: Label of script name.
   message: 'Имя:'

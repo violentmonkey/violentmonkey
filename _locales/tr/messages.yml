@@ -206,7 +206,9 @@ descSyncGitRepoPreexisting:
   description: >-
     Note explaining the repository must already exist; Violentmonkey never
     creates it.
-  message: ''
+  message: >-
+    Depo önceden mevcut olmalıdır — Violentmonkey bunu sizin adınıza asla
+    oluşturmaz veya başlatmaz.
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: gruplandır
@@ -375,7 +377,7 @@ hintInputURL:
   message: 'URL''yi girin:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: Geçersiz 5 alanlı cron ifadesi
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Kaldırdığınız betikler burada listelenir ve 7 gün boyunca tutulur.
@@ -467,10 +469,10 @@ labelCronDaily:
   message: her gün
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: Ayın Günü
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: Haftanın Günü
 labelCronHour:
   description: Label for the hour field in a cron expression.
   message: Saat
@@ -1069,7 +1071,9 @@ msgSyncRepoNotFound:
   description: >-
     Message shown when the configured Git repository was not found, or the token
     can't access it. Violentmonkey never creates it automatically.
-  message: ''
+  message: >-
+    Depo bulunamadı. Önce depoyu oluşturun, ardından jetonunuzun bu depoya
+    erişim izni olduğundan emin olun.
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Eşitleme devam ediyor...
@@ -1260,13 +1264,17 @@ titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to
     change it.
-  message: ''
+  message: >-
+    Dosyayı ilk kez oluştururken senkronizasyon başarısız olursa, diğer yöntemi
+    deneyin.
 titleSyncGitPathPrefix:
   description: Hover title for the Git path-prefix input, clarifying what it does.
-  message: ''
+  message: Deponun kök dizini yerine bu alt klasöre senkronize edin. İsteğe bağlı.
 titleSyncGitToken:
   description: Hover title for the Git access token input, clarifying required permissions.
-  message: ''
+  message: >-
+    Deponun içeriğine okuma/yazma erişimi gereklidir (depo önceden mevcut
+    olmalıdır).
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Kullanıcı betiği enjeksiyonunu aç/kapat

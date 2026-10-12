@@ -3,7 +3,7 @@ buttonApply:
   message: Aplicar
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Aprobar
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancelar
@@ -27,7 +27,7 @@ buttonDisable:
   message: Deshabilitar
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: Desconectar
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Descargar temas
@@ -80,7 +80,7 @@ buttonRecycleBin:
   message: Papelera de reciclaje
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: Rechazar
 buttonRemove:
   description: Button to remove a script.
   message: Eliminar
@@ -635,25 +635,29 @@ labelMatch:
   message: Reglas @match
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: Acceso para agentes de IA (MCP)
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: >-
+    El servidor MCP cerró la conexión. Abre una nueva URL de conexión para
+    volver a intentarlo.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'Servidor MCP en el puerto $1: conectado'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: Conectando con el servidor MCP en el puerto $1...
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: Aprende a conectar un agente de IA
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: No hay solicitudes pendientes.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: >-
+    Un servidor MCP en el puerto $1 quiere leer y editar tus scripts. Apruébalo
+    solo si tú lo iniciaste.
 labelName:
   description: Label of script name.
   message: 'Nombre:'
