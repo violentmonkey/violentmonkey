@@ -3,7 +3,7 @@ buttonApply:
   message: Zastosuj
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Zatwierdź
 buttonCancel:
   description: Cancel button on dialog.
   message: Anuluj
@@ -27,7 +27,7 @@ buttonDisable:
   message: Wyłącz
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: Rozłącz
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Pobierz motywy
@@ -80,7 +80,7 @@ buttonRecycleBin:
   message: Kosz
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: Odrzuć
 buttonRemove:
   description: Button to remove a script.
   message: Usuń
@@ -624,25 +624,27 @@ labelMatch:
   message: Reguły @match
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: Dostęp agenta AI (MCP)
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: >-
+    Serwer MCP zamknął połączenie. Otwórz nowy adres URL połączenia, aby
+    spróbować ponownie.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'Serwer MCP na porcie $1: połączono'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: "Łączenie z\_serwerem MCP na porcie $1..."
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: Dowiedz się, jak połączyć agenta AI
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: Brak oczekujących żądań.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: "Serwer MCP na porcie $1 chce odczytać i\_edytować Twoje skrypty. Zatwierdź tylko wtedy, gdy to Ty go uruchomiłeś."
 labelName:
   description: Label of script name.
   message: 'Nazwa skryptu:'

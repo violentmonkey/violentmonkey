@@ -3,7 +3,7 @@ buttonApply:
   message: تطبيق
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: يعتمد
 buttonCancel:
   description: Cancel button on dialog.
   message: إلغاء
@@ -27,7 +27,7 @@ buttonDisable:
   message: تعطيل
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: قطع الاتصال
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -80,7 +80,7 @@ buttonRecycleBin:
   message: سلة المحذوفات
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: يرفض
 buttonRemove:
   description: Button to remove a script.
   message: إزالة
@@ -618,25 +618,27 @@ labelMatch:
   message: قواعد @match
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: وصول وكيل الذكاء الاصطناعي (MCP)
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: أغلق خادم MCP الاتصال. افتح رابط اتصال جديداً للمحاولة مرة أخرى.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'خادم MCP على المنفذ $1: متصل'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: جارٍ الاتصال بخادم MCP على المنفذ $1...
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: تعرّف على كيفية توصيل وكيل ذكاء اصطناعي
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: لا توجد طلبات معلقة.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: >-
+    يرغب خادم MCP على المنفذ $1 في قراءة نصوصك البرمجية وتعديلها. لا تمنح
+    الموافقة إلا إذا كنت أنت من قمت بتشغيله.
 labelName:
   description: Label of script name.
   message: 'الاسم:'

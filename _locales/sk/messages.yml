@@ -3,7 +3,7 @@ buttonApply:
   message: Použiť
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Schváliť
 buttonCancel:
   description: Cancel button on dialog.
   message: Zrušiť
@@ -27,7 +27,7 @@ buttonDisable:
   message: Zakázať
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: Odpojiť
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Stiahnuť motívy
@@ -80,7 +80,7 @@ buttonRecycleBin:
   message: Kôš
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: Odmietnuť
 buttonRemove:
   description: Button to remove a script.
   message: Odstrániť
@@ -627,25 +627,29 @@ labelMatch:
   message: pravidlá @match
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: Prístup agenta AI (MCP)
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: >-
+    Server MCP ukončil spojenie. Otvorte novú adresu URL na pripojenie a skúste
+    to znova.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'Server MCP na porte $1: pripojené'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: Pripájanie k serveru MCP na porte $1
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: Zistite, ako pripojiť agenta AI
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: Žiadne čakajúce žiadosti.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: >-
+    Server MCP na porte $1 chce čítať a upravovať vaše skripty. Schváľte to len
+    vtedy, ak ste ho spustili vy.
 labelName:
   description: Label of script name.
   message: 'Názov:'

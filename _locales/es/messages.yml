@@ -3,7 +3,7 @@ buttonApply:
   message: Aplicar
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Aprobar
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancelar
@@ -27,7 +27,7 @@ buttonDisable:
   message: Desactivar
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: Desconectar
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -80,7 +80,7 @@ buttonRecycleBin:
   message: Papelera de reciclaje
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: Rechazar
 buttonRemove:
   description: Button to remove a script.
   message: Eliminar
@@ -148,7 +148,7 @@ confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     ¡Las modificaciones no se han guardado!
-    Haz clic en OK para descartarlas o en Cancelar para matenerlas.
+    Haz clic en OK para descartarlas o en Cancelar para mantenerlas.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
@@ -296,8 +296,8 @@ fileInstallBlocked:
     Hay varios métodos para instalar o rastrear ediciones en un archivo local:
     <1> Arrastra y suelta el archivo en una página abierta o menú emergente de
     Violentmonkey (incluida esta). <2> Instala un servidor HTTP local para ese
-    archivo y ábrelo desde http://localhost. <3> Activa la opción “Permitir el
-    acceso a las URL del archivo” en los detalles de Violentmonkey en la página
+    archivo y ábrelo desde http://localhost. <3> Activa la opción "Permitir el
+    acceso a las URL del archivo" en los detalles de Violentmonkey en la página
     chrome://extensions. Esto es peligroso, ya que cualquier userscript podría
     leer cualquier archivo local.
 fileInstallBlockedFF:
@@ -541,10 +541,10 @@ labelFastInject:
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Un método de inyección alternativo para scripts <document-start> disponible,
-    más rápido que el modo predeterminado. Al igual que el "modo page
-    sincrónico", también incrementa el uso de memoria, por lo que podrías
-    desactivarlo si tus scripts funcionan correctamente sin esta opción.
+    Un método de inyección alternativo para scripts <document-start>, más rápido
+    que el modo predeterminado. Al igual que el "modo page sincrónico", también
+    incrementa el uso de memoria, por lo que podrías desactivarlo si tus scripts
+    funcionan correctamente sin esta opción.
 labelFeedback:
   description: Label of link to feedback page.
   message: Comentarios
@@ -634,25 +634,29 @@ labelMatch:
   message: Reglas @match
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: Acceso para agentes de IA (MCP)
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: >-
+    El servidor MCP cerró la conexión. Abre una nueva URL de conexión para
+    volver a intentarlo.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'Servidor MCP en el puerto $1: conectado'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: Conectando con el servidor MCP en el puerto $1...
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: Aprende a conectar un agente de IA
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: No hay solicitudes pendientes.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: >-
+    Un servidor MCP en el puerto $1 quiere leer y editar tus scripts. Apruébalo
+    solo si tú lo iniciaste.
 labelName:
   description: Label of script name.
   message: 'Nombre:'
@@ -890,11 +894,10 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    La pestaña actual se recargará automáticamente si activaste esta opción en
+    La pestaña actual se recargará automáticamente si habilitaste esta opción en
     la configuración general.
 
-    Para aplicar los cambios a todas las demás pestañas, recargarlas
-    manualmente.
+    Para aplicar los cambios en las demás pestañas, recárgalas manualmente.
 
     Utiliza la pestaña "Configuración" del editor para mayor flexibilidad.
 menuFeedback:
@@ -1143,7 +1146,7 @@ optionShowEnabledFirst:
   message: Mostrar scripts activos primero
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: Tema de la interfaz
+  message: 'Tema de la interfaz: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: automático
