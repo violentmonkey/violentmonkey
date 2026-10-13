@@ -12,6 +12,7 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
+$submenuButtonsGap: 4.5rem;
 
 $hoverColor: var(--bg);
 $hoverBack: cornflowerblue;
@@ -299,6 +300,11 @@ footer {
       }
     }
   }
+}
+
+.script:hover > .menu-item,
+.script.buttons-shown > .menu-item {
+  padding-right: $submenuButtonsGap;
 }
 
 .failure-reason {

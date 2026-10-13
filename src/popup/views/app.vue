@@ -93,6 +93,7 @@
             runs: item.runs,
             'extras-shown': extras === item,
             'excludes-shown': item.excludes,
+            'buttons-shown': showButtons(item),
           }"
           class="script">
           <div
