@@ -93,7 +93,6 @@
             runs: item.runs,
             'extras-shown': extras === item,
             'excludes-shown': item.excludes,
-            'buttons-shown': showButtons(item),
           }"
           class="script">
           <div
@@ -124,8 +123,7 @@
             </div>
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>
-          <div class="submenu-buttons"
-               v-show="showButtons(item)">
+          <div class="submenu-buttons">
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex @click="onEditScript(item)"
                  :title="i18n('buttonEditClickHint')">
@@ -587,9 +585,6 @@ function getEllipsizedMessage(el) {
 }
 function updateMessage({ target: el = getActiveElement() } = {}) {
   message.value = el && getEllipsizedMessage(el) || '';
-}
-function showButtons(item) {
-  return extras.value?.id === item.id || focusedItem.value?.id === item.id;
 }
 
 onMounted(() => {

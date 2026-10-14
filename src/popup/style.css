@@ -12,7 +12,10 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
-$submenuButtonsGap: 4.5rem;
+$itemWidth: 2rem;
+$submenuButtonPad: calc(($itemWidth - $iconSize) / 2);
+$submenuButtonsWidth: calc(2 * (2 * $submenuButtonPad + $iconSize));
+$submenuButtonsGap: .5rem;
 
 $hoverColor: var(--bg);
 $hoverBack: cornflowerblue;
@@ -249,17 +252,19 @@ footer {
     }
   }
   &-buttons {
-    display: flex;
+    display: none;
     position: absolute;
     top: 0;
     right: 0;
     .script:hover &, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
+    .script:focus-within &,
+    .script.extras-shown &,
     .touch & {
-      display: flex !important;
+      display: flex;
     }
   }
   &-button {
-    padding: .5rem;
+    padding: $submenuButtonPad;
     line-height: 1;
     background: var(--bg);
     cursor: pointer;
@@ -273,6 +278,8 @@ footer {
     }
     .icon {
       display: block;
+      width: $iconSize;
+      height: $iconSize;
     }
   }
   &-commands {
@@ -303,8 +310,10 @@ footer {
 }
 
 .script:hover > .menu-item,
-.script.buttons-shown > .menu-item {
-  padding-right: $submenuButtonsGap;
+.script:focus-within > .menu-item,
+.script.extras-shown > .menu-item,
+.touch .script > .menu-item {
+  padding-right: calc($submenuButtonsWidth + $submenuButtonsGap);
 }
 
 .failure-reason {
