@@ -14,8 +14,7 @@ bridge.onScripts.push(() => {
 on('pageshow', onShown);
 if (pending) {
   document::on('prerenderingchange', onShown.bind(null), { once: true });
-  // eslint-disable-next-line no-import-assign
-  bridge.reify = new Promise(resolve => (resolveOnReify = resolve));
+  bridge.setReify(new Promise(resolve => (resolveOnReify = resolve)));
 }
 
 function onShown(evt) {
@@ -23,7 +22,8 @@ function onShown(evt) {
   if (evt.isTrusted) {
     if (!this) {
       topRenderMode = 3; // eslint-disable-line no-global-assign
-      sent = bridge.reify = false; // eslint-disable-line no-import-assign
+      sent = false;
+      bridge.setReify(false);
       resolveOnReify();
       report();
       topRenderMode = 4; // eslint-disable-line no-global-assign

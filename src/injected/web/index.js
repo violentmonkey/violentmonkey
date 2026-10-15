@@ -19,10 +19,10 @@ VMInitInjection = (invokeHost, console) => {
   if (PAGE_MODE_HANDSHAKE) {
     window::on(PAGE_MODE_HANDSHAKE + '*', e => {
       e = e::getDetail();
-      bridge.post = bindEvents(e[0], e[1], bridge.onHandle); // eslint-disable-line no-import-assign
+      bridge.setPost(bindEvents(e[0], e[1], bridge.onHandle));
     }, { __proto__: null, once: true, capture: true });
     window::fire(new SafeCustomEvent(PAGE_MODE_HANDSHAKE));
-    bridge.mode = PAGE; // eslint-disable-line no-import-assign
+    bridge.setMode(PAGE);
     bridge.addHandlers({
       /** @this {Node} contentWindow */
       WriteVault(id) {
@@ -40,9 +40,8 @@ VMInitInjection = (invokeHost, console) => {
       };
     }
   } else {
-    bridge.mode = CONTENT; // eslint-disable-line no-import-assign
-    bridge.post = (cmd, data, node) => // eslint-disable-line no-import-assign
-      invokeHost({ cmd, data, node }, CONTENT);
+    bridge.setMode(CONTENT);
+    bridge.setPost((cmd, data, node) => invokeHost({ cmd, data, node }, CONTENT));
     global.browser = global.chrome = undefined;
     logging = console; // eslint-disable-line no-global-assign
     return (cmd, data, realm, node) => {

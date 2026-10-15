@@ -52,6 +52,20 @@ export const onHandle = async ({ cmd, data, node }, realm) => {
     post('Callback', { res, err, id: callbackId || '' }, realm, nodeRet[0]);
   }
 };
+export const init = data => {
+  assign(ids, data[IDS]);
+  injectInto = data[INJECT_INTO];
+  useMenu = data[kUseMenu];
+};
+export const end = () => {
+  onScripts = null;
+};
+export const setCache = val => (cache = val);
+export const setPathMaps = val => (pathMaps = val);
+export const setPost = fn => (post = fn);
+export const setReify = val => (reify = val);
+export const setUseMenu = val => (useMenu = val);
+
 export let cache;
 export let injectInto;
 export let pathMaps;
