@@ -30,8 +30,8 @@
           </div>
           <div v-if="filteredScripts.length" class="btn-group filtered">
             <Tooltip
-              v-for="({ icon, num }, key) in batchActions" :key
-              :content="batchActionTooltip(key)"
+              v-for="({ icon, num, idleTooltip, activeTooltip }, key) in batchActions" :key
+              :content="state.batchAction.action === key ? activeTooltip : idleTooltip"
               placement="bottom"
               align="start"
             >
@@ -375,6 +375,8 @@ const getDataBatchAction = evt => evt.target.closest('[data-batch-action]');
 const ALL_BATCH_ACTIONS = {
   [TOGGLE]: {
     icon: TOGGLE_ON,
+    idleTooltip: i18n('batchActionEnable'),
+    activeTooltip: i18n('batchActionEnableConfirm'),
     arg(scripts) {
       const enabled = this.icon === TOGGLE_ON ? 1 : 0;
       return scripts.filter(s => +s.config.enabled !== enabled);
@@ -383,11 +385,15 @@ const ALL_BATCH_ACTIONS = {
   },
   [UPDATE]: {
     icon: 'refresh',
+    idleTooltip: i18n('batchActionUpdate'),
+    activeTooltip: i18n('batchActionUpdateConfirm'),
     fn: handleActionUpdate,
     [UNDO]: false,
   },
   [REMOVE]: {
     icon: 'trash',
+    idleTooltip: i18n('batchActionRemove'),
+    activeTooltip: i18n('batchActionRemoveConfirm'),
     async fn(scripts, el, undo) {
       await Promise.all(scripts.map(s => markRemove(s, !undo)));
       // nuking the ghosts because the user's intent was already confirmed
@@ -407,26 +413,13 @@ const batchActions = computed(() => {
     if (!allShown) toUpdate += s.$canUpdate > 0;
   }
   res[TOGGLE].icon = toEnable ? TOGGLE_ON : TOGGLE_OFF;
+  res[TOGGLE].idleTooltip = toEnable ? i18n('batchActionEnable') : i18n('batchActionDisable');
+  res[TOGGLE].activeTooltip = toEnable ? i18n('batchActionEnableConfirm') : i18n('batchActionDisableConfirm');
   res[TOGGLE].num = toEnable < num ? toEnable : '';
   if (!toUpdate) ({ [UPDATE]: toUpdate, ...res } = res);
   else res[UPDATE].num = toUpdate < num ? toUpdate : '';
   return res;
 });
-
-function batchActionTooltip(key) {
-  const confirming = state.batchAction.action === key;
-  if (key === REMOVE) {
-    return i18n(confirming ? 'batchActionRemoveConfirm' : 'batchActionRemove');
-  }
-  if (key === UPDATE) {
-    return i18n(confirming ? 'batchActionUpdateConfirm' : 'batchActionUpdate');
-  }
-  const enabling = batchActions.value[TOGGLE].icon === TOGGLE_ON;
-  if (confirming) {
-    return i18n(enabling ? 'batchActionEnableConfirm' : 'batchActionDisableConfirm');
-  }
-  return i18n(enabling ? 'batchActionEnable' : 'batchActionDisable');
-}
 
 const disposables = [];
 const debouncedSearch = debounce(scheduleSearch, 100);
