@@ -30,8 +30,8 @@ async function init() {
   /** @type {VMInjection} */
   const data = regData || xhrData || await (canReg ? getRegistration(dataPromise) : dataPromise);
   const info = data.info;
-  const injectInto = bridge.injectInto = data[INJECT_INTO]; // eslint-disable-line no-import-assign
-  assign(bridge.ids, data[IDS]);
+  const injectInto = data[INJECT_INTO];
+  bridge.init(data);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
   }
@@ -44,11 +44,10 @@ async function init() {
     bridge.post('Expose', data[EXPOSE]);
   }
   if (objectKeys(bridge.ids).length) {
-    bridge.useMenu = data[kUseMenu]; // eslint-disable-line no-import-assign
     bridge.onScripts.forEach(fn => fn(data));
     await injectScripts(data, info, isXml);
   }
-  bridge.onScripts = null; // eslint-disable-line no-import-assign
+  bridge.end();
   finish(injectInto);
 }
 

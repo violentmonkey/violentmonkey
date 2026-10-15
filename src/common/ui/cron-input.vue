@@ -116,7 +116,7 @@ const CRON_FIELDS = [
 const CRON_LABELS = CRON_FIELDS.slice().reverse();
 const CRON_PRESETS = [
   { label: i18n('labelCronDaily'), value: '0 12 * * *' },
-  { label: i18n('labelCronTwiceADay'), value: '0 */2 * * *' },
+  { label: i18n('labelCronTwiceADay'), value: '0 0,12 * * *' },
   { label: i18n('labelCronHourly'), value: '0 * * * *' },
 ];
 

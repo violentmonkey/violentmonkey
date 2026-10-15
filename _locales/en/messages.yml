@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Apply
+buttonApprove:
+  description: Button to approve a request.
+  message: Approve
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancel
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Disable
+buttonDisconnect:
+  description: Button to disconnect.
+  message: Disconnect
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Download themes
@@ -70,6 +76,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Recycle Bin
+buttonReject:
+  description: Button to reject a request.
+  message: Reject
 buttonRemove:
   description: Button to remove a script.
   message: Remove
@@ -599,6 +608,29 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: '@match rules'
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: AI agent access (MCP)
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: The MCP server closed the connection. Open a new connect URL to retry.
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: 'MCP server on port $1: connected'
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: Connecting to MCP server on port $1...
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: Learn how to connect an AI agent
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: No pending requests.
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: >-
+    An MCP server on port $1 wants to read and edit your scripts. Only approve
+    if you started it.
 labelName:
   description: Label of script name.
   message: 'Name:'

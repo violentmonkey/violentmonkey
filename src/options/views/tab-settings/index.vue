@@ -49,6 +49,7 @@
       <vm-maintenance/>
     </section>
     <vm-sync></vm-sync>
+    <vm-mcp/>
     <details v-for="(obj, key) in {showAdvanced: settings}" :key :open="obj[key]">
       <summary class="h3" @click.prevent="obj[key] = !obj[key]">
         <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
@@ -166,6 +167,7 @@ import VmImport from './vm-import';
 import VmExport from './vm-export';
 import VmMaintenance from './vm-maintenance';
 import VmSync from './vm-sync';
+import VmMcp from './vm-mcp';
 import VmEditor from './vm-editor';
 import VmBlacklist from './vm-blacklist';
 import VmDateInfo from './vm-date-info';

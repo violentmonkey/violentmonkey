@@ -74,6 +74,17 @@ export function getCronOccurrence(expression, timestamp, tolerance = 0) {
   return occurrence != null && timestamp - occurrence <= tolerance ? occurrence : undefined;
 }
 
+/**
+ * Finds an occurrence that was skipped because the browser was not running,
+ * i.e. the first one in the half-open interval (lastUpdate, now].
+ * Returns undefined when the schedule was already honored or never ran.
+ */
+export function getMissedCronTime(expression, lastUpdate, now = Date.now()) {
+  if (!lastUpdate) return;
+  const due = getNextCronTime(expression, lastUpdate);
+  return due != null && due <= now ? due : undefined;
+}
+
 export function isCronOccurrence(expression, timestamp) {
   const date = new Date(timestamp);
   if (!Number.isFinite(date.getTime())) return false;

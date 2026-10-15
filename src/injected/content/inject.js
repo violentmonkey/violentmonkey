@@ -114,8 +114,7 @@ export function injectPageSandbox(data) {
   function handshaker(evt) {
     pageInjectable = true;
     evt::stopImmediatePropagation();
-    // eslint-disable-next-line no-import-assign
-    bridge.post = bindEvents(contentId, webId, bridge.onHandle, true);
+    bridge.setPost(bindEvents(contentId, webId, bridge.onHandle, true));
     fireBridgeEvent(`${handshakeId}*`, [webId, contentId]);
   }
 }
@@ -134,8 +133,8 @@ export async function injectScripts(data, info, isXml) {
   }
   injectedInfo = { __proto: null, [PAGE]: info, [CONTENT]: info };
   injectedRealms = createNullObj();
-  setPrototypeOf(bridge.cache = data[CACHE], null); // eslint-disable-line no-import-assign
-  bridge.pathMaps = createNullObj(); // eslint-disable-line no-import-assign
+  setPrototypeOf(bridge.setCache(data[CACHE]), null);
+  bridge.setPathMaps(createNullObj());
   if (isXml || data[FORCE_CONTENT]) {
     pageInjectable = false;
   } else if (data[PAGE] && pageInjectable == null) {
@@ -363,10 +362,9 @@ async function injectPageList(runAt) {
 function setupContentInvoker() {
   invokeContent = VMInitInjection(IS_FIREFOX)(bridge.onHandle, logging);
   const postViaBridge = bridge.post;
-  // eslint-disable-next-line no-import-assign
-  bridge.post = (cmd, params, realm, node) => {
+  bridge.setPost((cmd, params, realm, node) => {
     (realm === CONTENT ? invokeContent : postViaBridge)(cmd, params, undefined, node);
-  };
+  });
 }
 
 /**

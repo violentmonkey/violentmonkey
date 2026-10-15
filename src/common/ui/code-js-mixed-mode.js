@@ -20,6 +20,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
   const kInJsExprInStringTemplate = '#inJsExprInStringTemplate';
   const kIndexOfJsExprStart = '#indexOfJsExprStart';
   const kJsExprDepthInStringTemplate = '#jsExprDepthInStringTemplate';
+  const kJsExprStartConsumed = '#jsExprStartConsumed';
   const kJsState = '#jsState';
   const kLocalHtmlPlainStringEndPos = '#localHtmlPlainStringEndPos';
   const kLocalMode = '#localMode';
@@ -195,11 +196,20 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
 
   /** @this {Rule} */
   function prepReparseStringTemplateInLocalMode({stream, state}) {
+    const jsState = state[kJsState];
+    // If the token that started this reparse already ended with `${`, the JS parser has consumed
+    // it and now waits for the expression + `}`. Feeding the same `${` to it again later would
+    // leave an extra pending `}` in its stack, which then steals the first `}` after the template.
+    const jsExprStartConsumed = jsState[kTokenize] !== jsTokenQuasi
+      && stream.current().endsWith('${');
     // spit out beginning backtick as a token, and leave the rest of the text for local mode parsing
     stream.backUp(stream.pos - stream.start - (this.hasBeginBacktick !== false));
     // workaround needed for 1-line string template,
     // to ensure the ending backtick is parsed correctly.
-    state[kJsState][kTokenize] = jsTokenQuasi;
+    if (!jsExprStartConsumed) {
+      jsState[kTokenize] = jsTokenQuasi;
+    }
+    state[kJsExprStartConsumed] = jsExprStartConsumed;
     // switch to local mode for subsequent text
     state[kLocalMode] = this.mode;
     state[kLocalState] = cmStartState(state[kLocalMode]);
@@ -219,6 +229,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
 
   /** @this {Rule} */
   function exitLocalModeWithEndBacktick(ctx) {
+    ctx.state[kJsExprStartConsumed] = false;
     // parse the ending JS string template backtick in js mode
     ctx.style = jsMode.token(ctx.stream, ctx.state[kJsState]);
   }
@@ -316,6 +327,13 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
   });
 
   function tokenJsExpressionInStringTemplate(stream, state) {
+    if (state[kJsExprStartConsumed]) {
+      // JS mode has already seen this `${`, just skip it without involving the JS parser
+      state[kJsExprStartConsumed] = false;
+      stream.pos += 2;
+      state[kJsExprDepthInStringTemplate] += 1;
+      return 'string-2';
+    }
     const style = jsMode.token(stream, state[kJsState]);
     // track ${ , } to determine when the expression is complete.
     if (style === 'string-2' && tokenIndexOfUnescaped(stream, '${') >= 0) {
@@ -670,6 +688,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     startState: () => ({
       [kInJsExprInStringTemplate]: false,
       [kJsExprDepthInStringTemplate]: 0,
+      [kJsExprStartConsumed]: false,
       [kJsState]: cmStartState(jsMode),
       [kLocalMode]: null,
       [kLocalState]: null,
@@ -681,6 +700,7 @@ CodeMirror.defineMode('javascript-mixed', (config) => {
     copyState: state => ({
       [kInJsExprInStringTemplate]: state[kInJsExprInStringTemplate],
       [kJsExprDepthInStringTemplate]: state[kJsExprDepthInStringTemplate],
+      [kJsExprStartConsumed]: state[kJsExprStartConsumed],
       [kJsState]: cmCopyState(jsMode, state[kJsState]),
       [kLocalMode]: state[kLocalMode],
       [kLocalState]: state[kLocalState]

@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Zastosuj
+buttonApprove:
+  description: Button to approve a request.
+  message: Zatwierdź
 buttonCancel:
   description: Cancel button on dialog.
   message: Anuluj
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Wyłącz
+buttonDisconnect:
+  description: Button to disconnect.
+  message: Rozłącz
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Pobierz motywy
@@ -72,6 +78,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Kosz
+buttonReject:
+  description: Button to reject a request.
+  message: Odrzuć
 buttonRemove:
   description: Button to remove a script.
   message: Usuń
@@ -361,7 +370,7 @@ hintInputURL:
   message: 'Wprowadź adres URL:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: Nieprawidłowe 5-polowe wyrażenie cron
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Usunięte skrypty są wymienione tutaj i będą przechowywane przez 7 dni.
@@ -448,28 +457,28 @@ labelContributors:
   message: Współtwórcy
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: codziennie
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: Dzień miesiąca
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: Dzień tygodnia
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: Godzina
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: co godzinę
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: Minuta
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: Miesiąc
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: dwa razy dziennie
 labelCurrentLang:
   description: Label of current language.
   message: 'Używany język: '
@@ -613,6 +622,29 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: Reguły @match
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: Dostęp agenta AI (MCP)
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: >-
+    Serwer MCP zamknął połączenie. Otwórz nowy adres URL połączenia, aby
+    spróbować ponownie.
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: 'Serwer MCP na porcie $1: połączono'
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: "Łączenie z\_serwerem MCP na porcie $1..."
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: Dowiedz się, jak połączyć agenta AI
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: Brak oczekujących żądań.
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: "Serwer MCP na porcie $1 chce odczytać i\_edytować Twoje skrypty. Zatwierdź tylko wtedy, gdy to Ty go uruchomiłeś."
 labelName:
   description: Label of script name.
   message: 'Nazwa skryptu:'
@@ -782,16 +814,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Niestandardowe wyrażenie cron
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: Codziennie
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: Wyłączone
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: Sprawdź dostępność aktualizacji skryptów
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Adres URL aktualizacji:'
@@ -985,6 +1017,9 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Zapisz ponownie lub przeinstaluj te skrypty:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: "Należy ponownie uruchomić Violentmonkey, aby zakończyć aktualizację z\_wersji $1 do $2."
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (kod jest taki sam)
@@ -1030,9 +1065,7 @@ msgSyncRepoNotFound:
   description: >-
     Message shown when the configured Git repository was not found, or the token
     can't access it. Violentmonkey never creates it automatically.
-  message: >-
-    Nie znaleziono repozytorium. Najpierw je utwórz, a następnie upewnij się, że
-    Twój token ma do niego dostęp.
+  message: "Nie znaleziono repozytorium. Najpierw je utwórz, a\_następnie upewnij się, że Twój token ma do niego dostęp."
 msgSyncing:
   description: Message shown when sync is in progress.
   message: Trwa synchronizacja...
@@ -1228,14 +1261,10 @@ titleSyncGitCreateMethod:
     spróbuj użyć drugiej metody.
 titleSyncGitPathPrefix:
   description: Hover title for the Git path-prefix input, clarifying what it does.
-  message: >-
-    Synchronizuj z tym podkatalogiem repozytorium zamiast z jego katalogiem
-    głównym. Opcjonalne.
+  message: "Synchronizuj z\_tym podkatalogiem repozytorium zamiast z\_jego katalogiem głównym. Opcjonalne."
 titleSyncGitToken:
   description: Hover title for the Git access token input, clarifying required permissions.
-  message: >-
-    Wymaga uprawnień do odczytu i zapisu zawartości repozytorium (repozytorium
-    musi już istnieć).
+  message: "Wymaga uprawnień do odczytu i\_zapisu zawartości repozytorium (repozytorium musi już istnieć)."
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: Przełącz tryb wstrzykiwania skryptu użytkownika

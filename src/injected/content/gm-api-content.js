@@ -20,7 +20,7 @@ bridge.addBackgroundHandlers({
     }
   },
   [kUseMenu](state) {
-    bridge.useMenu = state; // eslint-disable-line no-import-assign
+    bridge.setUseMenu(state);
     if (state) sendSetPopup();
   },
 });

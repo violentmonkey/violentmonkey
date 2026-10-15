@@ -204,17 +204,13 @@ jobs:
           name: build-outputs
           path: .
 
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
       - name: Publish to Edge
         env:
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
           EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
         run: |
-          if ! deno run -A https://raw.githubusercontent.com/violentmonkey/publish-edge-ext/main/main.ts $ASSETS_DIR/$ASSET_CWS_ZIP 2>"$TEMP_DIR/stderr.log"; then
+          if ! node scripts/edge-upload.mjs $ASSETS_DIR/$ASSET_CWS_ZIP 2>"$TEMP_DIR/stderr.log"; then
             export ERROR=1
             export MESSAGE=$(cat "$TEMP_DIR/stderr.log" 2>/dev/null || true)
             MESSAGE="${MESSAGE:-Edge publish failed}"

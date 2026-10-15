@@ -47,6 +47,8 @@ export const call = (cmd, data, node, cb, cbAsync) => {
     return res;
   }
 };
+export const setMode = val => (mode = val);
+export const setPost = fn => (post = fn);
 /** @type {VMBridgeMode} */
 export let mode;
 /** @type {VMBridgePostFunc} */

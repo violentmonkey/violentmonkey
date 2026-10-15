@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Aplicar
+buttonApprove:
+  description: Button to approve a request.
+  message: Aprobar
 buttonCancel:
   description: Cancel button on dialog.
   message: Cancelar
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Desactivar
+buttonDisconnect:
+  description: Button to disconnect.
+  message: Desconectar
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -72,6 +78,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Papelera de reciclaje
+buttonReject:
+  description: Button to reject a request.
+  message: Rechazar
 buttonRemove:
   description: Button to remove a script.
   message: Eliminar
@@ -139,7 +148,7 @@ confirmNotSaved:
   description: Confirm message shown when there are unsaved script modifications.
   message: |-
     ¡Las modificaciones no se han guardado!
-    Haz clic en OK para descartarlas o en Cancelar para matenerlas.
+    Haz clic en OK para descartarlas o en Cancelar para mantenerlas.
 confirmUndoImport:
   description: >-
     Tooltip of the Undo button after importing a zip in settings. The same text
@@ -287,8 +296,8 @@ fileInstallBlocked:
     Hay varios métodos para instalar o rastrear ediciones en un archivo local:
     <1> Arrastra y suelta el archivo en una página abierta o menú emergente de
     Violentmonkey (incluida esta). <2> Instala un servidor HTTP local para ese
-    archivo y ábrelo desde http://localhost. <3> Activa la opción “Permitir el
-    acceso a las URL del archivo” en los detalles de Violentmonkey en la página
+    archivo y ábrelo desde http://localhost. <3> Activa la opción "Permitir el
+    acceso a las URL del archivo" en los detalles de Violentmonkey en la página
     chrome://extensions. Esto es peligroso, ya que cualquier userscript podría
     leer cualquier archivo local.
 fileInstallBlockedFF:
@@ -370,7 +379,7 @@ hintInputURL:
   message: 'Introduce la URL:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: Expresión cron de 5 campos no válida
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Los scripts eliminados se muestran aquí y se conservarán durante 7 días.
@@ -459,28 +468,28 @@ labelContributors:
   message: Colaboradores
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: diario
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: Día del mes
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: Día de la semana
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: Hora
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: cada hora
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: Minuto
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: Mes
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: dos veces al día
 labelCurrentLang:
   description: Label of current language.
   message: 'Idioma actual:'
@@ -532,10 +541,10 @@ labelFastInject:
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
   message: >-
-    Un método de inyección alternativo para scripts <document-start> disponible,
-    más rápido que el modo predeterminado. Al igual que el "modo page
-    sincrónico", también incrementa el uso de memoria, por lo que podrías
-    desactivarlo si tus scripts funcionan correctamente sin esta opción.
+    Un método de inyección alternativo para scripts <document-start>, más rápido
+    que el modo predeterminado. Al igual que el "modo page sincrónico", también
+    incrementa el uso de memoria, por lo que podrías desactivarlo si tus scripts
+    funcionan correctamente sin esta opción.
 labelFeedback:
   description: Label of link to feedback page.
   message: Comentarios
@@ -623,6 +632,31 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: Reglas @match
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: Acceso para agentes de IA (MCP)
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: >-
+    El servidor MCP cerró la conexión. Abre una nueva URL de conexión para
+    volver a intentarlo.
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: 'Servidor MCP en el puerto $1: conectado'
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: Conectando con el servidor MCP en el puerto $1...
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: Aprende a conectar un agente de IA
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: No hay solicitudes pendientes.
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: >-
+    Un servidor MCP en el puerto $1 quiere leer y editar tus scripts. Apruébalo
+    solo si tú lo iniciaste.
 labelName:
   description: Label of script name.
   message: 'Nombre:'
@@ -790,16 +824,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Expresión cron personalizada
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: Diario
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: Desactivado
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: Buscar actualizaciones del script
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'URL de actualización:'
@@ -860,11 +894,10 @@ menuExclude:
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
   message: >-
-    La pestaña actual se recargará automáticamente si activaste esta opción en
+    La pestaña actual se recargará automáticamente si habilitaste esta opción en
     la configuración general.
 
-    Para aplicar los cambios a todas las demás pestañas, recargarlas
-    manualmente.
+    Para aplicar los cambios en las demás pestañas, recárgalas manualmente.
 
     Utiliza la pestaña "Configuración" del editor para mayor flexibilidad.
 menuFeedback:
@@ -997,6 +1030,11 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Por favor, vuelve a guardar o reinstalar estos scripts:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: >-
+    Es necesario reiniciar Violentmonkey para completar la actualización de $1 a
+    $2.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (el código es el mismo)
@@ -1108,7 +1146,7 @@ optionShowEnabledFirst:
   message: Mostrar scripts activos primero
 optionUiTheme:
   description: Label for the theme selector in Advanced settings.
-  message: Tema de la interfaz
+  message: 'Tema de la interfaz: '
 optionUiThemeAuto:
   description: Name of a theme selector value in settings.
   message: automático

@@ -1,6 +1,9 @@
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Použiť
+buttonApprove:
+  description: Button to approve a request.
+  message: Schváliť
 buttonCancel:
   description: Cancel button on dialog.
   message: Zrušiť
@@ -22,6 +25,9 @@ buttonConfirmReinstallation:
 buttonDisable:
   description: Button to disable a script.
   message: Zakázať
+buttonDisconnect:
+  description: Button to disconnect.
+  message: Odpojiť
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: Stiahnuť motívy
@@ -72,6 +78,9 @@ buttonOK:
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Kôš
+buttonReject:
+  description: Button to reject a request.
+  message: Odmietnuť
 buttonRemove:
   description: Button to remove a script.
   message: Odstrániť
@@ -368,7 +377,7 @@ hintInputURL:
   message: 'Vložte adresu:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: Neplatný 5-polový cron výraz
 hintRecycleBin:
   description: Hint for recycle bin.
   message: Tu sa zobrazujú odstránené súbory a budú odstránené po 7 dňoch.
@@ -453,28 +462,28 @@ labelContributors:
   message: Prispievatelia
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: denne
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: Deň v mesiaci
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: Deň v týždni
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: Hodina
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: každú hodinu
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: Minúta
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: Mesiac
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: Dvakrát denne
 labelCurrentLang:
   description: Label of current language.
   message: 'Aktuálny jazyk: '
@@ -616,6 +625,31 @@ labelLineNumber:
 labelMatch:
   description: Label of @match rules.
   message: pravidlá @match
+labelMcp:
+  description: Title of the MCP (Model Context Protocol) section in settings.
+  message: Prístup agenta AI (MCP)
+labelMcpClosed:
+  description: Shown when the MCP server rejected or closed the connection.
+  message: >-
+    Server MCP ukončil spojenie. Otvorte novú adresu URL na pripojenie a skúste
+    to znova.
+labelMcpConnected:
+  description: Status text for an MCP connection. $1 is the port number.
+  message: 'Server MCP na porte $1: pripojené'
+labelMcpConnecting:
+  description: Status text while connecting to an MCP server. $1 is the port number.
+  message: Pripájanie k serveru MCP na porte $1
+labelMcpGuide:
+  description: Link text pointing to the MCP setup guide.
+  message: Zistite, ako pripojiť agenta AI
+labelMcpNoRequests:
+  description: Shown when no MCP server is connected and no request is pending.
+  message: Žiadne čakajúce žiadosti.
+labelMcpPending:
+  description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: >-
+    Server MCP na porte $1 chce čítať a upravovať vaše skripty. Schváľte to len
+    vtedy, ak ste ho spustili vy.
 labelName:
   description: Label of script name.
   message: 'Názov:'
@@ -783,16 +817,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: Vlastný cron výraz
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: Denne
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: Zakázané
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: Skontrolovať aktualizácie skriptu
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: 'Aktualizačná adresa:'
@@ -984,6 +1018,11 @@ msgReinstallScripts:
     Notification body shown for a missing @require or other resource when
     running such scripts.
   message: 'Prosím, znovu uložte alebo nainštalujte tieto skripty:'
+msgRestartToUpdate:
+  description: $1 is the old version, $2 is the new version.
+  message: >-
+    Na dokončenie aktualizácie z verzie $1 na verziu $2, je potrebné reštartovať
+    Violentmonkey.
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: ' (kód je rovnaký)'
