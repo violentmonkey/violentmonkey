@@ -29,21 +29,27 @@
             </Tooltip>
           </div>
           <div v-if="filteredScripts.length" class="btn-group filtered">
-            <a
+            <Tooltip
               v-for="({ icon, num }, key) in batchActions" :key
-              class="btn-ghost"
-              :class="{
-                'has-error': state.batchAction.action === key,
-                 disabled: store.batch,
-              }"
-              :data-batch-action="key"
-              tabindex="0"
-              @click.prevent="handleBatchAction"
+              :content="batchActionTooltip(key)"
+              placement="bottom"
+              align="start"
             >
-              <Icon :name="icon" />
-              <sub v-text="num" v-if="num" />
-              <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
-            </a>
+              <a
+                class="btn-ghost"
+                :class="{
+                  'has-error': state.batchAction.action === key,
+                  disabled: store.batch,
+                }"
+                :data-batch-action="key"
+                tabindex="0"
+                @click.prevent="handleBatchAction"
+              >
+                <Icon :name="icon" />
+                <sub v-text="num" v-if="num" />
+                <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
+              </a>
+            </Tooltip>
             <Tooltip :content="state.sizes" placement="bottom">
               <div class="btn-hint subtle"
                    v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
@@ -406,6 +412,21 @@ const batchActions = computed(() => {
   else res[UPDATE].num = toUpdate < num ? toUpdate : '';
   return res;
 });
+
+function batchActionTooltip(key) {
+  const confirming = state.batchAction.action === key;
+  if (key === REMOVE) {
+    return i18n(confirming ? 'batchActionRemoveConfirm' : 'batchActionRemove');
+  }
+  if (key === UPDATE) {
+    return i18n(confirming ? 'batchActionUpdateConfirm' : 'batchActionUpdate');
+  }
+  const enabling = batchActions.value[TOGGLE].icon === TOGGLE_ON;
+  if (confirming) {
+    return i18n(enabling ? 'batchActionEnableConfirm' : 'batchActionDisableConfirm');
+  }
+  return i18n(enabling ? 'batchActionEnable' : 'batchActionDisable');
+}
 
 const disposables = [];
 const debouncedSearch = debounce(scheduleSearch, 100);
