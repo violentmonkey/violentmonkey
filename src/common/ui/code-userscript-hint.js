@@ -5,20 +5,54 @@ const USERSCRIPT_OPEN_RE = new RegExp(`^\\s*//[\\x20\\t]*${USERSCRIPT_META_INTRO
 const USERSCRIPT_CLOSE_RE = /^\s*\/\/[\x20\t]*==\/UserScript==\s*$/;
 const META_LINE_RE = /^\s*\/\/[\x20\t]/;
 
+/**
+ * Last `// ==UserScript==` at or above `maxLine`.
+ * @param {CodeMirror.Editor} cm 
+ * @param {number} maxLine 
+ * @returns {number}
+ */
+function getLastUserScriptOpenLine(cm, maxLine) {
+  let openLine = -1;
+  let lineNo = 0;
+  cm.eachLine(0, maxLine + 1, ({ text }) => {
+    if (USERSCRIPT_OPEN_RE.test(text)) openLine = lineNo;
+    lineNo++;
+  });
+  return openLine;
+}
+
+/**
+ * @param {number} line 
+ * @param {number} userScriptOpenLine 
+ * @returns {boolean}
+ */
+function isCursorBelowUserScriptOpen(line, userScriptOpenLine) {
+  return userScriptOpenLine >= 0 && line > userScriptOpenLine;
+}
+
+/**
+ * @param {CodeMirror.Editor} cm 
+ * @param {number} line 
+ * @param {number} userScriptOpenLine 
+ * @returns {boolean}
+ */
+function isCursorAboveUserScriptClose(cm, line, userScriptOpenLine) {
+  if (userScriptOpenLine < 0) return false;
+  let closeLine = -1;
+  let lineNo = userScriptOpenLine + 1;
+  cm.eachLine(userScriptOpenLine + 1, cm.lineCount(), ({ text }) => {
+    if (closeLine < 0 && USERSCRIPT_CLOSE_RE.test(text)) closeLine = lineNo;
+    lineNo++;
+  });
+  return closeLine >= 0 && line < closeLine;
+}
+
 /** @param {CodeMirror.Editor} cm */
 export function isInUserScriptMetaBlock(cm) {
   const { line } = cm.getCursor();
-  let startLine = -1;
-  for (let i = 0; i <= line; i += 1) {
-    if (USERSCRIPT_OPEN_RE.test(cm.getLine(i))) startLine = i;
-  }
-  if (startLine < 0 || line <= startLine) return false;
-  for (let i = startLine + 1; i < cm.lineCount(); i += 1) {
-    if (USERSCRIPT_CLOSE_RE.test(cm.getLine(i))) {
-      return line < i;
-    }
-  }
-  return false;
+  const userScriptOpenLine = getLastUserScriptOpenLine(cm, line);
+
+  return isCursorBelowUserScriptOpen(line, userScriptOpenLine) && isCursorAboveUserScriptClose(cm, line, userScriptOpenLine);
 }
 
 /** @param {CodeMirror.Editor} cm */
