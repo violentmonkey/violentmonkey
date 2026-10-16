@@ -30,8 +30,8 @@
           </div>
           <div v-if="filteredScripts.length" class="btn-group filtered">
             <Tooltip
-              v-for="({ icon, num, idleTooltip, activeTooltip }, key) in batchActions" :key
-              :content="state.batchAction.action === key ? activeTooltip : idleTooltip"
+              v-for="({ icon, num, tooltip }, key) in batchActions" :key
+              :content="tooltip[state.batchAction.action === key ? 1 : 0]"
               placement="bottom"
               align="start"
             >
@@ -375,8 +375,11 @@ const getDataBatchAction = evt => evt.target.closest('[data-batch-action]');
 const ALL_BATCH_ACTIONS = {
   [TOGGLE]: {
     icon: TOGGLE_ON,
-    idleTooltip: i18n('batchActionEnable'),
-    activeTooltip: i18n('batchActionEnableConfirm'),
+    tooltip: [],
+    tooltips: [
+      [i18n('batchActionEnable'), i18n('batchActionEnableConfirm')],
+      [i18n('batchActionDisable'), i18n('batchActionDisableConfirm')],
+    ],
     arg(scripts) {
       const enabled = this.icon === TOGGLE_ON ? 1 : 0;
       return scripts.filter(s => +s.config.enabled !== enabled);
@@ -385,15 +388,13 @@ const ALL_BATCH_ACTIONS = {
   },
   [UPDATE]: {
     icon: 'refresh',
-    idleTooltip: i18n('batchActionUpdate'),
-    activeTooltip: i18n('batchActionUpdateConfirm'),
+    tooltip: [i18n('batchActionUpdate'), i18n('batchActionUpdateConfirm')],
     fn: handleActionUpdate,
     [UNDO]: false,
   },
   [REMOVE]: {
     icon: 'trash',
-    idleTooltip: i18n('batchActionRemove'),
-    activeTooltip: i18n('batchActionRemoveConfirm'),
+    tooltip: [i18n('batchActionRemove'), i18n('batchActionRemoveConfirm')],
     async fn(scripts, el, undo) {
       await Promise.all(scripts.map(s => markRemove(s, !undo)));
       // nuking the ghosts because the user's intent was already confirmed
@@ -413,8 +414,7 @@ const batchActions = computed(() => {
     if (!allShown) toUpdate += s.$canUpdate > 0;
   }
   res[TOGGLE].icon = toEnable ? TOGGLE_ON : TOGGLE_OFF;
-  res[TOGGLE].idleTooltip = toEnable ? i18n('batchActionEnable') : i18n('batchActionDisable');
-  res[TOGGLE].activeTooltip = toEnable ? i18n('batchActionEnableConfirm') : i18n('batchActionDisableConfirm');
+  res[TOGGLE].tooltip = res[TOGGLE].tooltips[toEnable ? 0 : 1];
   res[TOGGLE].num = toEnable < num ? toEnable : '';
   if (!toUpdate) ({ [UPDATE]: toUpdate, ...res } = res);
   else res[UPDATE].num = toUpdate < num ? toUpdate : '';
