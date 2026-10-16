@@ -82,6 +82,7 @@ import './code-autocomplete';
 import CodeMirror from 'codemirror';
 import cmDefaults from './code-defaults';
 import './code-js-mixed-mode';
+import { getUserScriptMetaHint } from './code-userscript-hint';
 import { killTrailingSpaces } from './code-trailing-spaces';
 
 // Make sure this is still the longest line in the doc
@@ -101,7 +102,7 @@ Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
 CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
-  let result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
+  let result = getUserScriptMetaHint(cm) || cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
   // fallback to anyword if default returns nothing (or no default)
   result = result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
   if (result) {
