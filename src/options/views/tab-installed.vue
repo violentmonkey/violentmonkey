@@ -376,10 +376,8 @@ const ALL_BATCH_ACTIONS = {
   [TOGGLE]: {
     icon: TOGGLE_ON,
     tooltip: [],
-    tooltips: [
-      [i18n('batchActionEnable'), i18n('batchActionEnableConfirm')],
-      [i18n('batchActionDisable'), i18n('batchActionDisableConfirm')],
-    ],
+    tooltipOn: [i18n('batchActionEnable'), i18n('batchActionEnableConfirm')],
+    tooltipOff: [i18n('batchActionDisable'), i18n('batchActionDisableConfirm')],
     arg(scripts) {
       const enabled = this.icon === TOGGLE_ON ? 1 : 0;
       return scripts.filter(s => +s.config.enabled !== enabled);
@@ -414,7 +412,7 @@ const batchActions = computed(() => {
     if (!allShown) toUpdate += s.$canUpdate > 0;
   }
   res[TOGGLE].icon = toEnable ? TOGGLE_ON : TOGGLE_OFF;
-  res[TOGGLE].tooltip = res[TOGGLE].tooltips[toEnable ? 0 : 1];
+  res[TOGGLE].tooltip = toEnable ? res[TOGGLE].tooltipOn : res[TOGGLE].tooltipOff;
   res[TOGGLE].num = toEnable < num ? toEnable : '';
   if (!toUpdate) ({ [UPDATE]: toUpdate, ...res } = res);
   else res[UPDATE].num = toUpdate < num ? toUpdate : '';
