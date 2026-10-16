@@ -2,7 +2,6 @@ import { USERSCRIPT_META_HEADERS } from '@/common/userscript-meta';
 
 const USERSCRIPT_OPEN_RE = /^\s*\/\/[\x20\t]*==UserScript==\s*$/;
 const USERSCRIPT_CLOSE_RE = /^\s*\/\/[\x20\t]*==\/UserScript==/;
-const META_LINE_RE = /^\s*\/\/[\x20\t]/;
 
 /**
  * Last `// ==UserScript==` at or above `maxLine`.
@@ -46,31 +45,35 @@ function isCursorAboveUserScriptClose(cm, line, userScriptOpenLine) {
   return closeLine >= 0 && line < closeLine;
 }
 
-/** @param {CodeMirror.Editor} cm */
-export function isInUserScriptMetaBlock(cm) {
-  const { line } = cm.getCursor();
+/**
+ * @param {CodeMirror.Editor} cm
+ * @param {CodeMirror.Pos} [cursor]
+ * @returns {boolean}
+ */
+export function isInUserScriptMetaBlock(cm, cursor = cm.getCursor()) {
+  const { line } = cursor;
   const userScriptOpenLine = getLastUserScriptOpenLine(cm, line);
 
   return isCursorBelowUserScriptOpen(line, userScriptOpenLine) && isCursorAboveUserScriptClose(cm, line, userScriptOpenLine);
 }
 
+const META_HEADER_BEFORE_RE = /^\s*\/\/[\x20\t]@([\w-:]*)$/;
+
 /** @param {CodeMirror.Editor} cm */
 export function getUserScriptMetaHint(cm) {
-  if (!isInUserScriptMetaBlock(cm)) return null;
   const cur = cm.getCursor();
-  const line = cm.getLine(cur.line);
-  if (!META_LINE_RE.test(line)) return null;
-  const before = line.slice(0, cur.ch);
-  const match = before.match(/@([\w-:]*)$/);
-  if (!match) return null;
+  const before = cm.getLine(cur.line).slice(0, cur.ch);
+  const match = before.match(META_HEADER_BEFORE_RE);
+  if (!match || !isInUserScriptMetaBlock(cm, cur)) return;
+
   const prefix = match[1].toLowerCase();
   const list = USERSCRIPT_META_HEADERS
     .filter(key => key.toLowerCase().startsWith(prefix))
     .map(key => `@${key}`);
-  if (!list.length) return null;
+  if (!list.length) return;
   return {
     list,
-    from: { line: cur.line, ch: cur.ch - match[0].length },
+    from: { line: cur.line, ch: cur.ch - match[1].length - 1 },
     to: cur,
   };
 }

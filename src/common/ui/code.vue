@@ -102,9 +102,7 @@ Object.assign(CodeMirror.keyMap.sublime, {
   'Shift-Ctrl-/': 'commentSelection',
 });
 CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
-  const metaHint = getUserScriptMetaHint(cm);
-  if (metaHint?.list.length) return metaHint;
-  let result = cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
+  let result = getUserScriptMetaHint(cm) || cm.getHelper(cm.getCursor(), 'hint')?.(cm, ...args);
   // fallback to anyword if default returns nothing (or no default)
   result = result?.list.length ? result : CodeMirror.hint.anyword(cm, ...args);
   if (result) {
