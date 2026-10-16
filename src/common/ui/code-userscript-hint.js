@@ -1,8 +1,7 @@
-import { USERSCRIPT_META_INTRO } from '@/common/consts';
 import { USERSCRIPT_META_HEADERS } from '@/common/userscript-meta';
 
-const USERSCRIPT_OPEN_RE = new RegExp(`^\\s*//[\\x20\\t]*${USERSCRIPT_META_INTRO}\\s*$`);
-const USERSCRIPT_CLOSE_RE = /^\s*\/\/[\x20\t]*==\/UserScript==\s*$/;
+const USERSCRIPT_OPEN_RE = /^\s*\/\/[\x20\t]*==UserScript==\s*$/;
+const USERSCRIPT_CLOSE_RE = /^\s*\/\/[\x20\t]*==\/UserScript==/;
 const META_LINE_RE = /^\s*\/\/[\x20\t]/;
 
 /**
