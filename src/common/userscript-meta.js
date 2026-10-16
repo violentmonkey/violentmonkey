@@ -43,7 +43,12 @@ export const metaOptionalTypes = {
   [UNWRAP]: booleanType,
 };
 
-const metaOtherProps = [
+
+/** Header names as written in `// @…` lines, for editor autocomplete. */
+export const USERSCRIPT_META_HEADERS = [
+  ...Object.keys(metaTypes),
+  ...Object.keys(metaOptionalTypes),
+  // other props
   'author',
   'description',
   'downloadURL',
@@ -56,29 +61,6 @@ const metaOtherProps = [
   'version',
   HOMEPAGE_URL,
   SUPPORT_URL,
-];
-
-/** `@` header when it differs from the internal camelCase property name. */
-const metaPropToHeader = {
-  excludeMatch: 'exclude-match',
-  injectInto: 'inject-into',
-  runAt: 'run-at',
-  [TL_AWAIT]: 'top-level-await',
-};
-
-// properties that are not particularly important/documented
-const uncommonHeaders = new Set(['antifeature', 'compatible', 'connect']);
-
-/** Header names as written in `// @…` lines, for editor autocomplete. */
-export const USERSCRIPT_META_HEADERS = [
-  ...Object.keys(metaTypes),
-  ...Object.keys(metaOptionalTypes),
-  ...metaOtherProps,
 ]
-  .map((prop) => metaPropToHeader[prop] ?? prop)
-  .sort((a, b) => {
-    const aLast = uncommonHeaders.has(a);
-    const bLast = uncommonHeaders.has(b);
-    if (aLast !== bLast) return aLast ? 1 : -1;
-    return a.localeCompare(b);
-  });
+  .map(prop => prop.replace(/[A-Z](?=[a-z])/g, s => '-' + s.toLowerCase()))
+  .sort((a, b) => a.localeCompare(b));
