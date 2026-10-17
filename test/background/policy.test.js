@@ -2,6 +2,7 @@ import { parseMeta } from '@/background/utils/script';
 
 const URL_A = 'https://example.com/a.user.js';
 const URL_B = 'https://example.com/b.user.js';
+const URL_C = 'https://example.com/c.user.js';
 const codeFor = name => `// ==UserScript==
 // @name ${name}
 // @namespace policy-test
@@ -28,10 +29,9 @@ beforeEach(() => {
     init: new Promise(resolve => { resolveInit = resolve; }),
     inIncognitoContext: false,
   };
-  managed = { get: jest.fn(async () => policy) };
   onChanged = { addListener: jest.fn() };
+  managed = { get: jest.fn(async () => policy), onChanged };
   browser.storage.managed = managed;
-  browser.storage.onChanged = onChanged;
   request = jest.fn(async url => ({ data: codeFor(url) }));
   parseScript = jest.fn(async ({ code, url }) => {
     scripts.push({ meta: parseMeta(code), custom: { lastInstallURL: url }, config: {} });
@@ -54,20 +54,22 @@ beforeEach(() => {
 
 afterEach(() => {
   delete browser.storage.managed;
-  delete browser.storage.onChanged;
   jest.restoreAllMocks();
   jest.useRealTimers();
   delete __.MV3;
+  global.IS_FIREFOX = false;
 });
 
 function loadPolicy() {
-  return require('@/background/utils/policy').applyScriptPolicy;
+  require('@/background/utils/policy');
+  return () => onChanged.addListener.mock.calls[0]?.[0]({ scripts: {} });
 }
 
 async function apply() {
   const refresh = loadPolicy();
   resolveInit();
   await refresh();
+  await flush();
   return refresh;
 }
 
@@ -126,13 +128,20 @@ test('handles missing or unavailable managed storage', async () => {
   expect(request).not.toHaveBeenCalled();
 });
 
-test('ignores an unconfigured Firefox policy and can process a later change', async () => {
+test('installs at startup in Firefox without registering a change listener', async () => {
+  global.IS_FIREFOX = true;
+  await apply();
+  expect(onChanged.addListener).not.toHaveBeenCalled();
+  expect(parseScript).toHaveBeenCalledTimes(1);
+});
+
+test('ignores an unconfigured Firefox policy', async () => {
+  global.IS_FIREFOX = true;
   managed.get.mockRejectedValueOnce(new Error('Managed storage manifest not found'));
-  const refresh = await apply();
+  await apply();
+  expect(onChanged.addListener).not.toHaveBeenCalled();
   expect(request).not.toHaveBeenCalled();
   expect(console.warn).not.toHaveBeenCalled();
-  await refresh();
-  expect(parseScript).toHaveBeenCalledTimes(1);
 });
 
 test.each([{}, { scripts: [] }, { scripts: null }])('ignores an empty policy: %j', async value => {
@@ -187,13 +196,12 @@ test('applies only managed script changes and leaves removed policy scripts inst
   await apply();
   const [listener] = onChanged.addListener.mock.calls[0];
   const reads = managed.get.mock.calls.length;
-  await listener({ scripts: { newValue: [URL_B] } }, 'local');
-  await listener({ other: { newValue: true } }, 'managed');
+  await listener({ other: { newValue: true } });
   expect(managed.get).toHaveBeenCalledTimes(reads);
   policy.scripts = [URL_B];
-  await listener({ scripts: { newValue: [URL_B] } }, 'managed');
+  await listener({ scripts: { newValue: [URL_B] } });
   policy = {};
-  await listener({ scripts: { oldValue: [URL_B] } }, 'managed');
+  await listener({ scripts: { oldValue: [URL_B] } });
   expect(scripts.map(script => script.custom.lastInstallURL)).toEqual([URL_A, URL_B]);
 });
 
@@ -211,6 +219,45 @@ test('discards a download if the policy changes before it finishes', async () =>
   expect(parseScript.mock.calls.map(([src]) => src.url)).toEqual([URL_B]);
 });
 
+test('aborts all pending downloads when the policy changes', async () => {
+  policy.scripts = [URL_A, URL_B];
+  const pending = (url, { signal }) => new Promise((resolve, reject) => {
+    signal.addEventListener('abort', () => reject(new Error('Aborted')));
+  });
+  request.mockImplementationOnce(pending).mockImplementationOnce(pending);
+  const refresh = loadPolicy();
+  resolveInit();
+  await flush();
+  expect(request).toHaveBeenCalledTimes(2);
+  const signals = request.mock.calls.map(([, { signal }]) => signal);
+  policy.scripts = [URL_C];
+  await refresh();
+  expect(signals.every(signal => signal.aborted)).toBe(true);
+  expect(parseScript.mock.calls.map(([src]) => src.url)).toEqual([URL_C]);
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
+test('discards a policy read if the policy changes before it finishes', async () => {
+  let finish;
+  managed.get.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  const refresh = loadPolicy();
+  resolveInit();
+  await flush();
+  policy.scripts = [URL_B];
+  const next = refresh();
+  finish({ scripts: [URL_A] });
+  await next;
+  expect(request.mock.calls.map(([url]) => url)).toEqual([URL_B]);
+});
+
+test('installs matching metadata from concurrent downloads only once', async () => {
+  policy.scripts = [URL_A, URL_B];
+  request.mockResolvedValue({ data: codeFor('Same script') });
+  await apply();
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(parseScript).toHaveBeenCalledTimes(1);
+});
+
 test('recognizes a manual installation completed during a policy download', async () => {
   request.mockImplementationOnce(async () => {
     scripts.push({ meta: parseMeta(codeFor(URL_A)), custom: {}, config: {} });
@@ -220,18 +267,21 @@ test('recognizes a manual installation completed during a policy download', asyn
   expect(parseScript).not.toHaveBeenCalled();
 });
 
-test('times out a stalled download and proceeds to the next script', async () => {
+test('allows slow downloads without blocking other scripts', async () => {
   jest.useFakeTimers();
   policy.scripts = [URL_A, URL_B];
-  request.mockImplementationOnce((url, { signal }) => new Promise((resolve, reject) => {
-    signal.addEventListener('abort', () => reject(new Error('Aborted')));
-  }));
+  let finish;
+  request.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
   const refresh = loadPolicy();
   resolveInit();
   const done = refresh();
-  await jest.advanceTimersByTimeAsync(30e3);
-  await done;
+  await jest.advanceTimersByTimeAsync(60e3);
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(request.mock.calls[0][1].signal.aborted).toBe(false);
   expect(parseScript.mock.calls.map(([src]) => src.url)).toEqual([URL_B]);
+  finish({ data: codeFor(URL_A) });
+  await done;
+  expect(parseScript.mock.calls.map(([src]) => src.url)).toEqual([URL_B, URL_A]);
   expect(jest.getTimerCount()).toBe(0);
 });
 
