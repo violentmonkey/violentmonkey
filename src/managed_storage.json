@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "scripts": {
+    "scriptUrls": {
       "title": "Userscripts to install",
       "description": "HTTP or HTTPS userscript URLs to install automatically. Existing scripts and their settings are preserved. Removing a URL does not uninstall the script.",
       "type": "array",

@@ -26,26 +26,27 @@ if (browserManaged && !inIncognitoContext) {
   const installScripts = async currentRevision => {
     if (init) await init;
     if (currentRevision !== revision) return;
-    let scripts;
+    let scriptUrls;
     try {
-      ({ scripts } = await browserManaged.get('scripts'));
+      ({ scriptUrls } = await browserManaged.get('scriptUrls'));
     } catch {
       return;
     }
-    if (currentRevision !== revision || scripts == null) return;
-    if (!Array.isArray(scripts)) {
-      console.warn('Invalid userscript policy: scripts must be an array of URLs');
+    if (currentRevision !== revision || scriptUrls == null) return;
+    if (!Array.isArray(scriptUrls)) {
+      console.warn('Invalid userscript policy: scriptUrls must be an array of URLs');
       return;
     }
-    // Include the recycle bin so policy refreshes respect a user's removal.
-    const installedUrls = new Set(getScriptsByIdsOrAll().map(s => s.custom.lastInstallURL));
+    let installedUrls;
     controller = new AbortController();
-    await Promise.all([...new Set(scripts)].map(async entry => {
+    await Promise.all([...new Set(scriptUrls)].map(async entry => {
       const url = typeof entry === 'string' && isValidHttpUrl(entry);
       if (!url) {
         console.warn('Invalid userscript policy URL:', entry);
         return;
       }
+      // Include the recycle bin so policy refreshes respect a user's removal
+      installedUrls ||= new Set(getScriptsByIdsOrAll().map(s => s.custom.lastInstallURL));
       if (installedUrls.has(url)) return;
       try {
         const { data: code } = await request(url, { ...NO_CACHE, signal: controller.signal });
@@ -65,7 +66,7 @@ if (browserManaged && !inIncognitoContext) {
 
   // Register synchronously so policy changes can wake the MV3 worker.
   if (!IS_FIREFOX) browserManaged.onChanged.addListener(changes => {
-    if ('scripts' in changes) return applyScriptPolicy();
+    if ('scriptUrls' in changes) return applyScriptPolicy();
   });
   applyScriptPolicy();
 }

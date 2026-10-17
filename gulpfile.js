@@ -27,7 +27,7 @@ function clean() {
 
 function watch() {
   gulp.watch(paths.manifest, manifest);
-  gulp.watch('src/managed-storage-schema.json', copyPolicySchema);
+  gulp.watch('src/managed_storage.json', copyPolicySchema);
   gulp.watch(paths.locales.concat(paths.templates), copyI18n);
 }
 
@@ -106,7 +106,7 @@ async function createIcons() {
 
 async function copyPolicySchema() {
   await fs.mkdir(DIST, { recursive: true });
-  await fs.copyFile('src/managed-storage-schema.json', `${DIST}/managed-storage-schema.json`);
+  await fs.copyFile('src/managed_storage.json', `${DIST}/managed_storage.json`);
 }
 
 /**

@@ -24,7 +24,7 @@ let resolveInit;
 beforeEach(() => {
   jest.resetModules();
   scripts = [];
-  policy = { scripts: [URL_A] };
+  policy = { scriptUrls: [URL_A] };
   init = {
     init: new Promise(resolve => { resolveInit = resolve; }),
     inIncognitoContext: false,
@@ -62,7 +62,7 @@ afterEach(() => {
 
 function loadPolicy() {
   require('@/background/utils/policy');
-  return () => onChanged.addListener.mock.calls[0]?.[0]({ scripts: {} });
+  return () => onChanged.addListener.mock.calls[0]?.[0]({ scriptUrls: {} });
 }
 
 async function apply() {
@@ -81,14 +81,14 @@ test('registers changes immediately and installs automatically after database in
   expect(parseScript).not.toHaveBeenCalled();
   resolveInit();
   await flush();
-  expect(managed.get).toHaveBeenCalledWith('scripts');
+  expect(managed.get).toHaveBeenCalledWith('scriptUrls');
   expect(parseScript).toHaveBeenCalledWith({
     code: codeFor(URL_A), url: URL_A, isNew: true, bumpDate: true,
   });
 });
 
 test('installs unique URLs only once across repeated policy applications', async () => {
-  policy.scripts = [URL_A, URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_A, URL_B];
   const refresh = await apply();
   await refresh();
   expect(request).toHaveBeenCalledTimes(2);
@@ -96,7 +96,7 @@ test('installs unique URLs only once across repeated policy applications', async
 });
 
 test('preserves scripts and recycle-bin entries from the same installation URL', async () => {
-  policy.scripts = [URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_B];
   scripts.push(
     { custom: { lastInstallURL: URL_A }, config: { enabled: 0, shouldUpdate: 0 } },
     { custom: { lastInstallURL: URL_B }, config: { removed: 1 } },
@@ -144,21 +144,21 @@ test('ignores an unconfigured Firefox policy', async () => {
   expect(console.warn).not.toHaveBeenCalled();
 });
 
-test.each([{}, { scripts: [] }, { scripts: null }])('ignores an empty policy: %j', async value => {
+test.each([{}, { scriptUrls: [] }, { scriptUrls: null }])('ignores an empty policy: %j', async value => {
   policy = value;
   await apply();
   expect(request).not.toHaveBeenCalled();
 });
 
 test.each(['https://example.com/a.user.js', {}, 1])('rejects a non-array policy: %j', async value => {
-  policy.scripts = value;
+  policy.scriptUrls = value;
   await apply();
   expect(request).not.toHaveBeenCalled();
   expect(console.warn).toHaveBeenCalledTimes(1);
 });
 
 test('skips invalid entries and non-HTTP URLs while installing valid entries', async () => {
-  policy.scripts = [null, {}, 1, '', 'not a URL', 'https://', 'file:///a.user.js',
+  policy.scriptUrls = [null, {}, 1, '', 'not a URL', 'https://', 'file:///a.user.js',
     'data:text/javascript,alert(1)', 'javascript:alert(1)', URL_A];
   await apply();
   expect(request).toHaveBeenCalledTimes(1);
@@ -167,7 +167,7 @@ test('skips invalid entries and non-HTTP URLs while installing valid entries', a
 
 test.each(['<html>not a userscript</html>', '// ==UserScript==\n// ==/UserScript==', null])(
   'rejects invalid script source and continues: %j', async code => {
-    policy.scripts = [URL_A, URL_B];
+    policy.scriptUrls = [URL_A, URL_B];
     request.mockResolvedValueOnce({ data: code });
     await apply();
     expect(parseScript).toHaveBeenCalledTimes(1);
@@ -176,7 +176,7 @@ test.each(['<html>not a userscript</html>', '// ==UserScript==\n// ==/UserScript
 );
 
 test('continues after a failed download and retries it on the next policy application', async () => {
-  policy.scripts = [URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_B];
   request.mockRejectedValueOnce(new Error('Network error'));
   const refresh = await apply();
   expect(parseScript.mock.calls.map(([src]) => src.url)).toEqual([URL_B]);
@@ -185,7 +185,7 @@ test('continues after a failed download and retries it on the next policy applic
 });
 
 test('continues after an installation error', async () => {
-  policy.scripts = [URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_B];
   parseScript.mockRejectedValueOnce(new Error('Storage error'));
   await apply();
   expect(parseScript).toHaveBeenCalledTimes(2);
@@ -198,10 +198,10 @@ test('applies only managed script changes and leaves removed policy scripts inst
   const reads = managed.get.mock.calls.length;
   await listener({ other: { newValue: true } });
   expect(managed.get).toHaveBeenCalledTimes(reads);
-  policy.scripts = [URL_B];
-  await listener({ scripts: { newValue: [URL_B] } });
+  policy.scriptUrls = [URL_B];
+  await listener({ scriptUrls: { newValue: [URL_B] } });
   policy = {};
-  await listener({ scripts: { oldValue: [URL_B] } });
+  await listener({ scriptUrls: { oldValue: [URL_B] } });
   expect(scripts.map(script => script.custom.lastInstallURL)).toEqual([URL_A, URL_B]);
 });
 
@@ -212,7 +212,7 @@ test('discards a download if the policy changes before it finishes', async () =>
   resolveInit();
   await flush();
   expect(request).toHaveBeenCalledTimes(1);
-  policy.scripts = [URL_B];
+  policy.scriptUrls = [URL_B];
   const next = refresh();
   finish({ data: codeFor(URL_A) });
   await next;
@@ -220,7 +220,7 @@ test('discards a download if the policy changes before it finishes', async () =>
 });
 
 test('aborts all pending downloads when the policy changes', async () => {
-  policy.scripts = [URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_B];
   const pending = (url, { signal }) => new Promise((resolve, reject) => {
     signal.addEventListener('abort', () => reject(new Error('Aborted')));
   });
@@ -230,7 +230,7 @@ test('aborts all pending downloads when the policy changes', async () => {
   await flush();
   expect(request).toHaveBeenCalledTimes(2);
   const signals = request.mock.calls.map(([, { signal }]) => signal);
-  policy.scripts = [URL_C];
+  policy.scriptUrls = [URL_C];
   await refresh();
   expect(signals.every(signal => signal.aborted)).toBe(true);
   expect(parseScript.mock.calls.map(([src]) => src.url)).toEqual([URL_C]);
@@ -243,15 +243,15 @@ test('discards a policy read if the policy changes before it finishes', async ()
   const refresh = loadPolicy();
   resolveInit();
   await flush();
-  policy.scripts = [URL_B];
+  policy.scriptUrls = [URL_B];
   const next = refresh();
-  finish({ scripts: [URL_A] });
+  finish({ scriptUrls: [URL_A] });
   await next;
   expect(request.mock.calls.map(([url]) => url)).toEqual([URL_B]);
 });
 
 test('installs matching metadata from concurrent downloads only once', async () => {
-  policy.scripts = [URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_B];
   request.mockResolvedValue({ data: codeFor('Same script') });
   await apply();
   expect(request).toHaveBeenCalledTimes(2);
@@ -269,7 +269,7 @@ test('recognizes a manual installation completed during a policy download', asyn
 
 test('allows slow downloads without blocking other scripts', async () => {
   jest.useFakeTimers();
-  policy.scripts = [URL_A, URL_B];
+  policy.scriptUrls = [URL_A, URL_B];
   let finish;
   request.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
   const refresh = loadPolicy();
