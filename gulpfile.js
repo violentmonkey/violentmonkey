@@ -27,6 +27,7 @@ function clean() {
 
 function watch() {
   gulp.watch(paths.manifest, manifest);
+  gulp.watch('src/managed-storage-schema.json', copyPolicySchema);
   gulp.watch(paths.locales.concat(paths.templates), copyI18n);
 }
 
@@ -103,6 +104,11 @@ async function createIcons() {
   ]);
 }
 
+async function copyPolicySchema() {
+  await fs.mkdir(DIST, { recursive: true });
+  await fs.copyFile('src/managed-storage-schema.json', `${DIST}/managed-storage-schema.json`);
+}
+
 /**
  * Bump `beta` in `package.json` to release a new beta version.
  */
@@ -162,7 +168,7 @@ function logError(err) {
   return this.emit('end');
 }
 
-const pack = gulp.parallel(createIcons, copyI18n, ...MV3 ? [manifest] : []);
+const pack = gulp.parallel(createIcons, copyI18n, copyPolicySchema, ...MV3 ? [manifest] : []);
 
 exports.clean = clean;
 exports.manifest = manifest;
