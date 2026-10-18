@@ -3,7 +3,7 @@
   "properties": {
     "scriptUrls": {
       "title": "Userscripts to install",
-      "description": "HTTP or HTTPS userscript URLs to install automatically. Existing scripts and their settings are preserved. Removing a URL does not uninstall the script.",
+      "description": "HTTP or HTTPS userscript URLs to install automatically. Existing scripts and their settings are preserved. Scripts in the recycle bin cannot be deleted permanently while listed in policy. Removing a URL does not uninstall the script.",
       "type": "array",
       "items": {
         "type": "string"

@@ -1019,6 +1019,9 @@ msgNoUpdate:
 msgOpenUpdateErrors:
   description: Shown at the beginning of a notification (Chrome) or in its title (Firefox).
   message: Error updating scripts. Click to open them.
+msgPolicyScriptProtected:
+  description: Shown when a policy listed script cannot be deleted from the recycle bin.
+  message: Scripts listed in browser policy cannot be deleted permanently. They can stay in the recycle bin or be restored.
 msgReinstallScripts:
   description: >-
     Notification body shown for a missing @require or other resource when

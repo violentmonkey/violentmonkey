@@ -19,6 +19,7 @@ let managed;
 let onChanged;
 let request;
 let parseScript;
+let updateScriptInfo;
 let resolveInit;
 
 beforeEach(() => {
@@ -33,13 +34,19 @@ beforeEach(() => {
   managed = { get: jest.fn(async () => policy), onChanged };
   browser.storage.managed = managed;
   request = jest.fn(async url => ({ data: codeFor(url) }));
-  parseScript = jest.fn(async ({ code, url }) => {
-    scripts.push({ meta: parseMeta(code), custom: { lastInstallURL: url }, config: {} });
+  parseScript = jest.fn(async ({ code, url, custom }) => {
+    scripts.push({
+      meta: parseMeta(code), custom: { lastInstallURL: url, ...custom }, config: {},
+      props: { id: scripts.length + 1 },
+    });
+  });
+  updateScriptInfo = jest.fn(async (id, { custom }) => {
+    Object.assign(scripts.find(script => script.props.id === id).custom, custom);
   });
   jest.doMock('@/common/browser', () => ({ __esModule: true, default: browser }));
   jest.doMock('@/background/utils/init', () => init);
   jest.doMock('@/background/utils/script', () => ({ parseMeta }));
-  jest.doMock('@/background/utils/url', () => ({ request }));
+  jest.doMock('@/background/utils/storage-fetch', () => ({ requestNewer: request }));
   jest.doMock('@/background/utils/db', () => ({
     getScriptsByIdsOrAll: () => scripts,
     getScript: ({ meta, removed }) => scripts.find(script => (
@@ -48,6 +55,7 @@ beforeEach(() => {
       && script.meta.namespace === meta.namespace
     )),
     parseScript,
+    updateScriptInfo,
   }));
   jest.spyOn(console, 'warn').mockImplementation(() => {});
 });
@@ -83,7 +91,7 @@ test('registers changes immediately and installs automatically after database in
   await flush();
   expect(managed.get).toHaveBeenCalledWith('scriptUrls');
   expect(parseScript).toHaveBeenCalledWith({
-    code: codeFor(URL_A), url: URL_A, isNew: true, bumpDate: true,
+    code: codeFor(URL_A), url: URL_A, isNew: true, bumpDate: true, custom: { policyUrls: [URL_A] },
   });
 });
 
@@ -98,21 +106,24 @@ test('installs unique URLs only once across repeated policy applications', async
 test('preserves scripts and recycle-bin entries from the same installation URL', async () => {
   policy.scriptUrls = [URL_A, URL_B];
   scripts.push(
-    { custom: { lastInstallURL: URL_A }, config: { enabled: 0, shouldUpdate: 0 } },
-    { custom: { lastInstallURL: URL_B }, config: { removed: 1 } },
+    { props: { id: 1 }, custom: { lastInstallURL: URL_A }, config: { enabled: 0, shouldUpdate: 0 } },
+    { props: { id: 2 }, custom: { lastInstallURL: URL_B }, config: { removed: 1 } },
   );
-  const before = JSON.stringify(scripts);
+  const before = scripts.map(script => ({
+    ...script, custom: { ...script.custom, policyUrls: [script.custom.lastInstallURL] },
+  }));
   await apply();
   expect(request).not.toHaveBeenCalled();
   expect(parseScript).not.toHaveBeenCalled();
-  expect(JSON.stringify(scripts)).toBe(before);
+  expect(scripts).toEqual(before);
 });
 
 test.each([0, 1])('preserves a matching name/namespace from another URL (removed=%s)', async removed => {
-  scripts.push({ meta: parseMeta(codeFor(URL_A)), custom: {}, config: { removed } });
+  scripts.push({ props: { id: 1 }, meta: parseMeta(codeFor(URL_A)), custom: {}, config: { removed } });
   await apply();
   expect(request).toHaveBeenCalledTimes(1);
   expect(parseScript).not.toHaveBeenCalled();
+  expect(scripts[0].custom.policyUrls).toEqual([URL_A]);
 });
 
 test('allows the same name in a different namespace', async () => {
@@ -256,11 +267,12 @@ test('installs matching metadata from concurrent downloads only once', async () 
   await apply();
   expect(request).toHaveBeenCalledTimes(2);
   expect(parseScript).toHaveBeenCalledTimes(1);
+  expect(scripts[0].custom.policyUrls).toEqual([URL_A, URL_B]);
 });
 
 test('recognizes a manual installation completed during a policy download', async () => {
   request.mockImplementationOnce(async () => {
-    scripts.push({ meta: parseMeta(codeFor(URL_A)), custom: {}, config: {} });
+    scripts.push({ props: { id: 1 }, meta: parseMeta(codeFor(URL_A)), custom: {}, config: {} });
     return { data: codeFor(URL_A) };
   });
   await apply();
