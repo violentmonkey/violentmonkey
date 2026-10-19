@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: Desactivar todos los scripts
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: Confirmar la desactivación de todos los scripts
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: Activar todos los scripts
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: Confirmar la activación de todos los scripts
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: Eliminar todos los scripts
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: Confirmar la eliminación de todos los scripts
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: Actualizar todos los scripts
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: Confirmar la actualización de todos los scripts
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Aplicar

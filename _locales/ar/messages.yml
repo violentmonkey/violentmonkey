@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: تعطيل جميع السكربتات
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: تأكيد تعطيل جميع السكربتات
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: تفعيل جميع السكربتات
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: تأكيد تفعيل جميع السكربتات
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: إزالة جميع السكربتات
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: تأكيد إزالة جميع السكربتات
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: تأكيد إزالة جميع السكربتات
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: تأكيد تحديث جميع السكربتات
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: تطبيق
