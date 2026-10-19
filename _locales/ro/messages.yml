@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: ''
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: ''
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: ''
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: ''
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: ''
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: ''
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: ''
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: ''
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Aplică

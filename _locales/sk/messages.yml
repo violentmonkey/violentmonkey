@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: Zakázať všetky skripty
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: Potvrďte zakázanie všetkých skriptov
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: Povoliť všetky skripty
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: Potvrďte povolenie všetkých skriptov
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: Odstrániť všetky skripty
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: Potvrďte odstránenie všetkých skriptov
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: Aktualizovať všetky skripty
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: Potvrďte aktualizáciu všetkých skriptov
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Použiť
