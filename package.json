@@ -35,6 +35,7 @@
     "@babel/plugin-transform-runtime": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
+    "@babel/runtime": "^7.29.10",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify-json/tabler": "^1.2.42",
     "@iconify-json/tdesign": "^1.2.19",

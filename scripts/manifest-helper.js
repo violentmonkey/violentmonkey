@@ -54,6 +54,9 @@ function buildManifest(base) {
     data.name = name;
     data[MV3 ? 'action' : 'browser_action'].default_title = name;
   }
+  if (process.env.TARGET === 'astrophage') {
+    require('./fork-release').configureManifest(data);
+  }
   return data;
 }
 
