@@ -1,0 +1,66 @@
+name: Astrophage release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: astrophage-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'Astrophage-IO/violentmonkey' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set release version and update channel
+        run: node scripts/fork-release.js prepare
+
+      - name: Test
+        run: pnpm run ci
+
+      - name: Build extensions
+        env:
+          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
+          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
+          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+        run: |
+          pnpm build
+          pnpm build:mv3
+
+      - name: Sign packages and generate update feeds
+        env:
+          ASTROPHAGE_CRX_PRIVATE_KEY: ${{ secrets.ASTROPHAGE_CRX_PRIVATE_KEY }}
+        run: node scripts/fork-release.js package
+
+      - name: Publish complete release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/fork-publish.js
+
+      - name: Link downloads
+        run: |
+          echo 'Download: https://github.com/Astrophage-IO/violentmonkey/releases/latest' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Orion ZIP: https://github.com/Astrophage-IO/violentmonkey/releases/latest/download/violentmonkey-orion.zip' >> "$GITHUB_STEP_SUMMARY"

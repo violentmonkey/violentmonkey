@@ -32,7 +32,7 @@ jobs:
           node-version-file: 'package.json'
 
       - name: Install
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
       - name: Test & Build
         run: |
           pnpm exec run-p ci build
@@ -61,7 +61,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to Transifex - check src
-        if: github.event_name == 'push' || github.event.pull_request.merged == true
+        if: github.repository == 'violentmonkey/violentmonkey' && (github.event_name == 'push' || github.event.pull_request.merged == true)
         uses: marceloprado/has-changed-path@v1.0.1
         id: changed-path-src
         with:
