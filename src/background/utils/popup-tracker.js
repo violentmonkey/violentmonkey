@@ -1,4 +1,5 @@
 import { executeScript, extensionDetailsUrl, registerInjector } from '@/common/browser-scripts-api';
+import { tryBrowserListener } from '@/common/browser-listener';
 import { getActiveTab, i18n, noop, sendTabCmd } from '@/common';
 import { kMainFrame } from '@/common/consts';
 import cache from './cache';
@@ -61,8 +62,8 @@ addPublicCommands({
   }
 });
 
-browser.runtime.onConnect.addListener(onPopupOpened);
-browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
+tryBrowserListener(browser.runtime.onConnect, 'addListener', onPopupOpened);
+tryBrowserListener(browser.webRequest?.onBeforeRequest, 'addListener', prefetchSetPopup, {
   urls: [chrome.runtime.getURL(extensionManifest[BROWSER_ACTION].default_popup)],
   types: [kMainFrame],
 });
@@ -70,7 +71,7 @@ browser.webRequest.onBeforeRequest.addListener(prefetchSetPopup, {
 async function augmentSetPopup(data, src, key) {
   data[MORE] = true;
   const ids = data[IDS];
-  const moreIds = getScriptsByURL(src.url, src[kTop], null, ids);
+  const moreIds = getScriptsByURL(src.url, src[kTop], null, ids, src.tab);
   Object.assign(ids, moreIds);
   Object.assign(data, await getData({ [IDS]: Object.keys(ids) }));
   data = [data, src];

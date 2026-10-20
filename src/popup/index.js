@@ -39,6 +39,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       url,
       [kTop]: isTop,
       [IDS]: dataIds,
+      tab: store.tab,
     }));
   }
   if (!isTop) await mutex;
@@ -74,6 +75,7 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
       }
       script.runs = content || state === PAGE;
       script.pageUrl = url; // each frame has its own URL
+      script.frameId = frameId;
       script.failed = badRealm || state === ID_INJECTING || more;
       if (grantless && (v = grantless[id]) && delete v.window && (v = Object.keys(v).join(', '))) {
         script.grantless = i18n('hintGrantless', v.length > 50 ? v.slice(0, 50) + '...' : v);

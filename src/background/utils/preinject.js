@@ -1,7 +1,7 @@
-import { getActiveTab, sendTabCmd } from '@/common';
+import { getActiveTab, getScriptRunAt, sendTabCmd } from '@/common';
 import { CACHE_KEYS, kDownloadMode, PROMISE } from '@/common/consts';
 import { deepCopy } from '@/common/object';
-import { getScriptsByURL } from './db';
+import { getScriptById, getScriptsByURL } from './db';
 import { setBadge } from './icon';
 import { addOwnCommands, addPublicCommands } from './init';
 import { clearNotifications } from './notifications';
@@ -20,12 +20,27 @@ import {
 } from './storage';
 import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
+import './context-menu-scripts';
 
 addOwnCommands({
   [SKIP_SCRIPTS]: reloadAndSkipScripts,
 });
 
 addPublicCommands({
+  async GetContextMenuScript({ id, [FORCE_CONTENT]: forceContent, url }, src) {
+    const script = getScriptById(id);
+    if (!isApplied || !script || script.config.removed
+    || getScriptRunAt(script) !== 'context-menu') return;
+    const { tab, [kFrameId]: frameId, [kTop]: isTop } = src;
+    const env = getScriptsByURL(url || src.url || tab.url, isTop, [], null, tab, +id);
+    if (!env?.[SCRIPTS].length) return;
+    if (env[PROMISE]) await env[PROMISE];
+    const scripts = prepareScripts(env);
+    triageRealms(scripts, forceContent, tab.id, frameId);
+    addValueOpener(scripts, tab.id, getFrameDocId(isTop, src[kDocumentId], frameId));
+    updateVisitedTime(scripts);
+    return { [SCRIPTS]: scripts, [S_CACHE]: env[S_CACHE] };
+  },
   /** @return {Promise<VMInjection>} */
   async GetInjected({ url, [FORCE_CONTENT]: forceContent, done }, src) {
     const { tab, [kFrameId]: frameId, [kTop]: isTop } = src;
@@ -46,8 +61,8 @@ addPublicCommands({
       delete skippedTabs[tabId]; // deleting the phantom as we're in a new page
       if (__.MV3) flushSession(SKIP_SCRIPTS, skippedTabs);
     }
-    const bagKey = getKey(url, isTop);
-    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop, true);
+    const bagKey = getKey(url, isTop, tabId);
+    const bagP = cache.get(bagKey) || prepare(bagKey, url, isTop, true, tab);
     const bag = bagP[INJECT] ? bagP : await bagP[PROMISE];
     /** @type {VMInjection} */
     const inject = bag[INJECT];
@@ -83,7 +98,7 @@ addPublicCommands({
     if (!moreKey) return;
     if (!url) url = src.url || tab.url;
     const env = cache.get(moreKey)
-      || cache.put(moreKey, getScriptsByURL(url, isTop))
+      || cache.put(moreKey, getScriptsByURL(url, isTop, null, null, tab))
       || { [SCRIPTS]: [] }; // scripts got removed or the url got blacklisted after GetInjected
     const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
     const scripts = prepareScripts(env);
@@ -154,7 +169,7 @@ onStorageChanged((keys, data) => {
 export async function reloadAndSkipScripts(tab) {
   if (!tab) tab = await getActiveTab();
   const tabId = tab.id;
-  const bag = cache.get(getKey(tab.url, true));
+  const bag = cache.get(getKey(tab.url, true, tabId));
   const reg = (__.MV3 ? chrome.userScripts : contentScriptsAPI) && bag && unregisterScript(bag);
   skippedTabs[tabId] = 1;
   if (__.MV3) flushSession(SKIP_SCRIPTS, skippedTabs);

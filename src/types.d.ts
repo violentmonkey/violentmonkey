@@ -33,13 +33,16 @@ declare interface GMContext {
 declare namespace GMReq {
   type EventType = keyof XMLHttpRequestEventMap;
   type EventTypeMap = { [name: EventType]: boolean };
-  type Response = string | Blob | ArrayBuffer;
+  type ResponseType = XMLHttpRequestResponseType | 'stream';
+  type Response = string | Blob | ArrayBuffer | ReadableStream<Uint8Array>;
   type UserOpts = VMScriptGMDownloadOptions | VMScriptGMXHRDetails<any>;
   interface BG {
+    aborted?: boolean;
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     cbe: (err: string|Error) => Promise<void>;
     /** use browser's `Cookie` header */
     cookie?: boolean;
+    cookiePartition?: { topLevelSite: string };
     /** allow Set-Cookie header to affect browser */
     'set-cookie'?: boolean;
     coreId: string;
@@ -58,7 +61,7 @@ declare namespace GMReq {
     tabId: number;
     timer?: number;
     url: string;
-    xhr: XMLHttpRequest;
+    xhr: XMLHttpRequest | { abort(): void };
     xhrUrl: string;
   }
   interface Content {
@@ -74,11 +77,14 @@ declare namespace GMReq {
     scriptId: number;
     cb: { [name: EventType]: VMScriptGMXHRDetails<any>['onload'] }[];
     context?: any;
+    controller?: ReadableStreamDefaultController<Uint8Array>;
     raw?: Response;
     response?: Response;
     responseHeaders?: string;
     responseText?: string;
-    responseType?: XMLHttpRequestResponseType;
+    responseType?: ResponseType;
+    stream?: ReadableStream<Uint8Array>;
+    streamFinished?: boolean;
   }
   namespace Message {
     /** From background */
@@ -90,6 +96,8 @@ declare namespace GMReq {
       data: VMScriptResponseObject<any>;
       dl?: boolean;
       id: string;
+      stream?: boolean;
+      streamError?: [string, string];
       type: EventType;
       upload: 0 | 1;
     }
@@ -111,15 +119,21 @@ declare namespace GMReq {
       id: string;
       scriptId: number;
       anonymous: boolean;
+      cookie?: string;
+      cookiePartition?: { topLevelSite?: string };
       conflictAction?: chrome.downloads.FilenameConflictAction;
       fileName: string;
       data: any[];
       events: [EventTypeMap, EventTypeMap];
       headers?: StringMap;
+      fetch?: boolean;
       method?: string;
+      nocache?: boolean;
       overrideMimeType?: string;
       password?: string;
-      responseType: XMLHttpRequestResponseType;
+      redirect?: 'follow' | 'error' | 'manual';
+      responseType: ResponseType;
+      revalidate?: boolean;
       saveAs?: boolean;
       timeout?: number;
       ua?: string[];
@@ -205,7 +219,7 @@ declare interface VMScript {
     origMatch: boolean;
     origTag: boolean;
     pathMap?: StringMap;
-    runAt?: VMScriptRunAt;
+    runAt?: VMScriptRunAt | 'context-menu';
     /** @since v2.36 */
     tag?: string[];
   };
@@ -226,7 +240,9 @@ declare interface VMScript {
     noframes?: boolean;
     require: string[];
     resources: StringMap;
-    runAt?: VMScriptRunAt;
+    runAt?: VMScriptRunAt | 'context-menu';
+    runIn?: string[] | string;
+    sandbox?: string;
     supportURL?: string;
     tag?: string[];
     topLevelAwait?: boolean;
@@ -332,7 +348,7 @@ declare interface VMInjection extends VMInjectionDisabled, VMInjectionFlags {
  * Injection paraphernalia in the background script
  */
 declare namespace VMInjection {
-  type RunAt = 'start' | 'body' | 'end' | 'idle';
+  type RunAt = 'start' | 'body' | 'end' | 'idle' | 'context-menu';
   interface Env {
     cache: StringMap;
     cacheKeys: string[];
@@ -448,6 +464,21 @@ declare type VMStorageFetch = (
 /** Augmented by handleCommandMessage in messages from the content script */
 declare interface VMMessageSender extends chrome.runtime.MessageSender {
   top?: VMTopRenderMode;
+}
+
+declare interface Commands {
+  [name: string]: ((...args: any[]) => any) & { isOwn?: boolean };
+  GetTab(data: { id: number }, src: VMMessageSender): Promise<object>;
+  SaveTab(data: { id: number; tab: object }, src: VMMessageSender): Promise<void>;
+  GetTabs(data: { id: number }, src: VMMessageSender): Promise<Record<number, object>>;
+  RunContextMenuScript(data: {
+    id: number; tabId: number; frameId?: number; url?: string;
+  }): Promise<boolean | void>;
+  GetContextMenuScript(data: {
+    id: number; forceContent?: boolean; url?: string;
+  }, src: VMMessageSender): Promise<{
+    scripts: VMInjection.Script[]; cache: StringMap;
+  } | void>;
 }
 
 declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string }

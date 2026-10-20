@@ -15,9 +15,9 @@ import {
   aliveScripts, getDefaultCustom, getNameURI, inferScriptProps, newScript, parseMeta,
   removedScripts, scriptMap, scriptSiteVisited,
 } from './script';
-import { testBlacklist, testerBatch, testScript } from './tester';
+import { testBlacklist, testerBatch, testScript, testScriptContext } from './tester';
 import { getImageData } from './icon';
-import { addOwnCommands, addPublicCommands, commands, init, resolveInit } from './init';
+import { addOwnCommands, addPublicCommands, commands, init, rejectInit, resolveInit } from './init';
 import { installedOver, NEW_INSTALL } from './on-installed';
 import patchDB from './patch-db';
 import { permissionDownloads } from './permissions';
@@ -62,8 +62,8 @@ addOwnCommands({
   CheckRemove: checkRemove,
   RemoveScripts: removeScripts,
   GetData: getData,
-  GetMoreIds({ url, [kTop]: isTop, [IDS]: ids }) {
-    return getScriptsByURL(url, isTop, null, ids);
+  GetMoreIds({ url, [kTop]: isTop, [IDS]: ids, tab }) {
+    return getScriptsByURL(url, isTop, null, ids, tab);
   },
   /** @return {VMScript} */
   GetScript: getScript,
@@ -219,7 +219,7 @@ export async function initializeDatabase(reset) {
   resolveInit();
 }
 
-initializeDatabase();
+initializeDatabase().catch(rejectInit);
 
 /** @return {number} */
 function getInt(val) {
@@ -315,7 +315,7 @@ const notifiedBadScripts = new Set();
  *   (disabled, newly installed, non-matching due to SPA navigation)
  * @return {VMInjection.EnvStart | VMInjection.EnvDelayed | Object | void }
  */
-export function getScriptsByURL(url, isTop, errors, prevIds) {
+export function getScriptsByURL(url, isTop, errors, prevIds, context, onlyId) {
   if (testBlacklist(url)) return;
   const allIds = {};
   const isDelayed = !errors;
@@ -332,8 +332,9 @@ export function getScriptsByURL(url, isTop, errors, prevIds) {
       meta,
       props: { id },
     } = script;
-    if ((prevIds ? id in prevIds : !enabled)
-    || !((isTop || !(custom.noframes ?? meta.noframes)) && testScript(url, script))) {
+    if (onlyId && id !== onlyId || (prevIds ? id in prevIds : !enabled)
+    || !((isTop || !(custom.noframes ?? meta.noframes))
+      && testScriptContext(script, context) && testScript(url, script))) {
       continue;
     }
     if (prevIds) {
@@ -351,7 +352,8 @@ export function getScriptsByURL(url, isTop, errors, prevIds) {
     }
     const { pathMap = buildPathMap(script) } = custom;
     const runAt = getScriptRunAt(script);
-    const env = runAt === 'start' || runAt === 'body' ? envStart : envDelayed;
+    const env = runAt === 'start' || runAt === 'body' || runAt === 'context-menu'
+      ? envStart : envDelayed;
     const { depsMap } = env;
     env[IDS].push(id);
     env[RUN_AT][id] = runAt;

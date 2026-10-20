@@ -120,6 +120,20 @@ bridge.addBackgroundHandlers({
       return;
     }
     let response = data?.[kResponse];
+    if (msg.stream) {
+      if (response != null) {
+        if (U8_fromBase64) response = U8_fromBase64(response);
+        else {
+          const raw = safeAtob(response);
+          response = new SafeUint8Array(raw.length);
+          for (let i = 0; i < raw.length; i++) response[i] = safeCharCodeAt(raw, i);
+        }
+        data[kResponse] = response;
+      }
+      if (msg.type === LOADEND) delete requests[id];
+      sendHttpRequested(msg, req.realm);
+      return;
+    }
     if (response != null) {
       const wantsBinary = req[kXhrType];
       const wantsBlob = wantsBinary === 'blob';

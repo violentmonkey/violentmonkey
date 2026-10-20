@@ -121,6 +121,8 @@ buttonResetSettings:
 buttonRestore:
   description: Button to restore a removed script.
   message: Restore
+buttonRunScript:
+  message: Run script
 buttonSave:
   description: Button to save modifications of a script.
   message: Save

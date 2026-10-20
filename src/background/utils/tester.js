@@ -207,6 +207,19 @@ export function testScript(url, script) {
   return ok;
 }
 
+export function testScriptContext({ meta: { runIn } }, context) {
+  if (!runIn?.length) return true;
+  if (!context) return false;
+  const { incognito, cookieStoreId } = context;
+  const privateContext = !!incognito
+    || !!cookieStoreId && cookieStoreId !== 'firefox-default';
+  const container = cookieStoreId?.match(/^firefox-container-(\d+)$/)?.[1];
+  const contexts = Array.isArray(runIn) ? runIn : [runIn];
+  return contexts.some(value => value === 'normal-tabs' ? !privateContext
+    : value === 'incognito-tabs' ? privateContext
+      : !!container && value === `container-id-${container}`);
+}
+
 function testRules(url, script, ...list) {
   if (curUrl !== url) setContext(url);
   // TODO: combine all non-regex rules in one big smart regexp

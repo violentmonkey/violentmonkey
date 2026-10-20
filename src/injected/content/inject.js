@@ -18,6 +18,10 @@ let invokeContent;
 let nonce;
 let getAttribute;
 let querySelector;
+const manualScripts = createNullObj();
+let manualInfo;
+let resolveManualReady;
+let manualQueue = new SafePromise(resolve => { resolveManualReady = resolve; });
 
 // https://bugzil.la/1408996
 let VMInitInjection = window[__.INIT_FUNC_NAME];
@@ -31,6 +35,7 @@ if (!__.MV3) bridge.addHandlers({
    */
   InjectList: IS_FIREFOX && injectPageList,
 });
+bridge.addBackgroundHandlers({ RunContextMenuScript: runContextMenuScript }, true);
 
 export function injectPageSandbox(data) {
   pageInjectable = false;
@@ -132,6 +137,7 @@ export async function injectScripts(data, info, isXml) {
     logging.warn(errors);
   }
   injectedInfo = { __proto: null, [PAGE]: info, [CONTENT]: info };
+  manualInfo = info;
   injectedRealms = createNullObj();
   setPrototypeOf(bridge.setCache(data[CACHE]), null);
   bridge.setPathMaps(createNullObj());
@@ -141,7 +147,13 @@ export async function injectScripts(data, info, isXml) {
     injectPageSandbox(data);
   }
   const toContent = data[SCRIPTS]
-    .filter(scr => triageScript(scr) === CONTENT)
+    .filter(scr => {
+      if (scr[RUN_AT] === 'context-menu') {
+        manualScripts[scr.id] = true;
+        return false;
+      }
+      return triageScript(scr) === CONTENT;
+    })
     .map(scr => [scr.id, scr.key.data]);
   const moreData = (more || toContent.length)
     && sendFeedback(toContent, more);
@@ -191,7 +203,37 @@ export async function injectScripts(data, info, isXml) {
     await injectAll('idle');
   }
   // release for GC
-  injectedInfo = contLists = pageLists = VMInitInjection = null;
+  injectedInfo = contLists = pageLists = null;
+  if (!objectKeys(manualScripts).length) VMInitInjection = manualInfo = null;
+  resolveManualReady();
+}
+
+export function runContextMenuScript(id) {
+  if (!manualScripts[id]) return false;
+  const result = manualQueue::then(() => injectContextMenuScript(id));
+  manualQueue = result::then(null, () => {});
+  return result;
+}
+
+async function injectContextMenuScript(id) {
+  const data = await sendCmd('GetContextMenuScript', {
+    id,
+    [FORCE_CONTENT]: !pageInjectable,
+    url: IS_FIREFOX && location.href,
+  });
+  const script = data?.[SCRIPTS]?.[0];
+  if (!script) return false;
+  assign(bridge.cache, data.cache);
+  injectedInfo = { __proto__: null, [PAGE]: manualInfo, [CONTENT]: manualInfo };
+  try {
+    const realm = triageScript(script);
+    if (!realm) return false;
+    await injectAll('context-menu');
+    if (realm === CONTENT) await sendFeedback([[script.id, script.key.data]]);
+    return true;
+  } finally {
+    injectedInfo = contLists = pageLists = null;
+  }
 }
 
 function didPageLoseInjectability(toContent, scripts) {

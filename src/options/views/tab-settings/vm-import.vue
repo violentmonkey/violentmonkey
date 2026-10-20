@@ -213,7 +213,7 @@ async function doImportBackup(buf, zipName) {
         [kOrigTag]: !!hasOrigTags,
         [kComment]: ovr[kComment] || undefined,
         noframes: ovr.noframes == null ? undefined : +!!ovr.noframes,
-        runAt: RUN_AT_RE.test(opts.run_at) ? opts.run_at : undefined,
+        runAt: opts.run_at === 'context-menu' || RUN_AT_RE.test(opts.run_at) ? opts.run_at : undefined,
         [kExclude]: toStringArray(ovr.use_excludes),
         [kInclude]: toStringArray(ovr.use_includes),
         [kMatch]: toStringArray(ovr.use_matches),

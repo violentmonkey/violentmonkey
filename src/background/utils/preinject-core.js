@@ -1,5 +1,6 @@
-import { noop, sendTabCmd } from '@/common';
+import { getTab, noop, sendTabCmd } from '@/common';
 import { executeScript, INJECTED_API_ID, INJECTED_DATA_ID } from '@/common/browser-scripts-api';
+import { tryBrowserListener } from '@/common/browser-listener';
 import initCache from '@/common/cache';
 import {
   __CODE, BLACKLIST, CACHE_KEYS, GLOB_ALL, kDownloadMode, kMainFrame, kSubFrame, REQ_KEYS, UNWRAP,
@@ -31,8 +32,8 @@ export let lastRegDuration = 0;
 export let lastRegTime = 0;
 let xhrInjectKey;
 
-const API_HEADERS_RECEIVED = browser.webRequest.onHeadersReceived;
-const API_XHR = __.MV3 ? browser.webRequest.onBeforeRequest : API_HEADERS_RECEIVED;
+const API_HEADERS_RECEIVED = browser.webRequest?.onHeadersReceived;
+const API_XHR = __.MV3 ? browser.webRequest?.onBeforeRequest : API_HEADERS_RECEIVED;
 export const makeXhrHeader = (key, blobUrl) => ({
   [key]: kSetCookie,
   value: `${xhrInjectKey}=${blobUrl.split('/').pop()}; SameSite=Lax`,
@@ -44,7 +45,7 @@ const API_CONFIG = {
 const API_EXTRA = [
   !__.MV3 && 'blocking', // used for xhrInject and to make Firefox fire the event before GetInjected
   kResponseHeaders,
-  browser.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS,
+  browser.webRequest?.OnHeadersReceivedOptions?.EXTRA_HEADERS,
 ].filter(Boolean);
 const findCspHeader = h => h.name.toLowerCase() === 'content-security-policy';
 const CSP_RE = /(?:^|[;,])\s*(?:script-src(-elem)?|(d)efault-src)(\s+[^;,]+)/g;
@@ -78,8 +79,8 @@ const resolveDataCodeStr = `(${(global, key, data) => {
     global[key] = data;
   }
 }})`;
-export const getKey = (url, isTop) => (
-  isTop ? url : `-${url}`
+export const getKey = (url, isTop, tabId) => (
+  `${tabId}:${isTop ? '' : '-'}${url}`
 );
 /** @param {chrome.webRequest.WebRequestDetails} info */
 export const isTopFrame = info => info.frameType === 'outermost_frame' || !info[kFrameId];
@@ -91,9 +92,9 @@ const OPT_HANDLERS = {
     cache.destroy();
     if (injectInto) { // already initialized, so we should update the listener
       if (value === CONTENT) {
-        API_HEADERS_RECEIVED.removeListener(onHeadersReceived);
+        tryBrowserListener(API_HEADERS_RECEIVED, 'removeListener', onHeadersReceived);
       } else if (isApplied && IS_FIREFOX && !xhrInject) {
-        API_HEADERS_RECEIVED.addListener(onHeadersReceived, API_CONFIG, API_EXTRA);
+        tryBrowserListener(API_HEADERS_RECEIVED, 'addListener', onHeadersReceived, API_CONFIG, API_EXTRA);
       }
     }
     injectInto = value;
@@ -139,14 +140,15 @@ function onOptionChanged(changes) {
 }
 
 function toggleXhrInject(enable) {
-  if (enable) enable = injectInto !== CONTENT;
+  if (enable) enable = injectInto !== CONTENT && !!API_XHR?.addListener;
   if (xhrInject === enable) return;
   xhrInject = enable;
   xhrInjectKey ??= extensionRoot.match(XHR_COOKIE_RE)[1];
   cache.destroy();
-  API_XHR.removeListener(onHeadersReceived);
+  tryBrowserListener(API_XHR, 'removeListener', onHeadersReceived);
   if (enable) {
-    API_XHR.addListener(onHeadersReceived, API_CONFIG, __.MV3 ? undefined : API_EXTRA);
+    xhrInject = tryBrowserListener(API_XHR, 'addListener', onHeadersReceived,
+      API_CONFIG, __.MV3 ? undefined : API_EXTRA);
   } else if (__.MV3) {
     revokeBlobRules();
   }
@@ -158,13 +160,13 @@ function togglePreinject(enable) {
   // And even in Chrome a site may be so fast that preinject on onHeadersReceived won't be useful.
   const onOff = `${enable ? 'add' : 'remove'}Listener`;
   const config = enable ? API_CONFIG : undefined;
-  browser.webRequest.onSendHeaders[onOff](onSendHeaders, config);
+  tryBrowserListener(browser.webRequest?.onSendHeaders, onOff, onSendHeaders, config);
   if (!isApplied /* remove the listener */
   || IS_FIREFOX && !xhrInject && injectInto !== CONTENT /* add 'nonce' detector */) {
-    API_HEADERS_RECEIVED[onOff](onHeadersReceived, config, config && API_EXTRA);
+    tryBrowserListener(API_HEADERS_RECEIVED, onOff, onHeadersReceived, config, config && API_EXTRA);
   }
-  tabsOnRemoved[onOff](onTabRemoved);
-  browser.tabs.onReplaced[onOff](onTabReplaced);
+  tryBrowserListener(tabsOnRemoved, onOff, onTabRemoved);
+  tryBrowserListener(browser.tabs.onReplaced, onOff, onTabReplaced);
   if (!enable) {
     cache.destroy();
     clearFrameData();
@@ -182,18 +184,21 @@ function toggleFastForwardInject(enable) {
 }
 
 /** @param {chrome.webRequest.WebRequestDetails} info */
-function onSendHeaders(info) {
+async function onSendHeaders(info) {
   const { url, tabId } = info;
   const isTop = isTopFrame(info);
-  const key = getKey(url, isTop);
+  const key = getKey(url, isTop, tabId);
   if (!cache.has(key) && !skippedTabs[tabId]) {
-    prepare(key, url, isTop);
+    const tab = await getTab(tabId);
+    if (tab && isApplied && !cache.has(key) && !skippedTabs[tabId]) {
+      prepare(key, url, isTop, false, tab);
+    }
   }
 }
 
 /** @param {chrome.webRequest.WebRequestDetails} info */
 function onHeadersReceived(info) {
-  const key = getKey(info.url, isTopFrame(info));
+  const key = getKey(info.url, isTopFrame(info), info.tabId);
   const bag = cache.get(key);
   // The INJECT data is normally already in cache if code and values aren't huge
   if (bag && !bag[FORCE_CONTENT] && bag[INJECT]?.[SCRIPTS] && !skippedTabs[info.tabId]) {
@@ -208,7 +213,8 @@ export function injectContentRealm(toContent, tabId, frameId) {
     const scr = cache.get(S_SCRIPT_PRE + id); // TODO: recreate if expired?
     if (!scr || scr.key.data !== dataKey) continue;
     const code = scr[__CODE].join('');
-    executeScript(tabId, code, `document_${scr[RUN_AT]}`.replace('body', 'start'), frameId)
+    const runAt = scr[RUN_AT] === 'context-menu' ? 'end' : scr[RUN_AT];
+    executeScript(tabId, code, `document_${runAt}`.replace('body', 'start'), frameId)
       .then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
   }
 }

@@ -13,11 +13,17 @@ const deps = __.MV3 ? [sessionData] : [];
 export const initDependency = deps.push.bind(deps);
 
 export let resolveInit;
-export let init = new Promise(resolve => {
+export let rejectInit;
+export let init = new Promise((resolve, reject) => {
+  rejectInit = reject;
   resolveInit = async () => {
-    await Promise.all(deps.map(d => typeof d === 'function' ? d() : d));
-    resolve();
-    init = null;
+    try {
+      await Promise.all(deps.map(d => typeof d === 'function' ? d() : d));
+      resolve();
+      init = null;
+    } catch (error) {
+      reject(error);
+    }
   };
 });
 export const inIncognitoContext = __.SW && chrome.extension.inIncognitoContext;

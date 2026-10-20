@@ -5,6 +5,7 @@ import {
 } from '@/common/consts';
 import { deepSize, forEachValue, mapEntry, objectPick } from '@/common/object';
 import { getScriptsByURL, kTryVacuuming } from './db';
+import { aliveScripts } from './script';
 import { registerDnrBlob } from './dnr';
 import { inIncognitoContext } from './init';
 import {
@@ -46,7 +47,9 @@ export const normalizeRealm = val => (
   KNOWN_INJECT_INTO[val] ? val : injectInto || AUTO
 );
 export const normalizeScriptRealm = (custom, meta) => (
-  normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO])
+  normalizeRealm(custom[INJECT_INTO] || meta[INJECT_INTO]
+    || (meta.sandbox === 'DOM' ? CONTENT
+      : meta.sandbox === 'raw' || meta.sandbox === 'JavaScript' ? AUTO : null))
 );
 const isContentRealm = (val, force) => (
   val === CONTENT || val === AUTO && force
@@ -67,7 +70,7 @@ export function prepareXhrBlob({ [kResponseHeaders]: responseHeaders, frameId, t
   }
 }
 
-export function prepare(cacheKey, url, isTop, isLate) {
+export function prepare(cacheKey, url, isTop, isLate, context) {
   const shouldExpose = isTop && url.startsWith('https://')
     ? expose[url.split('/', 3)[2]]
     : null;
@@ -78,18 +81,18 @@ export function prepare(cacheKey, url, isTop, isLate) {
   }
   const errors = [];
   // TODO: teach `getScriptEnv` to skip prepared scripts in cache
-  const env = getScriptsByURL(url, isTop, errors);
+  const env = getScriptsByURL(url, isTop, errors, null, context);
   const res = env || bagNoOp;
   cache.put(cacheKey, res); // must be called before prepareBag overwrites it synchronously
   if (env) {
     env[PROMISE] = prepareBag(cacheKey, url, isTop, isLate,
-      env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors
+      env, shouldExpose != null ? { [EXPOSE]: shouldExpose } : {}, errors, context
     ).catch(() => (env[PROMISE] = null));
   }
   return res;
 }
 
-async function prepareBag(cacheKey, url, isTop, isLate, env, inject, errors) {
+async function prepareBag(cacheKey, url, isTop, isLate, env, inject, errors, context) {
   if (env[PROMISE]) await env[PROMISE];
   if (!isApplied) return; // the user disabled injection while we awaited
   cache.batch(true);
@@ -102,7 +105,13 @@ async function prepareBag(cacheKey, url, isTop, isLate, env, inject, errors) {
     [MORE]: moreKey,
     [kSessionId]: sessionId,
     [IDS]: allIds,
-    info: { ua, gmi: { [kDownloadMode]: downloadMode, isIncognito } },
+    info: {
+      ua,
+      gmi: {
+        [kDownloadMode]: downloadMode,
+        isIncognito: context?.incognito ?? !!isIncognito,
+      },
+    },
     errors: errors.filter(err => allIds[err.split('#').pop()]).join('\n'),
   }, objectPick(env, [
     S_CACHE,
@@ -113,7 +122,8 @@ async function prepareBag(cacheKey, url, isTop, isLate, env, inject, errors) {
     if (val !== true) bag[val] = env[val];
   });
   bag[MORE] = envDelayed;
-  if (isTop && !isLate && ffInject && !xhrInject && (__.MV3 || contentScriptsAPI) && (
+  if (isTop && !isLate && ffInject && !xhrInject && (__.MV3 || contentScriptsAPI)
+  && !aliveScripts.some(script => script.meta.runIn?.length) && (
     performance.now() - lastRegTime > lastRegDuration ||
     env.size + deepSize(env[S_CACHE]) < 1e6
   )) {
@@ -285,7 +295,7 @@ export function triageRealms(scripts, forceContent, tabId, frameId, bag) {
         metaStr[0] = scr[__CODE][i].slice(from, to);
       }
       code = '';
-      toContent.push([scr.id, scr.key.data]);
+      if (scr[RUN_AT] !== 'context-menu') toContent.push([scr.id, scr.key.data]);
     } else {
       metaStr[0] = '';
       code = forceContent ? ID_BAD_REALM : scr[__CODE];

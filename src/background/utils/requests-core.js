@@ -1,6 +1,7 @@
 import { buffer2string, isEmpty, noop } from '@/common';
 import { forEachEntry } from '@/common/object';
 import { CHROME } from './ua';
+import { mergeCookieHeaders } from './requests-cookies';
 
 let encoder;
 
@@ -41,15 +42,14 @@ const API_FILTER = {
 };
 const EXTRA_HEADERS = [
   !__.MV3 && 'blocking',
-  browser.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS,
+  browser.webRequest?.OnBeforeSendHeadersOptions?.EXTRA_HEADERS,
 ].filter(Boolean);
 const headersToInject = {};
+const attachedEvents = {};
 export const kCookie = 'cookie';
 export const kSetCookie = 'set-cookie';
 const SET_COOKIE_VALUE_RE = regex({ disable: { n: true } })`
   ^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:\<-\[\]-~]*)  \3(.*)`;
-const SET_COOKIE_ATTR_RE = regex({ disable: { n: true }, flags: 'y' })`
-  \s*  ;?\s*  (\w+)  (?:= (")?  ([!#-+\--:\<-\[\]-~]*)  \2)?`;
 const SAME_SITE_MAP = {
   strict: 'strict',
   lax: 'lax',
@@ -70,15 +70,16 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId, tabId, url 
   if (req) {
     // Populate responseHeaders for GM_xhr's `response`
     req[kResponseHeaders] = headers.map(encodeWebRequestHeader).join('');
-    if (__.MV3) return;
-    const { storeId } = req;
+    const { storeId, cookiePartition } = req;
     // Drop Set-Cookie headers if anonymous or using a custom storeId
-    if (!req[kSetCookie] || storeId) {
+    if (!req[kSetCookie] || storeId || cookiePartition) {
       headers = headers.filter(h => {
         if (h.name.toLowerCase() !== kSetCookie) return true;
-        if (storeId) setCookieInStore(h.value, storeId, url);
+        if (req[kSetCookie] && (storeId || cookiePartition)) {
+          setCookieInStore(h.value, storeId, url, cookiePartition);
+        }
       });
-      return { [kResponseHeaders]: headers };
+      if (!__.MV3) return { [kResponseHeaders]: headers };
     }
   }
 }
@@ -114,7 +115,7 @@ function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, tabId, url
         continue;
       }
       if (!h2 && name === kCookie && (h2 = headers2[name])) {
-        combinedHeaders[name] = { name, value: h.value + '; ' + h2.value };
+        combinedHeaders[name] = { name, value: mergeCookieHeaders(h.value, h2.value) };
       } else {
         headersMap[name] = h;
       }
@@ -129,7 +130,18 @@ export function toggleHeaderInjector(reqId, headers) {
   if (headers) {
     if (isEmpty(headersToInject)) {
       API_EVENTS::forEachEntry(([name, [listener, ...options]]) => {
-        browser.webRequest[name].addListener(listener, API_FILTER, options);
+        const event = browser.webRequest?.[name];
+        if (event?.addListener) {
+          try {
+            event.addListener(listener, API_FILTER, options);
+            attachedEvents[name] = true;
+          } catch {
+            try {
+              event.addListener(listener, API_FILTER, options.filter(opt => opt !== 'extraHeaders'));
+              attachedEvents[name] = true;
+            } catch {/**/}
+          }
+        }
       });
     }
     // Adding even if empty so that the toggle-off `if` runs just once even when called many times
@@ -138,10 +150,14 @@ export function toggleHeaderInjector(reqId, headers) {
     delete headersToInject[reqId];
     if (!CHROME_REG_LEAK_BUG && isEmpty(headersToInject)) {
       API_EVENTS::forEachEntry(([name, [listener]]) => {
-        browser.webRequest[name].removeListener(listener);
+        if (attachedEvents[name]) {
+          try { browser.webRequest?.[name]?.removeListener(listener); } catch {/**/}
+          delete attachedEvents[name];
+        }
       });
     }
   }
+  return !!attachedEvents.onBeforeSendHeaders && !!attachedEvents.onHeadersReceived;
 }
 
 /**
@@ -162,29 +178,38 @@ function encodeWebRequestHeader({ name, value, binaryValue }) {
  * @param {string} storeId
  * @param {string} url
  */
-function setCookieInStore(headerValue, storeId, url) {
+function setCookieInStore(headerValue, storeId, url, cookiePartition) {
   let m = SET_COOKIE_VALUE_RE.exec(headerValue);
   if (m) {
     const [, prefix, name, , value, optStr] = m;
     const opt = {};
     const isHost = prefix === 'Host';
-    SET_COOKIE_ATTR_RE.lastIndex = 0;
-    while ((m = SET_COOKIE_ATTR_RE.exec(optStr))) {
-      opt[m[1].toLowerCase()] = m[3];
+    for (const part of optStr.split(';')) {
+      const pos = part.indexOf('=');
+      const key = (pos < 0 ? part : part.slice(0, pos)).trim().toLowerCase();
+      if (key) {
+        let val = pos < 0 ? '' : part.slice(pos + 1).trim();
+        if (val[0] === '"' && val.endsWith('"')) val = val.slice(1, -1);
+        opt[key] = val;
+      }
     }
-    const sameSite = opt.sameSite?.toLowerCase();
+    const sameSite = opt.samesite?.toLowerCase();
+    const expiration = /^-?\d+$/.test(opt['max-age'])
+      ? Date.now() / 1000 + +opt['max-age']
+      : Date.parse(opt.expires) / 1000;
     browser.cookies.set({
       url,
-      name,
+      name: prefix ? `__${prefix}-${name}` : name,
       value,
       domain: isHost ? undefined : opt.domain,
-      expirationDate: Math.max(0, +new Date(opt['max-age'] * 1000 || opt.expires)) || undefined,
+      expirationDate: Number.isFinite(expiration) ? Math.max(0, expiration) : undefined,
       httpOnly: 'httponly' in opt,
       path: isHost ? '/' : opt.path,
       sameSite: SAME_SITE_MAP[sameSite],
       secure: url.startsWith('https:') && (!!prefix || sameSite === 'none' || 'secure' in opt),
       storeId,
-    });
+      ...cookiePartition && 'partitioned' in opt && { partitionKey: cookiePartition },
+    }).catch(noop);
   }
 }
 
@@ -201,7 +226,9 @@ function string2byteString(str) {
 // Chrome 74-91 needs an extraHeaders listener at tab load start, https://crbug.com/1074282
 // We're attaching a no-op in non-blocking mode so it's very lightweight and fast.
 if (!__.MV3 && CHROME >= 74 && CHROME <= 91) {
-  browser.webRequest.onBeforeSendHeaders.addListener(noop, API_FILTER, EXTRA_HEADERS);
+  try {
+    browser.webRequest?.onBeforeSendHeaders?.addListener(noop, API_FILTER, EXTRA_HEADERS);
+  } catch {/**/}
 }
 // Attaching globally will see all XHRs in all tabs because tabId:-1 in addListener is ignored
 if (CHROME_REG_LEAK_BUG) toggleHeaderInjector('', []);
