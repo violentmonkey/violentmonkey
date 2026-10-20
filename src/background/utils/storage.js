@@ -2,8 +2,9 @@ import { initHooks } from '@/common';
 import { mapEntry } from '@/common/object';
 import { ensureArray } from '@/common/util';
 import { addOwnCommands } from './init';
+import protectSourceStorage from './storage-source';
 
-let api = browser.storage.local;
+let api = protectSourceStorage(browser.storage.local);
 
 /** @prop {VMStorageFetch} [fetch] */
 class VMStorageArea {

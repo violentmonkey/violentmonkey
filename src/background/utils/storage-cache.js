@@ -11,6 +11,7 @@ import storage, {
   fireStorageChanged, S_MOD_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
 import { clearValueOpener } from './values';
+import { decodeSource } from './storage-source';
 
 /** Throttling browser API for `storage.value`, processing requests sequentially,
  so that we can supersede an earlier chained request if it's obsolete now,
@@ -137,7 +138,7 @@ if (!__.MV3) global[WATCH_STORAGE] = fn => {
   api.onChanged.addListener(changes => {
     const keys = Object.keys(changes);
     for (const key of keys) {
-      const val = changes[key] = changes[key].newValue;
+      const val = changes[key] = decodeSource(key, changes[key].newValue);
       const exists = val !== undefined ? 1 : 0;
       if (key !== S_MSG_IN && key !== S_MSG_OUT) {
         if (exists) cache.put(key, val); else cache.del(key);
