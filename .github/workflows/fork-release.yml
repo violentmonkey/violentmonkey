@@ -40,11 +40,15 @@ jobs:
       - name: Test
         run: pnpm run ci
 
-      - name: Build for Orion
-        run: pnpm build
-
-      - name: Build MV3
-        run: pnpm build:mv3
+      - name: Build extensions
+        env:
+          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
+          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
+          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+        run: |
+          pnpm build
+          pnpm build:mv3
 
       - name: Sign packages and generate update feeds
         env:
