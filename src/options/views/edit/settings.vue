@@ -31,6 +31,7 @@
           <option value="document-body">document-body</option>
           <option value="document-end">document-end</option>
           <option value="document-idle">document-idle</option>
+          <option value="context-menu">context-menu</option>
         </select>
       </dd>
       <dd>

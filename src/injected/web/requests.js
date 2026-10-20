@@ -25,10 +25,16 @@ const OPTS_TO_KEEP = [
 ];
 const OPTS_TO_PASS = [
   'conflictAction',
+  'cookie',
+  'cookiePartition',
+  'fetch',
   'headers',
   'method',
+  'nocache',
   'overrideMimeType',
   'password',
+  'redirect',
+  'revalidate',
   'saveAs',
   'timeout',
   'user',
@@ -46,6 +52,7 @@ const XHR_TYPES = {
   arraybuffer: 1,
   blob: 1,
   json: 0,
+  stream: 0,
   [kDocument]: 0,
   text: 0,
   '': 0,
@@ -68,6 +75,10 @@ bridge.addHandlers({
       msg = msg[ERROR];
       msg = new SafeError(msg[0], msg[1]);
       if (cb) cb(msg); else log(ERROR, [bridge.displayNames[req.scriptId]], msg);
+      return;
+    }
+    if (msg.stream) {
+      receiveStream(req, msg, cb);
       return;
     }
     if (!cb) {
@@ -109,6 +120,41 @@ bridge.addHandlers({
     cb(data);
   },
 });
+
+function receiveStream(req, msg, cb) {
+  const { type, data } = msg;
+  if (!req.stream) {
+    req.stream = new SafeReadableStream({
+      __proto__: null,
+      start: controller => { req.controller = controller; },
+      cancel: () => {
+        req.streamFinished = true;
+        bridge.post('AbortRequest', req.id);
+      },
+    });
+  }
+  if (!req.streamFinished) {
+    const { controller } = req;
+    if (data?.[kResponse] != null) controller::streamEnqueue(data[kResponse]);
+    if (type === LOAD) {
+      req.streamFinished = true;
+      controller::streamClose();
+    } else if (type === ERROR || type === 'abort' || type === 'timeout') {
+      req.streamFinished = true;
+      const info = msg.streamError || ['Request failed', 'Error'];
+      const err = new SafeError(info[0]);
+      setOwnProp(err, 'name', info[1]);
+      controller::streamError(err);
+    }
+  }
+  if (cb && data) {
+    setOwnProp(data, 'context', req.context);
+    setOwnProp(data, kResponse, req.stream);
+    setOwnProp(data, kResponseText, null);
+    setOwnProp(data, kResponseXML, null);
+    cb(data);
+  }
+}
 
 /**
  * `response` is sent only when changed so we need to remember it for response-less events
@@ -195,6 +241,10 @@ export function onRequestCreate(opts, context, fileName) {
     onRequestInitError(opts, err);
     return; // not returning the abort controller as there's no request to abort
   }
+  if (type === 'stream' && !SafeReadableStream) {
+    onRequestInitError(opts, new SafeError('ReadableStream is not supported by this browser.'));
+    return;
+  }
   if (!(type in XHR_TYPES)) {
     logging.warn(`Unknown ${kResponseType} "${type}"`);
     type = '';
@@ -222,9 +272,13 @@ export function onRequestCreate(opts, context, fileName) {
   }
   if (context.async) {
     const { resolve, reject } = res = SafePromiseWithResolvers();
-    const { [LOAD]: onload, [ERROR]: onerror } = cb[0];
+    const { [LOAD]: onload } = cb[0];
     cb[0][LOAD] = onload ? v => { resolve(v); onload(v); } : (events[0][LOAD] = true, resolve);
-    cb[0][ERROR] = onerror ? v => { reject(v); onerror(v); } : (events[0][ERROR] = true, reject);
+    for (const key of [ERROR, 'abort', 'timeout']) {
+      const fn = cb[0][key];
+      events[0][key] = true;
+      cb[0][key] = fn ? v => { reject(v); fn(v); } : reject;
+    }
     res = res.promise;
   } else {
     res = {};

@@ -2,6 +2,7 @@ import * as bridge from './bridge';
 import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
 import './notifications';
+import './gm-tabs';
 import './requests';
 import './tabs';
 import { sendCmd } from './util';

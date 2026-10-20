@@ -138,6 +138,12 @@
               <icon name="more"/>
             </div>
           </div>
+          <div v-if="item.manual && item.config.enabled && optionsData.isApplied && !store.failure"
+               class="submenu-commands">
+            <button :tabIndex @click="onRunScript(item)">
+              <icon name="command"/> {{i18n('buttonRunScript')}}
+            </button>
+          </div>
           <div v-if="item.excludes" class="excludes-menu mb-1c mr-1c">
             <button v-for="(val, key) in item.excludes[1]" :key
                     v-text="val" class="ellipsis" :title="`*://${val}/*`"
@@ -251,7 +257,7 @@ const INJECT_LEARN = IS_FIREFOX
   ? i18n('labelFirefoxPatchCspPopup', ['<content>', i18n('labelFirefoxPatchCsp')])
   : '@inject-into content\n' + i18n('learnInjectionMode');
 const SCRIPT_CLS = '.script';
-const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
+const RUN_AT_ORDER = ['start', 'body', 'end', 'idle', 'context-menu'];
 const kNoCmdNames = 'noCmdNames';
 const needsReload = reactive({});
 const collator = getSortCollator();
@@ -354,6 +360,7 @@ function makeInjectionScopes() {
         ...script,
         id,
         name: scriptName,
+        manual: getScriptRunAt(script) === 'context-menu',
         key: `${
           enabledFirst && +!enabled
         }${
@@ -447,6 +454,14 @@ function onOpenUrl(e) {
 }
 function onEditScript(item) {
   sendCmdDirectly('OpenEditor', item.props.id).then(close);
+}
+function onRunScript(item) {
+  sendCmdDirectly('RunContextMenuScript', {
+    id: item.id,
+    tabId: store.tab.id,
+    frameId: item.frameId || 0,
+    url: item.pageUrl,
+  }).then(result => result && close());
 }
 function onCommand(evt) {
   const { type, currentTarget: el } = evt;

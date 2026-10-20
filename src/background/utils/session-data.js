@@ -5,6 +5,7 @@ export const kAlarmRemove = 'remove';
 export const kAlarmSync = 'sync';
 export const kAlarmUpdate = 'update';
 export const kBadges = 'badges';
+export const kGmTabs = 'gmTabs';
 export const kNotifications = 'notifications';
 export const kScriptSizes = 'scriptSizes';
 export const kTabOpeners = 'tabOpeners';
@@ -12,6 +13,7 @@ export const kTabOpeners = 'tabOpeners';
 /** @type {{ [tabId: string]: VMBadgeData }}*/
 export let badges = {};
 export let downloads = {};
+export let gmTabs = {};
 export let notifications = {};
 /** @type {{ [url:string]: number }} */
 export let scriptSizes = {};
@@ -22,6 +24,7 @@ let flushing;
 let sessionData = __.MV3 && chrome.storage.session.get().then(data => (
   badges = data[kBadges] || badges,
   downloads = data[kDownloads] || downloads,
+  gmTabs = data[kGmTabs] || gmTabs,
   notifications = data[kNotifications] || notifications,
   scriptSizes = data[kScriptSizes] || scriptSizes,
   skippedTabs = data[SKIP_SCRIPTS] || skippedTabs,

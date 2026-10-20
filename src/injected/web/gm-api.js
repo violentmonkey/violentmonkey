@@ -15,6 +15,15 @@ export const GM4_ALIAS = createNullObj();
 export const GM_API_CTX_GM4ASYNC = {
   __proto__: null,
   GM_cookie: gmCookieInvoker,
+  GM_getTab(cb) {
+    return gmTabInvoker(this, 'GetTab', undefined, cb);
+  },
+  GM_getTabs(cb) {
+    return gmTabInvoker(this, 'GetTabs', undefined, cb);
+  },
+  GM_saveTab(tab, cb) {
+    return gmTabInvoker(this, 'SaveTab', tab, cb);
+  },
   /** @this {GMContext} */
   GM_deleteValue(key) {
     return dumpValue(this, false, [key]);
@@ -199,6 +208,28 @@ export function gmCookieInvoker(cmd, hasResult, opts, cb) {
   if (this.async) return bridge.promise(cmd, opts);
   if (cb) return bridge.call(cmd, opts, null, hasResult ? cb : (res, err) => cb(err));
   bridge.post(cmd, opts);
+}
+
+function gmTabInvoker(context, cmd, tab, cb) {
+  const data = { id: context.id, tab, __proto__: null };
+  const prr = context.async && SafePromiseWithResolvers();
+  if (prr || isFunction(cb)) {
+    bridge.call(cmd, data, null, (res, err) => {
+      if (prr) {
+        if (err) prr.reject(err);
+        else prr.resolve(cmd === 'SaveTab' ? undefined : res);
+      } else if (err) {
+        throw err;
+      } else if (cmd === 'SaveTab') {
+        cb();
+      } else {
+        cb(res);
+      }
+    });
+  } else {
+    bridge.post(cmd, data);
+  }
+  return prr ? prr.promise : undefined;
 }
 
 function webAddElement(parent, tag, attrs) {

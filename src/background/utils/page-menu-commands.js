@@ -1,4 +1,5 @@
 import { browserWindows, getActiveTab, i18n, ignoreChromeErrors, sendTabCmd } from '@/common';
+import { tryBrowserListener } from '@/common/browser-listener';
 import { FILE_GLOB_ALL, GLOB_ALL } from '@/common/consts';
 import { forEachEntry, forEachValue } from '@/common/object';
 import { kPageMenuCommands } from '@/common/options-defaults';
@@ -178,27 +179,27 @@ function rebuildPageCommandMenuTab(tabId) {
     const hub = merged[scriptId];
     const script = getScriptById(scriptId);
     const subId = `${tabId}:${scriptId}`;
-    contextMenus.create({
+    tryMenu('create', {
       id: subId,
       parentId: ROOT_ID,
       title: (script?.config.enabled ? '' : '⛔ ')
         + (script ? clipString(getScriptName(script)) : `#${scriptId}`),
       ...SCOPE,
-    }, ignoreChromeErrors);
+    });
     submenuIds.push(subId);
     for (const key in hub) {
       const item = hub[key];
       const id = `${CMD_PREFIX}${subId}:${item[SHORT_ID]}`;
-      contextMenus.create({
+      tryMenu('create', {
         id,
         parentId: subId,
         title: clipString(item.text || ''),
         ...SCOPE,
-      }, ignoreChromeErrors);
+      });
       commandCount += 1;
     }
   }
-  contextMenus.update(ROOT_ID, { visible: commandCount > 0 }, ignoreChromeErrors);
+  tryMenu('update', ROOT_ID, { visible: commandCount > 0 });
   menuTabId = tabId;
 }
 
@@ -216,7 +217,7 @@ async function rebuildForActiveTab(windowId, updatedTabId) {
 function removeSubMenus() {
   if (submenuIds) {
     for (const id of submenuIds) {
-      contextMenus.remove(id, ignoreChromeErrors);
+      tryMenu('remove', id);
     }
   }
   submenuIds = tabData && [];
@@ -227,24 +228,34 @@ function setEnabled(value) {
   tabData = value && {};
   tabRoutes = value && {};
   const onOff = value ? 'addListener' : 'removeListener';
-  browserWindows?.onFocusChanged[onOff](onFocusChanged);
-  tabsOnActivated[onOff](onTabActivated);
-  tabsOnRemoved[onOff](onTabRemoved);
+  tryBrowserListener(browserWindows?.onFocusChanged, onOff, onFocusChanged);
+  tryBrowserListener(tabsOnActivated, onOff, onTabActivated);
+  tryBrowserListener(tabsOnRemoved, onOff, onTabRemoved);
   if (!tabData) {
     if (submenuIds) {
       removeSubMenus();
-      contextMenus.remove(ROOT_ID, ignoreChromeErrors);
+      tryMenu('remove', ROOT_ID);
     }
     return;
   }
   if (!submenuIds) {
-    contextMenus.create({
+    if (!tryMenu('create', {
       id: ROOT_ID,
       title: i18n('extName'),
       visible: false,
       ...SCOPE,
-    }, ignoreChromeErrors);
+    })) return setEnabled(false);
     submenuIds = [];
   }
   rebuildForActiveTab();
+}
+
+function tryMenu(method, ...args) {
+  try {
+    if (typeof contextMenus?.[method] !== 'function') return false;
+    contextMenus[method](...args, ignoreChromeErrors);
+    return true;
+  } catch {
+    return false;
+  }
 }

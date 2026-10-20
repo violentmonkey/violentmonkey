@@ -52,7 +52,9 @@ export function getScriptName(script) {
 
 /** @returns {VMInjection.RunAt} without "document-" */
 export function getScriptRunAt(script) {
-  return `${script.custom[RUN_AT] || script.meta[RUN_AT] || ''}`.match(RUN_AT_RE)?.[1] || 'end';
+  const value = script.custom[RUN_AT] || script.meta[RUN_AT];
+  return value === 'context-menu' ? value
+    : `${value || ''}`.match(RUN_AT_RE)?.[1] || (value ? 'end' : 'idle');
 }
 
 /** URL that shows the name of the script and opens in devtools sources or in our editor */

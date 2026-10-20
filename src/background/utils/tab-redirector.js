@@ -1,5 +1,6 @@
 import { browserWindows, getTab, getUniqId, i18n, isRemote, noop, sendTabCmd } from '@/common';
 import browser from '@/common/browser';
+import { tryBrowserListener } from '@/common/browser-listener';
 import { executeScript } from '@/common/browser-scripts-api';
 import { FILE_GLOB_ALL, kMainFrame, NO_CACHE } from '@/common/consts';
 import cache from './cache';
@@ -98,7 +99,7 @@ ${code?.length > 1e6 ? code.slice(0, 1e6) + '...' : code}`;
   }
 }
 
-tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
+tryBrowserListener(tabsOnUpdated, 'addListener', async (tabId, { url }, tab) => {
   if (!url) return;
   const { id, title } = tab;
   const isFile = url.startsWith('file:');
@@ -121,7 +122,7 @@ tabsOnUpdated.addListener(async (tabId, { url }, tab) => {
   }
 }, !__.MV3 && FIREFOX && { properties: [FIREFOX >= 88 ? 'url' : 'status'] });
 
-browser.webRequest.onBeforeRequest.addListener((req) => {
+tryBrowserListener(browser.webRequest?.onBeforeRequest, 'addListener', (req) => {
   const { method, tabId, url } = req;
   if (method !== 'GET') {
     return;
@@ -155,7 +156,7 @@ browser.webRequest.onBeforeRequest.addListener((req) => {
   types: [kMainFrame],
 }, __.MV3 ? [] : ['blocking']);
 
-browser.webRequest.onBeforeRequest.addListener(({ tabId, url }) => {
+tryBrowserListener(browser.webRequest?.onBeforeRequest, 'addListener', ({ tabId, url }) => {
   if (tabId >= 0 && requestMcpConnection(url)) {
     openMcpAuthorization(tabId);
     return IS_FIREFOX ? { cancel: true } : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url

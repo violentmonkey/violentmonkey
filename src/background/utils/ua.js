@@ -1,5 +1,5 @@
 import { browserWindows } from '@/common';
-import { listenOnce } from '@/common/browser';
+import { tryBrowserListener } from '@/common/browser-listener';
 import { addOwnCommands, initDependency } from './init';
 
 export const {
@@ -11,7 +11,8 @@ const kFullVersionList = 'fullVersionList';
 
 /** @type {VMScriptGMInfoPlatform} */
 export const ua = {
-  mobile: navUAD ? navUAD.mobile : navUA.includes('Android'),
+  mobile: !!(navUAD?.mobile || /Android|iP(?:ad|hone|od)/.test(navUA)
+    || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
 };
 /** @type {number|void} This value can be trusted because the only way to spoof it in Chrome/ium
  * is to manually open devtools for the background page in device emulation mode.
@@ -28,15 +29,15 @@ addOwnCommands({
 
 initDependency(
   Promise.all([
-    browser.runtime.getPlatformInfo(),
-    browser.runtime.getBrowserInfo?.(),
-    navUAD?.getHighEntropyValues([kFullVersionList]),
-    IS_FIREFOX ? [] : browserWindows.getAll(),
+    getOptionalInfo(browser.runtime, 'getPlatformInfo'),
+    getOptionalInfo(browser.runtime, 'getBrowserInfo'),
+    getOptionalInfo(navUAD, 'getHighEntropyValues', [kFullVersionList]),
+    IS_FIREFOX ? [] : getOptionalInfo(browserWindows, 'getAll'),
   ]).then(([
-    { os, arch },
+    { os, arch } = {},
     { name, version } = {},
     { [kFullVersionList]: list } = {},
-    [wnd],
+    [wnd] = [],
   ]) => {
     if (!version && list?.[0]) {
       [name, version] = list.map(({ brand, version: v }) => (
@@ -52,9 +53,21 @@ initDependency(
     ua[kFullVersionList] = list;
     if (FIREFOX) FIREFOX = parseFloat(version);
     else if (wnd) checkVivaldi(wnd);
-    else browserWindows.onCreated::listenOnce(checkVivaldi);
+    else if (browserWindows?.onCreated) {
+      const checkOnce = createdWindow => {
+        tryBrowserListener(browserWindows.onCreated, 'removeListener', checkOnce);
+        checkVivaldi(createdWindow);
+      };
+      tryBrowserListener(browserWindows.onCreated, 'addListener', checkOnce);
+    }
   })
 );
+
+function getOptionalInfo(object, method, ...args) {
+  return Promise.resolve().then(() => object?.[method]?.(...args))
+    .then(value => value || undefined)
+    .catch(() => undefined);
+}
 
 function checkVivaldi(wnd) {
   if (wnd.vivExtData/*new*/ || wnd.extData/*old*/) {

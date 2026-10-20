@@ -24,6 +24,10 @@ export let
   SafeSymbol,
   /** May be unsafe in old bugged Chrome */
   SafePromise,
+  SafeReadableStream,
+  streamEnqueue,
+  streamClose,
+  streamError,
   withResolvers,
   fire,
   getWindowLength,
@@ -195,6 +199,10 @@ export const VAULT = (() => {
       }
       return funcs;
     })(createNullObj()),
+    SafeReadableStream = res[i += 1] || src.ReadableStream,
+    streamEnqueue = res[i += 1] || (tmp = src.ReadableStreamDefaultController?.[PROTO])?.enqueue,
+    streamClose = res[i += 1] || tmp?.close,
+    streamError = res[i += 1] || tmp?.error,
   ];
   /* Chrome pre-115 can't use SafePromise when iframe is removed, fixed in crrev.com/1142900.
    * We'll use the unsafe one from `window` only for userscript API stuff, not internally.

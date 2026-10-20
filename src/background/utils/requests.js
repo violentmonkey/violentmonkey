@@ -9,6 +9,8 @@ import { addOwnCommands, addPublicCommands } from './init';
 import callOffscreen from './offscreen';
 import { getOption } from './options';
 import { permissionDownloads } from './permissions';
+import { mergeCookieHeaders } from './requests-cookies';
+import initFetch from './requests-fetch';
 import {
   FORBIDDEN_HEADER_RE, kCookie, kRequestHeaders, kSetCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
@@ -45,7 +47,7 @@ addPublicCommands({
     const dlInTab = fileName && IS_FIREFOX && FIREFOX >= 79 && ua.mobile;
     const dlInApi = fileName && !dlInTab && permissionDownloads && getOption(kGmDownloadViaApi);
     /** @param {GMReq.Message.BGAny} res */
-    const cb = res => {
+    const cb = async res => {
       if (!requests[id]) return;
       const { data } = res;
       if (__.MV3 && req.url && data?.finalUrl) {
@@ -58,14 +60,17 @@ addPublicCommands({
       if (res.type === 'loadend' && !data?.[UPLOAD]) {
         clearRequest(req);
       }
-      sendTabCmd(tabId, 'HttpRequested', res, req.frame);
+      try {
+        await sendTabCmd(tabId, 'HttpRequested', res, req.frame);
+      } catch {/**/}
     };
-    const cbError = err => cb({
-      id,
-      [ERROR]: [err.message || `${err}`, err.name],
-      data: null,
-      type: ERROR,
-    });
+    const cbError = async err => {
+      try {
+        await cb({ id, [ERROR]: [err.message || `${err}`, err.name], data: null, type: ERROR });
+      } finally {
+        await cb({ id, data: {}, type: 'loadend' });
+      }
+    };
     Object.defineProperties(req, { // non-enumerable props won't be messaged
       cb: {value: cb},
       cbe: {value: cbError},
@@ -111,6 +116,8 @@ async function httpRequest(opts, events, id, req, src) {
   const { tab } = src;
   const { incognito } = tab;
   const { anonymous, overrideMimeType, [kXhrType]: xhrType } = opts;
+  let useFetch = !req.dl && (opts.fetch || opts.redirect || opts[kResponseType] === 'stream'
+    || anonymous || opts.nocache || opts.revalidate);
   const url = vetUrl(opts.url, src.url, true);
   const vmHeaders = __.MV3 ? [] : {};
   const xhrHeaders = {};
@@ -124,14 +131,19 @@ async function httpRequest(opts, events, id, req, src) {
   const [body, contentType] = decodeBody(opts.data);
   // Firefox doesn't send cookies, https://github.com/violentmonkey/violentmonkey/issues/606
   // Chrome MV2 & FF need explicit routing of cookies in containers or "spanning" mode incognito
-  const shouldSendCookies = !__.MV3 && !anonymous && (incognito || IS_FIREFOX);
+  let shouldSendCookies = !anonymous && (incognito || IS_FIREFOX || opts.cookiePartition);
   const uaHeaders = [];
   const kOrigin = 'origin';
   let hasOriginHeader;
+  let suppliedCookies;
   let storeId;
-  if (!__.MV3) {
-    req[kCookie] = !anonymous && !shouldSendCookies;
-    req[kSetCookie] = !anonymous;
+  if (opts.cookiePartition) {
+    if (!anonymous && !browser.cookies?.set) {
+      throw new Error('Cookie partitions are not supported by this browser.');
+    }
+    const topLevelSite = new URL(opts.cookiePartition.topLevelSite || src.origin || tab.url || src.url);
+    if (!/^https?:$/.test(topLevelSite.protocol)) throw new Error('Invalid cookie partition site.');
+    req.cookiePartition = { topLevelSite: topLevelSite.origin };
   }
   if (contentType) xhrHeaders['Content-Type'] = contentType;
   opts.headers::forEachEntry(([name, value]) => {
@@ -140,6 +152,7 @@ async function httpRequest(opts, events, id, req, src) {
     if (i >= 0 && (uaHeaders[i] = true) || FORBIDDEN_HEADER_RE.test(name)) {
       pushHeader(vmHeaders, name, value, nameLow);
       hasOriginHeader ||= nameLow === kOrigin;
+      if (nameLow === kCookie) suppliedCookies = value;
     } else {
       xhrHeaders[name] = value;
     }
@@ -152,27 +165,46 @@ async function httpRequest(opts, events, id, req, src) {
   });
   xhrProps[kResponseType] = willStringifyBinaries && 'blob' || xhrType || 'text';
   xhrProps.timeout = Math.max(0, Math.min(0x7FFF_FFFF, opts.timeout)) || 0;
+  const explicitCookies = suppliedCookies != null || opts.cookie != null;
+  if (opts.cookie != null) suppliedCookies = mergeCookieHeaders(suppliedCookies, opts.cookie);
+  shouldSendCookies ||= !anonymous && __.MV3 && suppliedCookies != null;
+  req[kCookie] = !anonymous && !shouldSendCookies;
+  req[kSetCookie] = !anonymous;
   if (shouldSendCookies) {
-    for (const store of await browser.cookies.getAllCookieStores()) {
-      if (store.tabIds.includes(tab.id)) {
-        if (IS_FIREFOX ? !store.id.endsWith('-default') : store.id !== '0') {
-          /* Cookie routing. For the main store we rely on the browser.
-           * The ids are hard-coded as `stores` may omit the main store if no such tabs are open. */
-          storeId = req.storeId = store.id;
-        }
-        break;
-      }
+    if (!browser.cookies?.getAll) throw new Error('Cookie routing is not supported by this browser.');
+    const stores = browser.cookies.getAllCookieStores
+      ? await browser.cookies.getAllCookieStores() : [];
+    const tabStore = tab.cookieStoreId || stores.find(store => store.tabIds.includes(tab.id))?.id;
+    const defaultStore = IS_FIREFOX ? tabStore?.endsWith('-default') : tabStore === '0';
+    storeId = defaultStore ? undefined : tabStore;
+    if (incognito && !storeId) {
+      throw new Error('The private cookie store could not be identified.');
     }
+    if (storeId && !browser.cookies.set) throw new Error('Cookie routing is not supported by this browser.');
     const now = Date.now() / 1000;
-    const cookies = (await browser.cookies.getAll({
+    req.storeId = storeId;
+    const query = {
       url,
       storeId,
       ...IS_FIREFOX && { firstPartyDomain: null },
-    })).filter(c => c.session || c.expirationDate > now); // FF reports expired cookies!
-    if (cookies.length) {
-      pushHeader(vmHeaders, kCookie,
-        cookies.map(c => `${c.name}=${c.value};`).join(' '));
+    };
+    const cookies = await browser.cookies.getAll(query);
+    if (req.cookiePartition) {
+      cookies.push(...await browser.cookies.getAll({ ...query, partitionKey: req.cookiePartition }));
     }
+    suppliedCookies = mergeCookieHeaders(cookies.filter(c => c.session || c.expirationDate > now)
+      .map(c => `${c.name}=${c.value}`).join('; '), suppliedCookies);
+  }
+  if (suppliedCookies != null) {
+    if (/[\r\n]/.test(suppliedCookies)) throw new Error('Invalid cookie header.');
+    pushHeader(vmHeaders, kCookie, suppliedCookies);
+  }
+  if (!req.dl && (explicitCookies || req.cookiePartition || storeId)) {
+    if (opts.redirect === 'follow') {
+      throw new Error('Redirect following cannot preserve the selected cookie context.');
+    }
+    opts = { ...opts, redirect: opts.redirect || 'error' };
+    useFetch = true;
   }
   const xhrUrl = req.xhrUrl = url.split('#', 1)[0] + '#' + id;
   const xhrOpts = /** @namespace XHRStartOptions */{
@@ -185,14 +217,18 @@ async function httpRequest(opts, events, id, req, src) {
     mime: overrideMimeType,
     props: xhrProps,
   };
-  toggleHeaderInjector(id, vmHeaders);
+  const canInjectHeaders = toggleHeaderInjector(id, vmHeaders);
+  if (!canInjectHeaders && (req.cookiePartition || req.storeId
+  || !__.MV3 && (Object.keys(vmHeaders).length || anonymous && !useFetch))) {
+    throw new Error('Request header overrides are not supported by this browser.');
+  }
   if (__.MV3) {
     let responseHeaders;
     let ruleId = DNR_ID_XHR; while (xhrRules[++ruleId]) {/**/}
     req.ruleId = ruleId;
     xhrRules[ruleId] = 1;
-    if (anonymous) {
-      pushHeader(vmHeaders, kCookie);
+    if (anonymous || req.storeId || req.cookiePartition) {
+      if (anonymous && suppliedCookies == null) pushHeader(vmHeaders, kCookie);
       pushHeader(responseHeaders = [], kSetCookie);
     }
     if (!hasOriginHeader) {
@@ -212,17 +248,26 @@ async function httpRequest(opts, events, id, req, src) {
         },
       }]
     });
-    await callOffscreen('XHRStart', xhrOpts);
+    if (useFetch) await initFetch(opts, req, events, xhrUrl, xhrHeaders, body);
+    else await callOffscreen('XHRStart', xhrOpts);
   } else {
-    initXHR(xhrOpts);
+    if (useFetch) await initFetch(opts, req, events, xhrUrl, xhrHeaders, body);
+    else {
+      const xhr = initXHR(xhrOpts);
+      if (req.aborted) xhr.abort();
+    }
   }
 }
 
 function abortRequest(id) {
   const req = requests[id];
-  if (req) return req.dlId ? browser.downloads.cancel(req.dlId)
+  if (req) {
+    req.aborted = true;
+    return req.dlId ? browser.downloads.cancel(req.dlId)
+      : req.xhr ? req.xhr.abort()
     : __.MV3 ? callOffscreen('XHRStop', id)
-      : req.xhr.abort();
+      : undefined;
+  }
 }
 
 /** @param {GMReq.BG} req */
@@ -288,11 +333,14 @@ function decodeBody([body, type, wasBlob]) {
  */
 function pushHeader(res, name, value, nameLow = name) {
   if (__.MV3) {
-    res.push({
+    const header = {
       value,
-      header: name,
-      operation: value == null ? 'remove' : nameLow === kCookie ? 'append' : 'set',
-    });
+      header: nameLow,
+      operation: value == null ? 'remove' : 'set',
+    };
+    const index = res.findIndex(item => item.header === nameLow);
+    if (index < 0) res.push(header);
+    else res[index] = header;
   } else {
     res[nameLow] = { name, value };
   }
