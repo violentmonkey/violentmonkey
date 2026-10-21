@@ -1,6 +1,6 @@
 import { ErrorCode, createClient, ToolCallError } from '@violentmonkey/mcp-client';
 import browser from '@/common/browser';
-import { i18n, sendTabCmd } from '@/common';
+import { i18n } from '@/common';
 import { extensionOptionsPage } from '@/common/safe-globals';
 import { getScriptRunAt } from '@/common/script';
 import {
@@ -9,8 +9,8 @@ import {
 import { addOwnCommands, addPublicCommands } from './init';
 import { grantTab, hasGrant, listGrants, revokeTab } from './mcp-grants';
 import {
-  addLogs, clear as clearObserved, dropTab, getLogs, getScripts as getTabScripts, reserveLoad,
-  setActive,
+  addLogs, clear as clearObserved, dropTab, getLogs, getScripts as getTabScripts,
+  isCapturing, reserveLoad, setActive,
 } from './mcp-observe';
 import { aliveScripts, getDefaultCustom, parseMeta, removedScripts } from './script';
 import storage, { S_CODE } from './storage';
@@ -47,6 +47,7 @@ addOwnCommands({
     client?.close();
     client = current = null;
     status = 'idle';
+    dropGrants();
     clearObserved();
   },
   /** Open tabs and whether the agent may act on them, for the settings page */
@@ -59,19 +60,28 @@ addOwnCommands({
       title: title || '',
       url: url || '',
       granted: hasGrant(id),
+      capturing: isCapturing(id),
     }));
   },
+  /** Only possible while an agent is connected, a grant is useless without one */
   McpGrantTab(tabId) {
+    if (status !== 'open') return false;
     grantTab(tabId);
-    // The current document was served before the grant, so ask it to start capturing
-    sendTabCmd(tabId, 'SetLogCapture', true);
+    return true;
   },
   McpRevokeTab(tabId) {
     revokeTab(tabId);
     dropTab(tabId);
-    sendTabCmd(tabId, 'SetLogCapture', false);
   },
 });
+
+/** Forgets every grant, since no agent can act on those tabs anymore */
+function dropGrants() {
+  for (const tabId of listGrants()) {
+    revokeTab(tabId);
+    dropTab(tabId);
+  }
+}
 
 tabsOnRemoved.addListener((tabId) => {
   revokeTab(tabId);
@@ -116,7 +126,10 @@ function connect({ port, token }) {
     status = s;
     // Observe pages from the moment a connection is attempted so a blip doesn't lose data
     setActive(s === 'open' || s === 'connecting');
-    if (s === 'closed') clearObserved();
+    if (s === 'closed') {
+      dropGrants();
+      clearObserved();
+    }
   });
   client.connect();
 }
