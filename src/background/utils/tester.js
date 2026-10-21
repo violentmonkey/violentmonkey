@@ -207,6 +207,67 @@ export function testScript(url, script) {
   return ok;
 }
 
+/**
+ * Same answer as testScript, plus the rules that were evaluated and the one that decided it.
+ * Used by the MCP tool that asks whether a script would be injected at a URL.
+ * @param {string} url
+ * @param {VMScript} script
+ * @returns {{ matched: boolean, rule?: string, tried: string[] }}
+ */
+export function testScriptDetailed(url, script) {
+  const { custom, meta } = script;
+  const lists = [
+    [custom.origMatch && meta.match || '', MatchTest.try],
+    [custom.match || '', MatchTest.try],
+    [custom.origInclude && meta.include || '', autoReg],
+    [custom.include || '', autoReg],
+  ];
+  const excludes = [
+    [custom.origExcludeMatch && meta.excludeMatch || '', MatchTest.try],
+    [custom.excludeMatch || '', MatchTest.try],
+    [custom.origExclude && meta.exclude || '', autoReg],
+    [custom.exclude || '', autoReg],
+  ];
+  const tried = [];
+  const hasRules = lists.some(([rules]) => rules.length);
+  let rule;
+  let matched = true;
+  if (hasRules) {
+    rule = findRule(url, lists, tried);
+    matched = !!rule;
+  }
+  if (matched) {
+    const excluded = findRule(url, excludes, tried);
+    if (excluded) {
+      matched = false;
+      rule = excluded;
+    }
+  }
+  return { matched, rule: rule || undefined, tried };
+}
+
+/** @returns {string|false} the first rule that matches, false if none did */
+function findRule(url, lists, tried) {
+  if (curUrl !== url) setContext(url);
+  for (const [rules, builder] of lists) {
+    const cache = builder === MatchTest.try ? cacheMat : cacheInc;
+    for (const rule of rules) {
+      tried.push(rule);
+      let m = cache.get(rule);
+      if (!m) {
+        try {
+          m = builder(rule);
+        } catch (e) {
+          m = { err: e };
+        }
+        cache.put(rule, m);
+      }
+      if (m.test?.(url)) return rule;
+    }
+  }
+  return false;
+}
+
 function testRules(url, script, ...list) {
   if (curUrl !== url) setContext(url);
   // TODO: combine all non-regex rules in one big smart regexp

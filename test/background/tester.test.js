@@ -1,5 +1,5 @@
 import {
-  ERR_GLOB_HOST_SUFFIX, MatchTest, resetBlacklist, testBlacklist, testScript,
+  ERR_GLOB_HOST_SUFFIX, MatchTest, resetBlacklist, testBlacklist, testScript, testScriptDetailed,
 } from '@/background/utils/tester';
 import cache from '@/background/utils/cache';
 import { ERR_BAD_PATTERN } from '@/common/consts';
@@ -453,6 +453,89 @@ describe('custom', () => {
     });
     expect(testScript('https://twitter.com/', script)).toBeTruthy();
     expect(testScript('https://www.google.com/', script)).toBeFalsy();
+  });
+});
+
+describe('details', () => {
+  test('should report the rule that matched', () => {
+    const script = buildScript({
+      meta: {
+        match: ['https://twitter.com/*', 'https://www.google.com/*'],
+      },
+    });
+    expect(testScriptDetailed('https://www.google.com/', script)).toEqual({
+      matched: true,
+      rule: 'https://www.google.com/*',
+      tried: ['https://twitter.com/*', 'https://www.google.com/*'],
+    });
+  });
+
+  test('should report an include rule', () => {
+    const script = buildScript({ meta: { include: ['*://*.google.com/*'] } });
+    expect(testScriptDetailed('https://www.google.com/', script)).toEqual({
+      matched: true,
+      rule: '*://*.google.com/*',
+      tried: ['*://*.google.com/*'],
+    });
+  });
+
+  test('should report the exclude that decided it', () => {
+    const script = buildScript({
+      meta: {
+        match: ['*://*.google.com/*'],
+        exclude: ['https://www.google.com/*'],
+      },
+    });
+    expect(testScriptDetailed('https://www.google.com/', script)).toEqual({
+      matched: false,
+      rule: 'https://www.google.com/*',
+      tried: ['*://*.google.com/*', 'https://www.google.com/*'],
+    });
+  });
+
+  test('should try every rule when nothing matches', () => {
+    const script = buildScript({
+      meta: {
+        match: ['https://twitter.com/*', 'https://example.org/*'],
+        exclude: ['https://example.net/*'],
+      },
+    });
+    expect(testScriptDetailed('https://www.google.com/', script)).toEqual({
+      matched: false,
+      rule: undefined,
+      tried: ['https://twitter.com/*', 'https://example.org/*'],
+    });
+  });
+
+  test('should match without rules and report none', () => {
+    expect(testScriptDetailed('https://www.google.com/', buildScript())).toEqual({
+      matched: true,
+      rule: undefined,
+      tried: [],
+    });
+  });
+
+  test('should keep going past an invalid rule', () => {
+    const script = buildScript({ meta: { match: ['foo://*/*', 'https://*/*'] } });
+    expect(testScriptDetailed('https://www.google.com/', script)).toEqual({
+      matched: true,
+      rule: 'https://*/*',
+      tried: ['foo://*/*', 'https://*/*'],
+    });
+  });
+
+  test('should agree with testScript', () => {
+    for (const meta of [
+      { match: ['*://*/*'] },
+      { include: ['/^https:\\/\\/www\\.google\\.com\\//'] },
+      { match: ['*://*/*'], excludeMatch: ['https://*/*'] },
+      {},
+    ]) {
+      const script = buildScript({ meta });
+      for (const url of ['https://www.google.com/x', 'http://example.org/']) {
+        expect(testScriptDetailed(url, script).matched).toBe(!!testScript(url, script));
+      }
+    }
   });
 });
 
