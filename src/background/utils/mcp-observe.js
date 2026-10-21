@@ -1,15 +1,13 @@
 /**
- * Per-tab observation state for the MCP development tools:
- * which scripts a tab's document received and what they logged.
- *
- * This module is deliberately free of browser and database access so that the
- * injection pipeline can report into it from a hot path. Everything is memory-only
- * and is dropped when the tab goes away.
+ * Per-tab observation state for the MCP development tools: which scripts a tab's
+ * document received and what they logged. Memory only, dropped with the tab.
  */
 
 import { __CODE } from '@/common/consts';
 
-/** @typedef {'injected' | 'failed' | 'pending'} McpScriptStatus *//**
+/** @typedef {'injected' | 'failed' | 'pending'} McpScriptStatus */
+
+/**
  * @typedef {Object} McpScriptRecord
  * @property {number} id
  * @property {number} frameId
@@ -64,6 +62,7 @@ function getState(tabId) {
   if (!st) {
     states.set(tabId, st = {
       loadId: null,
+      url: null,
       pendingLoadId: null,
       pendingLoadAt: 0,
       /** @type {Map<number, Map<number, McpScriptRecord>>} frameId -> scriptId -> record */
@@ -98,12 +97,17 @@ export function reserveLoad(tabId) {
 
 /**
  * A top-level document started loading in this tab.
+ * @param {number} tabId
+ * @param {string} [url] - the document's URL
+ * @param {boolean} [capturing] - whether this document was injected with log capture on
  * @returns {string} the id of the new load
  */
-export function startLoad(tabId) {
+export function startLoad(tabId, url, capturing) {
   const st = getState(tabId);
   const pending = st.pendingLoadId;
   st.loadId = pending && Date.now() - st.pendingLoadAt < LOAD_ID_TTL ? pending : newLoadId();
+  st.url = url;
+  st.capturing = !!capturing;
   st.pendingLoadId = null;
   st.frames.clear();
   st.logs.length = 0;
@@ -113,7 +117,16 @@ export function startLoad(tabId) {
 }
 
 /**
- * @param {string[]} chunks
+ * Whether the tab's current document was injected with log capture on, i.e. whether it
+ * was loaded after the grant. Shown in the dashboard so the user knows a reload is due.
+ * @param {number} tabId
+ */
+export function isCapturing(tabId) {
+  return !!states.get(tabId)?.capturing;
+}
+
+/**
+ * @param {any[]} chunks
  * @returns {string} 32-bit FNV-1a in hex
  */
 function hashChunks(chunks) {
@@ -135,9 +148,7 @@ function hashSource(scr) {
 }
 
 /**
- * Record the scripts a document received, i.e. what the extension is about to run.
- * Does nothing unless the tab is already being observed, so the pipeline pays nothing
- * when no agent is connected.
+ * Record what a document received, i.e. what the extension is about to run.
  * @param {number} tabId
  * @param {number} frameId
  * @param {VMInjection.Script[]} scripts
@@ -149,7 +160,6 @@ export function recordScripts(tabId, frameId, scripts, { reset } = {}) {
   if (!st) return;
   let records = st.frames.get(frameId);
   if (!records || reset) st.frames.set(frameId, records = new Map());
-  const hash = active;
   for (const /** @type {VMInjection.Script} */ scr of scripts) {
     const { id, meta } = scr;
     const failed = scr.code === ID_BAD_REALM;
@@ -161,7 +171,7 @@ export function recordScripts(tabId, frameId, scripts, { reset } = {}) {
       runAt: scr[RUN_AT] || '',
       status: failed ? 'failed' : 'pending',
       error: failed ? ERR_BAD_REALM : undefined,
-      codeHash: hash ? hashSource(scr) : undefined,
+      codeHash: active ? hashSource(scr) : undefined,
     });
   }
 }
@@ -179,14 +189,12 @@ export function markRun(tabId, frameId, ids) {
   if (!records) st.frames.set(frameId, records = new Map());
   for (const id of ids) {
     const record = records.get(id);
-    if (record) {
-      if (record.status === 'pending') {
-        record.status = 'injected';
-        delete record.error;
-      }
-    } else {
+    if (!record) {
       // Shouldn't happen, but a script that ran is worth reporting even if unrecorded
       records.set(id, { id, frameId, name: '', runAt: '', status: 'injected' });
+    } else if (record.status === 'pending') {
+      record.status = 'injected';
+      delete record.error;
     }
   }
 }
@@ -208,7 +216,7 @@ export function markFailed(tabId, frameId, id, error) {
 
 /**
  * @param {number} tabId
- * @returns {{ loadId: string, scripts: McpScriptRecord[] }}
+ * @returns {{ loadId: string, url: string | null, scripts: McpScriptRecord[] }}
  */
 export function getScripts(tabId) {
   const st = getState(tabId);
@@ -217,7 +225,7 @@ export function getScripts(tabId) {
     for (const record of records.values()) scripts.push({ ...record });
   }
   scripts.sort((a, b) => a.frameId - b.frameId || a.id - b.id);
-  return { loadId: ensureLoadId(st), scripts };
+  return { loadId: ensureLoadId(st), url: st.url, scripts };
 }
 
 /**
@@ -233,7 +241,8 @@ export function addLogs(tabId, entries, dropped) {
   for (const entry of entries) {
     let text = `${entry.text}`;
     let truncated = false;
-    if (text.length > LOG_ENTRY_MAX) {
+    // The page realm already caps at the same length, so `>=` is what marks its output
+    if (text.length >= LOG_ENTRY_MAX) {
       text = text.slice(0, LOG_ENTRY_MAX);
       truncated = true;
     }
@@ -243,6 +252,7 @@ export function addLogs(tabId, entries, dropped) {
       last.count = (last.count || 1) + 1;
       continue;
     }
+    const size = text.length * 2 + ENTRY_OVERHEAD;
     st.seq += 1;
     st.logs.push({
       seq: st.seq,
@@ -250,9 +260,9 @@ export function addLogs(tabId, entries, dropped) {
       scriptId,
       text,
       ...truncated && { truncated },
-      size: text.length * 2 + ENTRY_OVERHEAD,
+      size,
     });
-    st.logBytes += text.length * 2 + ENTRY_OVERHEAD;
+    st.logBytes += size;
   }
   while (st.logs.length > LOG_ENTRIES_MAX || st.logBytes > LOG_BYTES_MAX) {
     st.logBytes -= st.logs.shift().size;

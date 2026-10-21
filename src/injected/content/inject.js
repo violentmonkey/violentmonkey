@@ -2,6 +2,7 @@ import { bindEvents, CONSOLE_METHODS, fireBridgeEvent, META_STR } from '../util'
 import * as bridge from './bridge';
 import { Run } from './cmd-run';
 import { elemByTag, makeElem, nextTask, onElement, sendCmd } from './util';
+import { isLogCapture } from './logs';
 
 const kWrappedJSObject = 'wrappedJSObject';
 let tardyQueue;
@@ -329,7 +330,7 @@ function injectAll(runAt) {
     const lists = inPage ? pageLists : contLists;
     const items = lists?.[runAt];
     if (items) {
-      bridge.post('ScriptData', { items, info: injectedInfo[realm] }, realm);
+      bridge.post('ScriptData', { items, info: injectedInfo[realm], logCapture: isLogCapture() }, realm);
       injectedInfo[realm] = false; // must be a sendable value to have own prop in the receiver
       injectedRealms[realm] = true;
       for (const { id, meta: { grant } } of items) {

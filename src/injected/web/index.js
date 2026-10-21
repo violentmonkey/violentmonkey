@@ -74,9 +74,6 @@ bridge.addHandlers({
   GetGrantless() {
     bridge.post('SetGrantless', grantlessUsage);
   },
-  SetLogCapture(val) {
-    setLogCapture(val);
-  },
   async Plant({ data: dataKey, win: winKey }) {
     setOwnProp(window, winKey, onCodeSet, true, 'set');
     /* Cleaning up for a script that didn't compile at all due to a syntax error.
@@ -88,7 +85,7 @@ bridge.addHandlers({
   /**
    * @param {VMInjection.Info} info
    * @param {VMInjection.Script[]} items
-   * @param {boolean} logCapture - known before the first script runs, unlike a later push
+   * @param {boolean} logCapture - decided by the host at injection time
    */
   ScriptData({ info, items, logCapture }) {
     if (info) {

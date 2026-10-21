@@ -1,7 +1,10 @@
 /**
- * Collects what userscripts log with GM_log and hands it to the background, but only
- * for documents the background asked about, i.e. a tab the user granted to an agent.
- * The buffer is capped so a runaway logging loop can't flood the messaging channel.
+ * Batches GM_log output for the background, but only for documents it asked about,
+ * i.e. a tab the user granted to an agent. The buffer is capped so a runaway logging
+ * loop can't flood the messaging channel.
+ *
+ * Fed by both realms: the page sandbox posts through the bridge event, and a script
+ * injected into the content realm posts to this same handler via `invokeHost`.
  */
 
 import * as bridge from './bridge';
@@ -27,6 +30,8 @@ export function setLogCapture(val) {
   clearTimeout(timer);
   timer = null;
 }
+
+export const isLogCapture = () => !!enabled;
 
 function flush() {
   timer = null;

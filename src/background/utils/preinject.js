@@ -58,9 +58,9 @@ addPublicCommands({
     const granted = observing && hasGrant(tabId);
     // A top-level document is a new load for the MCP tools, even if no script matches it
     if (observing && isTop) {
-      startLoad(tabId);
-      // The reply below normally carries the flag, but the fast-forward path ignores it
-      if (granted) sendTabCmd(tabId, 'SetLogCapture', true);
+      // Capture is decided here and travels with the injection, so a grant made after
+      // this document started needs a reload before its logs show up.
+      startLoad(tabId, url, granted);
     }
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
@@ -76,13 +76,13 @@ addPublicCommands({
     if (popupTabs[tabId]) {
       sendPopupShown(tabId, frameDoc);
     }
-    // The content script captures GM_log only when an agent may read this tab's logs
-    const logCapture = granted;
-    if (!isApplied) {
-      return { [INJECT_INTO]: 'off', ...inject, ...logCapture && { [kLogCapture]: true } };
-    }
-    if (done) return false;
-    return logCapture ? { ...inject, [kLogCapture]: true } : inject;
+    const res = isApplied
+      ? !done && inject
+      : { [INJECT_INTO]: 'off', ...inject };
+    // `inject` is a cached object, so the flag goes on a copy. The opt-in fast-forward
+    // path ignores this reply, and its data is cached per URL, so it can't carry a
+    // per-tab grant — log capture needs a normal load.
+    return res && granted ? { ...res, [kLogCapture]: true } : res;
   },
   async InjectionFeedback({
     [FORCE_CONTENT]: forceContent,

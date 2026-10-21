@@ -1,14 +1,21 @@
 import { ErrorCode, createClient, ToolCallError } from '@violentmonkey/mcp-client';
 import browser from '@/common/browser';
+import { i18n, sendTabCmd } from '@/common';
 import { extensionOptionsPage } from '@/common/safe-globals';
+import { getScriptRunAt } from '@/common/script';
 import {
   getScriptById, getScripts, parseScript, removeScripts, updateScriptInfo,
 } from './db';
 import { addOwnCommands, addPublicCommands } from './init';
-import { hasGrant } from './mcp-grants';
-import { addLogs, clear as clearObserved, setActive } from './mcp-observe';
-import { aliveScripts, removedScripts } from './script';
+import { grantTab, hasGrant, listGrants, revokeTab } from './mcp-grants';
+import {
+  addLogs, clear as clearObserved, dropTab, getLogs, getScripts as getTabScripts, reserveLoad,
+  setActive,
+} from './mcp-observe';
+import { aliveScripts, getDefaultCustom, parseMeta, removedScripts } from './script';
 import storage, { S_CODE } from './storage';
+import { getTabUrl, injectableRe, tabsOnRemoved } from './tabs';
+import { testScriptDetailed } from './tester';
 
 export const MCP_CONNECT_URL = 'https://violentmonkey.github.io/mcp_connect.html';
 const HOST = '127.0.0.1';
@@ -42,6 +49,33 @@ addOwnCommands({
     status = 'idle';
     clearObserved();
   },
+  /** Open tabs and whether the agent may act on them, for the settings page */
+  async McpGetTabs() {
+    const tabs = await browser.tabs.query({});
+    return tabs
+    .filter(tab => injectableRe.test(getTabUrl(tab)))
+    .map(({ id, title, url }) => ({
+      tabId: id,
+      title: title || '',
+      url: url || '',
+      granted: hasGrant(id),
+    }));
+  },
+  McpGrantTab(tabId) {
+    grantTab(tabId);
+    // The current document was served before the grant, so ask it to start capturing
+    sendTabCmd(tabId, 'SetLogCapture', true);
+  },
+  McpRevokeTab(tabId) {
+    revokeTab(tabId);
+    dropTab(tabId);
+    sendTabCmd(tabId, 'SetLogCapture', false);
+  },
+});
+
+tabsOnRemoved.addListener((tabId) => {
+  revokeTab(tabId);
+  dropTab(tabId);
 });
 
 /** GM_log output, forwarded by content scripts of tabs the agent may read */
@@ -157,6 +191,89 @@ function registerTools(c) {
     await removeScripts([id]);
     return { id };
   });
+
+  c.handle('tabs_list', async () => {
+    const tabs = [];
+    for (const tabId of listGrants()) {
+      const tab = await getTab(tabId);
+      if (tab) tabs.push({ tabId, url: getTabUrl(tab), title: tab.title || '' });
+      else revokeTab(tabId); // the tab is gone, the grant died with it
+    }
+    return { tabs };
+  });
+
+  c.handle('tab_scripts', async ({ tabId }) => {
+    const tab = await getGrantedTab(tabId);
+    const { loadId, url, scripts } = getTabScripts(tabId);
+    return { url: url || getTabUrl(tab), loadId, scripts: scripts.map(toTabScript) };
+  });
+
+  c.handle('tab_reload', async ({ tabId }) => {
+    const tab = await getGrantedTab(tabId);
+    // Reserve the id of the document this reload will create, before it exists
+    const loadId = reserveLoad(tabId);
+    await browser.tabs.reload(tabId);
+    return { tabId, url: getTabUrl(tab), loadId };
+  });
+
+  c.handle('script_logs', ({ tabId, ...opts }) => {
+    requireGrant(tabId);
+    return getLogs(tabId, opts);
+  });
+
+  c.handle('scripts_test_match', ({ code, url }) => {
+    try {
+      new URL(url);
+    } catch {
+      throw new ToolCallError(ErrorCode.InvalidParams, `Invalid URL: ${url}`);
+    }
+    const meta = parseMeta(code);
+    if (!meta) {
+      throw new ToolCallError(ErrorCode.InvalidParams,
+        `${i18n('msgInvalidScript')}\n${i18n('labelNoName')}`);
+    }
+    return testScriptDetailed(url, { meta, custom: getDefaultCustom() });
+  });
+}
+
+/** @returns {Promise<chrome.tabs.Tab>} */
+async function getTab(tabId) {
+  return browser.tabs.get(tabId).catch(() => null);
+}
+
+function requireGrant(tabId) {
+  if (!hasGrant(tabId)) {
+    throw new ToolCallError(ErrorCode.Denied, `Tab ${tabId} is not granted to the agent`);
+  }
+}
+
+async function getGrantedTab(tabId) {
+  requireGrant(tabId);
+  const tab = await getTab(tabId);
+  if (!tab) throw new ToolCallError(ErrorCode.NotFound, `Tab ${tabId} not found`);
+  return tab;
+}
+
+/** Fills in what the injection record doesn't know, e.g. for a script that ran unrecorded */
+function toTabScript(record) {
+  let { name, version, runAt } = record;
+  if (!name || !runAt) {
+    const script = getScriptById(record.id);
+    name ||= script?.meta.name;
+    version ||= script?.meta.version;
+    runAt ||= script && getScriptRunAt(script);
+  }
+  const { id, frameId, error, codeHash } = record;
+  return {
+    id,
+    name: name || '',
+    version: version || undefined,
+    runAt: runAt ? `document-${runAt}` : '',
+    frameId,
+    status: record.status,
+    ...error && { error },
+    ...codeHash && { codeHash },
+  };
 }
 
 async function markRemoved(id) {

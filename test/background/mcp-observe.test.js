@@ -21,13 +21,17 @@ function buildInjectedScript(id, props) {
 
 describe('loads', () => {
   test('assigns a new id and drops the previous document', () => {
-    const first = startLoad(TAB);
+    const first = startLoad(TAB, 'https://a.example/');
     recordScripts(TAB, 0, [buildInjectedScript(1)]);
     markRun(TAB, 0, [1]);
     addLogs(TAB, [{ scriptId: 1, text: 'hello' }]);
-    const second = startLoad(TAB);
+    const second = startLoad(TAB, 'https://b.example/');
     expect(second).not.toBe(first);
-    expect(getScripts(TAB)).toEqual({ loadId: second, scripts: [] });
+    expect(getScripts(TAB)).toEqual({
+      loadId: second,
+      url: 'https://b.example/',
+      scripts: [],
+    });
     expect(getLogs(TAB).entries).toEqual([]);
   });
 

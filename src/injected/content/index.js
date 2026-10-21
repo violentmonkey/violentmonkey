@@ -32,8 +32,8 @@ async function init() {
   const data = regData || xhrData || await (canReg ? getRegistration(dataPromise) : dataPromise);
   const info = data.info;
   const injectInto = data[INJECT_INTO];
-  // Only ever turns capture on: switching it off is pushed as an explicit `false`
-  if (data[kLogCapture]) setLogCapture(true);
+  // Decided by the host when it replies, so it travels with the injection below
+  setLogCapture(data[kLogCapture]);
   bridge.init(data);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);
