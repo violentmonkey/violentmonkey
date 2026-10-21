@@ -189,8 +189,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@violentmonkey/mcp-client':
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.1.2
+        version: 0.1.2
       '@violentmonkey/shortcut':
         specifier: ^1.4.4
         version: 1.4.4
@@ -477,6 +477,7 @@ packages:
 
   '@automattic/webpack-inline-constant-exports-plugin@1.0.0':
     resolution: {integrity: sha512-gbGYpRToZY5kqgWHqQxtNBIkytBODOB+n/mjWu5FxK2rhrJSRFX8JT4mDtaMJM2uhiH+qRLzeBizNEzrZ5S/Vw==}
+    deprecated: No longer maintained. 1.0.1 supports webpack 5 including 5.112.
     peerDependencies:
       webpack: ^5.7.0
 
@@ -2436,11 +2437,11 @@ packages:
   '@usync/util@0.1.0':
     resolution: {integrity: sha512-PXB6rpAxtMEuj+mi7I11//urfMxZyH8hQ41wn1VG44nXr9wtIEeomo7OqilfG8kIWrB0jbeYtjE+IrakKLEByg==}
 
-  '@violentmonkey/mcp-client@0.1.1':
-    resolution: {integrity: sha512-JtXGUky+8bDBi1Nqx2fva0DW3ZXuaCygVOAiIg8pSCoYZ5lU2VAAjm++9sr94C4YtSr4AIJhXfQRrPtfI5wAGw==}
+  '@violentmonkey/mcp-client@0.1.2':
+    resolution: {integrity: sha512-iktZorJ3nt8aWVLzg5UFjB1pfDN2ROjrnkZhg6NXtOuJhOHPHTDcilXa4+jz5IVhhkPxQ2RFkxtxYqHlW1epXw==}
 
-  '@violentmonkey/mcp-protocol@0.1.1':
-    resolution: {integrity: sha512-R0w1HikeSquYQ8Hf1eZR1GDQL/ojBKkvHZnk1Q+pdZCS1pJ6Kud2jhmzluHAoe3pHkRngEOyVI7OT8IoozfnZA==}
+  '@violentmonkey/mcp-protocol@0.1.2':
+    resolution: {integrity: sha512-3TSqShFcPixHbRJZFfpSnUEgngLhc+pLsBfWA9DaXHHWcTx8XD/qxhTFIGVSDsFPaxQsmndAkJWp9vu4L/uPgg==}
     engines: {node: '>=20'}
 
   '@violentmonkey/shortcut@1.4.4':
@@ -8774,11 +8775,11 @@ snapshots:
 
   '@usync/util@0.1.0': {}
 
-  '@violentmonkey/mcp-client@0.1.1':
+  '@violentmonkey/mcp-client@0.1.2':
     dependencies:
-      '@violentmonkey/mcp-protocol': 0.1.1
+      '@violentmonkey/mcp-protocol': 0.1.2
 
-  '@violentmonkey/mcp-protocol@0.1.1':
+  '@violentmonkey/mcp-protocol@0.1.2':
     dependencies:
       zod: 4.6.5
 
