@@ -20,6 +20,7 @@ import {
 } from './storage';
 import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
+import { recordScripts, markRun, startLoad } from './mcp-observe';
 
 addOwnCommands({
   [SKIP_SCRIPTS]: reloadAndSkipScripts,
@@ -52,8 +53,11 @@ addPublicCommands({
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[SCRIPTS];
+    // A top-level document is a new load for the MCP tools, even if no script matches it
+    if (isTop) startLoad(tabId);
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
+      recordScripts(tabId, frameId, scripts, { reset: true });
       addValueOpener(scripts, tabId, frameDoc);
       addMenuConfig(inject);
       if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
@@ -88,6 +92,7 @@ addPublicCommands({
     const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
     const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);
+    recordScripts(tabId, frameId, scripts);
     addValueOpener(scripts, tabId, getFrameDocId(isTop, src[kDocumentId], frameId));
     if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
       updateVisitedTime(scripts);
@@ -105,6 +110,7 @@ addPublicCommands({
     } = src;
     const hasIds = +ids?.[0];
     setBadge(ids, reset, src);
+    if (hasIds) markRun(tabId, src[kFrameId] || 0, ids);
     if (isTop === 3) {
       if (hasIds) {
         reifyValueOpener(ids, docId);
