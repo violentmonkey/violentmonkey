@@ -20,7 +20,8 @@ import {
 } from './storage';
 import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
-import { recordScripts, markRun, startLoad } from './mcp-observe';
+import { recordScripts, markRun, startLoad, isActive } from './mcp-observe';
+import { hasGrant } from './mcp-grants';
 
 addOwnCommands({
   [SKIP_SCRIPTS]: reloadAndSkipScripts,
@@ -53,8 +54,14 @@ addPublicCommands({
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[SCRIPTS];
+    const observing = isActive();
+    const granted = observing && hasGrant(tabId);
     // A top-level document is a new load for the MCP tools, even if no script matches it
-    if (isTop) startLoad(tabId);
+    if (observing && isTop) {
+      startLoad(tabId);
+      // The reply below normally carries the flag, but the fast-forward path ignores it
+      if (granted) sendTabCmd(tabId, 'SetLogCapture', true);
+    }
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
       recordScripts(tabId, frameId, scripts, { reset: true });
@@ -69,9 +76,13 @@ addPublicCommands({
     if (popupTabs[tabId]) {
       sendPopupShown(tabId, frameDoc);
     }
-    return isApplied
-      ? !done && inject
-      : { [INJECT_INTO]: 'off', ...inject };
+    // The content script captures GM_log only when an agent may read this tab's logs
+    const logCapture = granted;
+    if (!isApplied) {
+      return { [INJECT_INTO]: 'off', ...inject, ...logCapture && { [kLogCapture]: true } };
+    }
+    if (done) return false;
+    return logCapture ? { ...inject, [kLogCapture]: true } : inject;
   },
   async InjectionFeedback({
     [FORCE_CONTENT]: forceContent,

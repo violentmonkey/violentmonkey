@@ -2,6 +2,7 @@ import * as bridge from './bridge';
 import { GM_API_CTX } from './gm-api';
 import { makeGmApiWrapper } from './gm-api-wrapper';
 import './gm-values';
+import { reportLog, setLogCapture } from './logs';
 import './notifications';
 import './requests';
 import './tabs';
@@ -37,6 +38,7 @@ VMInitInjection = (invokeHost, console) => {
       /** @this {GMContext} */
       GM_API_CTX.GM_log = function (...args) {
         bridge.post('Log', ['log', safeConcat([`[${this.displayName}]`], args)]);
+        reportLog(this, args);
       };
     }
   } else {
@@ -72,6 +74,9 @@ bridge.addHandlers({
   GetGrantless() {
     bridge.post('SetGrantless', grantlessUsage);
   },
+  SetLogCapture(val) {
+    setLogCapture(val);
+  },
   async Plant({ data: dataKey, win: winKey }) {
     setOwnProp(window, winKey, onCodeSet, true, 'set');
     /* Cleaning up for a script that didn't compile at all due to a syntax error.
@@ -83,11 +88,13 @@ bridge.addHandlers({
   /**
    * @param {VMInjection.Info} info
    * @param {VMInjection.Script[]} items
+   * @param {boolean} logCapture - known before the first script runs, unlike a later push
    */
-  ScriptData({ info, items }) {
+  ScriptData({ info, items, logCapture }) {
     if (info) {
       assign(bridge.info, info);
     }
+    setLogCapture(logCapture);
     const toRunNow = [];
     for (const script of items) {
       const { id, key } = script;

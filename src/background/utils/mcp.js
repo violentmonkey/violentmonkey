@@ -4,7 +4,9 @@ import { extensionOptionsPage } from '@/common/safe-globals';
 import {
   getScriptById, getScripts, parseScript, removeScripts, updateScriptInfo,
 } from './db';
-import { addOwnCommands } from './init';
+import { addOwnCommands, addPublicCommands } from './init';
+import { hasGrant } from './mcp-grants';
+import { addLogs, clear as clearObserved, setActive } from './mcp-observe';
 import { aliveScripts, removedScripts } from './script';
 import storage, { S_CODE } from './storage';
 
@@ -16,6 +18,9 @@ let pending = null;
 let client = null;
 let status = 'idle';
 let current = null;
+
+/** Whether an agent may read this tab: the server is up and the user granted the tab */
+const isObserving = tabId => status === 'open' && hasGrant(tabId);
 
 addOwnCommands({
   McpGetState: () => ({
@@ -35,6 +40,17 @@ addOwnCommands({
     client?.close();
     client = current = null;
     status = 'idle';
+    clearObserved();
+  },
+});
+
+/** GM_log output, forwarded by content scripts of tabs the agent may read */
+addPublicCommands({
+  ScriptLog({ entries, dropped }, src) {
+    const tabId = src?.tab?.id;
+    if (tabId == null || !entries?.length && !dropped) return;
+    if (!isObserving(tabId)) return;
+    addLogs(tabId, entries, dropped);
   },
 });
 
@@ -62,7 +78,12 @@ function connect({ port, token }) {
     info: { name: 'Violentmonkey', version: __.VM_VER },
   });
   registerTools(client);
-  client.on('status', s => { status = s; });
+  client.on('status', (s) => {
+    status = s;
+    // Observe pages from the moment a connection is attempted so a blip doesn't lose data
+    setActive(s === 'open' || s === 'connecting');
+    if (s === 'closed') clearObserved();
+  });
   client.connect();
 }
 

@@ -1,6 +1,7 @@
 import * as bridge from './bridge';
 import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
+import { setLogCapture } from './logs';
 import './notifications';
 import './requests';
 import './tabs';
@@ -31,6 +32,8 @@ async function init() {
   const data = regData || xhrData || await (canReg ? getRegistration(dataPromise) : dataPromise);
   const info = data.info;
   const injectInto = data[INJECT_INTO];
+  // Only ever turns capture on: switching it off is pushed as an explicit `false`
+  if (data[kLogCapture]) setLogCapture(true);
   bridge.init(data);
   if (IS_FIREFOX && !data.clipFF) {
     off('copy', onClipboardCopy, true);

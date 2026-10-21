@@ -136,6 +136,8 @@ function hashSource(scr) {
 
 /**
  * Record the scripts a document received, i.e. what the extension is about to run.
+ * Does nothing unless the tab is already being observed, so the pipeline pays nothing
+ * when no agent is connected.
  * @param {number} tabId
  * @param {number} frameId
  * @param {VMInjection.Script[]} scripts
@@ -143,9 +145,8 @@ function hashSource(scr) {
  * @param {boolean} [opts.reset] - the frame is a new document, drop its previous records
  */
 export function recordScripts(tabId, frameId, scripts, { reset } = {}) {
-  if (!scripts?.length) return;
-  const st = getState(tabId);
-  ensureLoadId(st);
+  const st = scripts?.length && states.get(tabId);
+  if (!st) return;
   let records = st.frames.get(frameId);
   if (!records || reset) st.frames.set(frameId, records = new Map());
   const hash = active;
@@ -172,9 +173,8 @@ export function recordScripts(tabId, frameId, scripts, { reset } = {}) {
  * @param {number[]} ids
  */
 export function markRun(tabId, frameId, ids) {
-  if (!ids?.length) return;
-  const st = getState(tabId);
-  ensureLoadId(st);
+  const st = ids?.length && states.get(tabId);
+  if (!st) return;
   let records = st.frames.get(frameId);
   if (!records) st.frames.set(frameId, records = new Map());
   for (const id of ids) {
@@ -199,9 +199,7 @@ export function markRun(tabId, frameId, ids) {
  * @param {string} error
  */
 export function markFailed(tabId, frameId, id, error) {
-  const st = getState(tabId);
-  const records = st.frames.get(frameId);
-  const record = records?.get(id);
+  const record = states.get(tabId)?.frames.get(frameId)?.get(id);
   if (record) {
     record.status = 'failed';
     record.error = error;
@@ -229,8 +227,8 @@ export function getScripts(tabId) {
  * @param {number} [dropped] - entries already dropped before they got here
  */
 export function addLogs(tabId, entries, dropped) {
-  const st = getState(tabId);
-  ensureLoadId(st);
+  const st = states.get(tabId);
+  if (!st || !entries?.length && !dropped) return;
   st.dropped += dropped || 0;
   for (const entry of entries) {
     let text = `${entry.text}`;
@@ -311,6 +309,5 @@ export function dropTab(tabId) {
 /** Forgets everything, e.g. on disconnect or in tests */
 export function clear() {
   states.clear();
-  loadSeq = 0;
   active = false;
 }
