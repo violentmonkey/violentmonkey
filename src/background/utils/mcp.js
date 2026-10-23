@@ -17,7 +17,8 @@ import storage, { S_CODE } from './storage';
 import { getTabUrl, injectableRe, tabsOnRemoved } from './tabs';
 import { testScriptDetailed } from './tester';
 
-export const MCP_CONNECT_URL = 'https://violentmonkey.github.io/mcp_connect.html';
+/** Base of the connect URL: the server may print `/mcp_connect/` or the legacy `.html` */
+export const MCP_CONNECT_URL = 'https://violentmonkey.github.io/mcp_connect';
 const HOST = '127.0.0.1';
 
 /** @type {{ port: number, token: string } | null} */
