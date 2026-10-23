@@ -271,8 +271,13 @@ export function getScriptById(id) {
   return scriptMap[id];
 }
 
+/**
+ * @param {number[]} [ids]
+ * @return {VMScript[]} only the scripts that still exist: an id can point to a script
+ * that a dashboard/editor/popup still lists after it was hard-deleted
+ */
 export function getScriptsByIdsOrAll(ids) {
-  return ids?.map(getScriptById) ?? [...aliveScripts, ...removedScripts];
+  return ids ? ids.map(getScriptById).filter(Boolean) : [...aliveScripts, ...removedScripts];
 }
 
 /** @return {?VMScript} */
@@ -472,14 +477,12 @@ export function notifyToOpenScripts(title, text, ids) {
 export async function getData({ id, ids, sizes }) {
   if (id) ids = [id];
   const res = {};
-  const scripts = ids
-    // Some ids shown in popup/editor may have been hard-deleted
-    ? getScriptsByIdsOrAll(ids).filter(Boolean)
-    : getScriptsByIdsOrAll();
+  const scripts = getScriptsByIdsOrAll(ids);
   scripts.forEach(inferScriptProps);
   res[kDownloads] = permissionDownloads;
   res[SCRIPTS] = scripts;
-  if (sizes) res.sizes = getSizes(ids);
+  // Sizes are matched to scripts by index, so they have to come from the same list
+  if (sizes) res.sizes = scripts.map(getScriptSize);
   if (!id) res.cache = await getIconCache(scripts);
   if (!id && sizes) res.sync = commands.SyncGetStates();
   return res;
@@ -517,24 +520,31 @@ async function getIconCache(scripts) {
   return res;
 }
 
+/** Sizes of an id that no longer exists, e.g. hard-deleted while a UI still lists it */
+const NO_SIZES = [0, 0, 0, 0, 0];
+
 /**
  * @param {number[]} [ids]
- * @return {number[][]}
+ * @return {number[][]} one row per id, all zeros for ids that don't exist, because
+ * callers read the reply by index (`const [sizes] = await GetSizes([id])`)
  */
 export function getSizes(ids) {
-  const scripts = getScriptsByIdsOrAll(ids);
-  return scripts.map(({
-    meta,
-    custom: { pathMap = {} },
-    props: { id },
-  }, i) => [
+  const scripts = ids ? ids.map(getScriptById) : getScriptsByIdsOrAll();
+  return scripts.map(getScriptSize);
+}
+
+/** @param {?VMScript} script */
+function getScriptSize(script) {
+  if (!script) return NO_SIZES;
+  const { meta, custom: { pathMap = {} }, props: { id } } = script;
+  return [
     // Same order as SIZE_TITLES and sizesPrefixRe
     scriptSizes[S_CODE_PRE + id] || 0,
-    deepSize(scripts[i]),
+    deepSize(script),
     scriptSizes[S_VALUE_PRE + id] || 0,
     meta.require.reduce(getSizeForRequires, { len: 0, pathMap }).len,
     Object.values(meta.resources).reduce(getSizeForResources, { len: 0, pathMap }).len,
-  ]);
+  ];
 }
 
 function getSizeForRequires(accum, url) {
