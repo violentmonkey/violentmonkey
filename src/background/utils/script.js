@@ -160,6 +160,7 @@ export function getNameURI(script) {
 function inferScriptHome(script) {
   let u = script.custom.lastInstallURL;
   if (u) {
+    let len = 5; // scheme + 1 + host + group + name
     u = u.split('/', 6);
     switch (u[2]) {
     case 'update.greasyfork.org':
@@ -176,14 +177,16 @@ function inferScriptHome(script) {
     case 'github.com':
       break;
     case 'openuserjs.org':
+      // /install/user/name.user.js -> /scripts/user/name
       u[3] = 'scripts';
-      u[4] = u[4].replace(/(\.min)?\.user\.js$/, '');
+      u[5] = u[5]?.replace(/(\.min)?\.user\.js$/, '');
+      len = 6;
       break;
     default:
       u = false;
     }
     if (u) {
-      u.length = 5; // scheme + 1 + host + group + name
+      u.length = len;
       u = u.join('/');
     }
   }
@@ -203,10 +206,9 @@ function inferScriptHome(script) {
 function inferScriptSupportUrl(script, home = getScriptHome(script)) {
   let u = home && home.match(regex('i')`
     ^https://(
-      (
-        (?<GF>greas|sleaz)yfork\.(org|cc)(/(?!scripts)[^\/]+)? |
-        openuserjs\.org
-      )(?=/scripts/) |
+      (?<GF>greas|sleaz)yfork\.(org|cc)(/(?!scripts)[^\/]+)?(?=/scripts/) |
+      # OUJS pages are /scripts/user/name
+      openuserjs\.org/scripts |
       github\.com
     )/[^\/]+/[^\/]+`);
   if (u) {
