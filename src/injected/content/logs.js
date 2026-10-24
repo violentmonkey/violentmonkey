@@ -48,7 +48,7 @@ function pushLog(scriptId, text) {
     dropped += 1;
     return;
   }
-  entries[entries.length] = { scriptId, text, time: Date.now() };
+  safePush(entries, { scriptId, text, time: Date.now() });
   bytes += text.length * 2;
   timer ||= setTimeout(flush, FLUSH_MS);
 }
