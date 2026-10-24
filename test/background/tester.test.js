@@ -97,6 +97,7 @@ describe('host', () => {
         match: [
           'http://localhost:3000/*',
           'http://example.com:*/*',
+          'https://www.google.tld:8443/*',
         ],
       },
     });
@@ -105,6 +106,8 @@ describe('host', () => {
     expect(testScript('http://localhost/', withPort)).toBeFalsy();
     expect(testScript('http://example.com/', withPort)).toBeTruthy();
     expect(testScript('http://example.com:8080/', withPort)).toBeTruthy();
+    expect(testScript('https://www.google.co.uk:8443/', withPort)).toBeTruthy();
+    expect(testScript('https://www.google.co.uk/', withPort)).toBeFalsy();
   });
 
   test('should match wildcard', () => {
