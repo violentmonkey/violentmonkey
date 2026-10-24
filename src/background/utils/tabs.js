@@ -1,4 +1,6 @@
-import { browserWindows, getActiveTab, i18n, makePause, noop, sendTabCmd } from '@/common';
+import {
+  browserWindows, createTab, getActiveTab, i18n, makePause, noop, sendTabCmd,
+} from '@/common';
 import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands, init } from './init';
 import { getOption } from './options';
@@ -147,7 +149,7 @@ addPublicCommands({
       newTab = await browser.tabs.update(srcTab.id, { url, ...tabOpts }).catch(noop);
     }
     for (let retry = 0; !newTab && retry < 2; retry++) try {
-      newTab = await browser.tabs.create({
+      newTab = await createTab({
         url,
         ...tabOpts,
         ...storeId,
@@ -172,10 +174,11 @@ addPublicCommands({
         throw err;
       }
     }
-    if (active && newTab[kWindowId] !== windowId) {
+    newTab ||= {};
+    if (active && newTab[kWindowId] != null && newTab[kWindowId] !== windowId) {
       await browserWindows?.update(newTab[kWindowId], { focused: true });
     }
-    if (!isInternal && srcTab.id != null) {
+    if (!isInternal && newTab.id != null && srcTab.id != null) {
       tabOpeners[newTab.id] = srcTab.id;
       if (__.MV3) flushSession(kTabOpeners, tabOpeners);
     }

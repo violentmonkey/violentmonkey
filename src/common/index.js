@@ -36,6 +36,11 @@ export async function getTab(tabId) {
   }
 }
 
+/** `tabs.create` may resolve without a tab in some mobile browsers,
+ * so the result may be empty
+ * @return {Promise<chrome.tabs.Tab | void>} */
+export const createTab = (props) => browser.tabs.create(props);
+
 /** @return {Promise<chrome.tabs.Tab | void>} */
 export async function getActiveTab(windowId) {
   let res = { active: true };
