@@ -631,8 +631,9 @@ async function getCodeFromStorage(ids) {
 }
 async function handleEmptyRecycleBin() {
   if (await showConfirmation(i18n('buttonEmptyRecycleBin'))) {
-    sendCmdDirectly('CheckRemove', { force: true });
-    store.removedScripts = [];
+    const count = store.removedScripts.length;
+    const ids = await sendCmdDirectly('CheckRemove', { force: true });
+    if (ids.length < count) showMessage({ text: i18n('msgPolicyScriptProtected') });
   }
 }
 function adjustNarrowWidth(isTable) {
@@ -651,11 +652,12 @@ function selectScript(index) {
     state.focusedIndex = index;
   }
 }
-function handleActionRemove(script) {
+async function handleActionRemove(script) {
   if (!script.config.removed) {
     markRemove(script, 1);
   } else {
-    sendCmdDirectly('RemoveScripts', [script.props.id]);
+    const ids = await sendCmdDirectly('RemoveScripts', [script.props.id]);
+    if (!ids.length) showMessage({ text: i18n('msgPolicyScriptProtected') });
   }
 }
 async function handleActionRestore(script) {
