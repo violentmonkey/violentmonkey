@@ -1,0 +1,60 @@
+/**
+ * Batches GM_log output for the background, but only for documents it asked about,
+ * i.e. a tab the user granted to an agent. The buffer is capped so a runaway logging
+ * loop can't flood the messaging channel.
+ *
+ * Fed by both realms: the page sandbox posts through the bridge event, and a script
+ * injected into the content realm posts to this same handler via `invokeHost`.
+ */
+
+import * as bridge from './bridge';
+import { sendCmd } from './util';
+
+const FLUSH_MS = 250;
+const BATCH_MAX = 100;
+const BATCH_BYTES_MAX = 32e3;
+
+let enabled;
+let entries = [];
+let bytes;
+let dropped;
+let pending;
+
+/** @param {boolean} [val] */
+export function setLogCapture(val) {
+  val = !!val;
+  if (enabled === val) return; // don't throw away what's already buffered
+  enabled = val;
+  entries = [];
+  bytes = dropped = 0;
+}
+
+export const isLogCapture = () => !!enabled;
+
+function flush() {
+  pending = false;
+  if (!entries.length) return;
+  const data = { entries, dropped };
+  entries = [];
+  bytes = dropped = 0;
+  sendCmd('ScriptLog', data).catch(() => {});
+}
+
+function pushLog(scriptId, text) {
+  if (!enabled) return;
+  if (entries.length >= BATCH_MAX || bytes >= BATCH_BYTES_MAX) {
+    dropped += 1;
+    return;
+  }
+  safePush(entries, { scriptId, text, time: Date.now() });
+  bytes += text.length * 2;
+  if (!pending) {
+    pending = true;
+    // Timers in content scripts are shared with the web page, which can clear them
+    sendCmd('SetTimeout', FLUSH_MS)::then(flush);
+  }
+}
+
+bridge.addHandlers({
+  ScriptLog: ({ id, text }) => pushLog(id, text),
+});

@@ -649,6 +649,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: Dostęp agenta AI (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: ''
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: ''
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -660,15 +666,26 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: "Łączenie z\_serwerem MCP na porcie $1..."
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: ''
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Dowiedz się, jak połączyć agenta AI
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: Brak oczekujących żądań.
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: ''
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: "Serwer MCP na porcie $1 chce odczytać i\_edytować Twoje skrypty. Zatwierdź tylko wtedy, gdy to Ty go uruchomiłeś."
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
+  message: ''
 labelName:
   description: Label of script name.
   message: 'Nazwa skryptu:'

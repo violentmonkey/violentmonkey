@@ -161,6 +161,7 @@ browser.webRequest.onBeforeRequest.addListener(({ tabId, url }) => {
     return IS_FIREFOX ? { cancel: true } : { redirectUrl: 'javascript:void 0' }; // eslint-disable-line no-script-url
   }
 }, {
+  // `/mcp_connect/` and the legacy `/mcp_connect.html`, with any query string
   urls: [`${MCP_CONNECT_URL}*`],
   types: [kMainFrame],
 }, __.MV3 ? [] : ['blocking']);

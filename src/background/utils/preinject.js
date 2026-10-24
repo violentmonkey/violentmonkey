@@ -20,6 +20,8 @@ import {
 } from './storage';
 import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
+import { recordScripts, markRun, startLoad, isActive } from './mcp-observe';
+import { hasGrant } from './mcp-grants';
 
 addOwnCommands({
   [SKIP_SCRIPTS]: reloadAndSkipScripts,
@@ -52,8 +54,17 @@ addPublicCommands({
     /** @type {VMInjection} */
     const inject = bag[INJECT];
     const scripts = inject[SCRIPTS];
+    const observing = isActive();
+    const granted = observing && hasGrant(tabId);
+    // A top-level document is a new load for the MCP tools, even if no script matches it
+    if (observing && isTop) {
+      // Capture is decided here and travels with the injection, so a grant made after
+      // this document started needs a reload before its logs show up.
+      startLoad(tabId, url, granted);
+    }
     if (scripts) {
       triageRealms(scripts, bag[FORCE_CONTENT] || forceContent, tabId, frameId, bag);
+      recordScripts(tabId, frameId, scripts, { reset: true });
       addValueOpener(scripts, tabId, frameDoc);
       addMenuConfig(inject);
       if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
@@ -65,9 +76,13 @@ addPublicCommands({
     if (popupTabs[tabId]) {
       sendPopupShown(tabId, frameDoc);
     }
-    return isApplied
+    const res = isApplied
       ? !done && inject
       : { [INJECT_INTO]: 'off', ...inject };
+    // `inject` is a cached object, so the flag goes on a copy. The opt-in fast-forward
+    // path ignores this reply, and its data is cached per URL, so it can't carry a
+    // per-tab grant — log capture needs a normal load.
+    return res && granted ? { ...res, [kLogCapture]: true } : res;
   },
   async InjectionFeedback({
     [FORCE_CONTENT]: forceContent,
@@ -88,6 +103,7 @@ addPublicCommands({
     const envCache = (env[PROMISE] ? await env[PROMISE] : env)[S_CACHE];
     const scripts = prepareScripts(env);
     triageRealms(scripts, forceContent, tabId, frameId);
+    recordScripts(tabId, frameId, scripts);
     addValueOpener(scripts, tabId, getFrameDocId(isTop, src[kDocumentId], frameId));
     if (isTop < 2/* skip prerendered pages*/ && scripts.length) {
       updateVisitedTime(scripts);
@@ -105,6 +121,7 @@ addPublicCommands({
     } = src;
     const hasIds = +ids?.[0];
     setBadge(ids, reset, src);
+    if (hasIds) markRun(tabId, src[kFrameId] || 0, ids);
     if (isTop === 3) {
       if (hasIds) {
         reifyValueOpener(ids, docId);
