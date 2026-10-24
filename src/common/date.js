@@ -1,11 +1,14 @@
 const DAY_MS = 24 * 3600e3;
-const WEEK_MS = 7 * 24 * 3600e3;
 // Using simple padding functions because String#padStart is Chrome57+ but our minimum is 55
 const pad2 = num => `${num < 10 ? '0' : ''}${num}`;
 const pad3 = num => `${num < 10 && '00' || num < 100 && '0' || ''}${num}`;
 const getYear = date => date.getFullYear();
-const getDayOfYear = date => Math.floor((date - new Date(getYear(date), 0, 1)) / DAY_MS) + 1;
-const getWeekOfYear = date => Math.floor((date - new Date(getYear(date), 0, 1)) / WEEK_MS) + 1;
+// Counting calendar days in UTC, because a local day is 23 or 25 hours long when DST changes
+const getDaysSinceNewYear = date => (
+  Date.UTC(getYear(date), date.getMonth(), date.getDate()) - Date.UTC(getYear(date), 0, 1)
+) / DAY_MS;
+const getDayOfYear = date => getDaysSinceNewYear(date) + 1;
+const getWeekOfYear = date => Math.floor(getDaysSinceNewYear(date) / 7) + 1;
 const toLocaleString = (date, opts) => date.toLocaleString([navigator.language], opts);
 
 /** @type {Object<string,(Date)=>string>} */
@@ -38,9 +41,9 @@ export const DATE_FMT = {
   SS: date => `${+date}`.slice(-3, -1), // fractional second 00 01 ... 98 99
   SSS: date => `${+date}`.slice(-3), // fractional second 000 001 ... 998 999
   ZZ: date => { // -0700 -0600 ... +0600 +0700
-    const tz = date.getTimezoneOffset();
+    const tz = date.getTimezoneOffset(); // positive west of UTC, e.g. 420 for -0700
     const tza = Math.abs(tz);
-    return `${tz < 0 ? '-' : '+'}${pad2(Math.floor(tza / 60))}${pad2(Math.floor(tza % 60))}`;
+    return `${tz > 0 ? '-' : '+'}${pad2(Math.floor(tza / 60))}${pad2(Math.floor(tza % 60))}`;
   },
 };
 
