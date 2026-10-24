@@ -263,8 +263,51 @@ export async function openAuthPageMV3(url, redirectUri) {
       },
     );
     return await chrome.identity.launchWebAuthFlow({ interactive: true, url });
+  } catch (err) {
+    if (!isAuthWindowUnavailable(err)) throw err;
   } finally {
     await updateSessionRules([DNR_ID_IDENTITY]);
+  }
+  // Edge for Android exposes chrome.identity but can't open its auth window:
+  // https://github.com/microsoft/MicrosoftEdge-Extensions/issues/364
+  return openAuthTabMV3(url, redirectUri);
+}
+
+const isAuthWindowUnavailable = (err) =>
+  /couldn't create a browser window|not implemented/i.test(err?.message);
+
+/**
+ * Fallback for openAuthPageMV3: shows the auth page in a regular tab and captures
+ * the redirect with non-blocking webRequest events, since MV3 can't block them.
+ * @return {Promise<string | null>} redirect URL, or null if the tab was closed or timed out
+ */
+export async function openAuthTabMV3(url, redirectUri) {
+  const { promise, resolve } = Promise.withResolvers();
+  const { id: tabId } = await chrome.tabs.create({ url: 'about:blank' });
+  const filter = { urls: ['<all_urls>'], tabId, types: [kMainFrame] };
+  const onRequest = (info) => info.url.startsWith(redirectUri) && resolve(info.url);
+  const onRedirect = (info) => info.redirectUrl.startsWith(redirectUri) && resolve(info.redirectUrl);
+  const onRemoved = (id) => id === tabId && resolve(null);
+  const timer = setTimeout(resolve, 300_000, null);
+  try {
+    // Keep the auth code from reaching anything listening at the redirect URI, e.g. a loopback port
+    await updateSessionRules(
+      DNR_ID_IDENTITY,
+      { urlFilter: '|' + redirectUri, resourceTypes: [kMainFrame], tabIds: [tabId] },
+      { type: 'block' },
+    );
+    chrome.webRequest.onBeforeRequest.addListener(onRequest, filter);
+    chrome.webRequest.onBeforeRedirect.addListener(onRedirect, filter);
+    chrome.tabs.onRemoved.addListener(onRemoved);
+    await chrome.tabs.update(tabId, { url });
+    return await keepAlive(promise);
+  } finally {
+    clearTimeout(timer);
+    chrome.webRequest.onBeforeRequest.removeListener(onRequest);
+    chrome.webRequest.onBeforeRedirect.removeListener(onRedirect);
+    chrome.tabs.onRemoved.removeListener(onRemoved);
+    await updateSessionRules([DNR_ID_IDENTITY]);
+    chrome.tabs.remove(tabId).catch(noop);
   }
 }
 
