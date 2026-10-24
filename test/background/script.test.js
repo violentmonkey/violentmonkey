@@ -1,4 +1,4 @@
-import { ERR_META_SPACE_INSIDE, parseMeta } from '@/background/utils/script';
+import { ERR_META_SPACE_INSIDE, inferScriptProps, parseMeta } from '@/background/utils/script';
 
 const baseMeta = {
   include: [],
@@ -83,4 +83,34 @@ test('parseMetaIrregularities', () => {
 //
 ==/UserScript==
 */`)).toBeFalsy();
+});
+
+test('inferScriptProps homepage', () => {
+  const homeOf = url => {
+    const script = { custom: { lastInstallURL: url }, meta: {}, props: { id: 1 } };
+    inferScriptProps(script);
+    return [script.inferred.homepageURL, script.inferred.supportURL];
+  };
+  expect(homeOf('https://openuserjs.org/install/bob/My_Script.user.js')).toEqual([
+    'https://openuserjs.org/scripts/bob/My_Script',
+    'https://openuserjs.org/scripts/bob/My_Script/issues',
+  ]);
+  expect(homeOf('https://openuserjs.org/install/bob/My_Script.min.user.js')[0])
+    .toBe('https://openuserjs.org/scripts/bob/My_Script');
+  expect(homeOf('https://update.greasyfork.org/scripts/123/Foo.user.js')).toEqual([
+    'https://greasyfork.org/scripts/123',
+    'https://greasyfork.org/scripts/123/feedback',
+  ]);
+  expect(homeOf('https://raw.githubusercontent.com/bob/repo/main/foo.user.js')[0])
+    .toBe('https://github.com/bob/repo');
+});
+
+test('inferScriptProps support URL from @homepageURL', () => {
+  const script = {
+    custom: {},
+    meta: { homepageURL: 'https://openuserjs.org/scripts/bob/My_Script' },
+    props: { id: 2 },
+  };
+  inferScriptProps(script);
+  expect(script.inferred.supportURL).toBe('https://openuserjs.org/scripts/bob/My_Script/issues');
 });
