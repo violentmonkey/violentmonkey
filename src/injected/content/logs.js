@@ -18,7 +18,7 @@ let enabled;
 let entries = [];
 let bytes;
 let dropped;
-let timer;
+let pending;
 
 /** @param {boolean} [val] */
 export function setLogCapture(val) {
@@ -27,14 +27,12 @@ export function setLogCapture(val) {
   enabled = val;
   entries = [];
   bytes = dropped = 0;
-  clearTimeout(timer);
-  timer = null;
 }
 
 export const isLogCapture = () => !!enabled;
 
 function flush() {
-  timer = null;
+  pending = false;
   if (!entries.length) return;
   const data = { entries, dropped };
   entries = [];
@@ -50,7 +48,11 @@ function pushLog(scriptId, text) {
   }
   safePush(entries, { scriptId, text, time: Date.now() });
   bytes += text.length * 2;
-  timer ||= setTimeout(flush, FLUSH_MS);
+  if (!pending) {
+    pending = true;
+    // Timers in content scripts are shared with the web page, which can clear them
+    sendCmd('SetTimeout', FLUSH_MS)::then(flush);
+  }
 }
 
 bridge.addHandlers({
