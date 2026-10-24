@@ -77,6 +77,39 @@ describe('host', () => {
     expect(testScript('https://docs.google.com.cn/', script)).toBeFalsy();
   });
 
+  test('should match any port unless the pattern has one', () => {
+    const script = buildScript({
+      meta: {
+        match: [
+          'http://localhost/*',
+          '*://*.example.com/*',
+          'http://[::1]/*',
+        ],
+      },
+    });
+    expect(testScript('http://localhost/', script)).toBeTruthy();
+    expect(testScript('http://localhost:8080/app', script)).toBeTruthy();
+    expect(testScript('https://www.example.com:8443/', script)).toBeTruthy();
+    expect(testScript('http://[::1]:3000/', script)).toBeTruthy();
+    expect(testScript('http://localhost.evil.com:8080/', script)).toBeFalsy();
+    const withPort = buildScript({
+      meta: {
+        match: [
+          'http://localhost:3000/*',
+          'http://example.com:*/*',
+          'https://www.google.tld:8443/*',
+        ],
+      },
+    });
+    expect(testScript('http://localhost:3000/', withPort)).toBeTruthy();
+    expect(testScript('http://localhost:8080/', withPort)).toBeFalsy();
+    expect(testScript('http://localhost/', withPort)).toBeFalsy();
+    expect(testScript('http://example.com/', withPort)).toBeTruthy();
+    expect(testScript('http://example.com:8080/', withPort)).toBeTruthy();
+    expect(testScript('https://www.google.co.uk:8443/', withPort)).toBeTruthy();
+    expect(testScript('https://www.google.co.uk/', withPort)).toBeFalsy();
+  });
+
   test('should match wildcard', () => {
     const script = buildScript({
       meta: {

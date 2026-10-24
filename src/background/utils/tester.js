@@ -62,6 +62,8 @@ let batchErrors;
 let curUrl;
 let curScheme;
 let curHost;
+let curHostname;
+let curPort;
 let curTail;
 let urlResultsMat;
 let urlResultsInc;
@@ -81,10 +83,14 @@ hookOptionsInit((changes) => {
 export class MatchTest {
   constructor(rule, scheme, httpMod, host, path) {
     const isWild = scheme === '*' || httpMod === '*';
+    // Like Chrome, a pattern without a port or with :* matches any port
+    let port;
+    [host, port] = splitPort(host);
     const isWildHost = host === '*';
     this.scheme = isWild ? 'http' : scheme;
     this.scheme2 = isWild ? 'https' : null;
     this.host = isWildHost ? null : hostMatcher(host);
+    this.port = port && +port === parseInt(port) ? port : null;
     this.path = path === '*' ? null : pathMatcher(path);
     if (!isWildHost && host.match(RE_GLOB_HOST_SUFFIX)) {
       this.err = `${ERR_BAD_PATTERN} ${rule}: ${ERR_GLOB_HOST_SUFFIX} /^${
@@ -99,7 +105,8 @@ export class MatchTest {
 
   test() {
     return (this.scheme === curScheme || this.scheme2 === curScheme)
-      && this.host?.test(curHost) !== false
+      && this.host?.test(curHostname) !== false
+      && (!this.port || this.port === curPort)
       && this.path?.test(curTail) !== false;
   }
 
@@ -173,6 +180,7 @@ function setContext(url) {
   [, curScheme, curHost, curTail] = url
     && (url.match(RE_URL_PARTS) || url.charCodeAt(0) === 97/*a*/ && url.match(RE_ABOUT_URL_PARTS))
     || ['', '', '', '']; // parseMetaWithErrors uses an empty url for tests
+  [curHostname, curPort] = splitPort(curHost);
   urlResultsMat = url ? (cacheResultMat.get(url) || cacheResultMat.put(url, {})) : null;
   urlResultsInc = url ? (cacheResultInc.get(url) || cacheResultInc.put(url, {})) : null;
 }
@@ -255,6 +263,14 @@ function testRules(url, script, ...list) {
     }
     if (i === 1) cache = false; // this will switch cache+builder for includes if they're non-empty
   }
+}
+
+/** Splits `host:port`, also `[::1]:port` */
+function splitPort(host) {
+  const i = host.lastIndexOf(':');
+  return i > host.lastIndexOf(']')
+    ? [host.slice(0, i), host.slice(i + 1)]
+    : [host, ''];
 }
 
 function str2RE(str) {
