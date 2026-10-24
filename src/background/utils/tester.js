@@ -45,6 +45,8 @@ const RE_MATCH_BAD = regex({ disable: { n: true } })`^
 const RE_ABOUT_URL_PARTS = /^(about):()(.*)/;
 /** Simpler matching for a valid URL */
 const RE_URL_PARTS = /^([^:]*):\/\/([^/]*)\/(.*)/;
+/** A port at the end of a host, also after an IPv6 address like [::1]:8080 */
+const RE_HOST_PORT = /:\d*$/;
 const RE_STR_ANY = '(?:|[^:/]*?\\.)';
 const RE_STR_TLD = '(|(?:\\.[-\\w]+)+)';
 const MAX_BL_CACHE_LENGTH = 100e3;
@@ -62,6 +64,7 @@ let batchErrors;
 let curUrl;
 let curScheme;
 let curHost;
+let curHostNoPort;
 let curTail;
 let urlResultsMat;
 let urlResultsInc;
@@ -81,10 +84,13 @@ hookOptionsInit((changes) => {
 export class MatchTest {
   constructor(rule, scheme, httpMod, host, path) {
     const isWild = scheme === '*' || httpMod === '*';
+    // Like Chrome, a pattern without a port or with :* matches any port
+    if (host.endsWith(':*')) host = host.slice(0, -2);
     const isWildHost = host === '*';
     this.scheme = isWild ? 'http' : scheme;
     this.scheme2 = isWild ? 'https' : null;
     this.host = isWildHost ? null : hostMatcher(host);
+    this.hostPort = !isWildHost && RE_HOST_PORT.test(host);
     this.path = path === '*' ? null : pathMatcher(path);
     if (!isWildHost && host.match(RE_GLOB_HOST_SUFFIX)) {
       this.err = `${ERR_BAD_PATTERN} ${rule}: ${ERR_GLOB_HOST_SUFFIX} /^${
@@ -99,7 +105,7 @@ export class MatchTest {
 
   test() {
     return (this.scheme === curScheme || this.scheme2 === curScheme)
-      && this.host?.test(curHost) !== false
+      && this.host?.test(this.hostPort ? curHost : curHostNoPort) !== false
       && this.path?.test(curTail) !== false;
   }
 
@@ -173,6 +179,7 @@ function setContext(url) {
   [, curScheme, curHost, curTail] = url
     && (url.match(RE_URL_PARTS) || url.charCodeAt(0) === 97/*a*/ && url.match(RE_ABOUT_URL_PARTS))
     || ['', '', '', '']; // parseMetaWithErrors uses an empty url for tests
+  curHostNoPort = curHost.replace(RE_HOST_PORT, '');
   urlResultsMat = url ? (cacheResultMat.get(url) || cacheResultMat.put(url, {})) : null;
   urlResultsInc = url ? (cacheResultInc.get(url) || cacheResultInc.put(url, {})) : null;
 }
