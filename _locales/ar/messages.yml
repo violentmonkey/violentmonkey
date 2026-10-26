@@ -645,10 +645,10 @@ labelMcp:
   message: وصول وكيل الذكاء الاصطناعي (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: الكل
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: يتم تسجيل السجلات
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: أغلق خادم MCP الاتصال. افتح رابط اتصال جديداً للمحاولة مرة أخرى.
@@ -660,7 +660,7 @@ labelMcpConnecting:
   message: جارٍ الاتصال بخادم MCP على المنفذ $1...
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: منح صلاحية الوصول إلى علامات التبويب
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: تعرّف على كيفية توصيل وكيل ذكاء اصطناعي
@@ -671,7 +671,7 @@ labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: لا توجد صفحة ويب مفتوحة.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
@@ -679,7 +679,7 @@ labelMcpPending:
     الموافقة إلا إذا كنت أنت من قمت بتشغيله.
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: علامات التبويب
 labelName:
   description: Label of script name.
   message: 'الاسم:'
