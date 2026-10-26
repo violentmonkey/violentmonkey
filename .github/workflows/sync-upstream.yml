@@ -63,4 +63,5 @@ jobs:
         if: steps.merge.outputs.changed == 'true' || inputs.force_build == true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run BuildFork.yml --ref "${{ github.event.repository.default_branch }}" -f create_release=true
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run BuildFork.yml --repo "$GH_REPO" --ref "${{ github.event.repository.default_branch }}" -f create_release=true
