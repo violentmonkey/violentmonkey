@@ -1,0 +1,66 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '23 2 * * *'
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Build even if upstream has nothing new'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Merge upstream
+        id: merge
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/violentmonkey/violentmonkey.git
+          git fetch --no-tags upstream master
+
+          if git merge-base --is-ancestor upstream/master HEAD; then
+            echo "Already up to date"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! git merge --no-ff --no-commit upstream/master; then
+            git checkout --ours -- README.md
+            git add README.md
+            LEFT=$(git diff --name-only --diff-filter=U)
+            if [ -n "$LEFT" ]; then
+              echo "::error::Unresolved conflicts besides README.md:"
+              echo "$LEFT"
+              git merge --abort
+              exit 1
+            fi
+          fi
+
+          git commit -m "Merge upstream violentmonkey/violentmonkey"
+          git push origin HEAD
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger build and release
+        if: steps.merge.outputs.changed == 'true' || inputs.force_build == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run BuildFork.yml --ref "${{ github.event.repository.default_branch }}" -f create_release=true
