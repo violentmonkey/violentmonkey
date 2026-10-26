@@ -29,21 +29,27 @@
             </Tooltip>
           </div>
           <div v-if="filteredScripts.length" class="btn-group filtered">
-            <a
-              v-for="({ icon, num }, key) in batchActions" :key
-              class="btn-ghost"
-              :class="{
-                'has-error': state.batchAction.action === key,
-                 disabled: store.batch,
-              }"
-              :data-batch-action="key"
-              tabindex="0"
-              @click.prevent="handleBatchAction"
+            <Tooltip
+              v-for="({ icon, num, tooltip }, key) in batchActions" :key
+              :content="tooltip[state.batchAction.action === key ? 1 : 0]"
+              placement="bottom"
+              align="start"
             >
-              <Icon :name="icon" />
-              <sub v-text="num" v-if="num" />
-              <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
-            </a>
+              <a
+                class="btn-ghost"
+                :class="{
+                  'has-error': state.batchAction.action === key,
+                  disabled: store.batch,
+                }"
+                :data-batch-action="key"
+                tabindex="0"
+                @click.prevent="handleBatchAction"
+              >
+                <Icon :name="icon" />
+                <sub v-text="num" v-if="num" />
+                <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
+              </a>
+            </Tooltip>
             <Tooltip :content="state.sizes" placement="bottom">
               <div class="btn-hint subtle"
                    v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
@@ -369,6 +375,9 @@ const getDataBatchAction = evt => evt.target.closest('[data-batch-action]');
 const ALL_BATCH_ACTIONS = {
   [TOGGLE]: {
     icon: TOGGLE_ON,
+    tooltip: [],
+    tooltipOn: [i18n('batchActionEnable'), i18n('batchActionEnableConfirm')],
+    tooltipOff: [i18n('batchActionDisable'), i18n('batchActionDisableConfirm')],
     arg(scripts) {
       const enabled = this.icon === TOGGLE_ON ? 1 : 0;
       return scripts.filter(s => +s.config.enabled !== enabled);
@@ -377,11 +386,13 @@ const ALL_BATCH_ACTIONS = {
   },
   [UPDATE]: {
     icon: 'refresh',
+    tooltip: [i18n('batchActionUpdate'), i18n('batchActionUpdateConfirm')],
     fn: handleActionUpdate,
     [UNDO]: false,
   },
   [REMOVE]: {
     icon: 'trash',
+    tooltip: [i18n('batchActionRemove'), i18n('batchActionRemoveConfirm')],
     async fn(scripts, el, undo) {
       await Promise.all(scripts.map(s => markRemove(s, !undo)));
       // nuking the ghosts because the user's intent was already confirmed
@@ -401,6 +412,7 @@ const batchActions = computed(() => {
     if (!allShown) toUpdate += s.$canUpdate > 0;
   }
   res[TOGGLE].icon = toEnable ? TOGGLE_ON : TOGGLE_OFF;
+  res[TOGGLE].tooltip = toEnable ? res[TOGGLE].tooltipOn : res[TOGGLE].tooltipOff;
   res[TOGGLE].num = toEnable < num ? toEnable : '';
   if (!toUpdate) ({ [UPDATE]: toUpdate, ...res } = res);
   else res[UPDATE].num = toUpdate < num ? toUpdate : '';

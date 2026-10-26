@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: Zakázať všetky skripty
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: Potvrďte zakázanie všetkých skriptov
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: Povoliť všetky skripty
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: Potvrďte povolenie všetkých skriptov
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: Odstrániť všetky skripty
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: Potvrďte odstránenie všetkých skriptov
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: Aktualizovať všetky skripty
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: Potvrďte aktualizáciu všetkých skriptov
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Použiť
@@ -628,6 +652,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: Prístup agenta AI (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: Všetky
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: Logy sa zaznamenávajú
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -639,17 +669,28 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: Pripájanie k serveru MCP na porte $1
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: Povoliť prístup ku karte
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Zistite, ako pripojiť agenta AI
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: Žiadne čakajúce žiadosti.
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: Nie je otvorená žiadna webová stránka.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
     Server MCP na porte $1 chce čítať a upravovať vaše skripty. Schváľte to len
     vtedy, ak ste ho spustili vy.
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
+  message: Karty
 labelName:
   description: Label of script name.
   message: 'Názov:'

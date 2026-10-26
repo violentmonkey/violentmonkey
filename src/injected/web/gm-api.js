@@ -1,5 +1,6 @@
 import { isEmpty } from '../util';
 import * as bridge from './bridge';
+import { reportLog } from './logs';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
@@ -188,8 +189,17 @@ export const GM_API = {
   GM_setClipboard(data, type) {
     bridge.post('SetClipboard', { data, type });
   },
-  // using the native console.log so the output has a clickable link to the caller's source
-  GM_log: logging.log,
+  /**
+   * Using the native console.log so the output has a clickable link to the caller's
+   * source, and reporting to the host for the MCP tools that read it back.
+   * Only JSON-serializable arguments reach the agent; anything else is reported as an
+   * `[unserializable: …]` placeholder.
+   * @this {GMContext}
+   */
+  GM_log(...args) {
+    safeApply(logging.log, logging, args);
+    reportLog(this, args);
+  },
 };
 
 /** @this {GMContext} */

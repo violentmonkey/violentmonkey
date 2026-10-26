@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: Desactivar todos los scripts
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: Confirmar la desactivación de todos los scripts
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: Activar todos los scripts
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: Confirmar la activación de todos los scripts
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: Eliminar todos los scripts
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: Confirmar la eliminación de todos los scripts
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: Actualizar todos los scripts
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: Confirmar la actualización de todos los scripts
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Aplicar
@@ -635,6 +659,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: Acceso para agentes de IA (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: Todos
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: Se están capturando los registros
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -646,17 +676,28 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: Conectando con el servidor MCP en el puerto $1...
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: Conceder acceso a la pestaña
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Aprende a conectar un agente de IA
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: No hay solicitudes pendientes.
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: No hay ninguna página web abierta.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
     Un servidor MCP en el puerto $1 quiere leer y editar tus scripts. Apruébalo
     solo si tú lo iniciaste.
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
+  message: Pestañas
 labelName:
   description: Label of script name.
   message: 'Nombre:'

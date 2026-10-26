@@ -2,12 +2,12 @@ import {
   encodeFilename, getFullUrl, getScriptHome, getScriptSupportUrl, getTab, i18n,
 } from '@/common';
 import {
-  __CODE, GLOB_ALL, HOMEPAGE_URL, INFERRED, kOrigTag, kTag, METABLOCK_RE, SUPPORT_URL, TL_AWAIT,
-  UNWRAP,
+  __CODE, GLOB_ALL, HOMEPAGE_URL, INFERRED, kOrigTag, METABLOCK_RE, SUPPORT_URL,
 } from '@/common/consts';
 import { formatDate } from '@/common/date';
 import { mapEntry } from '@/common/object';
 import defaults, { kScriptTemplate } from '@/common/options-defaults';
+import { defaultMetaType, metaOptionalTypes, metaTypes } from '@/common/userscript-meta';
 import broadcast from './broadcast';
 import { addOwnCommands, commands } from './init';
 import { getOption, hookOptionsInit } from './options';
@@ -50,46 +50,6 @@ export const removedScripts = [];
 /** @return {boolean|?RegExpExecArray} */
 export const matchUserScript = text => !/^\s*</.test(text) /*HTML*/ && METABLOCK_RE.exec(text);
 
-const arrayType = {
-  default: () => [],
-  transform: (res, val) => {
-    res.push(val);
-    return res;
-  },
-};
-const booleanType = {
-  default: () => false,
-  transform: () => true,
-};
-const defaultType = {
-  default: () => null,
-  transform: (res, val) => (res == null ? val : res),
-};
-const metaTypes = {
-  include: arrayType,
-  exclude: arrayType,
-  match: arrayType,
-  excludeMatch: arrayType,
-  require: arrayType,
-  resource: {
-    default: () => ({}),
-    transform: (res, val) => {
-      const pair = val.match(/^(\w\S*)\s+(.*)/);
-      if (pair) res[pair[1]] = pair[2];
-      return res;
-    },
-  },
-  grant: arrayType,
-};
-const metaOptionalTypes = {
-  antifeature: arrayType,
-  compatible: arrayType,
-  connect: arrayType,
-  noframes: booleanType,
-  [kTag]: arrayType,
-  [TL_AWAIT]: booleanType,
-  [UNWRAP]: booleanType,
-};
 /**                   0         1       2          3     4 */
 const META_ITEM_RE = /(?:^|\n)(.*?)\/\/([\x20\t]*)(@\S+)(.*)/g;
 export const ERR_META_SPACE_BEFORE = 'Unexpected text before "//" in ';
@@ -116,7 +76,7 @@ export function parseMeta(code, { errors, retDefault, retMetaStr } = {}) {
     const camelKey = keyName.replace(/[-_](\w)/g, (m, g) => g.toUpperCase());
     const key = locale ? `${camelKey}:${locale.toLowerCase()}` : camelKey;
     const val = parts[4].trim();
-    const metaType = metaTypes[key] || metaOptionalTypes[key] || defaultType;
+    const metaType = metaTypes[key] || metaOptionalTypes[key] || defaultMetaType;
     let oldValue = meta[key];
     if (typeof oldValue === 'undefined') oldValue = metaType.default();
     if (errors) checkMetaItemErrors(parts, 0, errors);
@@ -200,6 +160,7 @@ export function getNameURI(script) {
 function inferScriptHome(script) {
   let u = script.custom.lastInstallURL;
   if (u) {
+    let len = 5; // scheme + 1 + host + group + name
     u = u.split('/', 6);
     switch (u[2]) {
     case 'update.greasyfork.org':
@@ -216,14 +177,16 @@ function inferScriptHome(script) {
     case 'github.com':
       break;
     case 'openuserjs.org':
+      // /install/user/name.user.js -> /scripts/user/name
       u[3] = 'scripts';
-      u[4] = u[4].replace(/(\.min)?\.user\.js$/, '');
+      u[5] = u[5]?.replace(/(\.min)?\.user\.js$/, '');
+      len = 6;
       break;
     default:
       u = false;
     }
     if (u) {
-      u.length = 5; // scheme + 1 + host + group + name
+      u.length = len;
       u = u.join('/');
     }
   }
@@ -243,10 +206,9 @@ function inferScriptHome(script) {
 function inferScriptSupportUrl(script, home = getScriptHome(script)) {
   let u = home && home.match(regex('i')`
     ^https://(
-      (
-        (?<GF>greas|sleaz)yfork\.(org|cc)(/(?!scripts)[^\/]+)? |
-        openuserjs\.org
-      )(?=/scripts/) |
+      (?<GF>greas|sleaz)yfork\.(org|cc)(/(?!scripts)[^\/]+)?(?=/scripts/) |
+      # OUJS pages are /scripts/user/name
+      openuserjs\.org/scripts |
       github\.com
     )/[^\/]+/[^\/]+`);
   if (u) {

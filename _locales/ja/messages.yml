@@ -1,9 +1,33 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: すべてのスクリプトを無効化
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: すべてのスクリプトの無効化を確定
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: すべてのスクリプトを有効化
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: すべてのスクリプトの有効化を確定
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: すべてのスクリプトを削除
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: すべてのスクリプトの削除を確定
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: すべてのスクリプトを更新
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: すべてのスクリプトの更新を確定
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: 適用
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: 承認
 buttonCancel:
   description: Cancel button on dialog.
   message: キャンセル
@@ -27,7 +51,7 @@ buttonDisable:
   message: 無効化
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: 切断
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -69,7 +93,7 @@ buttonNew:
   message: 新規作成
 buttonNewFromFile:
   description: Button to create a new script from a local file.
-  message: ''
+  message: ローカルファイルから新規作成
 buttonOK:
   description: OK button on dialog.
   message: OK
@@ -78,7 +102,7 @@ buttonRecycleBin:
   message: ゴミ箱
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: 拒否
 buttonRemove:
   description: Button to remove a script.
   message: 削除
@@ -114,10 +138,10 @@ buttonSupport:
   message: サポートページ
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: ローカルに1回プル
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: リモートに1回プッシュ
 buttonUndo:
   description: Button to undo removement of a script.
   message: 元に戻す
@@ -189,7 +213,7 @@ descSyncGitRepoPreexisting:
   description: >-
     Note explaining the repository must already exist; Violentmonkey never
     creates it.
-  message: ''
+  message: リポジトリはあらかじめ存在している必要があります。Violentmonkeyが自動で作成または初期化することはありません。
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: グループ
@@ -270,7 +294,9 @@ fileInstallBlocked:
     の「詳細」から「ファイルのURLへのアクセスを許可」を有効化します。しかしこれは危険です。ユーザースクリプトがパソコン内のファイルを読み込む可能性があります。
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: >-
+    about:addons
+    を開き、"Violentmonkey"をクリックし、"権限とデータ"をクリックして、"コンピューター上のローカルファイルへのアクセス"を有効にしてください。
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: アルファベット順
@@ -284,10 +310,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: 最終アクセス日時
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: このスクリプトの対象サイトを最後に訪問した日時です。
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: すべて
@@ -323,24 +349,27 @@ headerRecycleBin:
   message: ゴミ箱
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: ローカルスクリプトをインストールできない場合にヘルプを表示
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: $1 個の一致したスクリプトに対して
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` を指定すると、他のすべての `@grant` キーが無効になります。'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: |-
+    サンドボックス化されたスクリプトは、次のグローバルプロパティを変更できません: $1。
+    スクリプトを修正するには、 `@grant none` を追加してサンドボックスを無効化するか、
+    `window` の代わりに `unsafeWindow` を使用してください。
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 'URLを入力:'
 hintInvalidCron:
   description: Error shown for an invalid five-field cron expression
-  message: ''
+  message: 無効な5フィールドcron式です
 hintRecycleBin:
   description: Hint for recycle bin.
   message: 削除したスクリプトはここに7日間表示されます。
@@ -417,34 +446,34 @@ labelBlacklist:
   message: ブロックリスト
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: コメント
 labelContributors:
   description: Label for link to contributors.
   message: 貢献者
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: 毎日
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
-  message: ''
+  message: 日
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: 曜日
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: 時
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: 毎時
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: 分
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: 月
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: 1日2回
 labelCurrentLang:
   description: Label of current language.
   message: '現在の言語: '
@@ -501,30 +530,32 @@ labelFeedback:
   message: 意見や報告
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: FirefoxでCSPを回避
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: >-
+    WebページのCSPにランダムな値を追加し、Violentmonkeyのみが $1
+    注入モードでスクリプトを実行できるようにします。これを有効にしない場合、スクリプトを $2 を使用するように編集する必要があります。
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: 分離された $1 モードでは機能が制限される場合があります。設定の" $2 "を参照してください。
 labelGeneral:
   description: Label for general settings.
   message: 基本設定
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: ブラウザのダウンロードAPIを使用
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: スクリプトがダウンロードディレクトリ内のサブフォルダにファイルを保存できるようにし、ブラウザのダウンロードバーに進捗状況を表示します。
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: 権限を許可
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 翻訳のヘルプ
@@ -536,10 +567,10 @@ labelHomepageURL:
   message: 'ホームページのURL:'
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: GM_cookie によるHTTP-only Cookieへのアクセスを許可
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: 有効にすると、スクリプトはHTTP-onlyフラグ付きのCookieを読み書きできるようになります。これにより、通常のJavaScriptからはアクセスできないCookieにもアクセス可能になります。セキュリティ上のリスクを伴う可能性があるため、注意して使用してください。
 labelIconURL:
   description: Label for the input.
   message: 'アイコンのURL:'
@@ -574,24 +605,41 @@ labelMatch:
   message: 実行するページのURL (@match)
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
+  message: AIエージェントアクセス (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: ''
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
   message: ''
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: MCPサーバーが接続を切断しました。新しい接続URLを開いて再試行してください。
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: 'ポート $1 のMCPサーバー: 接続済み'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
+  message: ポート $1 のMCPサーバーに接続中...
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
   message: ''
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: AIエージェントの接続方法を見る
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
+  message: 保留中のリクエストはありません。
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
   message: ''
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: ポート $1 のMCPサーバーがスクリプトの読み取りと編集を要求しています。ご自身で起動した場合のみ承認してください。
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
   message: ''
 labelName:
   description: Label of script name.
@@ -619,7 +667,7 @@ labelNotifyUpdatesGlobal:
   message: スクリプトごとの通知を無視 (エディタの「設定」タブ内)
 labelPageMenuCommands:
   description: Checkbox item in page context menu and option to enable script commands.
-  message: ''
+  message: ページメニューにスクリプトコマンドを表示
 labelPrivacyPolicy:
   description: Label of link to privacy policy
   message: 個人情報保護方針
@@ -645,10 +693,10 @@ labelRunAtDefault:
   message: (変更しない)
 labelScriptOptionRequired:
   description: Shown after some global options in settings
-  message: ''
+  message: (設定でこのオプションが有効になっているスクリプトのみ)
 labelScriptOptionRequiredGlobal:
   description: Shown after some options in a script's settings
-  message: ''
+  message: (このオプションは全体設定でも有効になっている必要があります)
 labelScriptTemplate:
   description: Label for custom script template.
   message: スクリプトのテンプレート
@@ -666,7 +714,7 @@ labelShowOrder:
   message: 実行順を表示
 labelShowVisited:
   description: Label for option in dashboard -> script list
-  message: ''
+  message: 最終アクセス日時を表示
 labelSync:
   description: Label for sync options.
   message: 同期
@@ -681,33 +729,33 @@ labelSyncAuthorizing:
   message: 確認中
 labelSyncAutomatically:
   description: Label for option to sync automatically.
-  message: ''
+  message: 自動同期
 labelSyncDisabled:
   description: Label for option to disable sync service.
   message: なし
 labelSyncGitApiBase:
   description: Label for the Git API base URL input (GitHub/GHES/Gitea/Forgejo).
-  message: ''
+  message: 'APIベースURL:'
 labelSyncGitBranch:
   description: Label for the Git branch input.
-  message: ''
+  message: 'ブランチ:'
 labelSyncGitCreateMethod:
   description: >-
     Label for the Git file-creation-method select, matching the createMethod
     option key.
-  message: ''
+  message: 'ファイル作成方法:'
 labelSyncGitOwner:
   description: Label for the Git repository owner input.
-  message: ''
+  message: 'オーナー:'
 labelSyncGitPathPrefix:
   description: Label for the Git path-prefix input (folder within the repo).
-  message: ''
+  message: 'パスプレフィックス:'
 labelSyncGitRepo:
   description: Label for the Git repository name input.
-  message: ''
+  message: 'リポジトリ:'
 labelSyncGitToken:
   description: Label for the Git access token input.
-  message: ''
+  message: 'アクセストークン:'
 labelSyncPassword:
   description: Label for input to hold password.
   message: 'パスワード: '
@@ -720,28 +768,28 @@ labelSyncRevoke:
   message: 取り消し
 labelSyncS3AccessKeyId:
   description: Label for S3 access key ID input.
-  message: ''
+  message: 'アクセスキーID:'
 labelSyncS3Bucket:
   description: Label for S3 bucket name input.
-  message: ''
+  message: 'バケット:'
 labelSyncS3Endpoint:
   description: Label for custom S3-compatible endpoint URL input (leave blank for AWS).
-  message: ''
+  message: 'カスタムエンドポイント:'
 labelSyncS3Prefix:
   description: Label for S3 key prefix input (folder within the bucket).
-  message: ''
+  message: 'キープレフィックス:'
 labelSyncS3Region:
   description: Label for S3 region input.
-  message: ''
+  message: 'リージョン:'
 labelSyncS3SecretAccessKey:
   description: Label for S3 secret access key input.
-  message: ''
+  message: 'シークレットアクセスキー:'
 labelSyncScriptStatus:
   description: Label for option to sync script status.
   message: スクリプトのステータスも同期する
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'サーバURL: '
+  message: 'サーバーURL: '
 labelSyncService:
   description: Label for sync service select.
   message: '同期に利用するサービス:'
@@ -760,16 +808,16 @@ labelTranslator:
   touched: false
 labelUpdateCustom:
   description: Option to enter a custom five-field cron expression for script update checks
-  message: ''
+  message: カスタムcron式
 labelUpdateDaily:
   description: Option to check for script updates every day at noon
-  message: ''
+  message: 毎日
 labelUpdateDisabled:
   description: Option to disable automatic script update checks
-  message: ''
+  message: 無効
 labelUpdateSchedule:
   description: Option to configure automatic script update checks
-  message: ''
+  message: スクリプトの更新を確認
 labelUpdateURL:
   description: Label of script @updateURL in custom meta data.
   message: '更新を確認するURL:'
@@ -806,7 +854,7 @@ learnInjectionMode:
   message: 挿入方法の詳細
 linkManageRemoteFiles:
   description: Label for link to manage remote files.
-  message: ''
+  message: リモートファイルの管理
 menuCommands:
   description: Menu item to list script commands.
   message: ユーザスクリプトコマンド
@@ -951,7 +999,7 @@ msgReinstallScripts:
   message: '次のスクリプトを再び保存または再インストールしてください:'
 msgRestartToUpdate:
   description: $1 is the old version, $2 is the new version.
-  message: ''
+  message: $1 から $2 への更新を完了するには、Violentmonkeyを再起動する必要があります。
 msgSameCode:
   description: Shown inside the title when re-installing a script that's already installed.
   message: (変更なし)
@@ -997,7 +1045,7 @@ msgSyncRepoNotFound:
   description: >-
     Message shown when the configured Git repository was not found, or the token
     can't access it. Violentmonkey never creates it automatically.
-  message: ''
+  message: リポジトリが見つかりません。まずリポジトリを作成し、トークンにアクセス権があることを確認してください。
 msgSyncing:
   description: Message shown when sync is in progress.
   message: 同期中…
@@ -1121,7 +1169,7 @@ sideMenuInstalled:
   message: インストール済み
 sideMenuScripts:
   description: 'Side menu: Scripts'
-  message: ''
+  message: スクリプト
 sideMenuSettings:
   description: 'Side menu: Settings'
   message: 設定
@@ -1176,13 +1224,13 @@ titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to
     change it.
-  message: ''
+  message: 初回ファイル作成時に同期が失敗した場合は、もう一方の方法を試してください。
 titleSyncGitPathPrefix:
   description: Hover title for the Git path-prefix input, clarifying what it does.
-  message: ''
+  message: リポジトリのルートではなく、このサブフォルダ内に同期します。（省略可能）
 titleSyncGitToken:
   description: Hover title for the Git access token input, clarifying required permissions.
-  message: ''
+  message: リポジトリのコンテンツに対する読み取り/書き込み権限が必要です（リポジトリはあらかじめ存在している必要があります）。
 toggleInjection:
   description: Label for a keyboard shortcut.
   message: ユーザースクリプト挿入の切替
@@ -1202,7 +1250,7 @@ updateScript:
   message: 更新
 updateScriptForced:
   description: Tooltip for the update icon.
-  message: ''
+  message: 右クリックまたは長押しで依存関係を含めて強制更新
 updateScriptsAll:
   description: Command/button to update all scripts.
   message: すべてのスクリプトを更新
@@ -1211,10 +1259,12 @@ updateScriptsInTab:
   message: 現在のタブのスクリプトを更新
 userScriptsPermissionNote:
   description: Text in the popup or dashboard.
-  message: ''
+  message: >-
+    chrome://extensions の Violentmonkey の詳細で "ユーザースクリプトを許可する"
+    を有効にして、タブを再読み込みしてください
 userScriptsPermissionNoteOld:
   description: Text in the popup or dashboard in older browsers.
-  message: ''
+  message: chrome://extensions で "デベロッパー モード" を有効にして、タブを再読み込みしてください
 valueLabelKey:
   description: Label for key of a script value.
   message: キー (文字列)
@@ -1226,10 +1276,10 @@ valueLabelValueAll:
   message: すべての値 (JSONとしてシリアル化)
 valueLabelValueOr:
   description: $1 is "[x] string"
-  message: ''
+  message: 値 (JSON または $1 としてシリアライズ)
 valueLabelValueString:
   description: '$1 is the checkbox: "Value (serialized as JSON or [x] string)"'
-  message: ''
+  message: $1 文字列
 visitWebsite:
   description: Label for link to open Violentmonkey website.
   message: ウェブサイトを開く

@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: Отключить все скрипты
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: Подтвердить отключение всех скриптов
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: Включить все скрипты
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: Подтвердить включение всех скриптов
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: Удалить все скрипты
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: Подтвердить удаление всех скриптов
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: Обновить все скрипты
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: Подтвердить обновление всех скриптов
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Применить
@@ -622,6 +646,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: Доступ для ИИ-агентов (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: Все
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: Журналы записываются
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -633,17 +663,28 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: Подключение к серверу MCP на порту $1…
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: Предоставить доступ к вкладке
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Узнайте, как подключить ИИ-агента
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: Нет ожидающих запросов.
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: Веб-страница не открыта.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
     Сервер MCP на порту $1 хочет читать и изменять ваши скрипты. Подтверждайте
     только в том случае, если вы его запустили.
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
+  message: Вкладки
 labelName:
   description: Label of script name.
   message: 'Имя:'
@@ -792,7 +833,7 @@ labelSyncScriptStatus:
   message: Синхронизировать состояние скриптов
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'URL-адрес сервера: '
+  message: 'Адрес сервера: '
 labelSyncService:
   description: Label for sync service select.
   message: Синхронизация через

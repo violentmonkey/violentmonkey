@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: تعطيل جميع السكربتات
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: تأكيد تعطيل جميع السكربتات
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: تفعيل جميع السكربتات
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: تأكيد تفعيل جميع السكربتات
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: إزالة جميع السكربتات
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: تأكيد إزالة جميع السكربتات
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: تأكيد إزالة جميع السكربتات
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: تأكيد تحديث جميع السكربتات
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: تطبيق
@@ -619,6 +643,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: وصول وكيل الذكاء الاصطناعي (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: الكل
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: يتم تسجيل السجلات
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: أغلق خادم MCP الاتصال. افتح رابط اتصال جديداً للمحاولة مرة أخرى.
@@ -628,17 +658,28 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: جارٍ الاتصال بخادم MCP على المنفذ $1...
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: منح صلاحية الوصول إلى علامات التبويب
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: تعرّف على كيفية توصيل وكيل ذكاء اصطناعي
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: لا توجد طلبات معلقة.
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: لا توجد صفحة ويب مفتوحة.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
     يرغب خادم MCP على المنفذ $1 في قراءة نصوصك البرمجية وتعديلها. لا تمنح
     الموافقة إلا إذا كنت أنت من قمت بتشغيله.
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
+  message: علامات التبويب
 labelName:
   description: Label of script name.
   message: 'الاسم:'

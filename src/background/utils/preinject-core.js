@@ -8,6 +8,7 @@ import {
 import { forEachEntry, objectSet } from '@/common/object';
 import { kGmDownloadViaApi, kPageMenuCommands } from '@/common/options-defaults';
 import { revokeBlobRules } from './dnr';
+import { markFailed } from './mcp-observe';
 import { clearNotifications } from './notifications';
 import { getOption, hookOptionsInit } from './options';
 import { addMenuConfig } from './page-menu-commands';
@@ -209,7 +210,10 @@ export function injectContentRealm(toContent, tabId, frameId) {
     if (!scr || scr.key.data !== dataKey) continue;
     const code = scr[__CODE].join('');
     executeScript(tabId, code, `document_${scr[RUN_AT]}`.replace('body', 'start'), frameId)
-      .then(scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })));
+      .then(
+        scr.meta[UNWRAP] && (() => sendTabCmd(tabId, 'Run', id, { [kFrameId]: frameId })),
+        err => markFailed(tabId, frameId, id, `${err?.message || err}`),
+      );
   }
 }
 

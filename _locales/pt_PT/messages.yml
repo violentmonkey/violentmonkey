@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: ''
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: ''
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: ''
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: ''
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: ''
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: ''
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: ''
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: ''
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: ''
@@ -564,6 +588,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: ''
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: ''
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: ''
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: ''
@@ -573,14 +603,25 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: ''
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: ''
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: ''
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: ''
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: ''
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
+  message: ''
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
   message: ''
 labelName:
   description: Label of script name.

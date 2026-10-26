@@ -62,6 +62,8 @@ let batchErrors;
 let curUrl;
 let curScheme;
 let curHost;
+let curHostname;
+let curPort;
 let curTail;
 let urlResultsMat;
 let urlResultsInc;
@@ -81,10 +83,14 @@ hookOptionsInit((changes) => {
 export class MatchTest {
   constructor(rule, scheme, httpMod, host, path) {
     const isWild = scheme === '*' || httpMod === '*';
+    // Like Chrome, a pattern without a port or with :* matches any port
+    let port;
+    [host, port] = splitPort(host);
     const isWildHost = host === '*';
     this.scheme = isWild ? 'http' : scheme;
     this.scheme2 = isWild ? 'https' : null;
     this.host = isWildHost ? null : hostMatcher(host);
+    this.port = port && +port === parseInt(port) ? port : null;
     this.path = path === '*' ? null : pathMatcher(path);
     if (!isWildHost && host.match(RE_GLOB_HOST_SUFFIX)) {
       this.err = `${ERR_BAD_PATTERN} ${rule}: ${ERR_GLOB_HOST_SUFFIX} /^${
@@ -99,7 +105,8 @@ export class MatchTest {
 
   test() {
     return (this.scheme === curScheme || this.scheme2 === curScheme)
-      && this.host?.test(curHost) !== false
+      && this.host?.test(curHostname) !== false
+      && (!this.port || this.port === curPort)
       && this.path?.test(curTail) !== false;
   }
 
@@ -173,6 +180,7 @@ function setContext(url) {
   [, curScheme, curHost, curTail] = url
     && (url.match(RE_URL_PARTS) || url.charCodeAt(0) === 97/*a*/ && url.match(RE_ABOUT_URL_PARTS))
     || ['', '', '', '']; // parseMetaWithErrors uses an empty url for tests
+  [curHostname, curPort] = splitPort(curHost);
   urlResultsMat = url ? (cacheResultMat.get(url) || cacheResultMat.put(url, {})) : null;
   urlResultsInc = url ? (cacheResultInc.get(url) || cacheResultInc.put(url, {})) : null;
 }
@@ -205,6 +213,67 @@ export function testScript(url, script) {
     ) && testRules(url, script, matex1, matex2, inex1, inex2)
   );
   return ok;
+}
+
+/**
+ * Same answer as testScript, plus the rules that were evaluated and the one that decided it.
+ * Used by the MCP tool that asks whether a script would be injected at a URL.
+ * @param {string} url
+ * @param {VMScript} script
+ * @returns {{ matched: boolean, rule?: string, tried: string[] }}
+ */
+export function testScriptDetailed(url, script) {
+  const { custom, meta } = script;
+  const lists = [
+    [custom.origMatch && meta.match || '', MatchTest.try],
+    [custom.match || '', MatchTest.try],
+    [custom.origInclude && meta.include || '', autoReg],
+    [custom.include || '', autoReg],
+  ];
+  const excludes = [
+    [custom.origExcludeMatch && meta.excludeMatch || '', MatchTest.try],
+    [custom.excludeMatch || '', MatchTest.try],
+    [custom.origExclude && meta.exclude || '', autoReg],
+    [custom.exclude || '', autoReg],
+  ];
+  const tried = [];
+  const hasRules = lists.some(([rules]) => rules.length);
+  let rule;
+  let matched = true;
+  if (hasRules) {
+    rule = findRule(url, lists, tried);
+    matched = !!rule;
+  }
+  if (matched) {
+    const excluded = findRule(url, excludes, tried);
+    if (excluded) {
+      matched = false;
+      rule = excluded;
+    }
+  }
+  return { matched, rule: rule || undefined, tried };
+}
+
+/** @returns {string|false} the first rule that matches, false if none did */
+function findRule(url, lists, tried) {
+  if (curUrl !== url) setContext(url);
+  for (const [rules, builder] of lists) {
+    const cache = builder === MatchTest.try ? cacheMat : cacheInc;
+    for (const rule of rules) {
+      tried.push(rule);
+      let m = cache.get(rule);
+      if (!m) {
+        try {
+          m = builder(rule);
+        } catch (e) {
+          m = { err: e };
+        }
+        cache.put(rule, m);
+      }
+      if (m.test?.(url)) return rule;
+    }
+  }
+  return false;
 }
 
 function testRules(url, script, ...list) {
@@ -255,6 +324,14 @@ function testRules(url, script, ...list) {
     }
     if (i === 1) cache = false; // this will switch cache+builder for includes if they're non-empty
   }
+}
+
+/** Splits `host:port`, also `[::1]:port` */
+function splitPort(host) {
+  const i = host.lastIndexOf(':');
+  return i > host.lastIndexOf(']')
+    ? [host.slice(0, i), host.slice(i + 1)]
+    : [host, ''];
 }
 
 function str2RE(str) {

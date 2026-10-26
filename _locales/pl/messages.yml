@@ -1,3 +1,27 @@
+batchActionDisable:
+  description: Tooltip for batch disable (first click).
+  message: Wyłącz wszystkie skrypty
+batchActionDisableConfirm:
+  description: Tooltip for batch disable (confirm click).
+  message: Potwierdź wyłączenie wszystkich skryptów
+batchActionEnable:
+  description: Tooltip for batch enable (first click).
+  message: Włącz wszystkie skrypty
+batchActionEnableConfirm:
+  description: Tooltip for batch enable (confirm click).
+  message: Potwierdź włączenie wszystkich skryptów
+batchActionRemove:
+  description: Tooltip for batch remove (first click).
+  message: Usuń wszystkie skrypty
+batchActionRemoveConfirm:
+  description: Tooltip for batch remove (confirm click).
+  message: Potwierdź usunięcie wszystkich skryptów
+batchActionUpdate:
+  description: Tooltip for batch update (first click).
+  message: Zaktualizuj wszystkie skrypty
+batchActionUpdateConfirm:
+  description: Tooltip for batch update (confirm click).
+  message: Potwierdź aktualizację wszystkich skryptów
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Zastosuj
@@ -625,6 +649,12 @@ labelMatch:
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
   message: Dostęp agenta AI (MCP)
+labelMcpAll:
+  description: Checkbox that grants or revokes every listed tab at once.
+  message: Wszystkie
+labelMcpCapturing:
+  description: Tooltip of the icon shown for a granted tab whose logs are being captured.
+  message: Dzienniki są rejestrowane
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -636,15 +666,26 @@ labelMcpConnected:
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: "Łączenie z\_serwerem MCP na porcie $1..."
+labelMcpGrantTitle:
+  description: Small title above the list of tabs that can be granted to an AI agent.
+  message: Zezwalaj na dostęp do karty
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Dowiedz się, jak połączyć agenta AI
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: Brak oczekujących żądań.
+labelMcpNoTabs:
+  description: >-
+    Shown when no open tab is a web page, so there is nothing an AI agent could
+    be granted.
+  message: Żadna strona internetowa nie jest otwarta.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: "Serwer MCP na porcie $1 chce odczytać i\_edytować Twoje skrypty. Zatwierdź tylko wtedy, gdy to Ty go uruchomiłeś."
+labelMcpTabs:
+  description: Column header of the tab title in the MCP tab list.
+  message: Karty
 labelName:
   description: Label of script name.
   message: 'Nazwa skryptu:'
@@ -668,9 +709,7 @@ labelNotifyUpdates:
   message: Powiadamiaj o aktualizacjach skryptów
 labelNotifyUpdatesGlobal:
   description: Option to prioritize global notification option over script's setting.
-  message: >-
-    Ignoruj ​​powiadomienia dla poszczególnych skryptów (zakładka „ustawienia” w
-    edytorze)
+  message: "Ignoruj ​​powiadomienia dla poszczególnych skryptów (karta „Ustawienia” w\_edytorze)"
 labelPageMenuCommands:
   description: Checkbox item in page context menu and option to enable script commands.
   message: Pokaż polecenia skryptu w menu strony
@@ -882,13 +921,7 @@ menuExclude:
   message: Wyklucz...
 menuExcludeHint:
   description: Shown in popup menu after clicking "Exclude..." in script's "..." dropdown.
-  message: >-
-    Bieżąca karta zostanie automatycznie odświeżona, jeśli włączysz tę opcję w
-    ustawieniach ogólnych.
-
-    Aby zastosować zmiany we wszystkich innych kartach, odśwież je ręcznie.
-
-    Aby uzyskać większą elastyczność, użyj zakładki „Ustawienia” w edytorze.
+  message: "Bieżąca karta zostanie automatycznie odświeżona, jeśli włączysz tę opcję w\_ustawieniach ogólnych.\nAby zastosować zmiany we wszystkich innych kartach, odśwież je ręcznie.\nAby uzyskać większą elastyczność, użyj karty „Ustawienia” w\_edytorze."
 menuFeedback:
   description: >-
     Menu item in popup to open the selected script's feedback page. Please use a
@@ -1074,13 +1107,7 @@ msgSyntaxError:
   message: Błąd składni?
 msgTardyMatch:
   description: Shown in popup for scripts that missed their chance to run.
-  message: >-
-    Skrypt nie istniał lub nie pasował do bieżącego adresu URL w momencie
-    ładowania strony. Dzieje się tak na stronach typu Single-Page Application
-    (SPA), takich jak Facebook lub Instagram, gdzie nawigacja odbywa się bez
-    przeładowania strony. Odśwież kartę by uruchomić skrypt albo zastosuj @match
-    dla całej strony i wykrywaj zmiany za pomocą MutationObserver lub
-    window.navigation API.
+  message: "Skrypt nie istniał lub nie pasował do bieżącego adresu URL w\_momencie ładowania strony. Dzieje się tak na stronach typu Single-Page Application (SPA), takich jak Facebook lub Instagram, gdzie nawigacja odbywa się bez przeładowania strony. Odśwież kartę, aby uruchomić skrypt albo zastosuj @match dla całej strony i\_wykrywaj zmiany za pomocą API MutationObserver lub window.navigation."
 msgUpdated:
   description: Message shown when a script is updated/reinstalled.
   message: Skrypt zaktualizowany.

@@ -1,4 +1,4 @@
-import { debounce, keepAlive, noop, normalizeKeys } from '@/common';
+import { createTab, debounce, keepAlive, noop, normalizeKeys } from '@/common';
 import { kMainFrame, TIMEOUT_HOUR } from '@/common/consts';
 import {
   SYNC_MERGE,
@@ -216,9 +216,10 @@ export function openAuthPage(url, redirectUri) {
     authResolve = null;
     resolvePromise(null);
   }, 300_000);
-  browser.tabs.create({ url }).then(({ id: tabId }) => {
+  createTab({ url }).then((tab) => {
+    const tabId = tab?.id;
     const handler = (info) => {
-      browser.tabs.remove(tabId);
+      if (tabId != null) browser.tabs.remove(tabId);
       setTimeout(unregister, 0);
       if (authResolve) {
         clearTimeout(authTimer);
