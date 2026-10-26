@@ -1,4 +1,4 @@
->name: Build ViolentMonkey Fork
+name: Build ViolentMonkey Fork
 
 on:
   workflow_dispatch:
