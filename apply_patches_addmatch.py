@@ -968,6 +968,43 @@ const msgTimers = new Map(); // per-script-id timer to auto-clear a transient sc
         r"""    minimizer: isProd ? [""",
         r"""    minimizer: false ? [""",
     ),
+    (
+        'src/background/utils/tester.js',
+        r"""const RE_GLOB_HOST_SUFFIX = /\*[^.]*\.?$/;""",
+        r"""const RE_GLOB_HOST_SUFFIX = /\*[^.]*\.?$/;
+/** Host like `example.*` is treated as `.tld` (checked against the public suffix list) */
+const RE_STAR_TLD = /[^*]\.\*$/;""",
+    ),
+    (
+        'src/background/utils/tester.js',
+        r"""    if (!isWildHost && host.match(RE_GLOB_HOST_SUFFIX)) {""",
+        r"""    if (!isWildHost && !RE_STAR_TLD.test(host) && host.match(RE_GLOB_HOST_SUFFIX)) {""",
+    ),
+    (
+        'src/background/utils/tester.js',
+        r"""      parts[5] !== '*' && parts[5].match(RE_GLOB_HOST_SUFFIX) && ERR_GLOB_HOST_SUFFIX,""",
+        r"""      parts[5] !== '*' && !RE_STAR_TLD.test(parts[5]) && parts[5].match(RE_GLOB_HOST_SUFFIX)
+        && ERR_GLOB_HOST_SUFFIX,""",
+    ),
+    (
+        'src/background/utils/tester.js',
+        r"""  const isTld = rule.endsWith('.tld');""",
+        r"""  const isStarTld = RE_STAR_TLD.test(rule);
+  const isTld = isStarTld || rule.endsWith('.tld');""",
+    ),
+    (
+        'src/background/utils/tester.js',
+        r"""    base = base.slice(0, -4);""",
+        r"""    base = base.slice(0, isStarTld ? -2 : -4);""",
+    ),
+    (
+        'scripts/manifest-helper.js',
+        r"""  data.version = getVersion();""",
+        r"""  data.version = getVersion();
+  if (process.env.FORK_UPDATE_URL && data.browser_specific_settings?.gecko) {
+    data.browser_specific_settings.gecko.update_url = process.env.FORK_UPDATE_URL;
+  }""",
+    ),
 ]
 
 # New file written verbatim (jest tests for the pure helper functions).
