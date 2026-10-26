@@ -972,7 +972,7 @@ const msgTimers = new Map(); // per-script-id timer to auto-clear a transient sc
         'src/background/utils/tester.js',
         r"""const RE_GLOB_HOST_SUFFIX = /\*[^.]*\.?$/;""",
         r"""const RE_GLOB_HOST_SUFFIX = /\*[^.]*\.?$/;
-/** Host like `example.*` is treated as `.tld` (checked against the public suffix list) */
+/** Host like `example.*` stays a plain glob: don't report it as a bad pattern */
 const RE_STAR_TLD = /[^*]\.\*$/;""",
     ),
     (
@@ -985,17 +985,6 @@ const RE_STAR_TLD = /[^*]\.\*$/;""",
         r"""      parts[5] !== '*' && parts[5].match(RE_GLOB_HOST_SUFFIX) && ERR_GLOB_HOST_SUFFIX,""",
         r"""      parts[5] !== '*' && !RE_STAR_TLD.test(parts[5]) && parts[5].match(RE_GLOB_HOST_SUFFIX)
         && ERR_GLOB_HOST_SUFFIX,""",
-    ),
-    (
-        'src/background/utils/tester.js',
-        r"""  const isTld = rule.endsWith('.tld');""",
-        r"""  const isStarTld = RE_STAR_TLD.test(rule);
-  const isTld = isStarTld || rule.endsWith('.tld');""",
-    ),
-    (
-        'src/background/utils/tester.js',
-        r"""    base = base.slice(0, -4);""",
-        r"""    base = base.slice(0, isStarTld ? -2 : -4);""",
     ),
     (
         'scripts/manifest-helper.js',
