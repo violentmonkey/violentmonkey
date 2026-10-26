@@ -1,67 +1,162 @@
-name: Sync upstream
+>name: Build ViolentMonkey Fork
 
 on:
-  schedule:
-    - cron: '23 2 * * *'
   workflow_dispatch:
     inputs:
-      force_build:
-        description: 'Build even if upstream has nothing new'
+      create_release:
+        description: 'Create / update GitHub release'
         required: false
         default: false
         type: boolean
 
-permissions:
-  contents: write
-  actions: write
-
 concurrency:
-  group: sync-upstream
+  group: build-fork
   cancel-in-progress: false
 
 jobs:
-  sync:
+  ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-tags: true
 
-      - name: Merge upstream
-        id: merge
+      - name: Apply patches
+        run: python3 apply_patches_addmatch.py
+
+      - name: Resolve version
         run: |
+          BASE=$(node -p "const p=require('./package.json');p.version.match(/\d+\.\d+/)[0]+'.'+(p.beta||0)")
+          COUNT=$(git rev-list --count HEAD)
+          echo "VERSION=${BASE}.${COUNT}" >> $GITHUB_ENV
+          echo "FORK_UPDATE_URL=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/updates/updates.json" >> $GITHUB_ENV
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: 'package.json'
+
+      - name: Install
+        run: pnpm i
+      - name: Test
+        run: pnpm run ci
+      - name: Build
+        env:
+          SYNC_DROPBOX_CLIENT_ID: ${{ secrets.SYNC_DROPBOX_CLIENT_ID }}
+          SYNC_GOOGLE_DESKTOP_ID: ${{ secrets.SYNC_GOOGLE_DESKTOP_ID }}
+          SYNC_GOOGLE_DESKTOP_SECRET: ${{ secrets.SYNC_GOOGLE_DESKTOP_SECRET }}
+          SYNC_ONEDRIVE_CLIENT_ID: ${{ secrets.SYNC_ONEDRIVE_CLIENT_ID }}
+        run: pnpm build
+
+      - name: Verify update_url in manifest
+        run: node -e "const m=require('./dist/manifest.json');if(!m.browser_specific_settings.gecko.update_url){console.error('update_url missing');process.exit(1)}console.log(m.version,m.browser_specific_settings.gecko.update_url)"
+
+      - name: Get version and SHA
+        run: node scripts/action-helper.js ci
+
+      - name: Resolve artifact name
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          BETA=$(node -p "require('./package.json').beta || ''")
+          MM=$(echo "$PKG_VERSION" | cut -d. -f1,2)
+          echo "PKG_VERSION=${PKG_VERSION}" >> $GITHUB_ENV
+          echo "XPI_NAME=ViolentMonkey_AddDomain-V${VERSION}.xpi" >> $GITHUB_ENV
+          if [ -n "$BETA" ]; then
+            DISPLAY_VERSION="${MM}.${BETA}"
+            echo "ARTIFACT_NAME=ViolentMonkey_AddDomain-V${DISPLAY_VERSION}-Beta-Unsigned" >> $GITHUB_ENV
+            echo "RELEASE_TAG=V${DISPLAY_VERSION}-Beta"                                     >> $GITHUB_ENV
+            echo "RELEASE_NAME=ViolentMonkey AddDomain V${DISPLAY_VERSION} (Beta)"          >> $GITHUB_ENV
+            echo "IS_BETA=true"                                                             >> $GITHUB_ENV
+          else
+            echo "ARTIFACT_NAME=ViolentMonkey_AddDomain-V${PKG_VERSION}-Unsigned" >> $GITHUB_ENV
+            echo "RELEASE_TAG=V${PKG_VERSION}"                                    >> $GITHUB_ENV
+            echo "RELEASE_NAME=ViolentMonkey AddDomain V${PKG_VERSION}"           >> $GITHUB_ENV
+            echo "IS_BETA=false"                                                  >> $GITHUB_ENV
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        continue-on-error: true
+        with:
+          name: '${{ env.ARTIFACT_NAME }}'
+          path: 'dist/*'
+          if-no-files-found: error
+
+      - name: Package dist as ZIP and XPI
+        run: |
+          cd dist
+          zip -r -X "../$ARTIFACT_NAME.zip" .
+          cd ..
+          cp "$ARTIFACT_NAME.zip" "$XPI_NAME"
+
+      - name: Create / Update Release
+        if: inputs.create_release == true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PRERELEASE_FLAG=""
+          [ "$IS_BETA" = "true" ] && PRERELEASE_FLAG="--prerelease"
+
+          NOTES="Patched Violentmonkey build — Add domain to \`@match\` feature.
+          Based on upstream Violentmonkey v${PKG_VERSION}. Build ${VERSION}.
+
+          What's included:
+          - Popup + button to add current tab domain to a script's \`@match\`
+          - Dashboard domain-add panel with Current tab pre-fill
+          - Shorthand expansion on save (example.com,xyz.* to full \`@match\` lines)
+          - anyTld wildcard TLD support (\`example.*\` in \`@match\`)
+          - Self-updating via update_url
+          - No Code Minification
+
+          By @BlazeFTL"
+
+          gh release delete "$RELEASE_TAG" --cleanup-tag --yes 2>/dev/null || true
+
+          gh release create "$RELEASE_TAG" \
+            --title "$RELEASE_NAME" \
+            --notes "$NOTES" \
+            --target "$GITHUB_SHA" \
+            $PRERELEASE_FLAG \
+            "$ARTIFACT_NAME.zip" \
+            "$XPI_NAME"
+
+      - name: Publish updates.json
+        if: inputs.create_release == true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OUT=/tmp/updates-out
+          mkdir -p "$OUT"
+          node - "$OUT" <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const out = process.argv[2];
+          const id = JSON.parse(fs.readFileSync('dist/manifest.json', 'utf8')).browser_specific_settings.gecko.id;
+          const xpi = process.env.XPI_NAME;
+          const hash = crypto.createHash('sha256').update(fs.readFileSync(xpi)).digest('hex');
+          const data = {
+            addons: {
+              [id]: {
+                updates: [{
+                  version: process.env.VERSION,
+                  update_link: `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/${process.env.RELEASE_TAG}/${xpi}`,
+                  update_hash: `sha256:${hash}`,
+                }],
+              },
+            },
+          };
+          fs.writeFileSync(`${out}/updates.json`, JSON.stringify(data, null, 2));
+          NODE
+          cd "$OUT"
+          git init -q -b updates
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote add upstream https://github.com/violentmonkey/violentmonkey.git
-          git fetch --no-tags upstream master
-
-          if git merge-base --is-ancestor upstream/master HEAD; then
-            echo "Already up to date"
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if ! git merge --no-ff --no-commit upstream/master; then
-            git checkout --ours -- README.md
-            git add README.md
-            LEFT=$(git diff --name-only --diff-filter=U)
-            if [ -n "$LEFT" ]; then
-              echo "::error::Unresolved conflicts besides README.md:"
-              echo "$LEFT"
-              git merge --abort
-              exit 1
-            fi
-          fi
-
-          git commit -m "Merge upstream violentmonkey/violentmonkey"
-          git push origin HEAD
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Trigger build and release
-        if: steps.merge.outputs.changed == 'true' || inputs.force_build == true
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: gh workflow run BuildFork.yml --repo "$GH_REPO" --ref "${{ github.event.repository.default_branch }}" -f create_release=true
+          git add updates.json
+          git commit -q -m "updates.json ${VERSION}"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" updates
