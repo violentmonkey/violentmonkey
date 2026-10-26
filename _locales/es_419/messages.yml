@@ -662,10 +662,10 @@ labelMcp:
   message: Acceso para agentes de IA (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: Todos
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: Se están capturando los registros
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -679,7 +679,7 @@ labelMcpConnecting:
   message: Conectando con el servidor MCP en el puerto $1...
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: Conceder acceso a la pestaña
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Aprende a conectar un agente de IA
@@ -690,7 +690,7 @@ labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: No hay ninguna página web abierta.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
@@ -698,7 +698,7 @@ labelMcpPending:
     solo si tú lo iniciaste.
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: Pestañas
 labelName:
   description: Label of script name.
   message: 'Nombre:'

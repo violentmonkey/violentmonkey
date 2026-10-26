@@ -654,10 +654,10 @@ labelMcp:
   message: Prístup agenta AI (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: Všetky
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: Logy sa zaznamenávajú
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -671,7 +671,7 @@ labelMcpConnecting:
   message: Pripájanie k serveru MCP na porte $1
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: Povoliť prístup ku karte
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Zistite, ako pripojiť agenta AI
@@ -682,7 +682,7 @@ labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: Nie je otvorená žiadna webová stránka.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
@@ -690,7 +690,7 @@ labelMcpPending:
     vtedy, ak ste ho spustili vy.
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: Karty
 labelName:
   description: Label of script name.
   message: 'Názov:'

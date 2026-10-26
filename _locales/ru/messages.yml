@@ -648,10 +648,10 @@ labelMcp:
   message: Доступ для ИИ-агентов (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: Все
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: Журналы записываются
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: >-
@@ -665,7 +665,7 @@ labelMcpConnecting:
   message: Подключение к серверу MCP на порту $1…
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: Предоставить доступ к вкладке
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: Узнайте, как подключить ИИ-агента
@@ -676,7 +676,7 @@ labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: Веб-страница не открыта.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: >-
@@ -684,7 +684,7 @@ labelMcpPending:
     только в том случае, если вы его запустили.
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: Вкладки
 labelName:
   description: Label of script name.
   message: 'Имя:'
@@ -833,7 +833,7 @@ labelSyncScriptStatus:
   message: Синхронизировать состояние скриптов
 labelSyncServerUrl:
   description: Label for input to hold server URL.
-  message: 'URL-адрес сервера: '
+  message: 'Адрес сервера: '
 labelSyncService:
   description: Label for sync service select.
   message: Синхронизация через
