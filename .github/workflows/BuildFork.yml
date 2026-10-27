@@ -27,7 +27,7 @@ jobs:
           fetch-tags: true
 
       - name: Apply patches
-        run: python3 apply_patches_addmatch.py
+        run: python3 apply_patches_addmatch.py && python3 apply_patches_material.py
 
       - name: Resolve version
         run: |
