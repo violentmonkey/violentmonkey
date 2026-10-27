@@ -18,24 +18,33 @@ import './material.css';""",
 ]
 
 NEW_FILES = {
-    'src/common/ui/style/material.css': r"""/* Clean white theme. Original sizes everywhere except the popup script list on touch devices.
- * Accent colour is used for text, icons, toggles and checkboxes only, never for backgrounds.
+    'src/common/ui/style/material.css': r"""/* White theme, original sizes. Rounded bordered cards (popup script list, dashboard scripts, settings).
+ * Larger tap targets only in the popup script list on touch devices.
  * Tokens at :root:root; component rules under :root:root:root so they beat SFC/popup/options sheets. */
 
 :root:root {
   accent-color: var(--md-primary);
-  --md-primary: #8400ff;
+  --md-primary: #6366f1;
+  --vm-line: #e5e7eb;
+  --vm-soft-bg: #f9fafb;
+  --vm-head-bg: #eef2ff;
+  --vm-head-line: #e0e7ff;
+  --vm-head-fg: #4338ca;
   --md-state-hover: rgba(0, 0, 0, .06);
   --md-state-press: rgba(0, 0, 0, .12);
-  --md-shadow-card: 0 1px 3px rgba(0, 0, 0, .16), 0 1px 2px rgba(0, 0, 0, .08);
+  --md-shadow-card: 0 1px 3px rgba(0, 0, 0, .10), 0 1px 2px rgba(0, 0, 0, .06);
   --md-shadow-menu: 0 2px 6px rgba(0, 0, 0, .18), 0 6px 16px rgba(0, 0, 0, .14);
-  --vm-card-head: var(--fill-0-5);
   --focus-border-color: var(--md-primary);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:root {
-    --md-primary: #c9a7ff;
+    --md-primary: #a5b4fc;
+    --vm-line: var(--fill-3);
+    --vm-soft-bg: var(--fill-0-5);
+    --vm-head-bg: rgba(129, 140, 248, .16);
+    --vm-head-line: rgba(129, 140, 248, .28);
+    --vm-head-fg: #c7d2fe;
     --md-state-hover: rgba(255, 255, 255, .08);
     --md-state-press: rgba(255, 255, 255, .14);
     --md-shadow-card: 0 1px 3px rgba(0, 0, 0, .6);
@@ -48,6 +57,10 @@ a {
 }
 
 :root:root:root {
+  body {
+    background: var(--bg);
+  }
+
   /* ---------- shared controls: shape only, original sizes ---------- */
   input[type=text],
   input[type=url],
@@ -56,6 +69,7 @@ a {
   input[type=password],
   select,
   textarea {
+    border-color: var(--vm-line);
     border-radius: 10px;
     padding-left: .5em;
     padding-right: .5em;
@@ -80,7 +94,6 @@ a {
     &.active {
       border-color: transparent;
       background: var(--md-state-press);
-      color: var(--md-primary);
     }
   }
   fieldset {
@@ -92,7 +105,7 @@ a {
   }
   .vl-dropdown-menu {
     border-radius: 12px;
-    border-color: var(--fill-2);
+    border-color: var(--vm-line);
     box-shadow: var(--md-shadow-menu);
   }
   body .vl-tooltip-content {
@@ -105,8 +118,9 @@ a {
     border-radius: 10px;
   }
 
-  /* ---------- popup ---------- */
+  /* ---------- popup: white page, script list as cards ---------- */
   .page-popup {
+    background: var(--bg);
     .menu-area {
       &:hover,
       &:focus {
@@ -118,7 +132,7 @@ a {
       }
     }
     .menu-group {
-      color: var(--md-primary);
+      color: var(--fg);
       font-weight: 600;
     }
     .menu.expand > .menu-group {
@@ -127,14 +141,27 @@ a {
       z-index: 2;
       background: var(--bg);
     }
-    &[data-is-applied="true"] .menu-buttons > .menu-area:first-of-type {
-      color: var(--md-primary);
+    .submenu {
+      padding: 2px 0 6px;
+      border-top: 0;
+      > .script {
+        margin: 4px 10px;
+        border: 1px solid var(--vm-line);
+        border-radius: 16px;
+        background: var(--bg);
+        box-shadow: var(--md-shadow-card);
+      }
     }
-    .script:not(.disabled) > .menu-item > .icon {
-      color: var(--md-primary);
-    }
-    .script.disabled > .menu-item > .icon {
-      color: var(--fill-6);
+    .script {
+      > .menu-item {
+        border-radius: 15px;
+        > .icon {
+          color: var(--fg);
+        }
+      }
+      &.disabled > .menu-item > .icon {
+        color: var(--fill-6);
+      }
     }
     .submenu-button {
       &:hover,
@@ -150,7 +177,7 @@ a {
 
   .extras-menu {
     border-radius: 12px;
-    border-color: var(--fill-2);
+    border-color: var(--vm-line);
     box-shadow: var(--md-shadow-menu);
     overflow: hidden;
     > * {
@@ -165,21 +192,18 @@ a {
     }
   }
 
-  /* ---------- dashboard: one white header, rounded shadowed cards ---------- */
+  /* ---------- dashboard: one white header, rounded cards ---------- */
   aside {
-    border-color: var(--fill-2);
+    border-color: var(--vm-line);
     background: var(--bg);
-  }
-  .aside-menu-item a.active {
-    color: var(--md-primary);
   }
   .tab.tab-installed {
     header {
-      border-bottom-color: var(--fill-2);
+      border-bottom-color: var(--vm-line);
       background: var(--bg);
       .filtered,
       .btn-group {
-        border-right-color: var(--fill-2);
+        border-right-color: var(--vm-line);
       }
     }
     .filter-search input {
@@ -188,8 +212,8 @@ a {
     }
   }
   .scripts .script {
-    border-color: var(--fill-2);
-    border-radius: 14px;
+    border-color: var(--vm-line);
+    border-radius: 16px;
     box-shadow: var(--md-shadow-card);
     &:hover {
       border-color: var(--fill-4);
@@ -197,6 +221,10 @@ a {
     &.focused,
     &.focused:focus {
       box-shadow: 1px 2px 9px var(--fill-7);
+    }
+    &.disabled,
+    &.removed {
+      background: var(--vm-soft-bg);
     }
     .script-buttons {
       color: var(--fill-11);
@@ -207,39 +235,40 @@ a {
     box-shadow: none;
   }
 
-  /* ---------- settings: bordered rounded cards ---------- */
+  /* ---------- settings: bordered rounded cards with tinted header ---------- */
   .tab-settings {
     section {
       margin: 0 0 14px;
-      padding: 12px 16px 14px;
-      border: 1px solid var(--fill-3);
+      padding: 14px 18px 16px;
+      border: 1px solid var(--vm-line);
       border-radius: 16px;
       background: var(--bg);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
       > h3 {
-        margin: -12px -16px 12px !important;
-        border-radius: 15px 15px 0 0;
-        padding: 0 16px;
+        margin: -14px -18px 14px !important;
+        padding: 0 18px;
         border: 0;
-        border-bottom: 1px solid var(--fill-3);
-        background: var(--hbg, var(--vm-card-head));
-        color: var(--md-primary);
+        border-bottom: 1px solid var(--vm-head-line);
+        border-radius: 15px 15px 0 0;
+        background: var(--hbg, var(--vm-head-bg));
+        color: var(--vm-head-fg);
         font-size: 1rem;
-        font-weight: 600;
-        line-height: 2.6;
+        font-weight: 700;
+        line-height: 3.3;
       }
     }
     details > summary.h3 {
       margin: 0 0 14px !important;
-      padding: 0 16px;
-      border: 1px solid var(--fill-3);
+      padding: 0 18px;
+      border: 1px solid var(--vm-head-line);
       border-radius: 16px;
-      background: var(--vm-card-head);
-      line-height: 2.6;
+      background: var(--vm-head-bg);
+      line-height: 3.3;
       > * {
         margin: 0;
-        color: var(--md-primary);
+        color: var(--vm-head-fg);
         font-size: 1rem;
-        font-weight: 600;
+        font-weight: 700;
       }
     }
   }
@@ -248,18 +277,10 @@ a {
 /* ---------- popup script list: larger tap targets on touch devices only ---------- */
 html.touch:root:root:root {
   .page-popup {
-    .submenu {
-      padding-bottom: 6px;
-      > .script {
-        margin: 2px 6px;
-        border-radius: 12px;
-      }
-    }
     .script {
       > .menu-item {
-        min-height: 46px;
+        min-height: 52px;
         padding: 4px 130px 4px 0;
-        border-radius: 12px;
       }
       .script-icon {
         left: 12px;
@@ -293,9 +314,9 @@ html.touch:root:root:root {
       }
     }
     .submenu-buttons {
-      right: 4px;
+      right: 6px;
       align-items: center;
-      height: 46px;
+      height: 52px;
       padding-left: 4px;
       background: transparent;
       &::before {
@@ -303,7 +324,7 @@ html.touch:root:root:root {
         flex: 0 0 1px;
         height: 24px;
         margin-right: 4px;
-        background: var(--fill-3);
+        background: var(--vm-line);
       }
     }
     .submenu-button {
