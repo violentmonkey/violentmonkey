@@ -744,7 +744,7 @@ export function createSyncService({
       }
     });
 
-    const enableSync = getOption('syncScriptStatus');
+    const syncScriptStatus = getOption('syncScriptStatus');
 
     // Ensure all remote items have metadata
     remoteData.forEach((item) => {
@@ -765,7 +765,7 @@ export function createSyncService({
     // `props.lastModified`, which would otherwise always skip the merge.
     // NOTE: the clock is global, so toggles of different scripts on different
     // devices can overwrite each other, and a toggle also tilts `position` local.
-    if (enableSync) {
+    if (syncScriptStatus) {
       const deletedUris = new Set([
         ...delRemote.map(({ remote }) => remote.uri),
         ...delLocal.map(({ local }) => local.props.uri),
@@ -808,7 +808,10 @@ export function createSyncService({
             objectSet(data, 'props.lastModified', info.lastModified);
           const position = +info.position;
           if (position) data.position = position;
-          if (enableSync && info.enabled != null) {
+          if (!syncScriptStatus) {
+            // The file carries the uploader's status, keep ours.
+            if (data.config) delete data.config.enabled;
+          } else if (info.enabled != null) {
             objectSet(data, 'config.enabled', info.enabled);
           }
           return pluginScript.update(data);
@@ -821,7 +824,7 @@ export function createSyncService({
           items[local.props.uri] = {
             lastModified: local.props.lastModified,
             position: local.props.position,
-            ...(enableSync && {
+            ...(syncScriptStatus && {
               enabled: local.config.enabled,
             }),
           };
