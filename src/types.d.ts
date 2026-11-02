@@ -27,6 +27,16 @@ declare interface GMContext {
   displayName: string;
 }
 
+declare type McpScriptHandler = (params: PlainJSONValue, context: { callId: string }) => unknown;
+declare function GM_registerMcpHandler(handler: McpScriptHandler): Promise<boolean>;
+declare function GM_reportResult(value: unknown, options?: { callId?: string; error?: string }):
+  Promise<{ accepted: boolean; callId: string }>;
+declare namespace GM {
+  function registerMcpHandler(handler: McpScriptHandler): Promise<boolean>;
+  function reportResult(value: unknown, options?: { callId?: string; error?: string }):
+    Promise<{ accepted: boolean; callId: string }>;
+}
+
 /**
  * GM_xmlhttpRequest paraphernalia
  */
@@ -320,6 +330,10 @@ declare interface VMInjection extends VMInjectionDisabled, VMInjectionFlags {
   /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
   more: string;
   nonce?: string;
+  /** Private per-document token; only sent to the content bridge. */
+  mcpToken?: string;
+  /** Private authorization session and page identity for BFCache restoration. */
+  mcpContext?: { sessionId: string; pageId: string };
   /** `page` mode will be necessary */
   page: boolean;
   scripts: VMInjection.Script[];

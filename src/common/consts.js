@@ -79,6 +79,8 @@ export const GM_API_NAMES = [
   'GM_notification',
   'GM_openInTab',
   'GM_registerMenuCommand',
+  'GM_registerMcpHandler',
+  'GM_reportResult',
   'GM_removeValueChangeListener',
   'GM_setClipboard',
   'GM_setValue',
@@ -87,6 +89,8 @@ export const GM_API_NAMES = [
   'GM_xmlhttpRequest',
   'unsafeWindow',
 ];
+/** Maximum serialized script call/result length, shared by both bridge realms. */
+export const MCP_RESULT_MAX = 256 * 1024;
 export const GM4_ALIAS = {
   __proto__: null,
   getResourceURL: 'getResourceUrl',
