@@ -1,33 +1,33 @@
 batchActionDisable:
   description: Tooltip for batch disable (first click).
-  message: ''
+  message: Tüm betikleri devre dışı bırak
 batchActionDisableConfirm:
   description: Tooltip for batch disable (confirm click).
-  message: ''
+  message: Tüm betiklerin devre dışı bırakıldığını onaylayın
 batchActionEnable:
   description: Tooltip for batch enable (first click).
-  message: ''
+  message: Tüm betikleri etkinleştir
 batchActionEnableConfirm:
   description: Tooltip for batch enable (confirm click).
-  message: ''
+  message: Tüm betiklerin etkinleştirildiğini onaylayın
 batchActionRemove:
   description: Tooltip for batch remove (first click).
-  message: ''
+  message: Tüm betikleri kaldır
 batchActionRemoveConfirm:
   description: Tooltip for batch remove (confirm click).
-  message: ''
+  message: Tüm betiklerin silindiğini onaylayın
 batchActionUpdate:
   description: Tooltip for batch update (first click).
-  message: ''
+  message: Tüm betikleri güncelle
 batchActionUpdateConfirm:
   description: Tooltip for batch update (confirm click).
-  message: ''
+  message: Tüm betiklerin güncellenmesini onaylayın
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Uygula
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Onayla
 buttonCancel:
   description: Cancel button on dialog.
   message: İptal
@@ -51,7 +51,7 @@ buttonDisable:
   message: Devre dışı bırak
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: Bağlantıyı kes
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -104,7 +104,7 @@ buttonRecycleBin:
   message: Geri Dönüşüm Kutusu
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: Reddet
 buttonRemove:
   description: Button to remove a script.
   message: Kaldır
@@ -656,42 +656,46 @@ labelMatch:
   message: '@match kuralları'
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: YZ ajanı erişimi (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: Tümü
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: Günlükler kaydedilir
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: >-
+    MCP sunucusu bağlantıyı sonlandırdı. Tekrar denemek için yeni bir bağlantı
+    URL’si açın.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: '$1 numaralı bağlantı noktasındaki MCP sunucusu: bağlandı'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: $1 numaralı bağlantı noktası üzerinden MCP sunucusuna bağlanılıyor...
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: Erişim izni ver
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: Bir YZ ajanı nasıl bağlanacağını öğrenin
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: Bekleyen istek yok.
 labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: Açık hiçbir web sayfası yok.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: >-
+    $1 numaralı bağlantı noktasındaki bir MCP sunucusu, komut dosyalarınızı
+    okumak ve düzenlemek istiyor. Yalnızca siz başlatmışsanız onaylayın.
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: Sekmeler
 labelName:
   description: Label of script name.
   message: 'İsim:'

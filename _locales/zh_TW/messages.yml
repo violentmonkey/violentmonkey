@@ -1,33 +1,33 @@
 batchActionDisable:
   description: Tooltip for batch disable (first click).
-  message: ''
+  message: 停用所有腳本
 batchActionDisableConfirm:
   description: Tooltip for batch disable (confirm click).
-  message: ''
+  message: 確認停用所有腳本
 batchActionEnable:
   description: Tooltip for batch enable (first click).
-  message: ''
+  message: 啟用所有腳本
 batchActionEnableConfirm:
   description: Tooltip for batch enable (confirm click).
-  message: ''
+  message: 確認啟用所有腳本
 batchActionRemove:
   description: Tooltip for batch remove (first click).
-  message: ''
+  message: 刪除所有腳本
 batchActionRemoveConfirm:
   description: Tooltip for batch remove (confirm click).
-  message: ''
+  message: 確認刪除所有腳本
 batchActionUpdate:
   description: Tooltip for batch update (first click).
-  message: ''
+  message: 更新所有腳本
 batchActionUpdateConfirm:
   description: Tooltip for batch update (confirm click).
-  message: ''
+  message: 確認更新所有腳本
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: 套用
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: 核准
 buttonCancel:
   description: Cancel button on dialog.
   message: 取消
@@ -51,7 +51,7 @@ buttonDisable:
   message: 停用
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: 中斷連線
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: 下載佈景主題
@@ -93,7 +93,7 @@ buttonNew:
   message: 新增腳本
 buttonNewFromFile:
   description: Button to create a new script from a local file.
-  message: ''
+  message: 從檔案新增腳本
 buttonOK:
   description: OK button on dialog.
   message: 確定
@@ -102,7 +102,7 @@ buttonRecycleBin:
   message: 資源回收桶
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: 拒絕
 buttonRemove:
   description: Button to remove a script.
   message: 移除
@@ -138,10 +138,10 @@ buttonSupport:
   message: 技術支援
 buttonSyncPullOnce:
   description: Button to sync scripts from remote to local for once
-  message: ''
+  message: ' 從雲端同步至本機一次'
 buttonSyncPushOnce:
   description: Button to sync scripts from local to remote for once
-  message: ''
+  message: 從本機同步至雲端一次
 buttonUndo:
   description: Button to undo removement of a script.
   message: 復原
@@ -213,7 +213,7 @@ descSyncGitRepoPreexisting:
   description: >-
     Note explaining the repository must already exist; Violentmonkey never
     creates it.
-  message: ''
+  message: 儲存庫必須事先建立，Violentmonkey不會替您建立或初始化儲存庫。
 disabledScriptsGroup:
   description: 'Used as "Disabled scripts: group"'
   message: 分組
@@ -296,7 +296,7 @@ fileInstallBlocked:
     因為這將允許所有使用者腳本讀取您電腦上的任何檔案。
 fileInstallBlockedFF:
   description: Text in the installer when a local file is dropped into Firefox window.
-  message: ''
+  message: 開啟 about:addons，點選"Violentmonkey"，再點選"權限與資料"，啟用"存取您電腦上的本機檔案"
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
   message: 字母順序
@@ -310,10 +310,10 @@ filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: ''
+  message: 最近造訪時間
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
-  message: ''
+  message: 最近一次造訪此腳本適用網站的時間。
 filterScopeAll:
   description: Option in dashboard's search scope filter.
   message: 全部
@@ -349,18 +349,21 @@ headerRecycleBin:
   message: 資源回收桶
 helpForLocalFile:
   description: Label of the checkbox.
-  message: ''
+  message: 無法安裝本機腳本時顯示說明
 hintForBatchAction:
   description: Hint shown next to the buttons for batch actions.
   message: 對 $1 個符合的腳本
 hintGrantNone:
   description: Don't translate back-quoted terms.
-  message: ''
+  message: '`@grant none` 會停用所有其他 `@grant` 設定。'
 hintGrantless:
   description: >-
     1) This is a tooltip so preserve the line breaks to ensure it's not too
     wide. 2) Don't translate back-quoted terms like `window` or `@grant none`.
-  message: ''
+  message: |-
+    在沙箱中執行的腳本無法修改下列全域屬性：$1。
+    若要修正此腳本，請加入 `@grant none` 以停用沙箱，
+    或使用 `unsafeWindow` 取代 `window`。
 hintInputURL:
   description: Hint for a prompt box to input URL of a user script.
   message: 請輸入網址：
@@ -443,34 +446,34 @@ labelBlacklist:
   message: 黑名單
 labelComment:
   description: Label for a comment text in the script editor settings.
-  message: ''
+  message: 註解
 labelContributors:
   description: Label for link to contributors.
   message: 貢獻者
 labelCronDaily:
   description: Shortcut for a daily cron schedule.
-  message: ''
+  message: 每天
 labelCronDayOfMonth:
   description: Label for the day-of-month field in a cron expression.
   message: ''
 labelCronDayOfWeek:
   description: Label for the day-of-week field in a cron expression.
-  message: ''
+  message: 星期
 labelCronHour:
   description: Label for the hour field in a cron expression.
-  message: ''
+  message: 小時
 labelCronHourly:
   description: Shortcut for an hourly cron schedule.
-  message: ''
+  message: 每小時
 labelCronMinute:
   description: Label for the minute field in a cron expression.
-  message: ''
+  message: 分鐘
 labelCronMonth:
   description: Label for the month field in a cron expression.
-  message: ''
+  message: 月份
 labelCronTwiceADay:
   description: Shortcut for a cron schedule that runs twice a day.
-  message: ''
+  message: 每天兩次
 labelCurrentLang:
   description: Label of current language.
   message: 目前語言：
@@ -521,36 +524,38 @@ labelFastInject:
   message: 替代 $1 方案
 labelFastInjectHint:
   description: Tooltip hint for the option in Advanced settings.
-  message: ''
+  message: >-
+    為 <document-start>
+    腳本提供另一種注入方式，速度比預設模式更快。與「同步頁面模式」類似，此方式也會增加記憶體用量，因此若未啟用此選項時腳本仍能正常運作，可考慮停用此選項。
 labelFeedback:
   description: Label of link to feedback page.
   message: 回饋
 labelFirefoxPatchCsp:
   description: Option in Advanced settings.
-  message: ''
+  message: 在 Firefox 中繞過 CSP
 labelFirefoxPatchCspHint:
   description: >-
     (`$1` will be shown as <page>, $2 is <wrappedJSObject>) Hint for the option
     in Advanced settings.
-  message: ''
+  message: 在網頁的 CSP 中加入一個隨機值，只有 Violentmonkey 能使用此值，讓腳本以$1注入模式執行；否則，必須修改腳本才能使用 $2。
 labelFirefoxPatchCspPopup:
   description: >-
     ($1 is <content>, $2 is a translation for "Bypass CSP") Message for a script
     in the popup's extras menu.
-  message: ''
+  message: 隔離的$1模式可能會限制功能，請參閱設定中的“$2”。
 labelGeneral:
   description: Label for general settings.
   message: 一般
   touched: false
 labelGmDownloadViaApi:
   description: Option in Advanced settings to use the browser download API for GM_download.
-  message: ''
+  message: 使用瀏覽器下載 API
 labelGmDownloadViaApiHint:
   description: Tooltip for the browser download option in Advanced settings.
-  message: ''
+  message: 允許腳本將檔案儲存至下載資料夾內的子資料夾，並在瀏覽器的下載列顯示下載進度。
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: 授予權限
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: 協助翻譯
@@ -562,10 +567,12 @@ labelHomepageURL:
   message: 首頁網址：
 labelHttpOnlyCookie:
   description: Option in Advanced settings to enable HTTP-only cookies for GM_cookie.
-  message: ''
+  message: 允許 GM_cookie 存取 HTTP-only cookie
 labelHttpOnlyCookieHint:
   description: Tooltip for the HTTP-only cookie option.
-  message: ''
+  message: >-
+    啟用後，腳本可以讀取及寫入帶有 HTTP-only 標記的 cookie。這讓腳本能夠存取無法透過 JavaScript 存取的
+    cookie。使用此功能可能帶來安全風險，請謹慎使用。
 labelIconURL:
   description: Label for the input.
   message: 圖示網址：
@@ -600,19 +607,19 @@ labelMatch:
   message: '@match 規則'
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: AI agent存取 (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: 全部
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
   message: ''
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: MCP 伺服器已關閉連線。請開啟新的連線網址以重試。
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: ' 連接埠$1的 MCP 伺服器：已連線'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
   message: ''
