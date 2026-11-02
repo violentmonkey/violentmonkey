@@ -2,7 +2,7 @@
 
 This draft adds explicitly registered userscript callbacks and structured reports to the existing MCP development tools. It requires the companion `script_handlers`, `script_call` and `script_results` schemas in the Violentmonkey MCP repository. Published servers that do not know those tools will not expose them. File saving and download-directory settings are outside this change.
 
-Status as of 2026-11-02: all 38 real-browser regression cases passed in Chrome 156 with this extension's MV3 build and the companion MCP server. The new API and its extension of the MCP development scope remain proposals for maintainer review. Firefox and Chrome MV2 runtime checks are still pending.
+Status as of 2026-11-02: all 38 real-browser regression cases passed in Chrome 156 with this extension's MV3 build and the companion MCP server. The new API and its extension of the MCP development scope remain proposals for maintainer review. Firefox runtime checks are still pending.
 
 ## Example
 
@@ -73,6 +73,8 @@ The automated extension suite (141 tests), lint, and both MV2 and MV3 builds als
 
 ## Remaining browser verification
 
-Firefox and Chrome MV2 have not been tested in a real browser for these changes. Repeat the call, authorization and navigation checks there before claiming cross-browser validation. In particular, verify actual persisted `pageshow` events, both script realms, same-origin and cross-origin frames, and rejection of old calls and revoked sessions. Successful compilation alone does not establish runtime behavior.
+Firefox has not been tested in a real browser for these changes. Repeat the call, authorization and navigation checks in Firefox before claiming cross-browser validation. In particular, verify actual persisted `pageshow` events, both script realms, same-origin and cross-origin frames, and rejection of old calls and revoked sessions. Successful compilation alone does not establish runtime behavior.
+
+Chrome removed Manifest V2 support starting with version 139, as documented in the [official support timeline](https://developer.chrome.com/docs/extensions/develop/migrate/mv2-deprecation-timeline). The completed Chrome verification uses MV3. Legacy Chrome MV2 runtime testing would require an explicitly agreed older-browser compatibility target, rather than being a requirement for current Chrome validation.
 
 The first round remains limited to script invocation and structured results. File saving is deferred to a separate round.
