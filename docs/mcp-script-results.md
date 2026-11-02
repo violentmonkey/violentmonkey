@@ -2,6 +2,8 @@
 
 This draft adds explicitly registered userscript callbacks and structured reports to the existing MCP development tools. It requires the companion `script_handlers`, `script_call` and `script_results` schemas in the Violentmonkey MCP repository. Published servers that do not know those tools will not expose them. File saving and download-directory settings are outside this change.
 
+Status as of 2026-11-02: all 38 real-browser regression cases passed in Chrome 156 with this extension's MV3 build and the companion MCP server. The new API and its extension of the MCP development scope remain proposals for maintainer review. Firefox and Chrome MV2 runtime checks are still pending.
+
 ## Example
 
 ```js
@@ -51,8 +53,26 @@ All three tools require a granted tab. Invocation also checks that the installed
 
 Read-only servers expose discovery and results but omit `script_call`. Callback registration is deliberate participation by the script, not a security boundary against an agent already permitted to edit that script.
 
-## Browser verification before merge
+## Completed Chrome verification
 
-Run the example in Chrome and Firefox with both `@inject-into page` and `@inject-into content`. Verify synchronous and asynchronous returns, thrown errors, invalid JSON returns, concurrent calls and `wait: false`. Try an iframe and confirm its returned `frameId` is required to invoke it.
+On 2026-11-02, all 38 regression cases passed in Google Chrome 156.0.8078.79 on macOS arm64. The run used a headed browser with an isolated profile and the unpacked MV3 build (2.49.6), with developer mode and userscript execution enabled. Tested revisions: extension `f376fc5e7c13e24f026c0088640473c78ac88f8c`, paired with MCP `4fbc64eb1ac2d5347c8628730b06a4c3d97fd27a`.
 
-Navigate from A to B, then back and forward. Verify that `pageshow.persisted` is true to exercise the cache path; a reload alone does not test restoration. Registered callbacks should remain callable without duplicate script initialization, while old calls and revoked sessions must remain invalid. Repeat with an iframe. Check disconnect/reconnect, tab closure, and missing tab grants. These real-browser checks complement the automated state and bridge tests.
+Calls travelled through an MCP SDK client, the paired local MCP HTTP server, the extension's WebSocket connection and installed userscripts. The extension backend was not mocked. Two scripts exercised `GM_registerMcpHandler` / `GM_reportResult` in the page realm and `GM.registerMcpHandler` / `GM.reportResult` in the content realm. Each ran in a top document, a same-origin iframe and a cross-origin iframe, for six registered handlers.
+
+| Area | Chrome result |
+| --- | --- |
+| Invocation and reporting | Synchronous and asynchronous returns, falsy JSON values, concurrent calls, unsolicited reports and result pagination passed |
+| Errors and limits | Thrown errors, rejected promises, circular values, BigInt and oversized outputs produced failed execution records; oversized inputs, invalid frames and disabled scripts were rejected |
+| Call lifecycle | Duplicate IDs did not rerun a retained call; conflicting reuse was rejected; `wait: false`, timeout and late completion passed |
+| Navigation and BFCache | Back and forward restored callable handlers without repeating initialization; document tokens renewed and unfinished old calls stayed cancelled despite late replies |
+| Permissions and cleanup | Revoking access denied calls and reads; regranting did not revive an old cached session; reload, disconnect/reconnect, read-only mode and tab closure passed |
+
+The BFCache checks observed trusted native `pageshow.persisted === true` events in the main document and both iframe origins. They verified unchanged script closure instances and initialization counts of one after restoration. Restored scripts successfully reported results, and no unexpected page JavaScript errors were observed. A normal reload was tested separately and was not used as evidence of BFCache restoration.
+
+The automated extension suite (141 tests), lint, and both MV2 and MV3 builds also passed. The companion MCP suite (25 tests), typecheck and build passed.
+
+## Remaining browser verification
+
+Firefox and Chrome MV2 have not been tested in a real browser for these changes. Repeat the call, authorization and navigation checks there before claiming cross-browser validation. In particular, verify actual persisted `pageshow` events, both script realms, same-origin and cross-origin frames, and rejection of old calls and revoked sessions. Successful compilation alone does not establish runtime behavior.
+
+The first round remains limited to script invocation and structured results. File saving is deferred to a separate round.
