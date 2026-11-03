@@ -7,10 +7,9 @@ let ready;
 /** Handler metadata by script id and name, resent when restored from BFCache */
 let registered;
 export const setMcp = response => {
-  mcp = null;
   registered = createNullObj();
   ready = response::then(data => {
-    mcp = data?.mcp || null;
+    mcp = data?.mcp;
   });
 };
 
@@ -28,7 +27,10 @@ export function restoreMcp() {
         pageId,
         scripts: objectKeys(registered)::map(id => {
           const own = registered[id];
-          return { id: +id, handlers: objectKeys(own)::map(name => own[name]) };
+          return {
+            id: +id,
+            handlers: objectKeys(own)::map(name => own[name]),
+          };
         }),
       });
       mcp = { token, sessionId, pageId };

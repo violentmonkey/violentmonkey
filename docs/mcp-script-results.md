@@ -42,7 +42,7 @@ GM.mcp.report({ event: 'ready' });
 
 Registers handlers by name and resolves to `unregister` once the extension accepted them. Names are 1–64 letters, digits, `_`, `.` or `-`. Registering an existing name replaces it and keeps the script's other handlers. A script may have up to 32 handlers per frame. The returned `unregister()` removes only the handlers this call added that were not replaced since.
 
-`description` (up to 1,024 characters) and `inputSchema` (a JSON object up to 16 Ki characters when serialized) are shown to the agent by `script_handlers`. The schema is a hint: the extension does not validate params against it, so the handler validates its own input.
+`description` (up to 1,024 characters) and `inputSchema` (a JSON object up to 16k characters when serialized) are shown to the agent by `script_handlers`. The schema is a hint: the extension does not validate params against it, so the handler validates its own input.
 
 ### `handle({ params, report })`
 
@@ -80,7 +80,7 @@ Both have `scriptId`, `frameId` and an opaque `documentId`. Filtering by `callId
 
 Timeout does not stop the userscript or undo side effects. Reusing a retained call ID with the same script, frame, handler and serialized parameters returns the existing call without executing it again; conflicting reuse is rejected. This is an in-memory guarantee, not durable deduplication. After eviction or session reset, the same ID can execute again, and reports left from the evicted call are dropped.
 
-Serialized parameters and results are each capped at 256 Ki characters; error messages at 8,192 characters. A tab may have at most 32 pending calls. Settled calls and reports expire after five minutes and may be evicted earlier under the 100-entry/approximately 2 MiB retention limits. Reads return up to 100 entries and do not consume them. In MV3 the service worker is kept alive while a call is pending. Retained results and BFCache authorization live in memory, so a restarted worker loses them.
+Serialized parameters and results are each capped at 256k characters; error messages at 8,192 characters. A tab may have at most 32 pending calls. Settled calls and reports expire after five minutes and may be evicted earlier under the 100-entry/approximately 2 MiB retention limits. Reads return up to 100 entries and do not consume them. In MV3 the service worker is kept alive while a call is pending. Retained results and BFCache authorization live in memory, so a restarted worker loses them.
 
 All three tools require a granted tab. Invocation also checks that the installed script remains enabled. Revocation, disconnect and tab closure clear channels and results. Document replacement cancels unfinished calls. Back/forward cache restoration renews the channel and restores handlers with their metadata in either parent/child event order without rerunning script initialization. Old return values and reports stay invalid. Revoking and regranting access does not resurrect a cached authorization session; reload after granting again.
 

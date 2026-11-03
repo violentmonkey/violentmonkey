@@ -70,7 +70,7 @@ async function send(cmd, id, callId, value, options) {
   const { error } = nullObjFrom(options);
   const json = jsonStringify(value === undefined ? null : value);
   if (json == null) throw new SafeError('MCP result must be JSON serializable');
-  if (json.length > MCP_RESULT_MAX) throw new SafeError('MCP result exceeds 256 Ki characters');
+  if (json.length > MCP_RESULT_MAX) throw new SafeError('MCP result exceeds 256k characters');
   await bridge.promise(cmd, {
     id,
     callId,

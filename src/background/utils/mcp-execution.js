@@ -112,7 +112,7 @@ function parseHandlers(list) {
     let inputSchema;
     if (schema != null) {
       if (typeof schema !== 'string' || schema.length > SCHEMA_MAX) {
-        fail(400, `inputSchema of MCP handler "${name}" exceeds 16 Ki characters`);
+        fail(400, `inputSchema of MCP handler "${name}" exceeds 16k characters`);
       }
       try { inputSchema = JSON.parse(schema); } catch { /* checked below */ }
       if (!inputSchema || typeof inputSchema !== 'object' || Array.isArray(inputSchema)) {
