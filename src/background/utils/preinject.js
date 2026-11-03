@@ -22,7 +22,7 @@ import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
 import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
 import { recordScripts, markRun, startLoad, isActive } from './mcp-observe';
 import { hasGrant } from './mcp-grants';
-import { getDocumentContext, startDocument } from './mcp-execution';
+import { startDocument } from './mcp-execution';
 
 addOwnCommands({
   [SKIP_SCRIPTS]: reloadAndSkipScripts,
@@ -34,8 +34,7 @@ addPublicCommands({
     const { tab, [kFrameId]: frameId, [kTop]: isTop } = src;
     const frameDoc = getFrameDocId(isTop, src[kDocumentId], frameId);
     const tabId = tab.id;
-    const mcpToken = isActive() && hasGrant(tabId) && startDocument(tabId, frameId);
-    const mcpContext = mcpToken && getDocumentContext(tabId);
+    const mcp = isActive() && hasGrant(tabId) && startDocument(tabId, frameId);
     if (!url) url = src.url || tab.url;
     clearFrameData(tabId, frameDoc);
     let skip = skippedTabs[tabId];
@@ -85,7 +84,7 @@ addPublicCommands({
     // `inject` is a cached object, so the flag goes on a copy. The opt-in fast-forward
     // path ignores this reply, and its data is cached per URL, so it can't carry a
     // per-tab grant — log capture needs a normal load.
-    return granted ? { ...res, [kLogCapture]: true, mcpToken, mcpContext } : res;
+    return granted ? { ...res, [kLogCapture]: true, mcp } : res;
   },
   async InjectionFeedback({
     [FORCE_CONTENT]: forceContent,

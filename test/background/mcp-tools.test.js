@@ -1,9 +1,10 @@
 import { createClient } from '@violentmonkey/mcp-client';
 import browser from '@/common/browser';
+import { keepAlive } from '@/common';
 import { commands } from '@/background/utils/init';
 import { getScriptById } from '@/background/utils/db';
 import { requestMcpConnection } from '@/background/utils/mcp';
-import { getDocumentContext, startDocument } from '@/background/utils/mcp-execution';
+import { startDocument } from '@/background/utils/mcp-execution';
 
 jest.mock('@violentmonkey/mcp-client', () => ({
   createClient: jest.fn(),
@@ -12,6 +13,7 @@ jest.mock('@violentmonkey/mcp-client', () => ({
     constructor(code, message) { super(message); this.code = code; }
   },
 }), { virtual: true }); // upstream only exposes an ESM import condition
+jest.mock('@/common', () => ({ ...jest.requireActual('@/common'), keepAlive: jest.fn() }));
 jest.mock('@/background/utils/init', () => {
   const handlers = {};
   return {
@@ -32,8 +34,11 @@ jest.mock('@/background/utils/storage', () => ({}));
 jest.mock('@/background/utils/tester', () => ({}));
 
 let tools;
+let mcp;
 let token;
 const sender = { tab: { id: 7 }, frameId: 0 };
+const sum = { name: 'sum', description: 'Echoes params', schema: '{"type":"object"}' };
+const call = opts => tools.script_call({ tabId: 7, scriptId: 1, handler: 'sum', ...opts });
 
 beforeEach(() => {
   tools = {};
@@ -45,66 +50,102 @@ beforeEach(() => {
     close: () => onStatus('closed'),
   });
   browser.tabs.get = jest.fn(async id => ({ id, url: 'https://example.com/' }));
-  browser.tabs.sendMessage = jest.fn(async (tabId, { data }) => {
-    commands.ScriptResult({ id: data.id, callId: data.callId, token: data.token, json: JSON.stringify(data.params) }, sender);
+  browser.tabs.sendMessage = jest.fn(async (tabId, { data: { id, token: t, args } }) => {
+    commands.McpReturn({ id, callId: args.callId, token: t, json: JSON.stringify(args.params) }, sender);
     return true;
   });
   requestMcpConnection('https://example.com/?port=5678&token=test');
   commands.McpApprove();
   commands.McpGrantTab(7);
-  token = startDocument(7, 0);
-  commands.RegisterMcpHandler({ id: 1, token }, sender);
+  mcp = startDocument(7, 0);
+  ({ token } = mcp);
+  commands.McpRegister({ id: 1, token, handlers: [sum] }, sender);
 });
 afterEach(() => commands.McpDisconnect());
 
-test('tool call dispatches to the target frame and returns the matching structured result', async () => {
-  const { result } = await tools.script_call({ tabId: 7, scriptId: 1, params: { rows: [0, false] } });
-  expect(result).toMatchObject({ status: 'completed', scriptId: 1, value: { rows: [0, false] } });
+test('tool call dispatches to the named handler and returns the matching structured result', async () => {
+  const { result } = await call({ params: { rows: [0, false] } });
+  expect(result).toMatchObject({
+    kind: 'call', status: 'completed', scriptId: 1, handler: 'sum', value: { rows: [0, false] },
+  });
   expect(browser.tabs.sendMessage).toHaveBeenCalledWith(7, {
-    cmd: 'McpCall', data: { id: 1, callId: result.callId, params: { rows: [0, false] }, token },
+    cmd: 'McpCall',
+    data: { id: 1, token, args: { callId: result.callId, handler: 'sum', params: { rows: [0, false] } } },
   }, { frameId: 0 });
   expect(await tools.script_results({ tabId: 7, callId: result.callId }))
   .toMatchObject({ entries: [result] });
-  expect(await tools.script_handlers({ tabId: 7 })).toEqual({ handlers: [{ scriptId: 1, frameId: 0 }] });
+  expect(await tools.script_handlers({ tabId: 7 })).toEqual({
+    scripts: [{
+      scriptId: 1,
+      frameId: 0,
+      handlers: [{ name: 'sum', description: 'Echoes params', inputSchema: { type: 'object' } }],
+    }],
+  });
+});
+
+test('reports and unregistering go through the authorized channel', async () => {
+  const { result } = await call({});
+  expect(commands.McpReport({ id: 1, token, callId: result.callId, json: '"later"' }, sender)).toBe(true);
+  expect(commands.McpReport({ id: 1, token, json: '"event"' }, sender)).toBe(true);
+  const { entries } = await tools.script_results({ tabId: 7, scriptId: 1 });
+  expect(entries.map(e => [e.kind, e.callId, e.value])).toEqual([
+    ['call', result.callId, null], ['report', result.callId, 'later'], ['report', undefined, 'event'],
+  ]);
+  commands.McpUnregister({ id: 1, token, names: ['sum'] }, sender);
+  expect(await tools.script_handlers({ tabId: 7 })).toEqual({ scripts: [] });
+  await expect(call({})).rejects.toMatchObject({ code: 404 });
 });
 
 test('wait=false returns immediately and repeated IDs do not dispatch again', async () => {
   browser.tabs.sendMessage.mockResolvedValue(true);
-  const args = { tabId: 7, scriptId: 1, callId: 'queued', wait: false };
-  expect((await tools.script_call(args)).result.status).toBe('pending');
-  expect((await tools.script_call(args)).result.status).toBe('pending');
+  const args = { callId: 'queued', wait: false };
+  expect((await call(args)).result.status).toBe('pending');
+  expect((await call(args)).result.status).toBe('pending');
   expect(browser.tabs.sendMessage).toHaveBeenCalledTimes(1);
-  commands.ScriptResult({ id: 1, token, callId: 'queued', json: 'false' }, sender);
-  expect((await tools.script_call({ ...args, wait: true })).result.value).toBe(false);
+  commands.McpReturn({ id: 1, token, callId: 'queued', json: 'false' }, sender);
+  expect((await call({ ...args, wait: true })).result.value).toBe(false);
+});
+
+test('MV3 keeps the worker alive while a new call is pending', async () => {
+  browser.tabs.sendMessage.mockResolvedValue(true);
+  __.MV3 = true;
+  try {
+    await call({ callId: 'kept', wait: false });
+    await call({ callId: 'kept', wait: false });
+  } finally {
+    delete __.MV3;
+  }
+  expect(keepAlive).toHaveBeenCalledTimes(1);
+  expect(keepAlive).toHaveBeenCalledWith(expect.any(Promise));
 });
 
 test('authorization gates calls and reads, and revocation clears results', async () => {
-  await expect(tools.script_call({ tabId: 8, scriptId: 1 })).rejects.toMatchObject({ code: 403 });
-  await tools.script_call({ tabId: 7, scriptId: 1 });
+  await expect(tools.script_call({ tabId: 8, scriptId: 1, handler: 'sum' })).rejects.toMatchObject({ code: 403 });
+  await call({});
   commands.McpRevokeTab(7);
   await expect(tools.script_results({ tabId: 7 })).rejects.toMatchObject({ code: 403 });
-  expect(() => commands.ScriptResult({ id: 1, token, json: '1' }, sender)).toThrow(/not authorized/);
+  expect(() => commands.McpReport({ id: 1, token, json: '1' }, sender)).toThrow(/not authorized/);
+  expect(() => commands.McpRegister({ id: 1, token, handlers: [sum] }, sender)).toThrow(/not authorized/);
   commands.McpGrantTab(7);
   expect((await tools.script_results({ tabId: 7 })).entries).toEqual([]);
 });
 
 test('delivery failures complete the call instead of hanging', async () => {
   browser.tabs.sendMessage.mockRejectedValue(new Error('Receiving end does not exist'));
-  const { result } = await tools.script_call({ tabId: 7, scriptId: 1 });
+  const { result } = await call({});
   expect(result).toMatchObject({ status: 'failed', error: 'Receiving end does not exist' });
 });
 
 test('restored pages can be called and cannot revive revoked or inactive channels', async () => {
-  const context = getDocumentContext(7);
-  const data = { ...context, scriptIds: [1] };
+  const data = { sessionId: mcp.sessionId, pageId: mcp.pageId, scripts: [{ id: 1, handlers: [sum] }] };
   startDocument(7, 0);
   expect(() => commands.McpRestoreDocument(data, { ...sender, documentLifecycle: 'cached' }))
   .toThrow(/active document/);
   const restored = commands.McpRestoreDocument(data, { ...sender, documentLifecycle: 'active' });
-  expect(restored.mcpToken).not.toBe(token);
-  const { result } = await tools.script_call({ tabId: 7, scriptId: 1, params: 'restored' });
+  expect(restored.token).not.toBe(token);
+  const { result } = await call({ params: 'restored' });
   expect(result).toMatchObject({ status: 'completed', value: 'restored' });
-  expect(() => commands.ScriptResult({ id: 1, token, json: '0' }, sender)).toThrow(/different document/);
+  expect(() => commands.McpReport({ id: 1, token, json: '0' }, sender)).toThrow(/different document/);
 
   commands.McpRevokeTab(7);
   expect(() => commands.McpRestoreDocument(data, sender)).toThrow(/not authorized/);
@@ -114,12 +155,15 @@ test('restored pages can be called and cannot revive revoked or inactive channel
 });
 
 test('restoration skips disabled/deleted handlers without blocking other scripts', async () => {
-  const context = getDocumentContext(7);
   startDocument(7, 0);
   getScriptById.mockReturnValueOnce({ config: { enabled: 1 } })
   .mockReturnValueOnce({ config: { enabled: 0 } })
   .mockReturnValueOnce({ config: { removed: 1 } })
   .mockReturnValueOnce(undefined);
-  commands.McpRestoreDocument({ ...context, scriptIds: [1, 2, 3, 4] }, sender);
-  expect(await tools.script_handlers({ tabId: 7 })).toEqual({ handlers: [{ scriptId: 1, frameId: 0 }] });
+  commands.McpRestoreDocument({
+    sessionId: mcp.sessionId,
+    pageId: mcp.pageId,
+    scripts: [1, 2, 3, 4].map(id => ({ id, handlers: [sum] })),
+  }, sender);
+  expect((await tools.script_handlers({ tabId: 7 })).scripts.map(s => s.scriptId)).toEqual([1]);
 });

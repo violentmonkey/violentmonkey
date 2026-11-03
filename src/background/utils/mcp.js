@@ -1,6 +1,6 @@
 import { ErrorCode, createClient, ToolCallError } from '@violentmonkey/mcp-client';
 import browser from '@/common/browser';
-import { i18n } from '@/common';
+import { i18n, keepAlive } from '@/common';
 import { extensionOptionsPage } from '@/common/safe-globals';
 import { getScriptRunAt } from '@/common/script';
 import {
@@ -9,8 +9,8 @@ import {
 import { addOwnCommands, addPublicCommands } from './init';
 import { grantTab, hasGrant, listGrants, revokeTab } from './mcp-grants';
 import {
-  beginCall, clearExecution, dropExecutionTab, failCall, getHandlers, getResults,
-  registerHandler, reportResult, restoreDocument,
+  addReport, beginCall, clearExecution, dropExecutionTab, failCall, getHandlers, getResults,
+  registerHandlers, restoreDocument, settleCall, unregisterHandlers,
 } from './mcp-execution';
 import {
   addLogs, clear as clearObserved, dropTab, getLogs, getScripts as getTabScripts,
@@ -33,6 +33,11 @@ let current = null;
 
 /** Whether an agent may read this tab: the server is up and the user granted the tab */
 const isObserving = tabId => status === 'open' && hasGrant(tabId);
+const getObservedTab = src => {
+  const tabId = src?.tab?.id;
+  if (!isObserving(tabId)) throw new Error('Tab is not authorized for MCP');
+  return tabId;
+};
 
 addOwnCommands({
   McpGetState: () => ({
@@ -99,29 +104,36 @@ tabsOnRemoved.addListener((tabId) => {
 
 /** Script calls, results and logs forwarded by authorized content scripts. */
 addPublicCommands({
-  McpRestoreDocument(data, src) {
-    const tabId = src?.tab?.id;
-    if (!isObserving(tabId)) throw new Error('Tab is not authorized for MCP');
+  McpRestoreDocument({ sessionId, pageId, scripts }, src) {
+    const tabId = getObservedTab(src);
     if (src.documentLifecycle && src.documentLifecycle !== 'active') {
       throw new Error('Only an active document can restore its MCP channel');
     }
-    const scriptIds = Array.isArray(data.scriptIds) && data.scriptIds.filter(id => {
-      const script = getScriptById(id);
-      return script && !script.config.removed && script.config.enabled;
-    });
-    return { mcpToken: restoreDocument(tabId, src.frameId || 0, { ...data, scriptIds }) };
+    if (Array.isArray(scripts)) {
+      scripts = scripts.filter(s => {
+        const script = getScriptById(s?.id);
+        return script && !script.config.removed && script.config.enabled;
+      });
+    }
+    return { token: restoreDocument(tabId, src.frameId || 0, { sessionId, pageId, scripts }) };
   },
-  RegisterMcpHandler({ id, token }, src) {
-    const tabId = src?.tab?.id;
-    if (!isObserving(tabId)) throw new Error('Tab is not authorized for MCP');
+  McpRegister({ id, token, handlers }, src) {
+    const tabId = getObservedTab(src);
     getAliveScript(id);
-    return registerHandler(tabId, src.frameId || 0, token, id);
+    return registerHandlers(tabId, src.frameId || 0, token, id, handlers);
   },
-  ScriptResult(data, src) {
-    const tabId = src?.tab?.id;
-    if (!isObserving(tabId)) throw new Error('Tab is not authorized for MCP');
+  McpUnregister({ id, token, names }, src) {
+    return unregisterHandlers(getObservedTab(src), src.frameId || 0, token, id, names);
+  },
+  McpReport(data, src) {
+    const tabId = getObservedTab(src);
     getAliveScript(data.id);
-    return reportResult(tabId, src.frameId || 0, data.token, data);
+    return addReport(tabId, src.frameId || 0, data.token, data);
+  },
+  McpReturn(data, src) {
+    const tabId = getObservedTab(src);
+    getAliveScript(data.id);
+    return settleCall(tabId, src.frameId || 0, data.token, data);
   },
   ScriptLog({ entries, dropped }, src) {
     const tabId = src?.tab?.id;
@@ -204,6 +216,8 @@ function registerTools(c) {
     if (typeof wait !== 'boolean') throw new ToolCallError(ErrorCode.InvalidParams, 'wait must be boolean');
     const call = beginCall(tabId, opts);
     if (call.isNew) {
+      // With wait=false nothing else may keep the worker alive until the call settles.
+      if (__.MV3) keepAlive(call.promise);
       // Do not await transport delivery: the call timeout also covers a missing receiver.
       Promise.resolve().then(() => browser.tabs.sendMessage(tabId, { cmd: 'McpCall', data: call.message }, {
         frameId: call.result.frameId,

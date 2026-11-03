@@ -1,7 +1,7 @@
 import { isEmpty } from '../util';
 import * as bridge from './bridge';
 import { reportLog } from './logs';
-import { registerMcpHandler, reportResult } from './mcp';
+import { makeMcpApi } from './mcp';
 import { onTabCreate } from './tabs';
 import { onRequestCreate, onRequestInitError } from './requests';
 import { createNotification } from './notifications';
@@ -81,8 +81,7 @@ export const GM_API_CTX_GM4ASYNC = {
 /** Context-bound. Methods mirrored to GM4_ALIAS are async when used as GM.xxx */
 export const GM_API_CTX = {
   __proto__: null,
-  GM_registerMcpHandler: registerMcpHandler,
-  GM_reportResult: reportResult,
+  GM_mcp: makeMcpApi,
   /**
    * @callback GMValueChangeListener
    * @param {String} key
