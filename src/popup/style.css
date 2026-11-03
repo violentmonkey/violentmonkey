@@ -12,6 +12,7 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
+$tardyIconSize: 16px;
 $itemWidth: 2rem;
 $submenuButtonPad: calc(($itemWidth - $iconSize) / 2);
 $submenuButtonsWidth: calc(2 * (2 * $submenuButtonPad + $iconSize));
@@ -128,15 +129,6 @@ footer {
   align-self: stretch;
   align-items: center;
   display: flex;
-  .tardy {
-    margin-left: .5rem;
-    color: red;
-    .icon {
-      width: 16px;
-      height: 16px;
-      vertical-align: text-bottom;
-    }
-  }
 }
 
 .menu-buttons {
@@ -252,22 +244,39 @@ footer {
     }
   }
   &-buttons {
-    display: none;
+    display: flex;
+    align-items: center;
     position: absolute;
     top: 0;
     right: 0;
-    .script:hover &, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
-    .script:focus-within &,
-    .script.extras-shown &,
-    .touch & {
-      display: flex;
+    height: $itemWidth; 
+    pointer-events: none; 
+    > * {
+      pointer-events: auto;
+    }
+    .tardy {
+      margin-left: 0;
+      color: red;
+      padding: .5rem;
+      .icon {
+        width: $tardyIconSize;
+        height: $tardyIconSize;
+        vertical-align: text-bottom;
+      }
     }
   }
   &-button {
+    display: none;
     padding: $submenuButtonPad;
     line-height: 1;
     background: var(--bg);
     cursor: pointer;
+    .script:hover &, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
+    .script:focus-within &,
+    .script.extras-shown &,
+    .touch & {
+      display: block;
+    }
     &:hover, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
     &:focus {
       color: var(--bg);
@@ -309,11 +318,24 @@ footer {
   }
 }
 
+.script { 
+  /* minimum space to the left of the buttons when they appear */
+  --reserve: $submenuButtonsGap;
+}
+.script.has-tardy   { --reserve: calc($tardyIconSize + 2 * $submenuButtonsGap); }
+.script.has-tardy-2 { --reserve: calc(2 * ($tardyIconSize + 2 * $submenuButtonsGap)); }
+
+.menu-item {
+  /* at rest: keep 14px, or the badge width if it's wider */
+  padding-right: max($itemPaddingX, var(--reserve));
+}
+
 .script:hover > .menu-item,
 .script:focus-within > .menu-item,
 .script.extras-shown > .menu-item,
 .touch .script > .menu-item {
-  padding-right: calc($submenuButtonsWidth + $submenuButtonsGap);
+  /* buttons appear to the right of the badge cluster -> add their width */
+  padding-right: calc($submenuButtonsWidth + var(--reserve));
 }
 
 .failure-reason {
