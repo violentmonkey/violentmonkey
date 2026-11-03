@@ -1,5 +1,6 @@
 import * as bridge from './bridge';
 import { GM4_ALIAS, GM_API, GM_API_CTX, GM_API_CTX_GM4ASYNC, gmCookieInvoker } from './gm-api';
+import { makeMcpApi } from './mcp';
 import { makeGlobalWrapper } from './gm-global-wrapper';
 import { makeComponentUtils, safeCopy, thisObjectProto } from './util';
 
@@ -64,6 +65,8 @@ export function makeGmApiWrapper(script) {
             list: safeBind(fn, ctx, 'CookieList', /*hasResult=*/true),
             set: safeBind(fn, ctx, 'CookieSet', /*hasResult=*/false),
           };
+        } else if (fn === makeMcpApi) {
+          fn = makeMcpApi(ctx);
         } else {
           fn = safeBind(fn, ctx);
         }

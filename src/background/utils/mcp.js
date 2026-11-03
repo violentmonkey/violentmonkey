@@ -1,6 +1,6 @@
 import { ErrorCode, createClient, ToolCallError } from '@violentmonkey/mcp-client';
 import browser from '@/common/browser';
-import { i18n } from '@/common';
+import { i18n, keepAlive } from '@/common';
 import { extensionOptionsPage } from '@/common/safe-globals';
 import { getScriptRunAt } from '@/common/script';
 import {
@@ -8,6 +8,10 @@ import {
 } from './db';
 import { addOwnCommands, addPublicCommands } from './init';
 import { grantTab, hasGrant, listGrants, revokeTab } from './mcp-grants';
+import {
+  addReport, beginCall, clearExecution, dropExecutionTab, failCall, getHandlers, getResults,
+  registerHandlers, restoreDocument, settleCall, unregisterHandlers,
+} from './mcp-execution';
 import {
   addLogs, clear as clearObserved, dropTab, getLogs, getScripts as getTabScripts,
   isCapturing, reserveLoad, setActive,
@@ -29,6 +33,11 @@ let current = null;
 
 /** Whether an agent may read this tab: the server is up and the user granted the tab */
 const isObserving = tabId => status === 'open' && hasGrant(tabId);
+const getObservedTab = src => {
+  const tabId = src?.tab?.id;
+  if (!isObserving(tabId)) throw new Error('Tab is not authorized for MCP');
+  return tabId;
+};
 
 addOwnCommands({
   McpGetState: () => ({
@@ -50,6 +59,7 @@ addOwnCommands({
     status = 'idle';
     dropGrants();
     clearObserved();
+    clearExecution();
   },
   /** Open tabs and whether the agent may act on them, for the settings page */
   async McpGetTabs() {
@@ -73,6 +83,7 @@ addOwnCommands({
   McpRevokeTab(tabId) {
     revokeTab(tabId);
     dropTab(tabId);
+    dropExecutionTab(tabId);
   },
 });
 
@@ -81,16 +92,49 @@ function dropGrants() {
   for (const tabId of listGrants()) {
     revokeTab(tabId);
     dropTab(tabId);
+    dropExecutionTab(tabId);
   }
 }
 
 tabsOnRemoved.addListener((tabId) => {
   revokeTab(tabId);
   dropTab(tabId);
+  dropExecutionTab(tabId);
 });
 
-/** GM_log output, forwarded by content scripts of tabs the agent may read */
+/** Script calls, results and logs forwarded by authorized content scripts. */
 addPublicCommands({
+  McpRestoreDocument({ sessionId, pageId, scripts }, src) {
+    const tabId = getObservedTab(src);
+    if (src.documentLifecycle && src.documentLifecycle !== 'active') {
+      throw new Error('Only an active document can restore its MCP channel');
+    }
+    if (Array.isArray(scripts)) {
+      scripts = scripts.filter(s => {
+        const script = getScriptById(s?.id);
+        return script && !script.config.removed && script.config.enabled;
+      });
+    }
+    return { token: restoreDocument(tabId, src.frameId || 0, { sessionId, pageId, scripts }) };
+  },
+  McpRegister({ id, token, handlers }, src) {
+    const tabId = getObservedTab(src);
+    getAliveScript(id);
+    return registerHandlers(tabId, src.frameId || 0, token, id, handlers);
+  },
+  McpUnregister({ id, token, names }, src) {
+    return unregisterHandlers(getObservedTab(src), src.frameId || 0, token, id, names);
+  },
+  McpReport(data, src) {
+    const tabId = getObservedTab(src);
+    getAliveScript(data.id);
+    return addReport(tabId, src.frameId || 0, data.token, data);
+  },
+  McpReturn(data, src) {
+    const tabId = getObservedTab(src);
+    getAliveScript(data.id);
+    return settleCall(tabId, src.frameId || 0, data.token, data);
+  },
   ScriptLog({ entries, dropped }, src) {
     const tabId = src?.tab?.id;
     if (tabId == null || !entries?.length && !dropped) return;
@@ -130,6 +174,7 @@ function connect({ port, token }) {
     if (s === 'closed') {
       dropGrants();
       clearObserved();
+      clearExecution();
     }
   });
   client.connect();
@@ -155,6 +200,33 @@ function toSummary({ props, meta, config }) {
 }
 
 function registerTools(c) {
+  // Convert validation failures into protocol errors while keeping script failures
+  // as structured execution results (with a callId the caller can query).
+  const handleExecution = (name, fn) => c.handle(name, async (params) => {
+    await getGrantedTab(params.tabId);
+    try { return await fn(params); } catch (e) {
+      throw new ToolCallError(e.code || ErrorCode.Internal, e.message || String(e));
+    }
+  });
+  handleExecution('script_handlers', ({ tabId }) => getHandlers(tabId));
+  handleExecution('script_results', ({ tabId, ...opts }) => getResults(tabId, opts));
+  handleExecution('script_call', async ({ tabId, wait = true, ...opts }) => {
+    const script = getAliveScript(opts.scriptId);
+    if (!script.config.enabled) throw new ToolCallError(ErrorCode.Denied, 'Script is disabled');
+    if (typeof wait !== 'boolean') throw new ToolCallError(ErrorCode.InvalidParams, 'wait must be boolean');
+    const call = beginCall(tabId, opts);
+    if (call.isNew) {
+      // With wait=false nothing else may keep the worker alive until the call settles.
+      if (__.MV3) keepAlive(call.promise);
+      // Do not await transport delivery: the call timeout also covers a missing receiver.
+      Promise.resolve().then(() => browser.tabs.sendMessage(tabId, { cmd: 'McpCall', data: call.message }, {
+        frameId: call.result.frameId,
+      })).then((accepted) => {
+        if (!accepted) failCall(tabId, call.result.callId, 'Script document is no longer available');
+      }, e => failCall(tabId, call.result.callId, e.message || e));
+    }
+    return { result: wait ? await call.promise : call.result };
+  });
   c.handle('scripts_list', ({ query }) => {
     const q = query?.toLocaleLowerCase();
     return {

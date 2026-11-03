@@ -2,6 +2,7 @@ import * as bridge from './bridge';
 import { onClipboardCopy } from './clipboard';
 import { injectPageSandbox, injectScripts } from './inject';
 import { setLogCapture } from './logs';
+import { setMcp } from './mcp';
 import './notifications';
 import './requests';
 import './tabs';
@@ -27,6 +28,8 @@ async function init() {
   }, {
     retry: true,
   });
+  // Even the cached/fast injection path needs this document's private MCP token.
+  setMcp(dataPromise);
   // detecting if browser.contentScripts is usable, it was added in FF59 as well as composedPath
   /** @type {VMInjection} */
   const data = regData || xhrData || await (canReg ? getRegistration(dataPromise) : dataPromise);

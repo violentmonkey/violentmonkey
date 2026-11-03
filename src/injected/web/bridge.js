@@ -22,7 +22,7 @@ export const onHandle = ({ cmd, data, node }) => {
  */
 export const promise = (cmd, data, node) => {
   const prr = SafePromiseWithResolvers();
-  call(cmd, data, node, prr.resolve);
+  call(cmd, data, node, prr.resolve, false, prr.reject);
   return prr.promise;
 };
 /**
@@ -32,14 +32,15 @@ export const promise = (cmd, data, node) => {
  * @param {(this: Node, res: any, err?: Error) => any} [cb] - callback
  * @param {boolean} [cbAsync] - to keep the original callstack in the async error provided to `cb`,
  *                              note that Promise already tracks the caller in modern browsers.
+ * @param {(err: Error) => any} [cbError] - receives the error instead of `cb`
  * @return {any} the result in synchronous mode (no `cb`)
  */
-export const call = (cmd, data, node, cb, cbAsync) => {
+export const call = (cmd, data, node, cb, cbAsync, cbError) => {
   let res, err;
   const id = safeGetUniqId();
   callbacks[id] = [
     cb || ((a, b) => { res = a; err = b; }),
-    cbAsync && new SafeError(),
+    cbError || cbAsync && new SafeError(),
   ];
   post(cmd, { [CALLBACK_ID]: id, data }, node);
   if (!cb) {

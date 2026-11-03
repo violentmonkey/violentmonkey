@@ -65,8 +65,12 @@ bridge.addHandlers({
     const cb = bridge.callbacks[id];
     delete bridge.callbacks[id];
     if (cb) {
-      if (err && cb[1]) addErrorStack(err, cb[1]);
-      this::cb[0](res, err);
+      if (err && isFunction(cb[1])) {
+        cb[1](err);
+      } else {
+        if (err && cb[1]) addErrorStack(err, cb[1]);
+        this::cb[0](res, err);
+      }
     } else if (err) {
       throw err;
     }

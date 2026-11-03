@@ -27,6 +27,25 @@ declare interface GMContext {
   displayName: string;
 }
 
+declare type GMMcpReport = (value: unknown, options?: { error?: string }) => Promise<void>;
+declare interface GMMcpHandler {
+  description?: string;
+  /** JSON Schema shown to the agent as a hint; the handler validates its own params. */
+  inputSchema?: { [key: string]: PlainJSONValue };
+  /** Settles the call with its return value or thrown error. */
+  handle(call: { params: PlainJSONValue; report: GMMcpReport }): unknown;
+}
+declare interface GMMcp {
+  /** Merges handlers by name. Resolves to a function that removes the handlers it added. */
+  register(handlers: { [name: string]: GMMcpHandler }): Promise<() => Promise<void>>;
+  /** Reports a result that is not tied to a call. */
+  report: GMMcpReport;
+}
+declare const GM_mcp: GMMcp;
+declare namespace GM {
+  const mcp: GMMcp;
+}
+
 /**
  * GM_xmlhttpRequest paraphernalia
  */
@@ -320,6 +339,9 @@ declare interface VMInjection extends VMInjectionDisabled, VMInjectionFlags {
   /** cache key for envDelayed, which also tells content bridge to expect envDelayed */
   more: string;
   nonce?: string;
+  /** Private per-document MCP channel, only sent to the content bridge.
+   * sessionId and pageId restore it after BFCache. */
+  mcp?: { token: string; sessionId: string; pageId: string };
   /** `page` mode will be necessary */
   page: boolean;
   scripts: VMInjection.Script[];

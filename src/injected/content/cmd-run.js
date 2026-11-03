@@ -1,5 +1,6 @@
 import * as bridge from './bridge';
 import { sendSetPopup } from './gm-api-content';
+import { restoreMcp } from './mcp';
 import { nextTask, sendCmd } from './util';
 
 const getPersisted = describeProperty(PageTransitionEvent[PROTO], 'persisted').get;
@@ -28,6 +29,7 @@ function onShown(evt) {
       report();
       topRenderMode = 4; // eslint-disable-line no-global-assign
     } else if (evt::getPersisted()) {
+      restoreMcp();
       report(0, 'bfcache');
     }
   }
