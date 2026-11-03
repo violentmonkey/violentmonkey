@@ -12,11 +12,9 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
-$tardyIconSize: 16px;
+$issueIconSize: 16px; 
 $itemWidth: 2rem;
 $submenuButtonPad: calc(($itemWidth - $iconSize) / 2);
-$submenuButtonsWidth: calc(2 * (2 * $submenuButtonPad + $iconSize));
-$submenuButtonsGap: .5rem;
 
 $hoverColor: var(--bg);
 $hoverBack: cornflowerblue;
@@ -246,22 +244,17 @@ footer {
   &-buttons {
     display: flex;
     align-items: center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: $itemWidth; 
-    pointer-events: none; 
-    > * {
-      pointer-events: auto;
-    }
-    .tardy {
-      margin-left: 0;
-      color: red;
+    flex-shrink: 0;
+    .issue {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: .5rem;
+      color: red;
       .icon {
-        width: $tardyIconSize;
-        height: $tardyIconSize;
-        vertical-align: text-bottom;
+        display: block;
+        width: $issueIconSize;
+        height: $issueIconSize;
       }
     }
   }
@@ -282,7 +275,7 @@ footer {
       color: var(--bg);
       background: $hoverBack;
     }
-    .menu-item:hover + .submenu-buttons &:not(:focus):not(:hover) {
+    .menu-item:hover &:not(:focus):not(:hover) {
       background: var(--button-hover-inactive-bg, $hoverButtonInactiveBack);
     }
     .icon {
@@ -318,24 +311,11 @@ footer {
   }
 }
 
-.script { 
-  /* minimum space to the left of the buttons when they appear */
-  --reserve: $submenuButtonsGap;
-}
-.script.has-tardy   { --reserve: calc($tardyIconSize + 2 * $submenuButtonsGap); }
-.script.has-tardy-2 { --reserve: calc(2 * ($tardyIconSize + 2 * $submenuButtonsGap)); }
-
-.menu-item {
-  /* at rest: keep 14px, or the badge width if it's wider */
-  padding-right: max($itemPaddingX, var(--reserve));
-}
-
-.script:hover > .menu-item,
-.script:focus-within > .menu-item,
-.script.extras-shown > .menu-item,
-.touch .script > .menu-item {
-  /* buttons appear to the right of the badge cluster -> add their width */
-  padding-right: calc($submenuButtonsWidth + var(--reserve));
+.script > .menu-item {
+  padding-right: 0;
+  > .script-name {
+    padding-right: .5rem;
+  }
 }
 
 .failure-reason {
