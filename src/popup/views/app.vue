@@ -86,7 +86,6 @@
         <div
           v-for="item in /** @type {(VMScript & ScopeListItem)[]} */scope.list"
           :key="item.id"
-          :data-issues="(!store.failure && item.more ? 1 : 0) + (item.grantless ? 1 : 0) || null"
           :class="{
             disabled: !item.config.enabled,
             failed: item.failed,
@@ -112,31 +111,31 @@
               <sup class="syntax" v-if="item.syntax" v-text="i18n('msgSyntaxError')"/>
               <div class="ellipsis" v-text="item.name" :data-message="item.name"/>
             </div>
-            <div class="submenu-buttons">
-              <a v-if="!store.failure && item.more"
-                class="issue" tabindex="0" :title="TARDY_MATCH"
-                @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
-                <Icon name="info"/>
-              </a>
-              <a v-if="item.grantless"
-                class="issue" tabindex="0" :title="item.grantless"
-                @click.stop="note = note === item.grantless ? '' : item.grantless">
-                @
-              </a>
-              <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
-              <div class="submenu-button" :tabIndex @click="onEditScript(item)"
-                  :title="i18n('buttonEditClickHint')">
-                <icon name="code"></icon>
-              </div>
-              <div
-                class="submenu-button"
-                :tabIndex
-                :_item.prop="item"
-                @click="showExtras">
-                <icon name="more"/>
-              </div>
-            </div>
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
+          </div>
+          <div class="submenu-buttons">
+            <a v-if="!store.failure && item.more"
+               class="issue" tabindex="0" :title="TARDY_MATCH"
+               @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
+              <Icon name="info"/>
+            </a>
+            <a v-if="item.grantless"
+               class="issue" tabindex="0" :title="item.grantless"
+               @click.stop="note = note === item.grantless ? '' : item.grantless">
+              @
+            </a>
+            <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
+            <div class="submenu-button" :tabIndex @click="onEditScript(item)"
+                :title="i18n('buttonEditClickHint')">
+              <icon name="code"></icon>
+            </div>
+            <div
+              class="submenu-button"
+              :tabIndex
+              :_item.prop="item"
+              @click="showExtras">
+              <icon name="more"/>
+            </div>
           </div>
           <div v-if="item.excludes" class="excludes-menu mb-1c mr-1c">
             <button v-for="(val, key) in item.excludes[1]" :key

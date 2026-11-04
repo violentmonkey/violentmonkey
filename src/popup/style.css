@@ -246,14 +246,20 @@ footer {
     align-items: center;
     flex-shrink: 0;
     .issue {
+      box-sizing: border-box;
+      width: $itemWidth;                          /* 2rem = 28px */
+      height: $itemWidth;
+      padding: 0;                                 /* was .5rem */
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: .5rem;
       color: red;
+      &:focus-visible {
+        outline: 1px solid currentColor;
+        outline-offset: -1px;
+      }
       .icon {
-        display: block;
-        width: $issueIconSize;
+        width: $issueIconSize;                    /* 16px, fits */
         height: $issueIconSize;
       }
     }
@@ -311,11 +317,20 @@ footer {
   }
 }
 
-.script > .menu-item {
-  padding-right: 0;
-  > .script-name {
+.script {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;   /* buttons stay on line 1 when .upd wraps inside .menu-item */
+  > .menu-item {
+    flex: 1;
+    min-width: 0;              /* lets the name ellipsize instead of pushing the buttons off */
     padding-right: .5rem;
   }
+}
+
+.excludes-menu,
+.submenu-commands {
+  flex-basis: 100%;
 }
 
 .failure-reason {
