@@ -32,17 +32,18 @@ addPublicCommands({
     const frameId = getFrameDocIdFromSrc(src);
     const { id, events } = opts;
     const dl = fileName != null;
-    const req = requests[id] = /** @type {GMReq.BG} */ {
-      id,
-      tabId,
-      [kFrameId]: frameId,
-      [kFileName]: fileName,
-      frame: getFrameDocIdAsObj(frameId),
-    };
     // browser.downloads API was removed in mobile Firefox 79 and downloads via bg DOM
     // don't show the SaveAs dialog and either save silently into a random name or do nothing
     const dlInTab = dl && IS_FIREFOX && FIREFOX >= 79;
     const dlInApi = dl && !dlInTab && permissionDownloads && getOption(kGmDownloadViaApi);
+    const req = requests[id] = /** @type {GMReq.BG} */ {
+      id,
+      tabId,
+      dl: dlInTab ? 'tab' : dl,
+      [kFrameId]: frameId,
+      [kFileName]: fileName,
+      frame: getFrameDocIdAsObj(frameId),
+    };
     /** @param {GMReq.Message.BGAny} res */
     const cb = async res => {
       if (!requests[id]) return;
@@ -73,7 +74,6 @@ addPublicCommands({
       cbe: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
-    req.dl = dlInTab ? 'tab' : dl;
     if (dlInTab) {
       events[0].load = true;
     }
