@@ -731,9 +731,6 @@ labelRunAt:
 labelRunAtDefault:
   description: Shown when custom @run-at is not assigned.
   message: (Default)
-labelScriptOff:
-  description: Badge next to the name of a disabled script.
-  message: Off
 labelScriptOptionRequired:
   description: Shown after some global options in settings
   message: (only for scripts with this option enabled in their settings)
@@ -752,6 +749,9 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Settings
+labelShowAllSites:
+  description: Option in the dashboard to show the "All sites" badge.
+  message: Mark scripts that run on all sites
 labelShowOrder:
   description: Label for option in dashboard -> script list
   message: Show execution order positions

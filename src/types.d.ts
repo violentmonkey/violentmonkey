@@ -66,7 +66,7 @@ declare namespace GMReq {
     dlEvents?: EventTypeMap;
     dlId?: number;
     /** Firefox-only workaround for CSP blocking a blob: URL */
-    fileName: string;
+    fileName?: string;
     frame: VMMessageTargetFrame;
     frameId: number;
     id: string;
@@ -82,7 +82,8 @@ declare namespace GMReq {
   }
   interface Content {
     chunks?: Uint8Array | string[];
-    fileName: string;
+    dl: boolean;
+    fileName?: string;
     realm: VMScriptInjectInto;
     /** Used to wait before dispatching events that follow an event that asynchrously imports a binary response */
     p?: Promise<Blob|ArrayBuffer>;
@@ -131,7 +132,8 @@ declare namespace GMReq {
       scriptId: number;
       anonymous: boolean;
       conflictAction?: chrome.downloads.FilenameConflictAction;
-      fileName: string;
+      dl: boolean;
+      fileName?: string;
       data: any[];
       events: [EventTypeMap, EventTypeMap];
       headers?: StringMap;

@@ -191,13 +191,10 @@ footer {
     > .flex-1 {
       padding-right: 2rem;
     }
-    /* Applied to the children so the "All sites" badge stays readable */
-    .failed & > :not(.script-name),
-    .failed & .script-name > :not(.all-sites) {
+    .failed & {
       text-decoration: line-through red;
     }
-    .removed & > :not(.script-name),
-    .removed & .script-name > :not(.all-sites) {
+    .removed & {
       text-decoration: line-through;
     }
   }
@@ -422,22 +419,4 @@ footer {
   position: absolute;
   top: -0.2em;
   color: red;
-}
-
-.all-sites {
-  flex: none;
-  margin-left: .5em;
-  padding: 0 .45em;
-  border: 1px solid currentColor;
-  border-radius: 1em;
-  font-size: .75em;
-  line-height: 1.5;
-  white-space: nowrap;
-  color: hsl(30, 90%, 38%);
-  @media (prefers-color-scheme: dark) {
-    color: hsl(35, 90%, 62%);
-  }
-  .disabled & {
-    opacity: .6;
-  }
 }

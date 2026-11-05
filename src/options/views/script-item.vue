@@ -28,11 +28,9 @@
         }}</template>
         <template v-else>{{n}}</template>
       </a>
-      <span v-if="!isEnabled && !isRemoved" class="script-badge script-badge-off"
-            v-text="i18n('labelScriptOff')"/>
-      <tooltip v-if="canRender && !isRemoved && cache.allSites" :content="i18n('titleAllSites')"
-               align="start">
-        <span class="script-badge script-badge-all" v-text="i18n('labelAllSites')"/>
+      <tooltip v-if="canRender && showAllSites && !isRemoved && cache.allSites"
+               :content="i18n('titleAllSites')" align="start" class="script-all-sites">
+        <span v-text="i18n('labelAllSites')"/>
       </tooltip>
       <div class="script-tags" v-if="canRender">
         <a
@@ -99,9 +97,7 @@
         <template v-if="!isRemoved">
           <tooltip :content="labelEnable" align="start">
             <a
-              class="btn-ghost script-toggle"
-              :class="{ on: isEnabled }"
-              :aria-pressed="!!isEnabled"
+              class="btn-ghost"
               @click="onToggle"
               :data-hotkey="hotkeys.toggle"
               :tabIndex>
@@ -195,6 +191,7 @@ const props = defineProps([
   'hotkeys',
   'showHotkeys',
   'showVisit',
+  'showAllSites',
   'activeTags',
 ]);
 const emit = defineEmits([
@@ -519,40 +516,22 @@ $removedItemHeight: calc(
   &-message {
     white-space: nowrap;
   }
-  &-badge {
+  .visit {
+    color: var(--fill-8);
+  }
+  &-all-sites {
     flex: none;
     padding: 0 .5em;
+    border: 1px solid currentColor;
     border-radius: 1em;
     font-size: .8em;
     line-height: 1.6;
     white-space: nowrap;
-    border: 1px solid currentColor;
-    &-off {
-      color: var(--fill-9);
-    }
-    &-all {
-      color: hsl(30, 90%, 38%);
-      background: hsla(30, 90%, 50%, .12);
-      @media (prefers-color-scheme: dark) {
-        color: hsl(35, 90%, 62%);
-      }
-    }
-  }
-  &-toggle.on {
-    color: hsl(145, 63%, 32%);
-    @media (prefers-color-scheme: dark) {
-      color: hsl(145, 55%, 52%);
-    }
+    color: var(--warn-color, hsl(30, 90%, 38%));
   }
   .size.large {
-    color: hsl(30, 90%, 38%);
+    color: var(--warn-color, hsl(30, 90%, 38%));
     font-weight: 500;
-    @media (prefers-color-scheme: dark) {
-      color: hsl(35, 90%, 62%);
-    }
-  }
-  .visit {
-    color: var(--fill-8);
   }
 }
 
@@ -601,25 +580,6 @@ $removedItemHeight: calc(
       width: calc(var(--w) - 1px); // subtracting 1px to match margin of `.script`
       content: '';
     }
-    &[data-columns="1"], &[data-columns="3"] {
-      .script:nth-child(even) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="2"] .script {
-      &:nth-child(4n + 2),
-      &:nth-child(4n + 3) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="4"] .script {
-      &:nth-child(8n + 2),
-      &:nth-child(8n + 4),
-      &:nth-child(8n + 5),
-      &:nth-child(8n + 7) {
-        background-color: var(--fill-0-5);
-      }
-    }
     .script {
       grid-template-columns:
         auto /* main icons */
@@ -633,7 +593,9 @@ $removedItemHeight: calc(
       margin: -1px 0 0 -1px;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
       border-radius: 0;
-      background: none;
+      &:not(.disabled):not(.removed) {
+        background: none;
+      }
       &:hover::after {
         // using a separate element with z-index higher than a sibling's overlapped border
         content: '';
