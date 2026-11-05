@@ -12,15 +12,12 @@ import { permissionDownloads } from './permissions';
 import {
   FORBIDDEN_HEADER_RE, kCookie, kRequestHeaders, kSetCookie, requests, toggleHeaderInjector, verify,
 } from './requests-core';
-import { badges } from './session-data';
 import { getFrameDocIdAsObj, getFrameDocIdFromSrc } from './tabs';
-import { FIREFOX, navUA, navUAD, ua } from './ua';
+import { FIREFOX, navUA, navUAD } from './ua';
 import { vetUrl } from './url';
 
 if (__.MV3) addOwnCommands({
-  XHRNotify: data => {
-    requests[data.id].cb(data);
-  },
+  XHRNotify: data => requests[data.id].cb(data),
 });
 
 addPublicCommands({
@@ -30,36 +27,40 @@ addPublicCommands({
    * @return {Promise<void>}
    */
   HttpRequest(opts, src) {
+    let fileName = opts[kFileName];
     const tabId = src.tab.id;
     const frameId = getFrameDocIdFromSrc(src);
-    const { id, events, dl, [kFileName]: rawFileName } = opts;
-    const fileName = rawFileName || undefined;
+    const { id, events } = opts;
+    const dl = fileName != null;
     const req = requests[id] = /** @type {GMReq.BG} */ {
       id,
       tabId,
       [kFrameId]: frameId,
-      dl: !!dl,
+      [kFileName]: fileName,
       frame: getFrameDocIdAsObj(frameId),
     };
-    // 1. downloads via background page DOM are ignored in mobile Firefox
-    // 2. browser.downloads API was removed in mobile Firefox 79
-    const dlInTab = dl && IS_FIREFOX && FIREFOX >= 79 && ua.mobile;
+    // browser.downloads API was removed in mobile Firefox 79 and downloads via bg DOM
+    // don't show the SaveAs dialog and either save silently into a random name or do nothing
+    const dlInTab = dl && IS_FIREFOX && FIREFOX >= 79;
     const dlInApi = dl && !dlInTab && permissionDownloads && getOption(kGmDownloadViaApi);
     /** @param {GMReq.Message.BGAny} res */
-    const cb = res => {
+    const cb = async res => {
       if (!requests[id]) return;
       const { data } = res;
       if (__.MV3 && req.url && data?.finalUrl) {
         data.finalUrl = req.url; // from onBeforeSendHeaders
       }
-      if (res.type === 'load' && dlInTab && data && !data[UPLOAD]
-      && !(res.dl = !frameId || !badges[tabId]?.[INJECT])) {
-        sendTabCmd(tabId, 'Download', [data.response, fileName], { [kFrameId]: 0 });
+      if (dlInTab && res[kFileName]/*added in xhr.js*/) {
+        fileName ||= res[kFileName];
+        if (frameId &&
+          await sendTabCmd(tabId, 'Download', [data.response, fileName], { frameId: 0 })
+            .catch(console.warn)
+        ) delete res[kFileName];
       }
       if (res.type === 'loadend' && !data?.[UPLOAD]) {
         clearRequest(req);
       }
-      sendTabCmd(tabId, 'HttpRequested', res, req.frame);
+      return sendTabCmd(tabId, 'HttpRequested', res, req.frame);
     };
     const cbError = err => cb({
       id,
@@ -72,10 +73,9 @@ addPublicCommands({
       cbe: {value: cbError},
       resolve: {value: __.MV3 ? keepAlive() : noop},
     });
+    req.dl = dlInTab ? 'tab' : dl;
     if (dlInTab) {
       events[0].load = true;
-    } else {
-      req[kFileName] = fileName;
     }
     if (IS_FIREFOX && opts.url instanceof Blob) {
       opts.url = leaseBlobUrl(opts.url);
@@ -242,7 +242,7 @@ export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(/**@param{GMReq.BG}req*/req => {
     if ((tabId == null || req.tabId === tabId)
     && (!frameId || req[kFrameId] === frameId)
-    && !req.dl/* also aborts dlInTab because the tab is closed or navigated */) {
+    && req.dl !== true/* also aborts dlInTab because the tab is closed or navigated */) {
       abortRequest(req.id);
     }
   });

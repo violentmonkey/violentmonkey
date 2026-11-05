@@ -74,7 +74,7 @@ export const GM_API_CTX_GM4ASYNC = {
       [kResponseType]: 'blob',
       overrideMimeType: 'application/octet-stream',
     });
-    return onRequestCreate(opts, this, name, true);
+    return onRequestCreate(opts, this, name);
   },
 };
 

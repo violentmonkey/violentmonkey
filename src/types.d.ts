@@ -62,7 +62,7 @@ declare namespace GMReq {
     /** allow Set-Cookie header to affect browser */
     'set-cookie'?: boolean;
     coreId: string;
-    dl: boolean;
+    dl?: boolean | 'tab';
     dlEvents?: EventTypeMap;
     dlId?: number;
     /** Firefox-only workaround for CSP blocking a blob: URL */
@@ -83,7 +83,6 @@ declare namespace GMReq {
   interface Content {
     chunks?: Uint8Array | string[];
     dl: boolean;
-    fileName?: string;
     realm: VMScriptInjectInto;
     /** Used to wait before dispatching events that follow an event that asynchrously imports a binary response */
     p?: Promise<Blob|ArrayBuffer>;
@@ -108,7 +107,7 @@ declare namespace GMReq {
       chunked: boolean;
       contentType: string;
       data: VMScriptResponseObject<any>;
-      dl?: boolean;
+      fileName?: string;
       id: string;
       type: EventType;
       upload: 0 | 1;
@@ -132,8 +131,7 @@ declare namespace GMReq {
       scriptId: number;
       anonymous: boolean;
       conflictAction?: chrome.downloads.FilenameConflictAction;
-      dl: boolean;
-      fileName?: string;
+      fileName: string;
       data: any[];
       events: [EventTypeMap, EventTypeMap];
       headers?: StringMap;
