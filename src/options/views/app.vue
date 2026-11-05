@@ -1,7 +1,9 @@
 <template>
   <div class="page-options">
     <aside v-if="canRenderAside" :data-recycled="numbers[TAB_RECYCLE] ? '' : null">
-      <a v-if="SHOW_ERROR && store.error" v-text="store.error" :href="extensionDetailsUrl"
+      <!-- The scripts tab shows this error in its own banner -->
+      <a v-if="showAsideError" v-text="store.error"
+         :href="extensionDetailsUrl"
          @click="updateTabWithChromeUrl"/>
       <header>
         <img src="/public/images/icon128.png">
@@ -62,6 +64,9 @@ const current = computed(() => {
   const name = store.route.paths[0];
   return tabs.find(tab => tab.name === name) || tabs[0];
 });
+
+const showAsideError = computed(() => SHOW_ERROR && store.error
+  && (current.value.name !== SCRIPTS || !!store.route.paths[1]));
 
 const numbers = computed(() => ({
   [SCRIPTS]: store.scripts.length,

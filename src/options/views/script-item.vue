@@ -133,6 +133,7 @@
                  :disabled="!url" :content="title" align="start">
           <a
             class="btn-ghost"
+            :class="{ missing: !url }"
             v-bind="EXTERNAL_LINK_PROPS"
             :href="url"
             :tabIndex="url ? tabIndex : -1">
@@ -412,8 +413,23 @@ $removedItemHeight: calc(
     display: flex;
     gap: 8px;
     align-items: center;
+    min-width: 0;
     .script:not(.removed) & {
       align-self: flex-start;
+    }
+    /* When space runs out, the tags give way first, then the name */
+    > .script-name {
+      flex: 0 1 auto;
+      min-width: 8ch;
+    }
+    > .script-tags {
+      flex: 0 100 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    > .script-badge, > span:has(> .script-badge) {
+      flex: none;
     }
   }
   &-name {
@@ -511,6 +527,9 @@ $removedItemHeight: calc(
     display: flex;
     align-items: center;
     min-width: 4em;
+    > .icon {
+      flex: none;
+    }
     > .ellipsis {
       display: inline-block;
       max-width: 15ch;
@@ -620,13 +639,16 @@ $removedItemHeight: calc(
         background-color: var(--fill-0-5);
       }
     }
+    &[data-columns="1"] {
+      max-width: 1400px;
+    }
     .script {
       grid-template-columns:
+        2.5rem /* script icon */
+        minmax(12ch, 1fr) /* name */
+        auto /* info columns */
         auto /* main icons */
-        auto /* trash icon */
-        $iconSize /* script icon */
-        minmax(15ch, 1fr) /* name */
-        auto /* info */;
+        auto /* trash icon */;
       align-items: center;
       height: 2.5rem;
       width: var(--w);
@@ -654,35 +676,46 @@ $removedItemHeight: calc(
       &-icon {
         width: 2rem;
         height: 2rem;
-        margin-left: .5rem;
         grid-row-end: auto;
       }
       &-info {
         order: 2;
         align-self: stretch;
         justify-content: end;
-        margin-left: .5rem;
+        margin: 0 .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
+        .script-author {
+          width: 14ch;
+          > .ellipsis {
+            max-width: none;
+          }
+        }
         .size {
-          width: 3em;
+          width: 4em;
           text-align: right;
         }
         .updated, .version, .visit {
           text-align: right;
           color: var(--fill-8);
         }
+        .version {
+          width: 11ch;
+        }
         .updated, .visit {
-          width: 3em;
+          width: 3.5em;
         }
         .version:not(:empty)::before {
-          width: 6em;
           content: 'v';
         }
       }
       &-buttons {
-        order: -1;
+        order: 3;
         margin: 0;
+        &-right {
+          order: 4;
+        }
         &-left {
+          min-width: 165px; /* same as a normal row, so the columns stay aligned */
           > :first-child { /* edit button */
             display: none;
           }
@@ -691,30 +724,90 @@ $removedItemHeight: calc(
       &.removed .script-buttons .sep {
         display: none;
       }
+      @container (max-width: 900px) {
+        .script-author {
+          display: none;
+        }
+      }
+      @container (max-width: 720px) {
+        .version {
+          display: none;
+        }
+      }
       &-message {
-        position: absolute;
-        right: .5em;
-        top: 2em;
-        z-index: 3;
+        order: -1;
+        max-width: 22ch;
+        margin-right: .5em;
         font-size: smaller;
-        padding: 1px .5em;
-        border-radius: .5em;
-        border: 1px solid var(--fill-5);
-        background: var(--bg);
       }
     }
+  }
+  .btn-ghost.missing {
+    visibility: hidden;
+  }
+  .script {
+    container-type: inline-size;
+  }
+  .script-message {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   &:not([data-table]) {
     [data-hotkey-table]::after {
       content: none;
     }
-    .script:not(.removed) .size {
-      position: absolute;
-      bottom: 10px;
-      right: 40px;
+    &[data-columns="1"] {
+      max-width: 1100px;
+    }
+    .script:not(.removed) {
+      grid-template-columns: $iconSize auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        "icon name name name"
+        "icon actions meta trash";
+      .script-icon { grid-area: icon; }
+      .script-info-1 { grid-area: name; min-width: 0; }
+      .script-buttons-left { grid-area: actions; min-width: 0; }
+      .script-info {
+        grid-area: meta;
+        align-self: center;
+        justify-content: end;
+        min-width: 0;
+        gap: .4em;
+        > * {
+          flex: none;
+        }
+        .script-author {
+          flex: 0 1 auto;
+          min-width: 2em;
+          > .ellipsis {
+            max-width: 20ch;
+          }
+        }
+        .version:not(:empty)::before {
+          content: 'v';
+        }
+        .version, .updated, .visit {
+          color: var(--fill-8);
+        }
+      }
+      .script-buttons-right { grid-area: trash; }
+      .script-message {
+        margin-left: .5em;
+      }
     }
     .script-icon {
       align-self: start;
+    }
+    @container (max-width: 560px) {
+      .script-author {
+        display: none;
+      }
+    }
+    @container (max-width: 440px) {
+      .updated, .visit {
+        display: none;
+      }
     }
   }
   &[data-show-order] [data-order]::before {
