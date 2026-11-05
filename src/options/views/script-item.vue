@@ -28,7 +28,7 @@
         }}</template>
         <template v-else>{{n}}</template>
       </a>
-      <tooltip v-if="canRender && showAllSites && !isRemoved && cache.allSites"
+      <tooltip v-if="canRender && allSites"
                :content="i18n('titleAllSites')" align="start" class="script-all-sites">
         <span v-text="i18n('labelAllSites')"/>
       </tooltip>
@@ -77,8 +77,8 @@
                  v-if="showVisit">
           {{ visit.show }}
         </tooltip>
-        <tooltip class="size hidden-sm" :class="{ large: cache.large }"
-                 :content="cache.large ? i18n('titleLargeScript', cache.size) + '\n\n' + cache.sizes : cache.sizes"
+        <tooltip class="size hidden-sm" :class="{ large: isLarge }"
+                 :content="isLarge ? i18n('titleLargeScript', cache.size) + '\n\n' + cache.sizes : cache.sizes"
                  align="end">
           {{ cache.size }}
         </tooltip>
@@ -164,11 +164,14 @@
 <script>
 import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
 import { INFERRED, kTag } from '@/common/consts';
+import { runsOnAllSites } from '@/common/script-scope';
 import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
 const itemMargin = 8;
+/** Code size that gets the "large" color */
+const LARGE_SCRIPT_BYTES = 1024 * 1024;
 const i18nUpdateScriptForced = i18n('updateScriptForced');
 const visitedRecently = new Set();
 const refreshVisited = () => { store.now = Date.now(); };
@@ -217,6 +220,9 @@ const author = computed(() => {
   };
 });
 const cache = computed(() => props.script.$cache);
+const isLarge = computed(() => cache.value.sizesNum[0] >= LARGE_SCRIPT_BYTES);
+const allSites = computed(() => props.showAllSites && !isRemoved.value
+  && runsOnAllSites(props.script));
 const canUpdate = computed(() => props.script.$canUpdate);
 const notDataUrlRe = /^(?!data:)/;
 const canUpdateDeps = computed(() => {

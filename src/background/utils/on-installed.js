@@ -13,7 +13,7 @@ export let installedOver;
 chrome.runtime.onInstalled.addListener(({reason, previousVersion}) => {
   if (reason === 'update' || reason === 'install') {
     installedOver = previousVersion || NEW_INSTALL;
-    if (reason === 'install') setOption('filters.showAllSites', true);
+    if (!previousVersion) setOption('filters.showAllSites', true);
     if (__.MV3 && !inIncognitoContext) {
       registerInjector(true);
       chrome.alarms.clearAll().then(() => [

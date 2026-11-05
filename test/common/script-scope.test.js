@@ -40,6 +40,9 @@ test('runsOnAllSites: meta and custom rules', () => {
   // user replaced the original @match with a narrow one
   expect(runsOnAllSites({ meta: broad, custom: { origMatch: false, match: ['https://a.com/*'] } }))
     .toBe(false);
+  // user turned off the original broad @include
+  expect(runsOnAllSites({ meta: { match: [], include: ['*'] }, custom: { origInclude: false } }))
+    .toBe(false);
   // user added a broad rule to a narrow script
   expect(runsOnAllSites({ meta: narrow, custom: { include: ['*'] } })).toBe(true);
   // excludes do not change the answer

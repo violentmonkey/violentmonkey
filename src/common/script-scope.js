@@ -31,13 +31,10 @@ export function isAllSitesPattern(pattern) {
  * @return {boolean}
  */
 export function runsOnAllSites({ meta, custom = {} }) {
-  const pick = (key, origKey) => [
-    ...custom[origKey] !== false && meta?.[key] || [],
-    ...custom[key] || [],
-  ];
-  return pick('match', 'origMatch').some(isAllSitesPattern)
-    || pick('include', 'origInclude').some(isAllSitesPattern);
+  return !!(
+    custom.origMatch !== false && meta.match?.some(isAllSitesPattern)
+    || custom.match?.some(isAllSitesPattern)
+    || custom.origInclude !== false && meta.include?.some(isAllSitesPattern)
+    || custom.include?.some(isAllSitesPattern)
+  );
 }
-
-/** Scripts at or above this size get a "large" warning in the UI. */
-export const LARGE_SCRIPT_BYTES = 1024 * 1024;
