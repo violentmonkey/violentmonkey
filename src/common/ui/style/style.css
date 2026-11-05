@@ -364,6 +364,9 @@ li {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.hide-ovr {
+  overflow: hidden;
+}
 .pre {
   white-space: pre;
 }

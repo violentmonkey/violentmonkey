@@ -65,10 +65,10 @@
         <Tooltip v-else :content="state.sizes" :disabled="!state.sizes" placement="bottom">
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
-        <div>
+        <div class="hide-ovr">
           <!-- form and id are required for the built-in autocomplete using entered values -->
-          <form class="filter-search hidden-xs" @submit.prevent>
-            <label>
+          <form class="filter-search hidden-xs hide-ovr" @submit.prevent>
+            <label class="flex hide-ovr">
               <input
                 type="search"
                 :class="{'has-error': state.search.error}"
@@ -955,6 +955,7 @@ onBeforeUnmount(() => {
 $iconSize: 2rem; // from .icon in ui/style.css
 $headerH: 4rem;
 $headerBorder: 1px solid var(--fill-5);
+$minSearchWidth: 5em;
 .tab.tab-installed {
   height: 100vh;
   padding: 0;
@@ -973,6 +974,9 @@ $headerBorder: 1px solid var(--fill-5);
       height: $headerH;
       align-items: center;
       display: inline-flex;
+    }
+    > :last-child {
+      padding: 0 .5rem;
     }
     .vl-dropdown-toggle .icon {
       width: 1.25rem;
@@ -1072,8 +1076,7 @@ $headerBorder: 1px solid var(--fill-5);
   }
 }
 .filter-search {
-  min-width: 5em;
-  flex-basis: 10em;
+  min-width: $minSearchWidth;
   label {
     position: relative;
   }
@@ -1084,7 +1087,9 @@ $headerBorder: 1px solid var(--fill-5);
     right: .5rem;
   }
   input {
-    width: 100%;
+    min-width: $minSearchWidth;
+    max-width: 100%;
+    field-sizing: content;
     height: $iconSize;
     padding-left: .5rem;
     padding-right: $iconSize;
