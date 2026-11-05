@@ -3,6 +3,7 @@ import {
   getScriptUpdateUrl, i18n, ignoreChromeErrors, isDataUri, isRemote, isValidHttpUrl,
   makePause, trueJoin,
 } from '@/common';
+import browser from '@/common/browser';
 import {
   CACHE_KEYS, FETCH_OPTS, INFERRED, kDownloads, kTag, PROMISE, REQ_KEYS, TIMEOUT_24HOURS,
   TIMEOUT_WEEK, TL_AWAIT, VALUE_IDS,
@@ -557,7 +558,21 @@ function getSizeForResources(accum, url) {
   return accum;
 }
 
+/** @return {Promise<number[]>} IDs that were deleted permanently */
 export async function removeScripts(ids) {
+  if (!ids.length) return ids;
+  let scriptUrls;
+  try {
+    ({ scriptUrls } = await browser.storage.managed?.get('scriptUrls') || {});
+  } catch { /* firefox rejects when managed storage isnt setup */ }
+  const policyUrls = new Set((Array.isArray(scriptUrls) ? scriptUrls : [])
+    .map(url => typeof url === 'string' && isValidHttpUrl(url)).filter(Boolean));
+  ids = ids.filter(id => {
+    const script = getScriptById(id);
+    return script?.config.removed
+      && !policyUrls.has(script.custom.lastInstallURL)
+      && !script.custom.policyUrls?.some(url => policyUrls.has(url));
+  });
   const idsToRemove = [];
   // Only those marked as removed can be removed permanently
   const newLen = 1 + removedScripts.reduce((iAlive, script, i) => {
@@ -572,8 +587,10 @@ export async function removeScripts(ids) {
     removedScripts.length = newLen; // live scripts were moved to the beginning
     await storage.api.remove(idsToRemove);
     vacuum();
-    return broadcast('RemoveScripts', ids);
+    await broadcast('RemoveScripts', ids);
+    return ids;
   }
+  return [];
 }
 
 export function checkRemove({ force } = {}) {
