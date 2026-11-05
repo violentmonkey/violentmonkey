@@ -49,8 +49,7 @@ async function init() {
     bridge.addHandlers({ GetScriptVer: true });
     bridge.post('Expose', data[EXPOSE]);
   }
-  if (IS_FIREFOX) {
-    bridge.setMayDlInTab(true);
+  if (IS_FIREFOX && topRenderMode) {
     bridge.addBackgroundHandlers({
       /** @param {[Blob, string]} args */
       Download(args) {

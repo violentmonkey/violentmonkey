@@ -139,8 +139,10 @@ bridge.addBackgroundHandlers({
     } else if (req.p) {
       await req.p;
     }
-    if (IS_FIREFOX && bridge.mayDlInTab && req.dl) {
+    if (IS_FIREFOX && req.dl) {
       if (response) req[kResponse] = response;
+      // fileName is usually sent both to main_frame (iframe's CSP sometimes block downloads)
+      // or to the original frame if its main_frame doesn't have VM due to policies/settings.
       if (msg[kFileName]) download(req[kResponse], msg[kFileName]);
     }
     if (msg.type === LOADEND && !msg[UPLOAD]) {

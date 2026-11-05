@@ -61,7 +61,6 @@ export const end = () => {
   onScripts = null;
 };
 export const setCache = val => (cache = val);
-export const setMayDlInTab = val => (mayDlInTab = val);
 export const setPathMaps = val => (pathMaps = val);
 export const setPost = fn => (post = fn);
 export const setReify = val => (reify = val);
@@ -69,7 +68,6 @@ export const setUseMenu = val => (useMenu = val);
 
 export let cache;
 export let injectInto;
-export let mayDlInTab;
 export let pathMaps;
 export let reify;
 export let useMenu;
