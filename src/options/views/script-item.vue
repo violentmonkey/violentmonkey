@@ -28,6 +28,12 @@
         }}</template>
         <template v-else>{{n}}</template>
       </a>
+      <span v-if="!isEnabled && !isRemoved" class="script-badge script-badge-off"
+            v-text="i18n('labelScriptOff')"/>
+      <tooltip v-if="canRender && !isRemoved && cache.allSites" :content="i18n('titleAllSites')"
+               align="start">
+        <span class="script-badge script-badge-all" v-text="i18n('labelAllSites')"/>
+      </tooltip>
       <div class="script-tags" v-if="canRender">
         <a
           v-for="(item, i) in cache[kTag].slice(0, 2)"
@@ -73,7 +79,9 @@
                  v-if="showVisit">
           {{ visit.show }}
         </tooltip>
-        <tooltip class="size hidden-sm" :content="cache.sizes" align="end">
+        <tooltip class="size hidden-sm" :class="{ large: cache.large }"
+                 :content="cache.large ? i18n('titleLargeScript', cache.size) + '\n\n' + cache.sizes : cache.sizes"
+                 align="end">
           {{ cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
@@ -91,7 +99,9 @@
         <template v-if="!isRemoved">
           <tooltip :content="labelEnable" align="start">
             <a
-              class="btn-ghost"
+              class="btn-ghost script-toggle"
+              :class="{ on: isEnabled }"
+              :aria-pressed="!!isEnabled"
               @click="onToggle"
               :data-hotkey="hotkeys.toggle"
               :tabIndex>
@@ -508,6 +518,38 @@ $removedItemHeight: calc(
   }
   &-message {
     white-space: nowrap;
+  }
+  &-badge {
+    flex: none;
+    padding: 0 .5em;
+    border-radius: 1em;
+    font-size: .8em;
+    line-height: 1.6;
+    white-space: nowrap;
+    border: 1px solid currentColor;
+    &-off {
+      color: var(--fill-9);
+    }
+    &-all {
+      color: hsl(30, 90%, 38%);
+      background: hsla(30, 90%, 50%, .12);
+      @media (prefers-color-scheme: dark) {
+        color: hsl(35, 90%, 62%);
+      }
+    }
+  }
+  &-toggle.on {
+    color: hsl(145, 63%, 32%);
+    @media (prefers-color-scheme: dark) {
+      color: hsl(145, 55%, 52%);
+    }
+  }
+  .size.large {
+    color: hsl(30, 90%, 38%);
+    font-weight: 500;
+    @media (prefers-color-scheme: dark) {
+      color: hsl(35, 90%, 62%);
+    }
   }
   .visit {
     color: var(--fill-8);

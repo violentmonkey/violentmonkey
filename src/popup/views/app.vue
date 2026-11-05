@@ -110,6 +110,8 @@
                  @mousedown.middle.exact.stop="onEditScript(item)">
               <sup class="syntax" v-if="item.syntax" v-text="i18n('msgSyntaxError')"/>
               <div class="ellipsis" v-text="item.name" :data-message="item.name"/>
+              <span v-if="item.allSites" class="all-sites" :title="i18n('titleAllSites')"
+                    v-text="i18n('labelAllSites')"/>
               <a v-if="!store.failure && item.more"
                  class="tardy" tabindex="0" :title="TARDY_MATCH"
                  @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
@@ -238,6 +240,7 @@ import handlers from '@/common/handlers';
 import { objectPick } from '@/common/object';
 import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
+import { runsOnAllSites } from '@/common/script-scope';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { getSortCollator } from '@/common/ui/util';
 import { handleTabNavigation, isInput, kbdTypable, keyboardService } from '@/common/keyboard';
@@ -364,6 +367,7 @@ function makeInjectionScopes() {
           1e6 + script.props.position
         }`,
         excludes: null,
+        allSites: !!script.meta && runsOnAllSites(script),
       };
       if (upd) item.upd = null;
       if (upd && shouldUpdate) {

@@ -4,6 +4,7 @@ import {
 import { kOrigTag, kTag } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
+import { LARGE_SCRIPT_BYTES, runsOnAllSites } from '@/common/script-scope';
 import { render } from '@/common/ui';
 import '@/common/ui/favicon';
 import '@/common/ui/style';
@@ -49,6 +50,8 @@ function initScript(script, sizes, code) {
   $cache.size = formatByteLength(total, true).replace(' ', '');
   $cache.sizes = formatSizesStr(str);
   $cache.sizeNum = total;
+  $cache.large = sizes[0] >= LARGE_SCRIPT_BYTES;
+  $cache.allSites = runsOnAllSites(script);
   $cache.sizesNum = sizes;
   $cache[kStorageSize] = sizes[2];
   $cache[kTag] = getUniqTags(script, custom, meta);

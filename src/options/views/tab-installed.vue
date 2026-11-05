@@ -132,6 +132,13 @@
           </Dropdown>
         </div>
       </header>
+      <div v-if="SHOW_SETUP_BANNER && store.error && !showRecycle" class="setup-banner" role="alert">
+        <div>
+          <strong v-text="i18n('hintUserScriptsBanner')"/>
+          <div v-text="store.error"/>
+        </div>
+        <button v-text="i18n('buttonOpenExtensionDetails')" @click="openExtensionDetails"/>
+      </div>
       <div v-if="showRecycle" class="hint mx-1 my-1 flex flex-col">
         <span v-text="i18n('hintRecycleBin')"/>
         <a v-if="store.removedScripts.length" v-text="i18n('buttonEmptyRecycleBin')" tabindex="0"
@@ -199,6 +206,7 @@ import { loadData } from '@/options';
 import { TAB_SETTINGS } from '@/common/safe-globals'; // added as a banner but Vue needs an import
 import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import Icon from '@/common/ui/icon';
+import { extensionDetailsUrl } from '@/common/browser-scripts-api';
 import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';
 import IconAlphaDown from '~icons/mdi/sort-alphabetical-descending';
 import IconCalendar from '~icons/mdi/sort-calendar-ascending';
@@ -222,7 +230,13 @@ import toggleDragging from '../utils/dragging';
 import ScriptItem from './script-item';
 import Edit from './edit';
 
+const SHOW_SETUP_BANNER = __.MV3; // conditional compilation for the template
 const handleNewScript = () => handleEditScript('_new');
+const openExtensionDetails = () => chrome.tabs.update({ url: extensionDetailsUrl });
+/* Re-check after the user comes back from chrome://extensions, so the banner
+ * disappears as soon as "Allow User Scripts" is turned on. */
+const recheckInjector = () => store.error && sendCmdDirectly('GetInjectorError')
+  .then(err => { store.error = err; });
 const NEW_LINKS = [
   [i18n('buttonNew'),
     { tabIndex: 0, onclick: handleNewScript }],
@@ -917,6 +931,10 @@ Object.assign(handlers, {
 });
 
 onMounted(() => {
+  if (__.MV3) {
+    addEventListener('focus', recheckInjector);
+    disposables.push(() => removeEventListener('focus', recheckInjector));
+  }
   // Ensure the correct UI is shown when mounted:
   // * on subsequent navigation via history back/forward;
   // * on first initialization in some weird case the scripts got loaded early.
@@ -952,6 +970,30 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
+.setup-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 8px 0 0 8px;
+  padding: .75rem 1rem;
+  border: 1px solid #f008;
+  border-left-width: 4px;
+  border-radius: .3rem;
+  background: #f001;
+  strong {
+    display: block;
+    margin-bottom: .25rem;
+  }
+  > div {
+    flex: 1;
+  }
+  button {
+    flex: none;
+    height: auto;
+    padding: .4em 1em;
+    font-weight: 500;
+  }
+}
 $iconSize: 2rem; // from .icon in ui/style.css
 $headerH: 4rem;
 $headerBorder: 1px solid var(--fill-5);
