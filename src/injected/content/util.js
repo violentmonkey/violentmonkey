@@ -10,6 +10,7 @@ export * from './util-task';
 export const elemByTag = (tag, i) => getOwnProp(document::getElementsByTagName(tag), i || 0);
 const {
   TextDecoder: SafeTextDecoder,
+  unescape: safeUnescape,
 } = global;
 const { createElementNS } = document;
 const tdDecode = SafeTextDecoder[PROTO].decode;
@@ -55,34 +56,6 @@ export const makeElem = (tag, attrs) => {
 
 export const makeSafeBlob = (data, type) => new SafeBlob([data], { __proto__: null, type });
 
-const DATA_URL_RE = /^data:/i;
-const { fromCharCode } = String;
-
-const hexValue = c => {
-  c |= 32; // lowercase
-  return c >= 48 && c <= 57 ? c - 48
-    : c >= 97 && c <= 102 ? c - 87
-      : -1;
-};
-
-/** Decodes %XX as a byte, so the result is a binary string, not a unicode one */
-const percentDecode = str => {
-  let res = '';
-  for (let i = 0, c, len = str.length; i < len; i += 1) {
-    c = safeCharCodeAt(str, i);
-    if (c === 37/* % */ && i + 2 < len) {
-      const hi = hexValue(safeCharCodeAt(str, i + 1));
-      const lo = hexValue(safeCharCodeAt(str, i + 2));
-      if (hi >= 0 && lo >= 0) {
-        c = hi * 16 + lo;
-        i += 2;
-      }
-    }
-    res += fromCharCode(c);
-  }
-  return res;
-};
-
 const stringToBytes = str => {
   const len = str.length;
   const bytes = new SafeUint8Array(len);
@@ -100,20 +73,19 @@ const stringToBytes = str => {
 export const decodeResource = (raw, isBlob) => {
   let res;
   const pos = raw::stringIndexOf(',');
-  const isData = DATA_URL_RE::regexpTest(raw);
+  const isData = pos > 0 && raw::slice(0, 5)::toLowerCase() === 'data:';
   const mimeType = pos < 0 ? '' : raw::slice(isData ? 5/*data:*/ : 0, pos);
   const mimeData = pos < 0 ? raw : raw::slice(pos + 1);
-  const isBase64 = !isData || mimeType::stringIndexOf('base64') >= 0;
+  const isBase64 = !isData || mimeType && mimeType::toLowerCase()::stringIndexOf('base64') >= 0;
   if (isBlob === false) {
     return isData ? raw : `data:${mimeType};base64,${mimeData}`;
   }
-  res = isBase64 ? safeAtob(mimeData) : percentDecode(mimeData);
-  // TODO: do the check in BG and cache/store the result because safe-guarding all the stuff
-  // regexp picks from an instance internally is inordinately complicated
-  if (/[\x80-\xFF]/::regexpTest(res)) {
-    res = isBase64 && U8_fromBase64
-      ? U8_fromBase64(mimeData)
-      : stringToBytes(res);
+  res = !isBase64 ? safeUnescape(mimeData) :
+    U8_fromBase64 ? U8_fromBase64(mimeData) :
+      safeAtob(mimeData);
+  if (isBase64 && U8_fromBase64
+  // TODO: do the check in BG to avoid RegExp's internal access to unsafe props on itself & res?
+  || /[\x80-\xFF]/::regexpTest(res) && (res = stringToBytes(res))) {
     if (!isBlob) res = new SafeTextDecoder()::tdDecode(res);
   }
   if (isBlob && isBlob !== SafeUint8Array) {

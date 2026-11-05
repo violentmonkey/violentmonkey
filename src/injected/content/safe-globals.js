@@ -31,7 +31,7 @@ export const ResponseProto = SafeResponse[PROTO];
 export const hasOwnProperty = safeApply.call.bind(({}).hasOwnProperty);
 export const { forEach, includes, map } = []; // `push` is unsafe as it may call a setter; use safePush()
 export const { then } = SafePromise[PROTO];
-export const { indexOf: stringIndexOf, slice } = '';
+export const { indexOf: stringIndexOf, slice, toLowerCase } = '';
 export const safeCharCodeAt = safeApply.call.bind(''.charCodeAt); // faster than str::charCodeAt
 export const { append, appendChild, attachShadow, remove, setAttribute } = Element[PROTO];
 export const {
