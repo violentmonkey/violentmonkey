@@ -62,19 +62,19 @@ export const GM_API_CTX_GM4ASYNC = {
   GM_download(opts, name) {
     if (isString(opts)) {
       opts = { url: opts, name, __proto__: null };
-    } else if (opts) {
+    } else {
       opts = nullObjFrom(opts);
       name = opts.name;
     }
-    if (!name ? (name = 'missing') : !isString(name) && (name = 'not a string')) {
-      onRequestInitError(opts, new SafeError(`Required parameter "name" is ${name}.`));
+    if (name != null && !isString(name)) {
+      onRequestInitError(opts, new SafeError('Parameter "name" must be a string.'));
       return;
     }
     assign(opts, {
       [kResponseType]: 'blob',
       overrideMimeType: 'application/octet-stream',
     });
-    return onRequestCreate(opts, this, name);
+    return onRequestCreate(opts, this, name, true);
   },
 };
 

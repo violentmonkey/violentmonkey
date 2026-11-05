@@ -69,6 +69,7 @@ bridge.addHandlers({
     requests[msg.id] = {
       __proto__: null,
       realm,
+      dl: msg.dl,
       [kFileName]: msg[kFileName],
       [kXhrType]: msg[kXhrType],
     };
@@ -146,7 +147,7 @@ bridge.addBackgroundHandlers({
       await req.p;
     }
     if (IS_FIREFOX) {
-      if (response && req[kFileName]) req[kResponse] = response;
+      if (response && req.dl) req[kResponse] = response;
       if (msg.dl) download(req[kResponse], req[kFileName]);
     }
     if (msg.type === LOADEND && !msg[UPLOAD]) {
@@ -219,7 +220,7 @@ async function encodeBody(body, mode) {
 
 function download(blob, name) {
   const url = createObjectURL(blob);
-  const a = makeElem('a', { href: url, download: name });
+  const a = makeElem('a', { href: url, download: name || '' });
   a::fire(new SafeMouseEvent('click'));
   sendCmd('SetTimeout', 3000)::then(() => revokeObjectURL(url));
 }
