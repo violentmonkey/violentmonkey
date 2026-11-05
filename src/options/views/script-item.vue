@@ -58,6 +58,10 @@
           </template>
         </Dropdown>
       </div>
+      <!-- In table view the message lives in the flexible name column,
+           so it never shifts the fixed-width columns -->
+      <div class="script-message" v-if="canRender && viewTable && script.message"
+           v-text="script.message" :title="script.error"/>
     </div>
     <div class="script-info flex ml-1c">
       <template v-if="canRender">
@@ -141,7 +145,7 @@
           </a>
         </tooltip>
         <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
-        <div class="script-message" v-if="script.message" v-text="script.message"
+        <div class="script-message" v-if="script.message && !viewTable" v-text="script.message"
              :title="script.error"/>
       </template>
     </div>
@@ -734,11 +738,17 @@ $removedItemHeight: calc(
           display: none;
         }
       }
-      &-message {
-        order: -1;
-        max-width: 22ch;
-        margin-right: .5em;
+      &-info-1 > .script-message {
+        flex: 0 1 auto;
+        margin-left: auto;
+        padding-left: .5em;
+        max-width: 24ch;
         font-size: smaller;
+        color: var(--fill-8);
+        white-space: nowrap;
+      }
+      &.error .script-info-1 > .script-message {
+        color: #f00;
       }
     }
   }
@@ -761,7 +771,10 @@ $removedItemHeight: calc(
       max-width: 1100px;
     }
     .script:not(.removed) {
-      grid-template-columns: $iconSize auto minmax(0, 1fr) auto;
+      /* The buttons keep their width, the details keep theirs,
+       * and a long status message is what gets shortened. */
+      /* 200px fits the 6 buttons and the separator (195px measured) */
+      grid-template-columns: $iconSize minmax(200px, 1fr) auto auto;
       grid-template-areas:
         "icon name name name"
         "icon actions meta trash";
