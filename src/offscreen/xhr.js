@@ -158,13 +158,10 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
  */
 export function getFileNameFromXHR(req, xhr) {
   let v = xhr.getResponseHeader('Content-Disposition');
-  if ((v &&= v.match(regex({ disable: { n: true }, flags: 'i' })`^
-    \s*\w+\s*;
-    \s*filename(?:
-      \*\s*=\s*UTF-8'[\-\w]*'([^;]+) |
-      \s*=\s*(["']?)(.+[^\\])\2(?=;|$)
-    )`
-  )) && (v = v[1] || v[3]) && (v = v.trim())) {
+  if (v && ( // Preferring the newer filename* over filename
+    (v = v.match(/;\s*filename\*\s*=\s*UTF-8'[-\w]*'([^;]+)/i)) && (v = v[1]) ||
+    (v = v.match(/;\s*filename\s*=\s*(["']?)(.+[^\\])\2(?=;|$)/i)) && (v = v[2])
+  ) && (v = v.trim())) {
     // ok
   } else {
     v = new URL(req.url || xhr.responseURL);
