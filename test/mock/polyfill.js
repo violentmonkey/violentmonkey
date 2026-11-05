@@ -61,3 +61,7 @@ Object.assign(global, require('@/common/safe-globals'));
 Object.assign(global, require('@/injected/safe-globals'));
 Object.assign(global, require('@/injected/content/safe-globals'));
 Object.assign(global, require('@/injected/web/safe-globals'));
+
+// src/injected/web/index.js assigns this undeclared global (declared by a webpack banner in builds);
+// newer Node versions throw in strict mode without it.
+global.VMInitInjection = undefined;

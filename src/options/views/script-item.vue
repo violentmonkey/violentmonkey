@@ -28,11 +28,9 @@
         }}</template>
         <template v-else>{{n}}</template>
       </a>
-      <span v-if="!isEnabled && !isRemoved" class="script-badge script-badge-off"
-            v-text="i18n('labelScriptOff')"/>
-      <tooltip v-if="canRender && !isRemoved && cache.allSites" :content="i18n('titleAllSites')"
-               align="start">
-        <span class="script-badge script-badge-all" v-text="i18n('labelAllSites')"/>
+      <tooltip v-if="canRender && showAllSites && !isRemoved && cache.allSites"
+               :content="i18n('titleAllSites')" align="start" class="script-all-sites">
+        <span v-text="i18n('labelAllSites')"/>
       </tooltip>
       <div class="script-tags" v-if="canRender">
         <a
@@ -58,8 +56,7 @@
           </template>
         </Dropdown>
       </div>
-      <!-- In table view the message lives in the flexible name column,
-           so it never shifts the fixed-width columns -->
+      <!-- In table view the message sits in the name column, so it never covers the next row -->
       <div class="script-message" v-if="canRender && viewTable && script.message"
            v-text="script.message" :title="script.error"/>
     </div>
@@ -103,9 +100,7 @@
         <template v-if="!isRemoved">
           <tooltip :content="labelEnable" align="start">
             <a
-              class="btn-ghost script-toggle"
-              :class="{ on: isEnabled }"
-              :aria-pressed="!!isEnabled"
+              class="btn-ghost"
               @click="onToggle"
               :data-hotkey="hotkeys.toggle"
               :tabIndex>
@@ -137,7 +132,6 @@
                  :disabled="!url" :content="title" align="start">
           <a
             class="btn-ghost"
-            :class="{ missing: !url }"
             v-bind="EXTERNAL_LINK_PROPS"
             :href="url"
             :tabIndex="url ? tabIndex : -1">
@@ -200,6 +194,7 @@ const props = defineProps([
   'hotkeys',
   'showHotkeys',
   'showVisit',
+  'showAllSites',
   'activeTags',
 ]);
 const emit = defineEmits([
@@ -417,23 +412,8 @@ $removedItemHeight: calc(
     display: flex;
     gap: 8px;
     align-items: center;
-    min-width: 0;
     .script:not(.removed) & {
       align-self: flex-start;
-    }
-    /* When space runs out, the tags give way first, then the name */
-    > .script-name {
-      flex: 0 1 auto;
-      min-width: 8ch;
-    }
-    > .script-tags {
-      flex: 0 100 auto;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    > .script-badge, > span:has(> .script-badge) {
-      flex: none;
     }
   }
   &-name {
@@ -531,9 +511,6 @@ $removedItemHeight: calc(
     display: flex;
     align-items: center;
     min-width: 4em;
-    > .icon {
-      flex: none;
-    }
     > .ellipsis {
       display: inline-block;
       max-width: 15ch;
@@ -542,40 +519,22 @@ $removedItemHeight: calc(
   &-message {
     white-space: nowrap;
   }
-  &-badge {
+  .visit {
+    color: var(--fill-8);
+  }
+  &-all-sites {
     flex: none;
     padding: 0 .5em;
+    border: 1px solid currentColor;
     border-radius: 1em;
     font-size: .8em;
     line-height: 1.6;
     white-space: nowrap;
-    border: 1px solid currentColor;
-    &-off {
-      color: var(--fill-9);
-    }
-    &-all {
-      color: hsl(30, 90%, 38%);
-      background: hsla(30, 90%, 50%, .12);
-      @media (prefers-color-scheme: dark) {
-        color: hsl(35, 90%, 62%);
-      }
-    }
-  }
-  &-toggle.on {
-    color: hsl(145, 63%, 32%);
-    @media (prefers-color-scheme: dark) {
-      color: hsl(145, 55%, 52%);
-    }
+    color: var(--warn-color, hsl(30, 90%, 38%));
   }
   .size.large {
-    color: hsl(30, 90%, 38%);
+    color: var(--warn-color, hsl(30, 90%, 38%));
     font-weight: 500;
-    @media (prefers-color-scheme: dark) {
-      color: hsl(35, 90%, 62%);
-    }
-  }
-  .visit {
-    color: var(--fill-8);
   }
 }
 
@@ -624,42 +583,22 @@ $removedItemHeight: calc(
       width: calc(var(--w) - 1px); // subtracting 1px to match margin of `.script`
       content: '';
     }
-    &[data-columns="1"], &[data-columns="3"] {
-      .script:nth-child(even) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="2"] .script {
-      &:nth-child(4n + 2),
-      &:nth-child(4n + 3) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="4"] .script {
-      &:nth-child(8n + 2),
-      &:nth-child(8n + 4),
-      &:nth-child(8n + 5),
-      &:nth-child(8n + 7) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="1"] {
-      max-width: 1400px;
-    }
     .script {
       grid-template-columns:
-        2.5rem /* script icon */
-        minmax(12ch, 1fr) /* name */
-        auto /* info columns */
         auto /* main icons */
-        auto /* trash icon */;
+        auto /* trash icon */
+        $iconSize /* script icon */
+        minmax(15ch, 1fr) /* name */
+        auto /* info */;
       align-items: center;
       height: 2.5rem;
       width: var(--w);
       margin: -1px 0 0 -1px;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
       border-radius: 0;
-      background: none;
+      &:not(.disabled):not(.removed) {
+        background: none;
+      }
       &:hover::after {
         // using a separate element with z-index higher than a sibling's overlapped border
         content: '';
@@ -676,23 +615,56 @@ $removedItemHeight: calc(
         display: flex;
         align-self: stretch;
         align-items: center;
+        min-width: 0;
+        /* When space runs out, the tags shrink first, then the message, then the name */
+        > .script-name {
+          flex: 0 1 auto;
+          min-width: 8ch;
+        }
+        > .script-tags {
+          flex: 0 10000 auto;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        > .script-message {
+          flex: 0 100 auto;
+          min-width: 4ch;
+          max-width: 24ch;
+          margin-left: auto;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: smaller;
+          color: var(--fill-8);
+        }
+      }
+      &.error .script-info-1 > .script-message {
+        color: #f00;
       }
       &-icon {
         width: 2rem;
         height: 2rem;
+        margin-left: .5rem;
         grid-row-end: auto;
       }
       &-info {
         order: 2;
         align-self: stretch;
         justify-content: end;
-        margin: 0 .5rem;
+        margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
+        /* Fixed widths, so each detail forms a column across the rows */
         .script-author {
           width: 14ch;
+          > .icon {
+            flex: none;
+          }
           > .ellipsis {
             max-width: none;
           }
+        }
+        .version {
+          width: 11ch;
         }
         .size {
           width: 4em;
@@ -702,9 +674,6 @@ $removedItemHeight: calc(
           text-align: right;
           color: var(--fill-8);
         }
-        .version {
-          width: 11ch;
-        }
         .updated, .visit {
           width: 3.5em;
         }
@@ -713,13 +682,10 @@ $removedItemHeight: calc(
         }
       }
       &-buttons {
-        order: 3;
+        order: -1;
         margin: 0;
-        &-right {
-          order: 4;
-        }
         &-left {
-          min-width: 165px; /* same as a normal row, so the columns stay aligned */
+          min-width: 165px; /* as wide as in a normal row, so the recycled rows line up */
           > :first-child { /* edit button */
             display: none;
           }
@@ -728,99 +694,43 @@ $removedItemHeight: calc(
       &.removed .script-buttons .sep {
         display: none;
       }
-      @container (max-width: 900px) {
-        .script-author {
-          display: none;
-        }
-      }
-      @container (max-width: 720px) {
-        .version {
-          display: none;
-        }
-      }
-      &-info-1 > .script-message {
-        flex: 0 1 auto;
-        margin-left: auto;
-        padding-left: .5em;
-        max-width: 24ch;
-        font-size: smaller;
-        color: var(--fill-8);
-        white-space: nowrap;
-      }
-      &.error .script-info-1 > .script-message {
-        color: #f00;
+    }
+    /* The author column needs a script column about 1000px wide */
+    @media (max-width: 1200px) {
+      .script-author {
+        display: none;
       }
     }
-  }
-  .btn-ghost.missing {
-    visibility: hidden;
-  }
-  .script {
-    container-type: inline-size;
-  }
-  .script-message {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    @media (max-width: 2240px) {
+      &[data-columns="2"] .script-author {
+        display: none;
+      }
+    }
+    @media (max-width: 3240px) {
+      &[data-columns="3"] .script-author {
+        display: none;
+      }
+    }
+    &[data-columns="4"] .script-author {
+      display: none;
+    }
+    @media (max-width: 860px) {
+      .version {
+        display: none;
+      }
+    }
   }
   &:not([data-table]) {
     [data-hotkey-table]::after {
       content: none;
     }
-    &[data-columns="1"] {
-      max-width: 1100px;
-    }
-    .script:not(.removed) {
-      /* The buttons keep their width, the details keep theirs,
-       * and a long status message is what gets shortened. */
-      /* 200px fits the 6 buttons and the separator (195px measured) */
-      grid-template-columns: $iconSize minmax(200px, 1fr) auto auto;
-      grid-template-areas:
-        "icon name name name"
-        "icon actions meta trash";
-      .script-icon { grid-area: icon; }
-      .script-info-1 { grid-area: name; min-width: 0; }
-      .script-buttons-left { grid-area: actions; min-width: 0; }
-      .script-info {
-        grid-area: meta;
-        align-self: center;
-        justify-content: end;
-        min-width: 0;
-        gap: .4em;
-        > * {
-          flex: none;
-        }
-        .script-author {
-          flex: 0 1 auto;
-          min-width: 2em;
-          > .ellipsis {
-            max-width: 20ch;
-          }
-        }
-        .version:not(:empty)::before {
-          content: 'v';
-        }
-        .version, .updated, .visit {
-          color: var(--fill-8);
-        }
-      }
-      .script-buttons-right { grid-area: trash; }
-      .script-message {
-        margin-left: .5em;
-      }
+    .script:not(.removed) .size {
+      position: absolute;
+      bottom: 10px;
+      right: 40px;
     }
     .script-icon {
       align-self: start;
-    }
-    @container (max-width: 560px) {
-      .script-author {
-        display: none;
-      }
-    }
-    @container (max-width: 440px) {
-      .updated, .visit {
-        display: none;
-      }
     }
   }
   &[data-show-order] [data-order]::before {

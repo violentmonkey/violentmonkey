@@ -1,5 +1,5 @@
 import {
-  formatByteLength, getLocaleString, getScriptUpdateUrl, i18n, makePause, sendCmdDirectly, trueJoin,
+  formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { kOrigTag, kTag } from '@/common/consts';
 import handlers from '@/common/handlers';
@@ -59,20 +59,6 @@ function initScript(script, sizes, code) {
   script.$canUpdate = getScriptUpdateUrl(script)
     && (script.config.shouldUpdate ? 1 : -1 /* manual */);
   loadScriptIcon(script, store, true, $cache);
-}
-
-const QUIET_MESSAGE_DELAY = 3000;
-const quietMessageTimers = new Map();
-/* "No update found." carries no news, so it fades out instead of filling every row
- * after "Update all". Errors and real updates stay visible. */
-function clearQuietMessage(script, { message, error }) {
-  const id = script.props?.id;
-  clearTimeout(quietMessageTimers.get(id));
-  if (error || message !== i18n('msgNoUpdate')) return;
-  quietMessageTimers.set(id, setTimeout(() => {
-    quietMessageTimers.delete(id);
-    if (script.message === message && !script.error) script.message = '';
-  }, QUIET_MESSAGE_DELAY));
 }
 
 export function loadData() {
@@ -154,7 +140,6 @@ Object.assign(handlers, {
     Object.assign(script, update);
     if (script.error && !update.error) script.error = null;
     initScript(script, sizes, code);
-    clearQuietMessage(script, update);
     if (removed != null) {
       if (removed) {
         // Note that we don't update store.scripts even if a script is removed,

@@ -170,10 +170,11 @@ function parseRaw(req, msg, propName) {
 /**
  * @param {GMReq.UserOpts} opts - must already have a null proto
  * @param {GMContext} context
- * @param {string} fileName
+ * @param {string} [fileName]
+ * @param {boolean} [dl] - set by GM_download
  * @return {VMScriptXHRControl | Promise<VMScriptXHRControl>}
  */
-export function onRequestCreate(opts, context, fileName) {
+export function onRequestCreate(opts, context, fileName, dl) {
   if (__.DEBUG) throwIfProtoPresent(opts);
   let { data, url, [kResponseType]: type = '' } = opts;
   let err, res;
@@ -243,6 +244,7 @@ export function onRequestCreate(opts, context, fileName) {
   bridge.call('HttpRequest', safePickInto({
     anonymous,
     data,
+    dl: !!dl,
     id,
     scriptId,
     url,

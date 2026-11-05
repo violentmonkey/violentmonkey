@@ -32,18 +32,19 @@ addPublicCommands({
   HttpRequest(opts, src) {
     const tabId = src.tab.id;
     const frameId = getFrameDocIdFromSrc(src);
-    const { id, events, [kFileName]: fileName } = opts;
+    const { id, events, dl, [kFileName]: rawFileName } = opts;
+    const fileName = rawFileName || undefined;
     const req = requests[id] = /** @type {GMReq.BG} */ {
       id,
       tabId,
       [kFrameId]: frameId,
-      dl: !!fileName,
+      dl: !!dl,
       frame: getFrameDocIdAsObj(frameId),
     };
     // 1. downloads via background page DOM are ignored in mobile Firefox
     // 2. browser.downloads API was removed in mobile Firefox 79
-    const dlInTab = fileName && IS_FIREFOX && FIREFOX >= 79 && ua.mobile;
-    const dlInApi = fileName && !dlInTab && permissionDownloads && getOption(kGmDownloadViaApi);
+    const dlInTab = dl && IS_FIREFOX && FIREFOX >= 79 && ua.mobile;
+    const dlInApi = dl && !dlInTab && permissionDownloads && getOption(kGmDownloadViaApi);
     /** @param {GMReq.Message.BGAny} res */
     const cb = res => {
       if (!requests[id]) return;
@@ -241,7 +242,7 @@ export function clearRequestsByTabId(tabId, frameId) {
   requests::forEachValue(/**@param{GMReq.BG}req*/req => {
     if ((tabId == null || req.tabId === tabId)
     && (!frameId || req[kFrameId] === frameId)
-    && !req[kFileName]/* also aborts dlInTab because the tab is closed or navigated */) {
+    && !req.dl/* also aborts dlInTab because the tab is closed or navigated */) {
       abortRequest(req.id);
     }
   });

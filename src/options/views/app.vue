@@ -2,8 +2,7 @@
   <div class="page-options">
     <aside v-if="canRenderAside" :data-recycled="numbers[TAB_RECYCLE] ? '' : null">
       <!-- The scripts tab shows this error in its own banner -->
-      <a v-if="showAsideError" v-text="store.error"
-         :href="extensionDetailsUrl"
+      <a v-if="showAsideError" v-text="store.error" :href="extensionDetailsUrl"
          @click="updateTabWithChromeUrl"/>
       <header>
         <img src="/public/images/icon128.png">

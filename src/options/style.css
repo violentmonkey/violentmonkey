@@ -87,6 +87,24 @@ html:not(.narrow) {
     }
   }
 }
+/* Single-column view: the whole page is centered with a limited width */
+$pageMaxWidth: 1400px;
+@media (min-width: 1440px) {
+  html[data-single-column]:not(.narrow) {
+    background: var(--fill-0-5);
+    .page-options {
+      max-width: $pageMaxWidth;
+      margin: 0 auto;
+    }
+    aside {
+      left: calc(50vw - $pageMaxWidth / 2);
+      border-left-width: 1px;
+    }
+    .tab {
+      border-right: 1px solid var(--fill-5);
+    }
+  }
+}
 .text-red {
   color: red;
 }

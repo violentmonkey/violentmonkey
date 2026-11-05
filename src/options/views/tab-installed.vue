@@ -124,6 +124,9 @@
               <div>
                 <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
               </div>
+              <div>
+                <SettingCheck name="filters.showAllSites" :label="i18n('labelShowAllSites')" />
+              </div>
               <div class="mr-2c">
                 <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
                 <SettingCheck name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
@@ -159,6 +162,7 @@
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
           :showVisit="filters.showVisit || filters.sort.startsWith('visit')"
+          :showAllSites="filters.showAllSites"
           :script
           :draggable
           :visible="index < state.batchRender.limit"
@@ -289,6 +293,7 @@ const sortModes = [
   return res;
 }, {});
 const filters = reactive({
+  /** @type {Boolean} */ showAllSites: null,
   /** @type {Boolean} */ showEnabledFirst: null,
   /** @type {Boolean} */ showOrder: null,
   /** @type {Boolean} */ showVisit: null,
@@ -878,6 +883,9 @@ watch(() => state.search.value, debouncedSearch);
 watch(() => [filters.sort, filters.showEnabledFirst], lazyOrderUpdate);
 disposables.push(
   watch(() => filters.viewSingleColumn, adjustScriptWidth),
+  watch(() => filters.viewSingleColumn, val => {
+    document.documentElement.toggleAttribute('data-single-column', !!val);
+  }, { immediate: true }),
   watch(() => filters.viewTable, adjustNarrowWidth, { immediate: true }),
 );
 onMediaWidth(700, false, val => {
@@ -970,30 +978,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-.setup-banner {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 8px 0 0 8px;
-  padding: .75rem 1rem;
-  border: 1px solid #f008;
-  border-left-width: 4px;
-  border-radius: .3rem;
-  background: #f001;
-  strong {
-    display: block;
-    margin-bottom: .25rem;
-  }
-  > div {
-    flex: 1;
-  }
-  button {
-    flex: none;
-    height: auto;
-    padding: .4em 1em;
-    font-weight: 500;
-  }
-}
 $iconSize: 2rem; // from .icon in ui/style.css
 $headerH: 4rem;
 $headerBorder: 1px solid var(--fill-5);
@@ -1001,6 +985,28 @@ $headerBorder: 1px solid var(--fill-5);
   height: 100vh;
   padding: 0;
   overflow: auto;
+  /* Dark theme colors; the light ones are the fallbacks in var() */
+  @media (prefers-color-scheme: dark) {
+    --warn-color: hsl(35, 90%, 62%);
+    --banner-bg: hsl(0, 35%, 17%);
+    --banner-border: hsl(0, 55%, 40%);
+  }
+  .setup-banner {
+    display: flex;
+    align-items: center;
+    padding: .5rem 1rem;
+    background: var(--banner-bg, hsl(0, 100%, 95%));
+    border-bottom: 1px solid var(--banner-border, hsl(0, 70%, 70%));
+    > div {
+      flex: 1;
+      margin-right: 1rem;
+    }
+    button {
+      flex: none;
+      height: auto;
+      padding: .3em 1em;
+    }
+  }
   header {
     position: sticky;
     top: 0;
