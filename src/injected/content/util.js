@@ -70,8 +70,8 @@ const stringToBytes = str => {
 
 /**
  * @param {string} raw
- * @param {true | false} [isBlob]
- * @return {string | Blob} isBlob=false for data URI, isBlob=true for blob URL, otherwise Blob
+ * @param {?boolean} [isBlob] truthy: blob URL, `false`: data URI, falsy: decoded text
+ * @return {string}
  */
 export const decodeResource = (raw, isBlob) => {
   const pos = raw::stringIndexOf(',');
