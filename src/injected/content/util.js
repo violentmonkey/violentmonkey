@@ -15,9 +15,12 @@ const {
 const { createElementNS } = document;
 const tdDecode = SafeTextDecoder[PROTO].decode;
 const kTextContent = 'textContent';
-// required in FF to circumvent CSP style-src https://bugzil.la/1706787
+/** Required in FF to circumvent CSP style-src https://bugzil.la/1706787 */
 const setTextContent = describeProperty(Node[PROTO], kTextContent).set;
-const regexpTest = RegExp[PROTO].test; // Deeply unsafe. TODO: remove.
+/** Not using .test() because it internally calls .exec() per the spec */
+const regexpExec = RegExp[PROTO].exec;
+/** Immunize against proto poisoning by userscripts in "content" */
+const nonAsciiRe = setPrototypeOf(/[\x80-\xFF]/, null);
 export const { createObjectURL, revokeObjectURL } = URL;
 
 /**
@@ -67,32 +70,28 @@ const stringToBytes = str => {
 
 /**
  * @param {string} raw
- * @param {true | false | typeof Blob | typeof Uint8Array } [isBlob]
- * @return {string|Uint8Array|Blob|string}
+ * @param {true | false} [isBlob]
+ * @return {string | Blob} isBlob=false for data URI, isBlob=true for blob URL, otherwise Blob
  */
 export const decodeResource = (raw, isBlob) => {
-  let res;
   const pos = raw::stringIndexOf(',');
   const isData = pos > 0 && raw::slice(0, 5)::toLowerCase() === 'data:';
   const mimeType = pos < 0 ? '' : raw::slice(isData ? 5/*data:*/ : 0, pos);
   const mimeData = pos < 0 ? raw : raw::slice(pos + 1);
-  const isBase64 = !isData || mimeType && mimeType::toLowerCase()::stringIndexOf('base64') >= 0;
   if (isBlob === false) {
     return isData ? raw : `data:${mimeType};base64,${mimeData}`;
   }
-  res = !isBase64 ? safeUnescape(mimeData) :
-    U8_fromBase64 ? U8_fromBase64(mimeData) :
-      safeAtob(mimeData);
-  if (isBase64 && U8_fromBase64
-  // TODO: do the check in BG to avoid RegExp's internal access to unsafe props on itself & res?
-  || /[\x80-\xFF]/::regexpTest(res) && (res = stringToBytes(res))) {
-    if (!isBlob) res = new SafeTextDecoder()::tdDecode(res);
+  const isBase64 = !isData || mimeType && mimeType::toLowerCase()::stringIndexOf('base64') >= 0;
+  let bytes, str;
+  if (isBase64 && U8_fromBase64) {
+    bytes = U8_fromBase64(mimeData);
+  } else {
+    str = (isBase64 ? safeAtob : safeUnescape)(mimeData);
+    bytes = nonAsciiRe::regexpExec(str) && stringToBytes(str);
   }
-  if (isBlob && isBlob !== SafeUint8Array) {
-    res = makeSafeBlob(res, mimeType);
-    if (isBlob !== SafeBlob) res = createObjectURL(res);
-  }
-  return res;
+  return isBlob ? createObjectURL(makeSafeBlob(bytes || str, mimeType)) :
+    bytes ? new SafeTextDecoder()::tdDecode(bytes) :
+      str;
 };
 
 /**
