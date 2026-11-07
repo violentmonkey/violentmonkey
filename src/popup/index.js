@@ -6,7 +6,7 @@ import '@/common/ui/style';
 import App from './views/app';
 import { emptyStore, isFullscreenPopup, store } from './utils';
 
-const CMD_FRAME_IDS = 'frameIds';
+const CMD_FRAME_IDS = Symbol('frameIds'); // a Symbol doesn't clash with user-specified keys
 let idMapMain, idMapFrames;
 let mutex, mutexResolve, port;
 let hPrev;
