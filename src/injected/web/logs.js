@@ -22,9 +22,8 @@ export function setLogCapture(val) {
 
 /** @param {GMContext} ctx */
 export function reportLog(ctx, args) {
-  const { post } = bridge;
-  if (!capture || !post || !ctx || ctx.id == null) return;
-  post('ScriptLog', { id: ctx.id, text: serialize(args) });
+  if (!capture || !bridge.post || !ctx || ctx.id == null) return;
+  bridge.post('ScriptLog', { id: ctx.id, text: serialize(args) });
 }
 
 /**

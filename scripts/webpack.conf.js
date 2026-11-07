@@ -6,6 +6,7 @@ const { getVersion } = require('./version-helper');
 const { MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
 const { getBaseConfig, getPageConfig, isProd } = require('./webpack-base');
+const ForbidNamespaceFallbackPlugin = require('./webpack-forbid-ns-fallback-plugin');
 const { GLOBALS, addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 
 // Avoiding collisions with globals of a content-mode userscript
@@ -132,7 +133,9 @@ module.exports = [
   buildConfig(pgInjected, './src/injected', GLOBALS.injectedContent, (getGlobals) => ({
     header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
     footer: '}',
-  })),
+  }), (config) => {
+    config.plugins.push(new ForbidNamespaceFallbackPlugin());
+  }),
 
   buildConfig(pgInjectedWeb, './src/injected/web', GLOBALS.injectedWeb, (getGlobals) => ({
     header: () => `${skipReinjectionHeader} window["${INIT_FUNC_NAME}"] = ` +
@@ -141,6 +144,7 @@ module.exports = [
     footer: 'return VMInitInjection};1',
   }), (config) => {
     config.output.iife = false;
+    config.plugins.push(new ForbidNamespaceFallbackPlugin());
   }),
 
   buildConfig(pgZipWorker, './src/common/zip-worker.js', GLOBALS.minimal, ownWrappers, (config) => {
