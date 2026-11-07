@@ -20,7 +20,7 @@ if (__.SW) init.then(() => incognitoAllowed &&
       if (val > 0) {
         incomingLen = val;
         incomingStr = '';
-      } else if ((incomingStr += val) && (!incomingLen || incomingStr.length === incomingLen)) {
+      } else if ((incomingStr += val, !incomingLen || incomingStr.length === incomingLen)) {
         broadcaster.postMessage(JSON.parse(incomingStr));
         incomingLen = 0;
         incomingStr = '';
