@@ -6,6 +6,7 @@ import { getScriptRunAt } from '@/common/script';
 import {
   getScriptById, getScripts, parseScript, removeScripts, updateScriptInfo,
 } from './db';
+import broadcast from './broadcast';
 import { addOwnCommands, addPublicCommands } from './init';
 import { grantTab, hasGrant, listGrants, revokeTab } from './mcp-grants';
 import {
@@ -39,12 +40,16 @@ const getObservedTab = src => {
   return tabId;
 };
 
+const getState = () => ({
+  status,
+  pending: pending && { port: pending.port },
+  port: current?.port,
+});
+/** Pushes the state to the settings page instead of it polling the background */
+const notifyState = () => broadcast('McpState', getState());
+
 addOwnCommands({
-  McpGetState: () => ({
-    status,
-    pending: pending && { port: pending.port },
-    port: current?.port,
-  }),
+  McpGetState: getState,
   McpApprove() {
     if (!pending) return;
     connect(pending);
@@ -150,6 +155,7 @@ export function requestMcpConnection(url) {
   const token = params.get('token');
   if (!(port > 0 && port < 65536) || !token) return false;
   pending = { port, token };
+  notifyState();
   return true;
 }
 
@@ -169,6 +175,7 @@ function connect({ port, token }) {
   registerTools(client);
   client.on('status', (s) => {
     status = s;
+    notifyState();
     // Observe pages from the moment a connection is attempted so a blip doesn't lose data
     setActive(s === 'open' || s === 'connecting');
     if (s === 'closed') {
