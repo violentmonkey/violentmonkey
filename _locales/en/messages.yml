@@ -97,6 +97,9 @@ buttonNewFromFile:
 buttonOK:
   description: OK button on dialog.
   message: OK
+buttonOpenExtensionDetails:
+  description: Button in the dashboard banner that opens the extension details page in chrome://extensions.
+  message: Open extension details
 buttonRecycleBin:
   description: Button to list scripts in recycle bin.
   message: Recycle Bin
@@ -395,6 +398,9 @@ hintRecycleBin:
 hintUseDownloadURL:
   description: Shown as a place holder for @updateURL when it is not assigned
   message: Use @downloadURL
+hintUserScriptsBanner:
+  description: Title of the dashboard banner shown when the browser blocks userscripts.
+  message: Your userscripts are not running
 hintVacuum:
   description: Hint for vacuuming data.
   message: Discard the redundancy and try to reload the missing resources in cache.
@@ -420,6 +426,9 @@ labelAbout:
 labelAdvanced:
   description: Label for button to show advanced settings.
   message: Advanced
+labelAllSites:
+  description: Badge on a script that runs on every website.
+  message: All sites
 labelAllowUpdate:
   description: Option to allow checking updates for a script.
   message: Allow update
@@ -740,6 +749,9 @@ labelSearchScript:
 labelSettings:
   description: Label shown on the top of settings page
   message: Settings
+labelShowAllSites:
+  description: Option in the dashboard to show the "All sites" badge.
+  message: Mark scripts that run on all sites
 labelShowOrder:
   description: Label for option in dashboard -> script list
   message: Show execution order positions
@@ -1242,12 +1254,18 @@ sortOrder:
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Stop tracking
+titleAllSites:
+  description: Tooltip of the "All sites" badge.
+  message: Runs on every website. Limit its sites in the script settings if you do not need it everywhere.
 titleBadgeColor:
   description: Tooltip for option to set badge color.
   message: Normal badge color
 titleBadgeColorBlocked:
   description: Tooltip for option to set badge color of non-injectable tabs.
   message: Badge color when the site is non-injectable (blacklisted or unsupported)
+titleLargeScript:
+  description: Tooltip of the size of a large script. $1 is the size, e.g. 3.5 MB.
+  message: Large script ($1). The browser loads it on every page where it runs.
 titleSearchHint:
   description: Hover title for search icon in dashboard.
   message: |-
