@@ -110,24 +110,23 @@
                  @mousedown.middle.exact.stop="onEditScript(item)">
               <sup class="syntax" v-if="item.syntax" v-text="i18n('msgSyntaxError')"/>
               <div class="ellipsis" v-text="item.name" :data-message="item.name"/>
-              <a v-if="!store.failure && item.more"
-                 class="tardy" tabindex="0" :title="TARDY_MATCH"
-                 @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
-                <Icon name="info"/>
-              </a>
-              <a v-if="item.grantless"
-                 class="tardy" tabindex="0" :title="item.grantless"
-                 @click.stop="note = note === item.grantless ? '' : item.grantless">
-                @
-              </a>
             </div>
             <div class="upd ellipsis" :title="item.upd" :data-error="item.updError"/>
           </div>
-          <div class="submenu-buttons"
-               v-show="showButtons(item)">
+          <div class="submenu-buttons">
+            <a v-if="!store.failure && item.more"
+               class="issue" tabindex="0" :title="TARDY_MATCH"
+               @click.stop="note = note === TARDY_MATCH ? '' : TARDY_MATCH">
+              <Icon name="info"/>
+            </a>
+            <a v-if="item.grantless"
+               class="issue" tabindex="0" :title="item.grantless"
+               @click.stop="note = note === item.grantless ? '' : item.grantless">
+              @
+            </a>
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex @click="onEditScript(item)"
-                 :title="i18n('buttonEditClickHint')">
+                :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
             <div
@@ -586,9 +585,6 @@ function getEllipsizedMessage(el) {
 }
 function updateMessage({ target: el = getActiveElement() } = {}) {
   message.value = el && getEllipsizedMessage(el) || '';
-}
-function showButtons(item) {
-  return extras.value?.id === item.id || focusedItem.value?.id === item.id;
 }
 
 onMounted(() => {
