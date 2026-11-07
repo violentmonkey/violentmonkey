@@ -491,7 +491,9 @@ declare var __: {
   EXT: boolean,
   MV3: boolean;
   INIT_FUNC_NAME: string;
-  INJECTED: string | false;
+  INJECTED: boolean;
+  /** e.g. /public/lib/ */
+  PUBLIC_LIB: string,
   SW: boolean;
   SW_CLIENT: boolean;
   SYNC_DROPBOX_CLIENT_ID: string,
@@ -501,6 +503,8 @@ declare var __: {
   SYNC_ONEDRIVE_CLIENT_ID: string,
   TEST: boolean,
   VM_VER: string,
+  /** injected-web or zip-worker */
+  WEB: boolean,
 };
 
 declare const regex: import('regex').RegexTag<RegExp>;

@@ -3,19 +3,20 @@ const babelCore = require('@babel/core');
 const webpack = require('webpack');
 
 let babelConfig;
-const entryGlobals = {
-  'common': [],
-  'injected/content': [],
-  'injected/web': [],
+const SHARED = '*';
+const GLOBALS = {
+  common: 'common',
+  injectedContent: 'injected/content',
+  injectedWeb: 'injected/web',
+  minimal: '',
 };
-const entryPathToFilename = path => path === '*'
+const entryGlobals = Object.fromEntries(Object.values(GLOBALS).map(name => [
+  name,
+  [SHARED, name.split('/').at(-2)/*parent*/, name].filter(Boolean),
+]));
+const entryPathToFilename = path => path === SHARED
   ? `./src/common/safe-globals-shared.js`
   : `./src/${path}/safe-globals.js`;
-Object.entries(entryGlobals).forEach(([name, val]) => {
-  const parts = name.split('/');
-  if (parts[1]) parts[1] = name;
-  val.push('*', ...parts);
-});
 
 exports.restrictedSyntax = (
   // Hiding `code` so eslint doesn't complain about invalid schema
@@ -48,7 +49,7 @@ exports.restrictedSyntax = (
  * Adds a watcher for files in entryGlobals to properly recompile the project on changes.
  */
 function addWrapperWithGlobals(name, config, defsObj, callback) {
-  config.module.rules.push({
+  if (name) config.module.rules.push({
     test: new RegExp(`/${name}/.*?\\.js$`.replace(/\//g, /[/\\]/.source)),
     use: [{
       loader: './scripts/fake-dep-loader.js',
@@ -109,6 +110,7 @@ function readGlobalsFile(path, babelOpts = {}) {
   return ast ? res : res.code;
 }
 
+exports.GLOBALS = GLOBALS;
 exports.addWrapperWithGlobals = addWrapperWithGlobals;
 exports.getCodeMirrorThemes = getCodeMirrorThemes;
 exports.readGlobalsFile = readGlobalsFile;

@@ -20,15 +20,14 @@
 </template>
 
 <script setup>
-import { strFromU8, unzipSync } from 'fflate';
-import { ensureArray, getUniqId, i18n, readBlob, sendCmdDirectly } from '@/common';
+import { ensureArray, getUniqId, i18n, sendCmdDirectly } from '@/common';
 import { listenOnce } from '@/common/browser';
 import { kOrigTag, kTag, RUN_AT_RE } from '@/common/consts';
 import options from '@/common/options';
 import { showConfirmation } from '@/common/ui';
+import { kOptionsJson, kStorageJson, kUserJs, zipOrUnzip } from '@/common/zip';
 import {
   kComment, kDownloadURL, kExclude, kInclude, kMatch, kOrigExclude, kOrigInclude, kOrigMatch, runInBatch, store,
-  vmZipEntryName,
 } from '../../utils';
 import { onActivated, onMounted, reactive, ref } from 'vue';
 import SettingCheck from '@/common/ui/setting-check';
@@ -69,43 +68,34 @@ function pickBackup() {
 
 async function importBackup(file) {
   if (file && !store.batch) {
-    runInBatch(doImportBackup, await readBlob(file, true), file.name);
+    await runInBatch(doImportBackup, file, file.name);
   }
 }
 
-async function doImportBackup(buf, zipName) {
+/** @param {File} fileBlob */
+async function doImportBackup(fileBlob) {
   reports.length = 0;
   let vm;
   let files;
-  let total = 0;
-  const importScriptData = options.get('importScriptData');
-  const optionsNames = [];
-  const scriptTimes = {};
-  const storageNames = [];
-  const kUserJs = '.user.js';
-  const kOptionsJson = '.options.json';
-  const kStorageJson = '.storage.json';
+  let /**@type{Map}*/scriptTimes;
   try {
-    files = unzipSync(new Uint8Array(buf), {
-      filter: ({ name: filename, time, originalSize }) => originalSize < 100e6 && (
-        filename.toLowerCase() === vmZipEntryName && (vm = filename) ||
-        filename.endsWith(kOptionsJson) && optionsNames.push(filename) ||
-        filename.endsWith(kStorageJson) && storageNames.push(filename) ||
-        filename.endsWith(kUserJs) && (scriptTimes[filename] = time, ++total)
-      ),
-    });
+    [vm, files, scriptTimes] = await zipOrUnzip(fileBlob);
   } catch (err) {
     report(err.message || err);
     return;
   }
-  report('', zipName, 'info');
+  report('', fileBlob.name, 'info');
   report('', '', 'info'); // deps
+  const optionsNames = [];
+  const storageNames = [];
+  const total = scriptTimes.size;
   const uriMap = {};
   let scripts = {};
   let values = {};
   let now;
   let depsDone = 0;
   let depsTotal = 0;
+  fileBlob = null;
   depsPortId = getUniqId();
   chrome.runtime.onConnect.addListener(port => {
     if (port.name !== depsPortId) return;
@@ -127,11 +117,11 @@ async function doImportBackup(buf, zipName) {
     await new Promise(resolveOnUndoMessage);
   }
   for (const filename in files) {
-    try {
-      const text = strFromU8(files[filename]);
-      files[filename] = filename.endsWith(kUserJs)
-        ? text
-        : JSON.parse(text, filename);
+    if (!filename.endsWith(kUserJs)) try {
+      files[filename] = JSON.parse(files[filename]);
+      if (filename !== vm) (
+        filename.endsWith(kOptionsJson) ? optionsNames : storageNames
+      ).push(filename);
     } catch (e) {
       report(e, filename, null);
     }
@@ -145,10 +135,10 @@ async function doImportBackup(buf, zipName) {
     }
   }
   optionsNames.forEach(readScriptOptions);
-  for (const filename in scriptTimes) {
-    await readScript(filename, scriptTimes[filename]);
+  for (const nameAndTime of scriptTimes) {
+    await readScript(...nameAndTime);
   }
-  if (importScriptData) {
+  if (options.get('importScriptData')) {
     storageNames.forEach(readScriptStorage);
     sendCmdDirectly('SetValueStores', values);
   }
@@ -232,6 +222,7 @@ async function doImportBackup(buf, zipName) {
     const name = filename.slice(0, -kStorageJson.length);
     reports[0].text = TM;
     values[uriMap[name]] = files[filename].data;
+    files[filename] = '';
   }
   function report(text, name, type = 'critical') {
     reports.push({ text, name, type });

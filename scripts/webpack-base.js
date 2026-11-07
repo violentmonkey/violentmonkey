@@ -45,6 +45,7 @@ const MIN_OPTS_PUBLIC = isProd && {
 const MIN_OPTS_MAIN = isProd && deepmerge.all([{}, MIN_OPTS, {
   exclude: 'public/',
   terserOptions: {
+    toplevel: true, // drop unused global vars and funcs
     compress: {
       ecma: 8, // ES2017 Object.entries and so on
       passes: 2, // necessary now since we removed plaid's minimizer

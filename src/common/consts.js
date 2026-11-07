@@ -58,7 +58,7 @@ export const GLOB_ALL = '*://*/*';
 export const FILE_GLOB_ALL = 'file://*/*';
 export const XHR_COOKIE_RE = /:\W+([-\w]+)/; // extracts ://id in Chrome, ://{id} in Firefox
 /** @type {(str: string, opts?: {}) => Uint8Array} */
-export const U8_fromBase64 = __.INJECTED !== 'injected-web' && Uint8Array.fromBase64;
+export const U8_fromBase64 = !__.WEB && Uint8Array.fromBase64;
 export const UPLOAD = 'upload';
 export const GM_API_NAMES = [
   'GM',
@@ -108,4 +108,4 @@ export const CACHE_KEYS = 'cacheKeys';
 export const REQ_KEYS = 'reqKeys';
 export const VALUE_IDS = 'valueIds';
 export const PROMISE = 'promise';
-export const TLDJS = '/public/lib/tld.js';
+export const TLDJS = __.PUBLIC_LIB + 'tld.js';

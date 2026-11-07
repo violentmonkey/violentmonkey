@@ -2,18 +2,24 @@ const fs = require('node:fs');
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
-const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 const { getVersion } = require('./version-helper');
 const { MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
 const { getBaseConfig, getPageConfig, isProd } = require('./webpack-base');
+const { GLOBALS, addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 
 // Avoiding collisions with globals of a content-mode userscript
 const INIT_FUNC_NAME = '**VMInitInjection**';
 const IS_FIREFOX_MV2 = 'IS_FIREFOX_MV2';
 const VAULT_ID = 'VAULT_ID';
 const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
+const PUBLIC_LIB = '/public/lib';
 const VM_VER = getVersion();
+const pgInjected = 'injected';
+const pgInjectedWeb = 'injected-web';
+const pgOffscreen = 'offscreen';
+const pgSW = 'sw';
+const pgZipWorker = 'zip-worker';
 
 global.localStorage = {}; // workaround for node 25 and HtmlWebpackPlugin's `...global`
 
@@ -49,6 +55,7 @@ const defsObj = {
   ...Object.fromEntries(Object.entries({
     INIT_FUNC_NAME,
     MV3,
+    PUBLIC_LIB: PUBLIC_LIB + '/',
     CODEMIRROR_THEMES: getCodeMirrorThemes(),
     DEBUG: +process.env.DEBUG,
     DEV: !isProd,
@@ -72,14 +79,15 @@ const ownWrappers = (getGlobals) => ({
 });
 
 const buildConfig = (page, entry, globalsScope, wrap, init) => {
-  const SW = page === 'sw' ? 1 : 0;
+  const SW = page === pgSW ? 1 : 0;
   const vars = {
     ...defsObj,
     '__.BG': SW || !page && '__IS_BG__',
     '__.EXT': SW || !page,
-    '__.INJECTED': JSON.stringify(/injected/.test(page) && page),
+    '__.INJECTED': [pgInjected, pgInjectedWeb, pgZipWorker].includes(page),
     '__.SW': SW,
-    '__.SW_CLIENT': MV3 && (!page || page === 'offscreen'),
+    '__.SW_CLIENT': MV3 && (!page || page === pgOffscreen),
+    '__.WEB': [pgInjectedWeb, pgZipWorker].includes(page),
   };
   const config = (entry ? getBaseConfig : getPageConfig)(page);
   config.plugins.push(new webpack.DefinePlugin(vars));
@@ -90,7 +98,7 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
 };
 
 module.exports = [
-  buildConfig('', '', 'common', ownWrappers, (config) => {
+  buildConfig('', '', GLOBALS.common, ownWrappers, (config) => {
     if (!MV3) config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
@@ -104,34 +112,39 @@ module.exports = [
     });
   }),
 
-  MV3 && buildConfig('sw', './src/background/sw', 'common', ownWrappers),
+  MV3 && buildConfig(pgSW, './src/background/sw', GLOBALS.common, ownWrappers),
 
-  MV3 && buildConfig('offscreen', './src/offscreen', 'common', ownWrappers, (config) => {
+  MV3 && buildConfig(pgOffscreen, './src/offscreen', GLOBALS.common, ownWrappers, (config) => {
     const dir = `${config.output.path}/offscreen`;
     config.output.filename = 'offscreen/index.js';
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     fs.writeFileSync(`${dir}/index.html`, '<script src=index.js></script>', 'utf8');
   }),
 
-  MV3 && buildConfig('tld', 'tldts', '', null, (config) => {
-    config.output.path += '/public/lib';
+  MV3 && buildConfig('tld', 'tldts', GLOBALS.minimal, null, (config) => {
+    config.output.path += PUBLIC_LIB;
     config.output.library = {
       type: 'global',
       name: 'tld',
     };
   }),
 
-  buildConfig('injected', './src/injected', 'injected/content', (getGlobals) => ({
+  buildConfig(pgInjected, './src/injected', GLOBALS.injectedContent, (getGlobals) => ({
     header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
     footer: '}',
   })),
 
-  buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
+  buildConfig(pgInjectedWeb, './src/injected/web', GLOBALS.injectedWeb, (getGlobals) => ({
     header: () => `${skipReinjectionHeader} window["${INIT_FUNC_NAME}"] = ` +
       `(${IS_FIREFOX_MV2}, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}` +
       'let VMInitInjection;\n',
     footer: 'return VMInitInjection};1',
   }), (config) => {
+    config.output.iife = false;
+  }),
+
+  buildConfig(pgZipWorker, './src/common/zip-worker.js', GLOBALS.minimal, ownWrappers, (config) => {
+    config.output.path += PUBLIC_LIB;
     config.output.iife = false;
   }),
 ].filter(Boolean);

@@ -15,14 +15,13 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { strToU8, zipSync } from 'fflate';
 import { getScriptName, sendCmdDirectly } from '@/common';
 import { formatDate } from '@/common/date';
 import options from '@/common/options';
 import { downloadBlob } from '@/common/download';
-import { vmZipEntryName } from '@/options/utils';
 import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
+import { vmZipEntryName, zipOrUnzip } from '@/common/zip';
 import VmDateInfo from './vm-date-info';
 
 const tpl = ref();
@@ -83,12 +82,12 @@ async function exportData() {
     }
     vmScripts[name] = info;
     files[`${name}.user.js`] = [
-      strToU8(code),
+      code,
       modDate && { mtime: new Date(modDate) },
     ];
   }
-  files[vmZipEntryName] = [strToU8(JSON.stringify(vm, null, 2))]; // prettify to help users diff or view it
-  return new Blob([zipSync(files)], { type: 'application/zip' });
+  files[vmZipEntryName] = [JSON.stringify(vm, null, 2)]; // prettify to help users diff or view it
+  return zipOrUnzip(files);
 }
 </script>
 
