@@ -6,6 +6,7 @@ import '@/common/ui/style';
 import App from './views/app';
 import { emptyStore, isFullscreenPopup, store } from './utils';
 
+const CMD_FRAME_IDS = 'frameIds';
 let idMapMain, idMapFrames;
 let mutex, mutexResolve, port;
 let hPrev;
@@ -90,11 +91,21 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const cmds = data.menus[id];
     const scope = store[SCRIPTS][isTop || id in idMapMain ? 0 : 1];
     const script = scope.find(({ props }) => props.id === +id) || {};
-    const menu = script.cmds = new Map();
+    const menu = script.cmds ||= new Map();
+    let numAdded = 0;
     for (const cmd in cmds) {
       v = cmds[cmd];
       menu.set(cmd, v);
       loadCommandIcon(v, store);
+      (v[CMD_FRAME_IDS] ||= new Set()).add(frameId);
+      numAdded++;
+    }
+    if (menu.size > numAdded) {
+      menu.forEach(({ [CMD_FRAME_IDS]: frameIds }, key) => {
+        if (!cmds[key] && frameIds.delete(frameId) && !frameIds.size) {
+          menu.delete(key);
+        }
+      });
     }
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
