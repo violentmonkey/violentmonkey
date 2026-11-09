@@ -6,7 +6,7 @@ import { addOwnCommands, commands, init } from './init';
 import { installedOver } from './on-installed';
 import { getOption, hookOptions, setOption } from './options';
 import { popupTabs } from './popup-tracker';
-import { isTopFrame } from './preinject-core';
+import { clearFrameData, isTopFrame } from './preinject-core';
 import sessionData, { badges, flushSession, kBadges } from './session-data';
 import storage, { S_CACHE } from './storage';
 import { forEachTab, getTabUrl, injectableRe, openDashboard, tabsOnRemoved, tabsOnUpdated } from './tabs';
@@ -122,8 +122,11 @@ tabsOnRemoved.addListener(async id => {
 });
 if (__.MV3) {
   chrome.webNavigation.onCommitted.addListener(info => {
-    if (isTopFrame(info) && info.documentLifecycle !== 'prerender') {
-      onTabUpdated(info.tabId, info);
+    if (info.documentLifecycle !== 'prerender') {
+      // Clear keepAlive for previous page if GetInjected won't be called after navigation
+      // e.g. when this is a non-injectable URL like chrome: or about: or blocked by policy.
+      clearFrameData(info.tabId, info.frameId);
+      if (isTopFrame(info)) onTabUpdated(info.tabId, info);
     }
   }, {
     // A webpage may be navigated to a non-injectable page so we need to reset the badge.

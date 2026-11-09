@@ -8,18 +8,18 @@ import { clearNotifications } from './notifications';
 import { addMenuConfig, setMenus } from './page-menu-commands';
 import { popupTabs } from './popup-tracker';
 import {
-  cache, contentScriptsAPI, CSAPI_REG, downloadMode, getKey, injectContentRealm, isApplied,
-  propsToClear, unregisterScript,
+  cache, clearFrameData, contentScriptsAPI, CSAPI_REG, downloadMode, getKey, injectContentRealm,
+  isApplied, propsToClear, unregisterScript,
 } from './preinject-core';
 import { prepare, prepareScripts, triageRealms } from './preinject-prepare';
-import { clearRequestsByTabId, reifyRequests } from './requests';
+import { reifyRequests } from './requests';
 import { updateVisitedTime } from './script';
 import { flushSession, skippedTabs } from './session-data';
 import {
   onStorageChanged, S_CACHE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE, S_VALUE_PRE,
 } from './storage';
 import { getFrameDocId, getFrameDocIdAsObj } from './tabs';
-import { addValueOpener, clearValueOpener, reifyValueOpener } from './values';
+import { addValueOpener, reifyValueOpener } from './values';
 import { recordScripts, markRun, startLoad, isActive } from './mcp-observe';
 import { hasGrant } from './mcp-grants';
 import { startDocument } from './mcp-execution';
@@ -208,12 +208,6 @@ function setBaggedScriptValues(bag, id, val) {
       return true;
     }
   }
-}
-
-function clearFrameData(tabId, frameId, tabRemoved) {
-  clearRequestsByTabId(tabId, frameId);
-  clearValueOpener(tabId, frameId);
-  clearNotifications(tabId, frameId, tabRemoved);
 }
 
 function sendPopupShown(tabId, frameDoc) {

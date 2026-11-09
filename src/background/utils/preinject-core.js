@@ -318,7 +318,7 @@ function onTabReplaced(addedId, removedId) {
   onTabRemoved(removedId);
 }
 
-function clearFrameData(tabId, frameId, tabRemoved) {
+export function clearFrameData(tabId, frameId, tabRemoved) {
   clearRequestsByTabId(tabId, frameId);
   clearValueOpener(tabId, frameId);
   clearNotifications(tabId, frameId, tabRemoved);
