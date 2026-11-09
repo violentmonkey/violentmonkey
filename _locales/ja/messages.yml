@@ -608,10 +608,10 @@ labelMcp:
   message: AIエージェントアクセス (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: すべて
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: ログを記録中
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
   message: MCPサーバーが接続を切断しました。新しい接続URLを開いて再試行してください。
@@ -623,7 +623,7 @@ labelMcpConnecting:
   message: ポート $1 のMCPサーバーに接続中...
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: タブへのアクセスを許可
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: AIエージェントの接続方法を見る
@@ -634,13 +634,13 @@ labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: 開いているWebページがありません。
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
   message: ポート $1 のMCPサーバーがスクリプトの読み取りと編集を要求しています。ご自身で起動した場合のみ承認してください。
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: タブ
 labelName:
   description: Label of script name.
   message: 'スクリプト名:'
