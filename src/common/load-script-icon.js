@@ -28,11 +28,13 @@ export async function loadScriptIcon(script, store, showDefault, target = script
       target[KEY] = null;
     }
     if (url) {
-      target[KEY] = res = cache[url]
+      res = cache[url]
         || isDataUri(url) && url
         || isHiDPI && def // Using our big icon directly as its data URI is rendered slower
         || (def || isValidHttpUrl(url))
-          && (cache[url] = await sendCmdDirectly('GetImageData', url).catch(noop));
+          && (cache[url] = sendCmdDirectly('GetImageData', url).catch(noop));
+      if (res?.then) res = cache[url] = await res;
+      target[KEY] = res;
     }
   }
   return res;
