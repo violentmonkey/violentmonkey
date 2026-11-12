@@ -46,6 +46,7 @@ const EXTRA_HEADERS = [
 const headersToInject = {};
 export const kCookie = 'cookie';
 export const kSetCookie = 'set-cookie';
+const trimCookieValue = header => header.value.replace(/;\s*$/, '').trim();
 const SET_COOKIE_VALUE_RE = regex({ disable: { n: true } })`
   ^\s*  (?:__(Secure|Host)-)?  ([^=\s]+)  \s*=\s*  (")?  ([!#-+\--:\<-\[\]-~]*)  \3(.*)`;
 const SET_COOKIE_ATTR_RE = regex({ disable: { n: true }, flags: 'y' })`
@@ -73,7 +74,7 @@ function onHeadersReceived({ [kResponseHeaders]: headers, requestId, tabId, url 
     if (__.MV3) return;
     const { storeId } = req;
     // Drop Set-Cookie headers if anonymous or using a custom storeId
-    if (!req[kSetCookie] || storeId) {
+    if (!req[kCookie] || storeId) {
       headers = headers.filter(h => {
         if (h.name.toLowerCase() !== kSetCookie) return true;
         if (storeId) setCookieInStore(h.value, storeId, url);
@@ -105,22 +106,26 @@ function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, tabId, url
     if (__.MV3) return;
     const headersMap = {};
     const headers2 = headersToInject[reqId];
-    const combinedHeaders = headers2 && {};
+    const toCook = new URL(url).origin === req[kCookie];
+    let cookieParts;
     let h2 = !headers2;
     for (const h of headers) {
       let name = h.name.toLowerCase();
       if (name === 'origin' && h.value === extensionOrigin
-      || name === kCookie && !req[kCookie]) {
+      || toCook && name === kCookie && !req[kCookie]) {
         continue;
       }
-      if (!h2 && name === kCookie && (h2 = headers2[name])) {
-        combinedHeaders[name] = { name, value: h.value + '; ' + h2.value };
+      if (toCook && !h2 && name === kCookie && (h2 = headers2[name])) {
+        (cookieParts ||= new Set([trimCookieValue(h)])).add(trimCookieValue(h2));
       } else {
         headersMap[name] = h;
       }
     }
+    if (cookieParts) {
+      headersMap[kCookie] = [...cookieParts].join('; ');
+    }
     return {
-      [kRequestHeaders]: Object.values(Object.assign(headersMap, headers2, combinedHeaders))
+      [kRequestHeaders]: Object.values({ ...headers2, ...headersMap })
     };
   }
 }

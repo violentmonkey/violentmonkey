@@ -130,9 +130,8 @@ async function httpRequest(opts, events, id, req, src) {
   const kOrigin = 'origin';
   let hasOriginHeader;
   let storeId;
-  if (!__.MV3) {
-    req[kCookie] = !anonymous && !shouldSendCookies;
-    req[kSetCookie] = !anonymous;
+  if (!__.MV3 && !anonymous) {
+    req[kCookie] = new URL(url).origin;
   }
   if (contentType) xhrHeaders['Content-Type'] = contentType;
   opts.headers::forEachEntry(([name, value]) => {

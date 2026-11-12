@@ -57,10 +57,8 @@ declare namespace GMReq {
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     cbe: (err: string|Error) => Promise<void>;
-    /** use browser's `Cookie` header */
-    cookie?: boolean;
-    /** allow Set-Cookie header to affect browser */
-    'set-cookie'?: boolean;
+    /** URL origin for `Cookie` and `Set-Cookie` headers */
+    cookie?: string;
     coreId: string;
     dl?: boolean | 'tab';
     dlEvents?: EventTypeMap;
