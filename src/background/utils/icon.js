@@ -45,6 +45,7 @@ let badgeColorBlocked;
 
 addOwnCommands({
   GetImageData: getImageData,
+  GetCachedSize: async url => (await loadStorageCache(url) || '').length,
 });
 
 hookOptions((changes) => {

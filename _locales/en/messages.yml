@@ -746,6 +746,9 @@ labelShowOrder:
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: Show last visit time
+labelSize:
+  description: $1 is a size number like "1.1 MB".
+  message: 'Size: $1'
 labelSync:
   description: Label for sync options.
   message: Sync
