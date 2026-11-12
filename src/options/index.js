@@ -1,7 +1,7 @@
 import {
   formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmdDirectly, trueJoin,
 } from '@/common';
-import { kOrigTag, kTag } from '@/common/consts';
+import { FMT_SIZE_KB_MB, FMT_SIZE_TIGHT, kOrigTag, kTag } from '@/common/consts';
 import handlers from '@/common/handlers';
 import { loadScriptIcon } from '@/common/load-script-icon';
 import { render } from '@/common/ui';
@@ -41,12 +41,12 @@ function initScript(script, sizes, code) {
   let str = '';
   sizes.forEach((val, i) => {
     total += val;
-    if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val)}\n`;
+    if (val) str += `${SIZE_TITLES[i]}: ${formatByteLength(val, FMT_SIZE_KB_MB)}\n`;
   });
   $cache.desc = desc;
   $cache.name = name;
   $cache.lowerName = name.toLocaleLowerCase();
-  $cache.size = formatByteLength(total, true).replace(' ', '');
+  $cache.size = formatByteLength(total, FMT_SIZE_TIGHT);
   $cache.sizes = formatSizesStr(str);
   $cache.sizeNum = total;
   $cache.sizesNum = sizes;

@@ -1,6 +1,6 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { BLOB_LIFE, U8_fromBase64 } from '@/common/consts';
+import { BLOB_LIFE, FMT_SIZE_KB_MB, FMT_SIZE_TIGHT, U8_fromBase64 } from '@/common/consts';
 
 export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
@@ -200,11 +200,30 @@ export function formatTime(duration) {
   return `${duration | 0}${unitInfo[0]}`;
 }
 
-export function formatByteLength(len, noBytes) {
-  if (!len) return '';
-  if (len < 1024 && !noBytes) return `${len} B`;
-  if ((len /= 1024) < 1024) return `${Math.round(len)} k`;
-  return `${+(len / 1024).toFixed(1)} M`;
+let fractionDot;
+
+export function formatByteLength(len, opts) {
+  let unit;
+  if (!len) {
+    // empty
+  } else if (len < 1024 && !(opts & FMT_SIZE_TIGHT)) {
+    unit = 'B';
+  } else if ((len /= 1024) < 1024) {
+    len = Math.round(len);
+    unit = 'kB';
+  } else {
+    len = Math.round(len * 10/* 1 fractional digit */ / 1024);
+    if (len % 10) {
+      fractionDot ??= (1.1).toLocaleString(chrome.i18n.getUILanguage()).replace(/\d/g, '') || '.';
+      len = (len / 10 | 0) + fractionDot + (len % 10);
+    } else {
+      len /= 10;
+    }
+    unit = 'MB';
+  }
+  return unit
+    ? len + (opts & FMT_SIZE_TIGHT ? '' : ' ') + (opts & FMT_SIZE_KB_MB ? unit : unit[0])
+    : '';
 }
 
 // Used by `injected`

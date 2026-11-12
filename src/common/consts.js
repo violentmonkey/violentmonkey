@@ -109,3 +109,7 @@ export const REQ_KEYS = 'reqKeys';
 export const VALUE_IDS = 'valueIds';
 export const PROMISE = 'promise';
 export const TLDJS = __.PUBLIC_LIB + 'tld.js';
+/** No space, just k or M without B, sizes below 1k shown as 0k or 1k rounded */
+export const FMT_SIZE_TIGHT = 1;
+/** Show B in kB and MB unit suffix */
+export const FMT_SIZE_KB_MB = 2;

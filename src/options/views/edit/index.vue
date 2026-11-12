@@ -173,6 +173,7 @@ const reHASH = /#/;
 
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
+import { FMT_SIZE_KB_MB } from '@/common/consts';
 import VmCode from '@/common/ui/code';
 import VmExternals from '@/common/ui/externals';
 import LocaleGroup from '@/common/ui/locale-group';
@@ -250,7 +251,7 @@ const navItems = computed(() => {
     code: i18n('editNavCode'),
     settings: i18n('editNavSettings'),
     ...id && (size || isGmStorageGranted(meta)) && {
-      values: i18n('editNavValues') + (size ? ` (${formatByteLength(size)})` : ''),
+      values: i18n('editNavValues') + (size ? ` (${formatByteLength(size, FMT_SIZE_KB_MB)})` : ''),
     },
     ...(req || res) && { [EXTERNALS]: [req, res]::trueJoin('/') },
     help: '?',
