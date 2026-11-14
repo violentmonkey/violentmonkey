@@ -1,5 +1,5 @@
 import {
-  formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, noop, sendCmdDirectly, trueJoin,
+  formatByteLength, getLocaleString, getScriptUpdateUrl, makePause, sendCmdDirectly, trueJoin,
 } from '@/common';
 import { FMT_SIZE_KB_MB, FMT_SIZE_TIGHT, kOrigTag, kTag } from '@/common/consts';
 import handlers from '@/common/handlers';
@@ -118,10 +118,9 @@ Object.assign(handlers, {
   },
   async UpdateScript({ update, where, code } = {}) {
     if (!update) return;
-    // Ignoring the error of a failed batch, otherwise it'd break this and all subsequent updates
     if (updateThrottle
     || (updateThrottle = store.batch)
-    && (updateThrottle = Promise.race([updateThrottle, makePause(500)]).catch(noop))) {
+    && (updateThrottle = Promise.race([updateThrottle, makePause(500)]))) {
       await updateThrottle;
       updateThrottle = null;
     }
