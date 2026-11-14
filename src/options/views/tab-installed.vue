@@ -987,6 +987,11 @@ $minSearchWidth: 5em;
     .vl-dropdown-menu {
       white-space: nowrap;
     }
+    .hide-ovr .vl-dropdown-menu {
+      top: auto;
+      right: 1.5rem;
+      position: fixed;
+    }
   }
   @media (max-width: 640px) {
     header {
