@@ -1,5 +1,5 @@
 import { reactive, ref } from 'vue';
-import { getScriptsTags, i18n, sendCmdDirectly } from '@/common';
+import { getScriptsTags, i18n, noop, sendCmdDirectly } from '@/common';
 import { kTag } from '@/common/consts';
 import { route } from '@/common/router';
 
@@ -92,7 +92,7 @@ export function performSearch(scripts) {
 
 export async function runInBatch(fn, ...args) {
   try {
-    await (store.batch = fn(...args) || true);
+    await (store.batch = Promise.resolve(fn(...args)).catch(noop));
   } finally {
     store.batch = false;
   }
