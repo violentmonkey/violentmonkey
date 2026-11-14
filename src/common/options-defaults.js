@@ -75,6 +75,8 @@ export default {
   ffInject: false,
   xhrInject: false,
   filters: {
+    /** @type {boolean} - turned on for new installs in on-installed.js */
+    showAllSites: false,
     /** @type {boolean} */
     showOrder: false,
     /** @type {boolean} */

@@ -2,6 +2,7 @@ import { registerInjector } from '@/common/browser-scripts-api';
 import { kContentType, kMainFrame } from '@/common/consts';
 import { DNR, DNR_ID_INSTALL } from './dnr';
 import { inIncognitoContext } from './init';
+import { setOption } from './options';
 import { kAlarmRemove } from './session-data';
 import { CHROME } from './ua';
 import { autoUpdate } from './update';
@@ -12,6 +13,7 @@ export let installedOver;
 chrome.runtime.onInstalled.addListener(({reason, previousVersion}) => {
   if (reason === 'update' || reason === 'install') {
     installedOver = previousVersion || NEW_INSTALL;
+    if (!previousVersion) setOption('filters.showAllSites', true);
     if (__.MV3 && !inIncognitoContext) {
       registerInjector(true);
       chrome.alarms.clearAll().then(() => [
