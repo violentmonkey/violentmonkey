@@ -28,6 +28,10 @@
         }}</template>
         <template v-else>{{n}}</template>
       </a>
+      <tooltip v-if="canRender && allSites"
+               :content="i18n('titleAllSites')" align="start" class="script-all-sites">
+        <span v-text="i18n('labelAllSites')"/>
+      </tooltip>
       <div class="script-tags" v-if="canRender">
         <a
           v-for="(item, i) in cache[kTag].slice(0, 2)"
@@ -52,6 +56,9 @@
           </template>
         </Dropdown>
       </div>
+      <!-- In table view the message sits in the name column, so it never covers the next row -->
+      <div class="script-message" v-if="canRender && viewTable && script.message"
+           v-text="script.message" :title="script.error"/>
     </div>
     <div class="script-info flex ml-1c">
       <template v-if="canRender">
@@ -73,7 +80,9 @@
                  v-if="showVisit">
           {{ visit.show }}
         </tooltip>
-        <tooltip class="size hidden-sm" :content="cache.sizes" align="end">
+        <tooltip class="size hidden-sm" :class="{ large: isLarge }"
+                 :content="isLarge ? i18n('titleLargeScript', cache.size) + '\n\n' + cache.sizes : cache.sizes"
+                 align="end">
           {{ cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
@@ -130,7 +139,7 @@
           </a>
         </tooltip>
         <!-- Using v-if to actually hide it because FF is slow to apply :not(:empty) CSS -->
-        <div class="script-message" v-if="script.message" v-text="script.message"
+        <div class="script-message" v-if="script.message && !viewTable" v-text="script.message"
              :title="script.error"/>
       </template>
     </div>
@@ -158,11 +167,14 @@
 <script>
 import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
 import { INFERRED, kTag } from '@/common/consts';
+import { runsOnAllSites } from '@/common/script-scope';
 import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
 const itemMargin = 8;
+/** Code size that gets the "large" color */
+const LARGE_SCRIPT_BYTES = 1024 * 1024;
 const i18nUpdateScriptForced = i18n('updateScriptForced');
 const visitedRecently = new Set();
 const refreshVisited = () => { store.now = Date.now(); };
@@ -185,6 +197,7 @@ const props = defineProps([
   'hotkeys',
   'showHotkeys',
   'showVisit',
+  'showAllSites',
   'activeTags',
 ]);
 const emit = defineEmits([
@@ -210,6 +223,9 @@ const author = computed(() => {
   };
 });
 const cache = computed(() => props.script.$cache);
+const isLarge = computed(() => cache.value.sizesNum[0] >= LARGE_SCRIPT_BYTES);
+const allSites = computed(() => props.showAllSites && !isRemoved.value
+  && runsOnAllSites(props.script));
 const canUpdate = computed(() => props.script.$canUpdate);
 const notDataUrlRe = /^(?!data:)/;
 const canUpdateDeps = computed(() => {
@@ -512,6 +528,20 @@ $removedItemHeight: calc(
   .visit {
     color: var(--fill-8);
   }
+  &-all-sites {
+    flex: none;
+    padding: 0 .5em;
+    border: 1px solid currentColor;
+    border-radius: 1em;
+    font-size: .8em;
+    line-height: 1.6;
+    white-space: nowrap;
+    color: var(--warn-color, hsl(30, 90%, 38%));
+  }
+  .size.large {
+    color: var(--warn-color, hsl(30, 90%, 38%));
+    font-weight: 500;
+  }
 }
 
 .hotkeys [data-hotkey] {
@@ -559,25 +589,6 @@ $removedItemHeight: calc(
       width: calc(var(--w) - 1px); // subtracting 1px to match margin of `.script`
       content: '';
     }
-    &[data-columns="1"], &[data-columns="3"] {
-      .script:nth-child(even) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="2"] .script {
-      &:nth-child(4n + 2),
-      &:nth-child(4n + 3) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="4"] .script {
-      &:nth-child(8n + 2),
-      &:nth-child(8n + 4),
-      &:nth-child(8n + 5),
-      &:nth-child(8n + 7) {
-        background-color: var(--fill-0-5);
-      }
-    }
     .script {
       grid-template-columns:
         auto /* main icons */
@@ -591,7 +602,9 @@ $removedItemHeight: calc(
       margin: -1px 0 0 -1px;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
       border-radius: 0;
-      background: none;
+      &:not(.disabled):not(.removed) {
+        background: none;
+      }
       &:hover::after {
         // using a separate element with z-index higher than a sibling's overlapped border
         content: '';
@@ -608,6 +621,31 @@ $removedItemHeight: calc(
         display: flex;
         align-self: stretch;
         align-items: center;
+        min-width: 0;
+        /* When space runs out, the tags shrink first, then the message, then the name */
+        > .script-name {
+          flex: 0 1 auto;
+          min-width: 8ch;
+        }
+        > .script-tags {
+          flex: 0 10000 auto;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        > .script-message {
+          flex: 0 100 auto;
+          min-width: 4ch;
+          max-width: 24ch;
+          margin-left: auto;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: smaller;
+          color: var(--fill-8);
+        }
+      }
+      &.error .script-info-1 > .script-message {
+        color: #f00;
       }
       &-icon {
         width: 2rem;
@@ -621,8 +659,21 @@ $removedItemHeight: calc(
         justify-content: end;
         margin-left: .5rem;
         line-height: 1.2; /* not using 1.1 as it cuts descender in "g" */
+        /* Fixed widths, so each detail forms a column across the rows */
+        .script-author {
+          width: 14ch;
+          > .icon {
+            flex: none;
+          }
+          > .ellipsis {
+            max-width: none;
+          }
+        }
+        .version {
+          width: 11ch;
+        }
         .size {
-          width: 3em;
+          width: 4em;
           text-align: right;
         }
         .updated, .version, .visit {
@@ -630,10 +681,9 @@ $removedItemHeight: calc(
           color: var(--fill-8);
         }
         .updated, .visit {
-          width: 3em;
+          width: 3.5em;
         }
         .version:not(:empty)::before {
-          width: 6em;
           content: 'v';
         }
       }
@@ -641,6 +691,7 @@ $removedItemHeight: calc(
         order: -1;
         margin: 0;
         &-left {
+          min-width: 165px; /* as wide as in a normal row, so the recycled rows line up */
           > :first-child { /* edit button */
             display: none;
           }
@@ -649,16 +700,29 @@ $removedItemHeight: calc(
       &.removed .script-buttons .sep {
         display: none;
       }
-      &-message {
-        position: absolute;
-        right: .5em;
-        top: 2em;
-        z-index: 3;
-        font-size: smaller;
-        padding: 1px .5em;
-        border-radius: .5em;
-        border: 1px solid var(--fill-5);
-        background: var(--bg);
+    }
+    /* The author column needs a script column about 1000px wide */
+    @media (max-width: 1200px) {
+      .script-author {
+        display: none;
+      }
+    }
+    @media (max-width: 2240px) {
+      &[data-columns="2"] .script-author {
+        display: none;
+      }
+    }
+    @media (max-width: 3240px) {
+      &[data-columns="3"] .script-author {
+        display: none;
+      }
+    }
+    &[data-columns="4"] .script-author {
+      display: none;
+    }
+    @media (max-width: 860px) {
+      .version {
+        display: none;
       }
     }
   }
