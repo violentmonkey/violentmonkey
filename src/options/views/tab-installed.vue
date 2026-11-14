@@ -794,15 +794,15 @@ function bindKeys() {
     ...registerHotkey(() => {
       selectScript(state.focusedIndex - 1);
     }, [
-        ['ctrlcmd-left', conditionAll],
-        ['left', conditionNotSearch],
+        ['ctrlcmd-left', conditionNotNavigatable],
+        ['left', conditionNotNavigatable],
         ['h', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
       selectScript(state.focusedIndex + 1);
     }, [
-        ['ctrlcmd-right', conditionAll],
-        ['right', conditionNotSearch],
+        ['ctrlcmd-right', conditionNotNavigatable],
+        ['right', conditionNotNavigatable],
         ['l', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
