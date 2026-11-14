@@ -208,6 +208,7 @@ declare interface VMScript {
     downloadURL?: string;
     homepageURL?: string;
     lastInstallURL?: string;
+    policyUrls?: string[];
     updateURL?: string;
     icon?: string;
     injectInto?: VMScriptInjectInto;
