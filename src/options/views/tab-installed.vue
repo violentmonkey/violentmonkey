@@ -28,33 +28,36 @@
               </a>
             </Tooltip>
           </div>
-          <div v-if="filteredScripts.length" class="btn-group filtered">
-            <Tooltip
-              v-for="({ icon, num, tooltip }, key) in batchActions" :key
-              :content="tooltip[state.batchAction.action === key ? 1 : 0]"
-              placement="bottom"
-              align="start"
-            >
-              <a
-                class="btn-ghost"
-                :class="{
-                  'has-error': state.batchAction.action === key,
-                  disabled: store.batch,
-                }"
-                :data-batch-action="key"
-                tabindex="0"
-                @click.prevent="handleBatchAction"
+          <div v-if="filteredScripts.length || state.batchAction.undo" class="btn-group filtered">
+            <template v-if="filteredScripts.length">
+              <Tooltip
+                v-for="({ icon, num, tooltip }, key) in batchActions" :key
+                :content="tooltip[state.batchAction.action === key ? 1 : 0]"
+                placement="bottom"
+                align="start"
               >
-                <Icon :name="icon" />
-                <sub v-text="num" v-if="num" />
-                <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
-              </a>
-            </Tooltip>
-            <Tooltip :content="state.sizes" placement="bottom">
-              <div class="btn-hint subtle"
-                   v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
-                   :data-size="state.size"/>
-            </Tooltip>
+                <a
+                  class="btn-ghost"
+                  :class="{
+                    'has-error': state.batchAction.action === key,
+                    disabled: store.batch,
+                  }"
+                  :data-batch-action="key"
+                  tabindex="0"
+                  @click.prevent="handleBatchAction"
+                >
+                  <Icon :name="icon" />
+                  <sub v-text="num" v-if="num" />
+                  <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
+                </a>
+              </Tooltip>
+              <Tooltip :content="state.sizes" placement="bottom">
+                <div class="btn-hint subtle"
+                     v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
+                     :data-size="state.size"/>
+              </Tooltip>
+            </template>
+            <!-- Shown even with no scripts listed so that removing all of them can be undone -->
             <Tooltip :content="i18n('buttonUndo')" placement="bottom" align="start">
               <a v-if="state.batchAction.undo" class="btn-ghost" tabindex="0" @click.prevent="state.batchAction.undo">
                 <Icon name="undo" />
@@ -396,7 +399,7 @@ const ALL_BATCH_ACTIONS = {
     async fn(scripts, el, undo) {
       await Promise.all(scripts.map(s => markRemove(s, !undo)));
       // nuking the ghosts because the user's intent was already confirmed
-      if (!undo) store.scripts = [];
+      if (!undo) store.scripts = store.scripts.filter(s => !scripts.includes(s));
     },
   },
 };
