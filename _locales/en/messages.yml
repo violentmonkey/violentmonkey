@@ -1262,11 +1262,13 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * <kbd>Enter</kbd> key adds the text to autocomplete history
+    * Conditions are space separated
 
-    * All conditions are case-insensitive
+    * All conditions must match
 
-    * Space separated conditions can be combined
+    * Case-insensitive for conditions that are lowercase unquoted or <code>re:</code> prefixed
+
+    * Case-sensitive for Mixed Case, "quoted text", <code>/re/</code> without "i" flag
 
     * Search by metadata: <code>"Awesome Script" "Description"</code>
 

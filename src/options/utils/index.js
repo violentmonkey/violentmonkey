@@ -83,7 +83,7 @@ export function performSearch(scripts) {
         (!scope || scope === 'name') && ($cache.mark = re.exec($cache.name)) && 4 ||
         (!scope || scope === 'desc') && re.test($cache.desc) && 2 ||
         (!scope || scope === 'code') && re.test($cache.code) && 1;
-      if (negative ? res : !res) break;
+      if (negative ? res : !res) { show = 0; break; }
       if (res > show) show = res;
     }
     $cache.show = show;
