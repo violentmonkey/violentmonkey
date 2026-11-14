@@ -271,7 +271,7 @@ declare interface UIScriptCache {
   desc: string;
   lowerName: string;
   /** Name search result for highlighting the match */
-  mark?: RegExpExecArray;
+  marks?: RegExpExecArray[] & { tail: string };
   name: string;
   /** Search result grouping priority, 0: hide, 1: code, 2: desc, 3: tag, 4: name */
   show?: number;

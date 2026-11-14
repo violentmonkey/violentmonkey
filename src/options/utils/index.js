@@ -78,16 +78,39 @@ export function performSearch(scripts) {
   if (!rules?.length) return;
   for (const { $cache } of scripts) {
     let show = 0;
+    let marks, m, name;
     for (const { re, negative, scope } of rules) {
       const res = scope === kTag ? $cache[kTag].some(re.test, re) && 3 :
-        (!scope || scope === 'name') && ($cache.mark = re.exec($cache.name)) && 4 ||
+        (!scope || scope === 'name') && (m = re.exec(name ||= $cache.name)) &&
+          ((marks ||= {})[m.index + 1e9/* padding the key for native sort() */] = m, 4) ||
         (!scope || scope === 'desc') && re.test($cache.desc) && 2 ||
         (!scope || scope === 'code') && re.test($cache.code) && 1;
       if (negative ? res : !res) { show = 0; break; }
       if (res > show) show = res;
     }
+    $cache.marks = show && marks && splitNameByMarks(name, marks);
     $cache.show = show;
   }
+}
+
+function splitNameByMarks(name, marks) {
+  const res = /** @type {UIScriptCache['marks']} */[];
+  let prev;
+  let prevEnd = 0;
+  for (let pos of Object.keys(marks).sort()) {
+    const m = marks[pos];
+    pos -= 1e9;
+    if (pos >= prevEnd) {
+      m[1] = name.slice(prevEnd, pos); // preceding nonmatching text
+      res.push(m);
+      prev = m;
+    } else { // overlap
+      prev[0] += m[0].slice(prevEnd - pos); // extend prev
+    }
+    prevEnd = pos + m[0].length;
+  }
+  res.tail = name.slice(prevEnd);
+  return res;
 }
 
 export async function runInBatch(fn, ...args) {

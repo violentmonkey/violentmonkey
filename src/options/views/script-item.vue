@@ -23,10 +23,11 @@
       <a v-bind="viewTable && { draggable: false, href: url, tabIndex }"
          :data-order="isRemoved ? null : script.props.position"
          class="script-name ellipsis">
-        <template v-if="(n = cache.name, m = cache.mark)">{{
-          n.slice(0, m.index)}}<mark v-text="m[0]"/>{{n.slice(m.index + m[0].length)
-        }}</template>
-        <template v-else>{{n}}</template>
+        <template v-if="cache.marks">
+          <template v-for="[mark, prev] of cache.marks" :key="mark + '\n' + prev">{{
+              prev}}<mark v-text="mark"/></template>{{
+            cache.marks.tail}}</template>
+        <template v-else>{{cache.name}}</template>
       </a>
       <div class="script-tags" v-if="canRender">
         <a
@@ -209,7 +210,7 @@ const author = computed(() => {
     name: matches ? matches[1] : text,
   };
 });
-const cache = computed(() => props.script.$cache);
+const cache = computed(() => /**@type{UIScriptCache}*/props.script.$cache);
 const canUpdate = computed(() => props.script.$canUpdate);
 const notDataUrlRe = /^(?!data:)/;
 const canUpdateDeps = computed(() => {

@@ -620,7 +620,7 @@ function scheduleSearch() {
   if (ids?.length) getCodeFromStorage(ids);
   if (!state.search.rules.length) {
     for (const { $cache } of /**@type{UIScript[]}*/store.scripts) {
-      $cache.mark = $cache.show = null;
+      $cache.marks = $cache.show = null;
     }
   }
   onUpdate();
