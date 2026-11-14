@@ -12,6 +12,9 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
+$issueIconSize: 16px; 
+$itemWidth: 2rem;
+$submenuButtonPad: calc(($itemWidth - $iconSize) / 2);
 
 $hoverColor: var(--bg);
 $hoverBack: cornflowerblue;
@@ -124,15 +127,6 @@ footer {
   align-self: stretch;
   align-items: center;
   display: flex;
-  .tardy {
-    margin-left: .5rem;
-    color: red;
-    .icon {
-      width: 16px;
-      height: 16px;
-      vertical-align: text-bottom;
-    }
-  }
 }
 
 .menu-buttons {
@@ -249,29 +243,51 @@ footer {
   }
   &-buttons {
     display: flex;
-    position: absolute;
-    top: 0;
-    right: 0;
-    .script:hover &, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
-    .touch & {
-      display: flex !important;
+    align-items: center;
+    flex-shrink: 0;
+    .issue {
+      box-sizing: border-box;
+      width: $itemWidth;                          /* 2rem = 28px */
+      height: $itemWidth;
+      padding: 0;                                 /* was .5rem */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: red;
+      &:focus-visible {
+        outline: 1px solid currentColor;
+        outline-offset: -1px;
+      }
+      .icon {
+        width: $issueIconSize;                    /* 16px, fits */
+        height: $issueIconSize;
+      }
     }
   }
   &-button {
-    padding: .5rem;
+    display: none;
+    padding: $submenuButtonPad;
     line-height: 1;
     background: var(--bg);
     cursor: pointer;
+    .script:hover &, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
+    .script:focus-within &,
+    .script.extras-shown &,
+    .touch & {
+      display: block;
+    }
     &:hover, /* some browsers like Firefox or Vivaldi 8.1 don't focus the popup */
     &:focus {
       color: var(--bg);
       background: $hoverBack;
     }
-    .menu-item:hover + .submenu-buttons &:not(:focus):not(:hover) {
+    .menu-item:hover &:not(:focus):not(:hover) {
       background: var(--button-hover-inactive-bg, $hoverButtonInactiveBack);
     }
     .icon {
       display: block;
+      width: $iconSize;
+      height: $iconSize;
     }
   }
   &-commands {
@@ -299,6 +315,22 @@ footer {
       }
     }
   }
+}
+
+.script {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;   /* buttons stay on line 1 when .upd wraps inside .menu-item */
+  > .menu-item {
+    flex: 1;
+    min-width: 0;              /* lets the name ellipsize instead of pushing the buttons off */
+    padding-right: .5rem;
+  }
+}
+
+.excludes-menu,
+.submenu-commands {
+  flex-basis: 100%;
 }
 
 .failure-reason {
