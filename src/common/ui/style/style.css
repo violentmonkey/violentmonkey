@@ -150,6 +150,9 @@ input[type=password],
 textarea {
   padding: 0 .2em;
 }
+input[type="search"]::-webkit-search-cancel-button {
+  margin-inline-start: 4px;
+}
 kbd,
 code {
   padding: 0 .2em;
