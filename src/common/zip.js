@@ -8,12 +8,13 @@ export const kStorageJson = '.storage.json';
 
 /** @param {Blob | import('fflate').Zippable} data */
 export async function zipOrUnzip(data) {
-  const worker = new Worker(__.PUBLIC_LIB + '/zip-worker.js');
-  worker.onerror = worker.onmessageerror = e => rejectPending(`${e}`);
-  worker.onmessage = onClientMessage.bind(null, noop);
+  let worker;
   try {
+    worker = new Worker(__.PUBLIC_LIB + 'zip-worker.js');
+    worker.onerror = worker.onmessageerror = e => rejectPending(`${e}`);
+    worker.onmessage = onClientMessage.bind(null, noop);
     return await sendCmdTo('', data, worker, null, NO_PROXY);
   } finally {
-    worker.terminate();
+    worker?.terminate();
   }
 }
