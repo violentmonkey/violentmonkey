@@ -92,19 +92,20 @@ addOwnCommands({
   GetTags: () => getScriptsTags(aliveScripts),
   /** @return {Promise<void>} */
   async MarkRemoved({ id, removed }) {
-    if (!removed === !getScriptById(id).config.removed) return;
-    if (!removed) {
-      const script = getScriptById(id);
-      const conflict = getScript({ meta: script.meta });
-      if (conflict) throw i18n('msgNamespaceConflictRestore');
+    let script = scriptMap[id];
+    if (!removed === !script.config.removed) {
+      return;
+    }
+    if (!removed && getScript({ meta: script.meta })) {
+      throw i18n('msgNamespaceConflictRestore');
     }
     await updateScriptInfo(id, {
       config: { removed: removed ? 1 : 0 },
       props: { lastModified: Date.now() },
     });
     const list = removed ? aliveScripts : removedScripts;
-    const i = list.findIndex(script => script.props.id === id);
-    const [script] = list.splice(i, 1);
+    script = scriptMap[id]; // may be a deepCopy if updateScriptMap() was called during await
+    list.splice(list.indexOf(script), 1);
     (removed ? removedScripts : aliveScripts).push(script);
   },
   /** @return {boolean} */
