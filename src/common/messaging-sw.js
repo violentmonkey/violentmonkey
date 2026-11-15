@@ -81,7 +81,9 @@ export async function onClientMessage(handler, { data, source }) {
 export function rejectPending(msg) {
   for (const p of pending.values()) {
     const err = new Error(msg);
-    err.stack = p.stack;
+    const local = p.stack;
+    // Chromium duplicates the error message in the 1st line of the stack
+    err.stack = local.includes('\n ') ? msg + local.replace(/^.+/, '') : local;
     p.reject(err);
   }
   pending.clear();
