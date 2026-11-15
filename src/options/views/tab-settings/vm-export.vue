@@ -46,7 +46,7 @@ function normalizeFilename(name) {
 
 async function exportData() {
   const withValues = options.get('exportValues');
-  const { items, values } = await sendCmdDirectly('ExportZip', {
+  const items = await sendCmdDirectly('ExportZip', {
     values: withValues,
   });
   const names = {};
@@ -59,13 +59,14 @@ async function exportData() {
   const files = {};
   delete vm.settings.sync;
   if (withValues) vm.values = vmValues;
-  for (const { /**@type{VMScript}*/script, code } of items) {
+  for (const item of items) {
+    const { code, values, /**@type{VMScript}*/...script } = item;
     let name = normalizeFilename(getScriptName(script));
     if (names[name]) {
       names[name] += 1;
       name = `${name}_${names[name]}`;
     } else names[name] = 1;
-    const { id, position, uri, lastModified, lastUpdated } = script.props;
+    const { position, uri, lastModified, lastUpdated } = script.props;
     const modDate = lastUpdated || lastModified;
     const info = {
       custom: script.custom,
@@ -74,11 +75,10 @@ async function exportData() {
       lastModified,
       lastUpdated,
     };
-    const v = withValues && values[id];
-    if (v) {
+    if (values) {
       // `values` are related to scripts by `props.id` in Violentmonkey,
       // but by the global `props.uri` when exported.
-      vmValues[uri] = v;
+      vmValues[uri] = values;
     }
     vmScripts[name] = info;
     files[`${name}.user.js`] = [
