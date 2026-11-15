@@ -92,6 +92,7 @@ addOwnCommands({
   GetTags: () => getScriptsTags(aliveScripts),
   /** @return {Promise<void>} */
   async MarkRemoved({ id, removed }) {
+    if (!removed === !getScriptById(id).config.removed) return;
     if (!removed) {
       const script = getScriptById(id);
       const conflict = getScript({ meta: script.meta });
