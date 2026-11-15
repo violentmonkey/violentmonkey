@@ -1,6 +1,7 @@
 import { i18n, defaultImage, sendTabCmd, trueJoin } from '@/common';
 import { addPublicCommands, commands, init } from './init';
 import sessionData, { flushSession, kNotifications, notifications } from './session-data';
+import { tabOpen } from './tabs';
 import { vetUrl } from './url';
 
 const kZombie = 'zombie';
@@ -64,7 +65,7 @@ async function notifyOpener(id, isClick) {
     if (isClick) clearZombieTimer(op);
   } else if (op[kZombie]) {
     if (isClick) {
-      commands.TabOpen({ url: op[kZombieUrl] }, op);
+      tabOpen({ url: op[kZombieUrl] }, op);
     }
   } else {
     sendTabCmd(op.tabId, isClick ? 'NotificationClick' : 'NotificationClose', id, {
