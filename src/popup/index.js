@@ -168,8 +168,6 @@ function onResize(evt) {
   if (!evt
   // ignoring intermediate downsize
   || h > hPrev
-  // ignoring  initial devicePixelRatio which is based on page zoom in this extension's tabs
-    && document.readyState !== 'loading'
   // ignoring off-by-1 e.g. due to clientHeight being fractional
     && document.body.clientHeight - 1 > h
   ) {
