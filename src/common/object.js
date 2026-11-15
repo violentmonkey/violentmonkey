@@ -85,11 +85,16 @@ export function forEachValue(func, thisObj) {
   if (this) Object.values(this).forEach(func, thisObj);
 }
 
+/**
+ * @template T
+ * @param {T} src
+ * @return {T}
+ */
 export function deepCopy(src) {
   if (!src || typeof src !== 'object') return src;
-  // Using a literal [] instead of `src.map(deepCopy)` to avoid src `window` leaking.
-  // Using `concat` instead of `for` loop to preserve holes in the array.
-  if (Array.isArray(src)) return [].concat(src).map(deepCopy);
+  // Using a local realm's [] instead of `src.map(deepCopy)` to avoid src `window` leaking.
+  // Note that `map` preserves holes in the array.
+  if (Array.isArray(src)) return src::[].map(deepCopy);
   return src::mapEntry(deepCopy);
 }
 
