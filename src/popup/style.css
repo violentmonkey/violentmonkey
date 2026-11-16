@@ -12,7 +12,7 @@ $logoMLR: calc(($leftPaneWidth - $logoSize) / 2);
 $topIconSize: 20px;
 $findIconSize: 16px;
 $findIconML: calc($leftPaneWidth - $findIconSize - $iconMR);
-$issueIconSize: 16px; 
+$issueIconSize: 16px;
 $itemWidth: 2rem;
 $submenuButtonPad: calc(($itemWidth - $iconSize) / 2);
 
@@ -247,9 +247,9 @@ footer {
     flex-shrink: 0;
     .issue {
       box-sizing: border-box;
-      width: $itemWidth;                          /* 2rem = 28px */
+      width: $itemWidth;
       height: $itemWidth;
-      padding: 0;                                 /* was .5rem */
+      padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -259,7 +259,7 @@ footer {
         outline-offset: -1px;
       }
       .icon {
-        width: $issueIconSize;                    /* 16px, fits */
+        width: $issueIconSize;
         height: $issueIconSize;
       }
     }
@@ -281,7 +281,7 @@ footer {
       color: var(--bg);
       background: $hoverBack;
     }
-    .menu-item:hover &:not(:focus):not(:hover) {
+    .menu-item:hover + .submenu-buttons &:not(:focus):not(:hover) {
       background: var(--button-hover-inactive-bg, $hoverButtonInactiveBack);
     }
     .icon {
@@ -320,10 +320,10 @@ footer {
 .script {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;   /* buttons stay on line 1 when .upd wraps inside .menu-item */
+  align-items: flex-start; /* buttons stay on line 1 when .upd wraps inside .menu-item */
   > .menu-item {
     flex: 1;
-    min-width: 0;              /* lets the name ellipsize instead of pushing the buttons off */
+    min-width: 0; /* lets the name ellipsize instead of pushing the buttons off */
     padding-right: .5rem;
   }
 }
