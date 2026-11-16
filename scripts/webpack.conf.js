@@ -7,6 +7,9 @@ const { MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
 const { getBaseConfig, getPageConfig, isProd } = require('./webpack-base');
 const ForbidNamespaceFallbackPlugin = require('./webpack-forbid-ns-fallback-plugin');
+const GroupAssetsPlugin = require('./webpack-group-assets-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 const { GLOBALS, addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 
 // Avoiding collisions with globals of a content-mode userscript
@@ -100,6 +103,12 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
 
 module.exports = [
   buildConfig('', '', GLOBALS.common, ownWrappers, (config) => {
+    config.plugins.push(
+      new VueLoaderPlugin(),
+      new GroupAssetsPlugin(),
+      isProd && new MiniCssExtractPlugin({ filename: '[name].css' }),
+      require('unplugin-icons/webpack')(),
+    );
     if (!MV3) config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
@@ -113,7 +122,11 @@ module.exports = [
     });
   }),
 
-  MV3 && buildConfig(pgSW, './src/background/sw', GLOBALS.common, ownWrappers),
+  MV3 && buildConfig(pgSW, './src/background/sw', GLOBALS.common, ownWrappers, (config) => {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/\/common\/tld$/, (r) => { r.request += '-mv3'; }),
+    );
+  }),
 
   MV3 && buildConfig(pgOffscreen, './src/offscreen', GLOBALS.common, ownWrappers, (config) => {
     const dir = `${config.output.path}/offscreen`;
