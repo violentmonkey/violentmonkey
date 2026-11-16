@@ -91,7 +91,7 @@
             failed: item.failed,
             removed: item.config.removed,
             runs: item.runs,
-            'extras-shown': extras === item,
+            'extras-shown': extras?.id === item.id,
             'excludes-shown': item.excludes,
           }"
           class="script">
