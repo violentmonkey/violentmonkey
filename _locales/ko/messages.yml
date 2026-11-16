@@ -720,6 +720,9 @@ labelShowOrder:
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: 최근 방문 시각 표시
+labelSize:
+  description: $1 is a size number like "1.1 MB".
+  message: ''
 labelSync:
   description: Label for sync options.
   message: 동기화

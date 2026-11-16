@@ -687,6 +687,9 @@ labelShowOrder:
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: ''
+labelSize:
+  description: $1 is a size number like "1.1 MB".
+  message: ''
 labelSync:
   description: Label for sync options.
   message: Synkronointi
