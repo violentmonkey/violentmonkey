@@ -94,6 +94,10 @@ const buildConfig = (page, entry, globalsScope, wrap, init) => {
     '__.WEB': [pgInjectedWeb, pgZipWorker].includes(page),
   };
   const config = (entry ? getBaseConfig : getPageConfig)(page);
+  if (page === pgZipWorker) {
+    // Drop async leftovers in fflate as we use sync methods inside a dedicated Worker.
+    vars['typeof queueMicrotask'] = vars['typeof setTimeout'] = 'undefined';
+  }
   config.plugins.push(new webpack.DefinePlugin(vars));
   if (entry) config.entry = { [page]: entry };
   if (init) init(config);
