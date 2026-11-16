@@ -1266,9 +1266,11 @@ titleSearchHintV2:
 
     * All conditions must match
 
-    * Case-insensitive for conditions that are lowercase unquoted or <code>re:</code> prefixed
+    * Case-insensitive for conditions that are lowercase unquoted or
+    <code>re:</code> prefixed
 
-    * Case-sensitive for Mixed Case, "quoted text", <code>/re/</code> without "i" flag
+    * Case-sensitive for Mixed Case, "quoted text", <code>/re/</code> without
+    "i" flag
 
     * Search by metadata: <code>"Awesome Script" "Description"</code>
 
