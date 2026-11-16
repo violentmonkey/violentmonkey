@@ -1,10 +1,10 @@
 import { browserWindows, getActiveTab, i18n, makePause, noop, sendTabCmd } from '@/common';
 import browser from '@/common/browser';
-import { getDomain } from '@/common/tld';
 import { addOwnCommands, addPublicCommands, commands, init } from './init';
 import { getOption } from './options';
 import sessionData, { flushSession, kTabOpeners, tabOpeners } from './session-data';
 import { testScript } from './tester';
+import { getDomain } from './tld';
 import { CHROME } from './ua';
 import { vetUrl } from './url';
 

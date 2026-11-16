@@ -43,6 +43,7 @@ permissions:
   - clipboardWrite
   - contextMenus
   - cookies
+  - publicSuffix
 optional_permissions:
   - downloads
 commands:

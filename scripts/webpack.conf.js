@@ -124,7 +124,7 @@ module.exports = [
 
   MV3 && buildConfig(pgSW, './src/background/sw', GLOBALS.common, ownWrappers, (config) => {
     config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(/\/common\/tld$/, (r) => { r.request += '-mv3'; }),
+      new webpack.NormalModuleReplacementPlugin(/\/tld-impl$/, (r) => { r.request += '-mv3'; }),
     );
   }),
 
