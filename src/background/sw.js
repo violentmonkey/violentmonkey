@@ -42,7 +42,7 @@ global.onfetch = async evt => {
 
 global.oninstall = evt => {
   // Load tldjs on install to allow on-demand loading later as per SW spec.
-  getDomain('');
+  getDomain('a');
   // Not implemented in some browsers?
   evt.addRoutes?.({
     condition: { urlPattern: `${GET_DATA_URL}*` },
