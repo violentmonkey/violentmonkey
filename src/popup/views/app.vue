@@ -126,7 +126,7 @@
             </a>
             <!-- Using a standard tooltip that's shown after a delay to avoid nagging the user -->
             <div class="submenu-button" :tabIndex @click="onEditScript(item)"
-                :title="i18n('buttonEditClickHint')">
+                 :title="i18n('buttonEditClickHint')">
               <icon name="code"></icon>
             </div>
             <div
