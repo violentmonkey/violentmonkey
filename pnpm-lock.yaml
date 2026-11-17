@@ -188,23 +188,23 @@ importers:
   .:
     dependencies:
       '@usync/drive':
-        specifier: ^0.3.2
-        version: 0.3.2
+        specifier: ^0.3.3
+        version: 0.3.3
       '@usync/oauth2':
         specifier: ^0.1.8
         version: 0.1.8
       '@usync/sync':
         specifier: ^0.1.1
         version: 0.1.1
+      '@usync/xml-parser':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@violentmonkey/mcp-client':
         specifier: ^0.2.0
         version: 0.2.0
       '@violentmonkey/shortcut':
         specifier: ^1.4.4
         version: 1.4.4
-      '@violentmonkey/xml-parser':
-        specifier: ^1.0.1
-        version: 1.0.1
       codemirror:
         specifier: ^5.65.20
         version: 5.65.20
@@ -2414,8 +2414,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@usync/drive@0.3.2':
-    resolution: {integrity: sha512-TQiuTYJgPpbdeClkwz3oODcwq/x6sjRwo2jmYiKMR74aLwXqBqqjOow2CdGxRcPzDIv25vTBk44kXpLy2dhXig==}
+  '@usync/drive@0.3.3':
+    resolution: {integrity: sha512-kOuC0ZFMGQwsS8t88+Ye8zHFIqyuEX+fw4v209OwSYgUcmfXPT+RUJYyOlbpXr6/NHd8y9kPDXgt2+QVfweGkw==}
 
   '@usync/oauth2@0.1.8':
     resolution: {integrity: sha512-jwOxCwC3zes+O7/aUa/Y9bEnxLkPfuX5kc/jUgUhDzF1n+TeNmqgqnZf+Y56LSpzrRk37BFDcClKnnNsPQDkhQ==}
@@ -2425,6 +2425,9 @@ packages:
 
   '@usync/util@0.1.0':
     resolution: {integrity: sha512-PXB6rpAxtMEuj+mi7I11//urfMxZyH8hQ41wn1VG44nXr9wtIEeomo7OqilfG8kIWrB0jbeYtjE+IrakKLEByg==}
+
+  '@usync/xml-parser@0.1.0':
+    resolution: {integrity: sha512-12FrOSwocoQ6lgtGj9IJNgiubAex83Zt0x5Mn6Okh2fpyc0TaaE9IorwB8LgZRr6kGU86Ev9LovYpM3GpC23Jg==}
 
   '@violentmonkey/mcp-client@0.2.0':
     resolution: {integrity: sha512-IGBMlIPyaOTHTyT2h9PqRRY08SImFrFGp84KSrlxAluCx93Sk+SzWS1alW8gsX8hJ5iqDoqvlJcaL+l6VrhZTA==}
@@ -2438,10 +2441,6 @@ packages:
 
   '@violentmonkey/types@0.3.5':
     resolution: {integrity: sha512-9HgYx5WjO3z6uBva0VGqR0jbhC5HuePl/K7Mw13bsE4vFsKywoHHR5NeM6APRHbvAfRf+q/oh95xa/IluVhHlw==}
-
-  '@violentmonkey/xml-parser@1.0.1':
-    resolution: {integrity: sha512-zgFXl/+JKqpwCxEnKCcB8EBH55c4khE5NNIvXJQNLLt3T2Ib4FdoR1zK95dBrURKXjtvzscWRxH/gazYkJYPBA==}
-    deprecated: Moved to @usync/xml-parser
 
   '@volar/language-core@2.4.30':
     resolution: {integrity: sha512-73fjwEV8wat6aOZ6U/y/hqtE30ocrIWECg67b0txGczOMNw+MffLmvJ5fnFfN9drVUEYZzLdaNo6VAy6G6avMw==}
@@ -8582,10 +8581,11 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@usync/drive@0.3.2':
+  '@usync/drive@0.3.3':
     dependencies:
       '@usync/oauth2': 0.1.8
       '@usync/util': 0.1.0
+      '@usync/xml-parser': 0.1.0
       isomorphic-git: 1.42.2
 
   '@usync/oauth2@0.1.8':
@@ -8596,6 +8596,8 @@ snapshots:
   '@usync/sync@0.1.1': {}
 
   '@usync/util@0.1.0': {}
+
+  '@usync/xml-parser@0.1.0': {}
 
   '@violentmonkey/mcp-client@0.2.0':
     dependencies:
@@ -8614,8 +8616,6 @@ snapshots:
       '@types/firefox-webext-browser': 143.0.0
       chrome-types: 0.1.464
       user-agent-data-types: 0.4.2
-
-  '@violentmonkey/xml-parser@1.0.1': {}
 
   '@volar/language-core@2.4.30':
     dependencies:
