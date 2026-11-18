@@ -57,7 +57,9 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
   let sentTextLength = 0;
   let sentReadyState4;
   let tmp;
-  const { id, xhr, dl, [kFileName]: fileName } = req;
+  let fileName = req[kFileName];
+  let fileNameForTabDL;
+  const { id, dl, xhr } = req;
   const getResponseHeaders = () => req[kResponseHeaders] || xhr.getAllResponseHeaders();
   const eventQueue = [];
   const sequentialize = async () => {
@@ -98,11 +100,13 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           : blobbed ? 1 : 0;
       }
     }
-    if (response && isEnd && dl) {
-      downloadBlob(response, fileName);
+    if (dl && isEnd && response) {
+      fileName ||= getFileNameFromXHR(req, xhr);
+      if (IS_FIREFOX && dl === 'tab') fileNameForTabDL = fileName;
+      else downloadBlob(response, fileName);
     }
     const shouldSendResponse =
-      !upload && !dl && shouldNotify && (!isJson || readyState4) && !sent;
+      !upload && dl !== true && shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
@@ -117,7 +121,7 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
     }
     /* WARNING! We send `null` in the mandatory props because Chrome can't send `undefined`,
      * and for simple destructuring and `prop?.foo` in the receiver without getOwnProp checks. */
-    await req.cb({
+    const msg = {
       blobbed,
       chunked,
       contentType,
@@ -136,11 +140,40 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
           : null,
       } : null,
       [UPLOAD]: upload,
-    });
+    };
+    if (IS_FIREFOX && fileNameForTabDL) msg[kFileName] = fileNameForTabDL;
+    await req.cb(msg);
     if (__.MV3 && isEnd) xhrs.delete(id);
   };
   return (evt) => {
     eventQueue.push(evt);
     lastPromise = lastPromise.then(sequentialize);
   };
+}
+
+/**
+ * @param {GMReq.BG} req
+ * @param {XMLHttpRequest} xhr
+ * @return {string}
+ */
+export function getFileNameFromXHR(req, xhr) {
+  let v = xhr.getResponseHeader('Content-Disposition');
+  if ((v &&= // Preferring the newer filename* over filename
+    v.match(/;\s*filename\*\s*=\s*UTF-8'([-\w]*)'([^;]+)/i) ||
+    v.match(/;\s*filename\s*=\s*(["']?)(.+[^\\])\2(?=;|$)/i)
+  ) && (v = v[2].trim())) {
+    // ok
+  } else {
+    v = new URL(req.url || xhr.responseURL);
+    // TODO: add a missing file extension based on contentType
+    v = (
+      v.pathname.replace(/\//g, '\n') + // \nPath1\nPath2...
+      v.search.replace(/[?&][^=&]*=?/g, '\n') // \nQueryValue1\nQueryValue2...
+      // Try file.ext with valid chars from https://crsrc.org/base/i18n/file_util_icu.cc
+      // eslint-disable-next-line no-control-regex
+    ).match(/\b[^\x00-\x1F\x7F"*/:<>?\\|\uFDD0\uFDEF\uFFFE]+\.[-\w]+$|$/gmu).pop()
+      // Try the last path component and let the browser replace the invalid chars
+      || v.pathname.match(/([^/]+)\/?$|$/)[1];
+  }
+  return v ? decodeURIComponent(v) : 'file.txt';
 }

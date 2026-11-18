@@ -24,7 +24,7 @@ export default async function downloadViaApi(opts, events, id, req, src, fileNam
   const { headers } = opts;
   const dlId = await browser.downloads.download({
     conflictAction: opts.conflictAction,
-    filename: fileName,
+    filename: fileName || undefined,
     headers: headers ? Object.entries(headers).map(objEntryToApiHeader).filter(Boolean) : undefined,
     method: opts.method || 'GET',
     saveAs: opts.saveAs,

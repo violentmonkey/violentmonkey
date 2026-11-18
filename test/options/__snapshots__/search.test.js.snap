@@ -27,12 +27,22 @@ exports[`createSearchRules 2`] = `
     },
     {
       "negative": false,
-      "re": /CaseSensitive/u,
+      "re": /Case/u,
       "scope": "",
     },
     {
       "negative": false,
-      "re": /CaseInsensitive/iu,
+      "re": /Case/u,
+      "scope": "",
+    },
+    {
+      "negative": false,
+      "re": /case/u,
+      "scope": "",
+    },
+    {
+      "negative": false,
+      "re": /no-case/iu,
       "scope": "",
     },
   ],
@@ -63,15 +73,27 @@ exports[`createSearchRules 2`] = `
     },
     {
       "negative": false,
-      "parsed": "CaseSensitive",
+      "parsed": "Case",
       "prefix": "",
-      "raw": ""CaseSensitive"",
+      "raw": ""Case"",
     },
     {
       "negative": false,
-      "parsed": "CaseInsensitive",
+      "parsed": "Case",
       "prefix": "",
-      "raw": "CaseInsensitive",
+      "raw": "Case",
+    },
+    {
+      "negative": false,
+      "parsed": "case",
+      "prefix": "",
+      "raw": ""case"",
+    },
+    {
+      "negative": false,
+      "parsed": "no-case",
+      "prefix": "",
+      "raw": "no-case",
     },
   ],
 }

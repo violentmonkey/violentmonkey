@@ -51,6 +51,7 @@
             </dl>
           </div>
           <div v-if="!script && message" v-text="message" class="warning"/>
+          <div v-if="script" v-text="formattedSize"/>
         </div>
       </div>
       <div class="flex" v-if="script">
@@ -117,9 +118,10 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import {
-  debounce, getFullUrl, getLocaleString, getScriptHome, i18n, isRemote, makePause, sendCmdDirectly,
-  trueJoin,
+  debounce, formatByteLength, getFullUrl, getLocaleString, getScriptHome, i18n, isRemote,
+  makePause, sendCmdDirectly, trueJoin,
 } from '@/common';
+import { FMT_SIZE_KB_MB } from '@/common/consts';
 import { keyboardService, isMacintosh } from '@/common/keyboard';
 import initCache from '@/common/cache';
 import { loadScriptIcon } from '@/common/load-script-icon';
@@ -149,6 +151,7 @@ const cmOptions = ref({ lineWrapping: true });
 const code = ref('');
 const commands = ref({ close: closeTab });
 const deps = ref({}); // combines `require` and `resources` i.e. all actually loaded deps
+const iconSize = ref(0);
 const descr = ref('');
 const error = ref();
 const heading = ref(i18n('msgLoadingData'));
@@ -167,6 +170,21 @@ const sameCode = ref(false);
 const script = ref();
 const tracking = ref(false);
 
+const formattedSize = computed(() => {
+  const size = code.value.length;
+  const depsSize = (iconSize.value || 0)
+    + Object.values(deps.value).reduce((sum, v) => v ? sum + v.length : sum, 0);
+  const depsStr = !depsSize ? '' : ' + '
+    + formatByteLength(depsSize, FMT_SIZE_KB_MB) + ' @'
+    + [
+      requireUrls?.length && 'require',
+      resourceUrls?.length && 'resource',
+      iconSize.value && 'icon',
+    ]::trueJoin('/')
+    + ' = '
+    + formatByteLength(size + depsSize, FMT_SIZE_KB_MB);
+  return i18n('labelSize', formatByteLength(size, FMT_SIZE_KB_MB) + depsStr);
+});
 const hotkey = computed(() => ({
   [isLocal.value && $track.value?.value ? 'track'
     : $edit.value?.value ? 'edit'
@@ -275,6 +293,9 @@ async function loadNewFileHandle(fh) {
   await nextTick();
   fileHandle = fh;
   infoVal = info.value = { url: fh._url || DROP_PREFIX + fh.name };
+  deps.value = {};
+  iconSize.value = 0;
+  requireUrls = resourceUrls =
   error.value = safeIcon.value = message.value = requireCache = resourceCache = null;
   await initScript();
   if (!disposeList) initKeys();
@@ -340,9 +361,7 @@ async function parseMeta() {
   else return res;
 }
 async function loadDeps() {
-  if (!safeIcon.value) {
-    loadScriptIcon(script.value).then(url => { safeIcon.value = url; });
-  }
+  if (!safeIcon.value) loadIcon();
   if (requireCache
   && deepEqual([...requireUrls].sort(), Object.keys(requireCache).sort())
   && deepEqual([...resourceUrls].sort(), Object.keys(resourceCache).sort())) {
@@ -389,6 +408,13 @@ async function loadDeps() {
     message.value = null;
     return true;
   }
+}
+async function loadIcon() {
+  const iconCache = {};
+  const res = await loadScriptIcon(script.value, { cache: iconCache });
+  const remoteUrl = Object.keys(iconCache)[0];
+  safeIcon.value = res;
+  iconSize.value = remoteUrl ? await sendCmdDirectly('GetCachedSize', remoteUrl) : 0;
 }
 function closeTab() {
   if (__.MV3 && history.length) {

@@ -15,14 +15,13 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { strToU8, zipSync } from 'fflate';
 import { getScriptName, sendCmdDirectly } from '@/common';
 import { formatDate } from '@/common/date';
 import options from '@/common/options';
 import { downloadBlob } from '@/common/download';
-import { vmZipEntryName } from '@/options/utils';
 import SettingCheck from '@/common/ui/setting-check';
 import SettingText from '@/common/ui/setting-text';
+import { vmZipEntryName, zipOrUnzip } from '@/common/zip';
 import VmDateInfo from './vm-date-info';
 
 const tpl = ref();
@@ -47,7 +46,7 @@ function normalizeFilename(name) {
 
 async function exportData() {
   const withValues = options.get('exportValues');
-  const { items, values } = await sendCmdDirectly('ExportZip', {
+  const items = await sendCmdDirectly('ExportZip', {
     values: withValues,
   });
   const names = {};
@@ -60,13 +59,14 @@ async function exportData() {
   const files = {};
   delete vm.settings.sync;
   if (withValues) vm.values = vmValues;
-  for (const { /**@type{VMScript}*/script, code } of items) {
+  for (const item of items) {
+    const { code, values, /**@type{VMScript}*/...script } = item;
     let name = normalizeFilename(getScriptName(script));
     if (names[name]) {
       names[name] += 1;
       name = `${name}_${names[name]}`;
     } else names[name] = 1;
-    const { id, position, uri, lastModified, lastUpdated } = script.props;
+    const { position, uri, lastModified, lastUpdated } = script.props;
     const modDate = lastUpdated || lastModified;
     const info = {
       custom: script.custom,
@@ -75,20 +75,19 @@ async function exportData() {
       lastModified,
       lastUpdated,
     };
-    const v = withValues && values[id];
-    if (v) {
+    if (values) {
       // `values` are related to scripts by `props.id` in Violentmonkey,
       // but by the global `props.uri` when exported.
-      vmValues[uri] = v;
+      vmValues[uri] = values;
     }
     vmScripts[name] = info;
     files[`${name}.user.js`] = [
-      strToU8(code),
+      code,
       modDate && { mtime: new Date(modDate) },
     ];
   }
-  files[vmZipEntryName] = [strToU8(JSON.stringify(vm, null, 2))]; // prettify to help users diff or view it
-  return new Blob([zipSync(files)], { type: 'application/zip' });
+  files[vmZipEntryName] = [JSON.stringify(vm, null, 2)]; // prettify to help users diff or view it
+  return zipOrUnzip(files);
 }
 </script>
 

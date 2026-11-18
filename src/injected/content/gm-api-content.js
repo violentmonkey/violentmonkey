@@ -4,7 +4,6 @@ import { decodeResource, elemByTag, makeElem, nextTask, sendCmd } from './util';
 
 const menus = createNullObj();
 const HEAD_TAGS = ['script', 'style', 'link', 'meta'];
-const { toLowerCase } = '';
 const jsonStringify = JSON.stringify;
 let sentMenus = '{}';
 let setPopupThrottle;

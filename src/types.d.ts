@@ -57,12 +57,10 @@ declare namespace GMReq {
   interface BG {
     cb: (data: GMReq.Message.BGAny) => Promise<void>;
     cbe: (err: string|Error) => Promise<void>;
-    /** use browser's `Cookie` header */
-    cookie?: boolean;
-    /** allow Set-Cookie header to affect browser */
-    'set-cookie'?: boolean;
+    /** URL origin for `Cookie` and `Set-Cookie` headers */
+    cookie?: string;
     coreId: string;
-    dl: boolean;
+    dl?: boolean | 'tab';
     dlEvents?: EventTypeMap;
     dlId?: number;
     /** Firefox-only workaround for CSP blocking a blob: URL */
@@ -83,7 +81,6 @@ declare namespace GMReq {
   interface Content {
     chunks?: Uint8Array | string[];
     dl: boolean;
-    fileName?: string;
     realm: VMScriptInjectInto;
     /** Used to wait before dispatching events that follow an event that asynchrously imports a binary response */
     p?: Promise<Blob|ArrayBuffer>;
@@ -108,7 +105,7 @@ declare namespace GMReq {
       chunked: boolean;
       contentType: string;
       data: VMScriptResponseObject<any>;
-      dl?: boolean;
+      fileName?: string;
       id: string;
       type: EventType;
       upload: 0 | 1;
@@ -132,8 +129,7 @@ declare namespace GMReq {
       scriptId: number;
       anonymous: boolean;
       conflictAction?: chrome.downloads.FilenameConflictAction;
-      dl: boolean;
-      fileName?: string;
+      fileName: string;
       data: any[];
       events: [EventTypeMap, EventTypeMap];
       headers?: StringMap;
@@ -275,7 +271,7 @@ declare interface UIScriptCache {
   desc: string;
   lowerName: string;
   /** Name search result for highlighting the match */
-  mark?: RegExpExecArray;
+  marks?: RegExpExecArray[] & { tail: string };
   name: string;
   /** Search result grouping priority, 0: hide, 1: code, 2: desc, 3: tag, 4: name */
   show?: number;
@@ -493,7 +489,9 @@ declare var __: {
   EXT: boolean,
   MV3: boolean;
   INIT_FUNC_NAME: string;
-  INJECTED: string | false;
+  INJECTED: boolean;
+  /** e.g. /public/lib/ */
+  PUBLIC_LIB: string,
   SW: boolean;
   SW_CLIENT: boolean;
   SYNC_DROPBOX_CLIENT_ID: string,
@@ -503,6 +501,8 @@ declare var __: {
   SYNC_ONEDRIVE_CLIENT_ID: string,
   TEST: boolean,
   VM_VER: string,
+  /** injected-web or zip-worker */
+  WEB: boolean,
 };
 
 declare const regex: import('regex').RegexTag<RegExp>;

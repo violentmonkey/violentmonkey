@@ -1,15 +1,15 @@
 batchActionDisable:
   description: Tooltip for batch disable (first click).
-  message: ''
+  message: Dezactivează toate scripturile
 batchActionDisableConfirm:
   description: Tooltip for batch disable (confirm click).
-  message: ''
+  message: Confirmă dezactivarea tuturor scripturilor
 batchActionEnable:
   description: Tooltip for batch enable (first click).
-  message: ''
+  message: Activează toate scripturile
 batchActionEnableConfirm:
   description: Tooltip for batch enable (confirm click).
-  message: ''
+  message: Confirmă activarea tuturor scripturilor
 batchActionRemove:
   description: Tooltip for batch remove (first click).
   message: ''
@@ -21,13 +21,13 @@ batchActionUpdate:
   message: ''
 batchActionUpdateConfirm:
   description: Tooltip for batch update (confirm click).
-  message: ''
+  message: Confirmă actualizarea tuturor scripturilor
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: Aplică
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: Aprobă
 buttonCancel:
   description: Cancel button on dialog.
   message: Anulează
@@ -587,7 +587,7 @@ labelGmDownloadViaApiHint:
   message: ''
 labelGrantPermission:
   description: Button to request the API permission.
-  message: ''
+  message: Acordă permisiunea
 labelHelpTranslate:
   description: Label for link to localization guide in about tab
   message: Ajută la traducere
@@ -655,7 +655,7 @@ labelMcpConnecting:
   message: ''
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: Acordă acces la file
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
   message: ''
@@ -672,7 +672,7 @@ labelMcpPending:
   message: ''
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: File
 labelName:
   description: Label of script name.
   message: 'Nume:'
@@ -746,6 +746,9 @@ labelShowOrder:
   message: Afișează pozițiile ordinii executării
 labelShowVisited:
   description: Label for option in dashboard -> script list
+  message: ''
+labelSize:
+  description: $1 is a size number like "1.1 MB".
   message: ''
 labelSync:
   description: Label for sync options.

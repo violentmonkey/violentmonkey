@@ -1,9 +1,9 @@
-let browser = __.INJECTED !== 'injected-web' && (__.MV3 ? chrome : global.browser);
+let browser = !__.WEB && (__.MV3 ? chrome : global.browser);
 const kAddListener = 'addListener';
 const kRemoveListener = 'removeListener';
 const kSendMessage = 'sendMessage';
 
-if (__.INJECTED === 'injected-web') {
+if (__.WEB) {
 // Since this also runs in a content script we'll guard against implicit global variables
 // for DOM elements with 'id' attribute which is a standard feature, more info:
 // https://github.com/mozilla/webextension-polyfill/pull/153

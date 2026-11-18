@@ -1,5 +1,7 @@
 export const handlersSW = { __proto__: null };
 
+/** No `Proxy` in the messaged object so it can be sent as-is */
+export const NO_PROXY = 1;
 /** @return {Promise<WindowClient[]>} */
 export const getClients = () => global.clients.matchAll({ includeUncontrolled: true });
 /** @type {Map<number, PromiseWithResolvers & { stack: string }>} */
@@ -19,11 +21,12 @@ export async function sendCmdToSW(cmd, data, fakeSrc) {
 /**
  * @param {string} cmd
  * @param {any} data
- * @param {ServiceWorker | WindowClient} target
+ * @param {ServiceWorker | Worker | WindowClient} target
  * @param {{}} [fakeSrc]
+ * @param {number} [mode]
  * @return {Promise}
  */
-export function sendCmdTo(cmd, data, target, fakeSrc) {
+export function sendCmdTo(cmd, data, target, fakeSrc, mode) {
   const p = Promise.withResolvers();
   if (__.DEBUG) {
     console.log('%cOUT', 'color:#008', location.pathname, ...arguments);
@@ -35,7 +38,7 @@ export function sendCmdTo(cmd, data, target, fakeSrc) {
   pending.set(++curId, p);
   target.postMessage({
     id: curId,
-    msg: __.EXT && !__.SW && data && typeof data === 'object'
+    msg: mode !== NO_PROXY && __.EXT && !__.SW && data && typeof data === 'object'
       ? JSON.stringify({ cmd, data }) // might be a Vue Proxy which can't be sent
       : { cmd, data },
     src: fakeSrc,
@@ -61,7 +64,7 @@ export async function onClientMessage(handler, { data, source }) {
       err = e;
       res = undefined; // clearing Promise
     }
-    source.postMessage({ id, res, err }, transfer);
+    (source || global/*Worker*/).postMessage({ id, res, err }, transfer);
   } else if ((p = pending.get(id))) {
     pending.delete(id);
     if ((err = data.err)) {
@@ -78,7 +81,9 @@ export async function onClientMessage(handler, { data, source }) {
 export function rejectPending(msg) {
   for (const p of pending.values()) {
     const err = new Error(msg);
-    err.stack = p.stack;
+    const local = p.stack;
+    // Chromium duplicates the error message in the 1st line of the stack
+    err.stack = local.includes('\n ') ? msg + local.replace(/^.+/, '') : local;
     p.reject(err);
   }
   pending.clear();

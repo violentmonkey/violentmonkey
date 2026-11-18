@@ -4,7 +4,7 @@ import { injectPageSandbox, injectScripts } from './inject';
 import { setLogCapture } from './logs';
 import { setMcp } from './mcp';
 import './notifications';
-import './requests';
+import { download } from './requests';
 import './tabs';
 import { sendCmd } from './util';
 import { isEmpty, XHR_COOKIE_RE } from '../util';
@@ -48,6 +48,15 @@ async function init() {
   if (data[EXPOSE] != null && !isXml && injectPageSandbox(data)) {
     bridge.addHandlers({ GetScriptVer: true });
     bridge.post('Expose', data[EXPOSE]);
+  }
+  if (IS_FIREFOX && topRenderMode) {
+    bridge.addBackgroundHandlers({
+      /** @param {[Blob, string]} args */
+      Download(args) {
+        download(args[0], args[1]);
+        return true;
+      },
+    }, true/*even when no scripts*/);
   }
   if (objectKeys(bridge.ids).length) {
     bridge.onScripts.forEach(fn => fn(data));
