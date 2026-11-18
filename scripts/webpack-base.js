@@ -122,7 +122,7 @@ const getBaseConfig = (page) => /** @type {import('webpack/types').Configuration
           name: PUBLIC_LIB.slice(1) + '/codemirror',
           test: makePathTester([
             '/codemirror',
-            '/src/common/ui/code',
+            '/src/common/ui/code.*css$',
           ]),
           chunks: 'all',
           enforce: true,
@@ -132,7 +132,7 @@ const getBaseConfig = (page) => /** @type {import('webpack/types').Configuration
           name: 'common-ui',
           test: makePathTester([
             /\bsvg/,
-            '/src/common/(?!zip|router|.*cron|ui/code)',
+            '/src/common/(?!zip|router|.*cron)',
             '/@violentmonkey/shortcut',
             '/@?vue',
           ]),
