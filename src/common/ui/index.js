@@ -108,6 +108,7 @@ export function render(App, el) {
     i18n,
     calcRows,
   });
+  app.config.throwUnhandledErrorInProduction = true; // we have showUnhandledError
   if (!el) {
     el = document.createElement('div');
     document.body.append(el);

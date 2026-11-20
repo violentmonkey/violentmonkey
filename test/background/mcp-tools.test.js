@@ -22,6 +22,7 @@ jest.mock('@/background/utils/init', () => {
     addPublicCommands: obj => Object.assign(handlers, obj),
   };
 });
+jest.mock('@/background/utils/broadcast', () => jest.fn());
 jest.mock('@/background/utils/db', () => ({
   getScriptById: jest.fn(id => ({ props: { id }, config: { enabled: 1 } })),
 }));

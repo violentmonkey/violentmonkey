@@ -9,9 +9,9 @@ export const kbdEnterable = 'canEnter';
 export const kbdTypable = 'canType';
 export const kbdNavigatable = 'canNav';
 /** @param {HTMLElement} el */
-export const isInput = ({ localName: n } = {}) =>
+export const isInput = ({ localName: n, type } = {}) =>
   n === 'button' ? ENTERABLE
-    : n === 'input' ? ENTERABLE + TYPABLE
+    : n === 'input' ? ENTERABLE + TYPABLE + (type === 'search' || type === 'text' ? NAVIGATABLE : 0)
       : n === 'select' || n === 'textarea' ? ENTERABLE + TYPABLE + NAVIGATABLE
         : 0;
 const ENTERABLE = 1;

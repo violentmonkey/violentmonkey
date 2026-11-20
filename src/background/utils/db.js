@@ -1,13 +1,13 @@
 import {
   dataUri2text, getScriptHome, getScriptName, getScriptPrettyUrl, getScriptRunAt, getScriptsTags,
-  getScriptUpdateUrl, i18n, ignoreChromeErrors, isDataUri, isRemote, isValidHttpUrl,
-  makePause, trueJoin,
+  getScriptUpdateUrl, i18n, ignoreChromeErrors, isDataUri, isRemote, isValidHttpUrl, makePause,
+  trueJoin,
 } from '@/common';
 import {
   CACHE_KEYS, FETCH_OPTS, INFERRED, kDownloads, kTag, PROMISE, REQ_KEYS, TIMEOUT_24HOURS,
   TIMEOUT_WEEK, TL_AWAIT, VALUE_IDS,
 } from '@/common/consts';
-import { deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
+import { deepCopy, deepSize, forEachEntry, forEachKey, forEachValue } from '@/common/object';
 import { isGmStorageGranted } from '@/common/script';
 import pluginEvents from '../plugin/events';
 import broadcast from './broadcast';
@@ -30,7 +30,7 @@ import storage, {
   S_CACHE_PRE, S_CODE_PRE, S_MOD_PRE, S_REQUIRE_PRE, S_SCRIPT_PRE, S_VALUE_PRE,
   getStorageKeys,
 } from './storage';
-import { storageCacheHas } from './storage-cache';
+import { storageCacheHas, storageChanging } from './storage-cache';
 import { reloadTabForScript } from './tabs';
 import { vetUrl } from './url';
 
@@ -68,15 +68,22 @@ addOwnCommands({
   /** @return {VMScript} */
   GetScript: getScript,
   GetSizes: getSizes,
-  /** @return {Promise<{ items: VMScript[], values? }>} */
   async ExportZip({ values }) {
-    const scripts = getScripts();
-    const ids = scripts.map(getPropsId);
-    const codeMap = await storage[S_CODE].getMulti(ids);
-    return {
-      items: scripts.map(script => ({ script, code: codeMap[script.props.id] })),
-      values: values ? await storage[S_VALUE].getMulti(ids) : undefined,
-    };
+    if (storageChanging) await storageChanging;
+    // Freezing the contents for the duration of async storage read.
+    const scripts = deepCopy(aliveScripts);
+    const keys = [];
+    for (const { props: { id } } of scripts) {
+      keys.push(S_CODE_PRE + id);
+      if (values) keys.push(S_VALUE_PRE + id);
+    }
+    // Reading in one go so that code and values are coherent and match scripts.
+    const data = await storage.api.get(keys);
+    for (const script of scripts) {
+      script.code = data[S_CODE_PRE + script.props.id] || '';
+      if (values) script.values = data[S_VALUE_PRE + script.props.id];
+    }
+    return scripts;
   },
   /** @return {Promise<string>} */
   GetScriptCode(id) {
@@ -85,18 +92,20 @@ addOwnCommands({
   GetTags: () => getScriptsTags(aliveScripts),
   /** @return {Promise<void>} */
   async MarkRemoved({ id, removed }) {
-    if (!removed) {
-      const script = getScriptById(id);
-      const conflict = getScript({ meta: script.meta });
-      if (conflict) throw i18n('msgNamespaceConflictRestore');
+    let script = scriptMap[id];
+    if (!removed === !script.config.removed) {
+      return;
+    }
+    if (!removed && getScript({ meta: script.meta })) {
+      throw i18n('msgNamespaceConflictRestore');
     }
     await updateScriptInfo(id, {
       config: { removed: removed ? 1 : 0 },
       props: { lastModified: Date.now() },
     });
     const list = removed ? aliveScripts : removedScripts;
-    const i = list.findIndex(script => script.props.id === id);
-    const [script] = list.splice(i, 1);
+    script = scriptMap[id]; // may be a deepCopy if updateScriptMap() was called during await
+    list.splice(list.indexOf(script), 1);
     (removed ? removedScripts : aliveScripts).push(script);
   },
   /** @return {boolean} */

@@ -57,7 +57,7 @@ export function createSearchRules(search) {
       } else if (reStr) {
         str = reStr;
       } else {
-        if (!quoted) flags = 'i';
+        if (!quoted && str === str.toLowerCase()) flags = 'i';
         str = str.replace(ESC_STR_RE, '\\$&');
       }
       /** @namespace VMSearchRule */

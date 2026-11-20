@@ -23,10 +23,11 @@
       <a v-bind="viewTable && { draggable: false, href: url, tabIndex }"
          :data-order="isRemoved ? null : script.props.position"
          class="script-name ellipsis">
-        <template v-if="(n = cache.name, m = cache.mark)">{{
-          n.slice(0, m.index)}}<mark v-text="m[0]"/>{{n.slice(m.index + m[0].length)
-        }}</template>
-        <template v-else>{{n}}</template>
+        <template v-if="cache.marks">
+          <template v-for="[mark, prev] of cache.marks" :key="mark + '\n' + prev">{{
+              prev}}<mark v-text="mark"/></template>{{
+            cache.marks.tail}}</template>
+        <template v-else>{{cache.name}}</template>
       </a>
       <tooltip v-if="canRender && allSites"
                :content="i18n('titleAllSites')" align="start" class="script-all-sites">
@@ -222,7 +223,7 @@ const author = computed(() => {
     name: matches ? matches[1] : text,
   };
 });
-const cache = computed(() => props.script.$cache);
+const cache = computed(() => /**@type{UIScriptCache}*/props.script.$cache);
 const isLarge = computed(() => cache.value.sizesNum[0] >= LARGE_SCRIPT_BYTES);
 const allSites = computed(() => props.showAllSites && !isRemoved.value
   && runsOnAllSites(props.script));

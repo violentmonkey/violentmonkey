@@ -1,5 +1,4 @@
 import { registerInjector } from '@/common/browser-scripts-api';
-import { TLDJS } from '@/common/consts';
 import { onClientMessage } from '@/common/messaging-sw';
 import { autoSync } from './sync/sync-engine';
 import { checkRemove, getData } from './utils/db';
@@ -9,6 +8,7 @@ import { getAllOptions } from './utils/options';
 import { initPopup } from './utils/popup-tracker';
 import { kAlarmRemove, kAlarmSync, kAlarmUpdate, kNotifications } from './utils/session-data';
 import { resolveVirtualUrl } from './utils/tab-redirector';
+import { getDomain } from './utils/tld';
 import { autoUpdate } from './utils/update';
 import { handleCommandMessage } from '.';
 
@@ -41,7 +41,8 @@ global.onfetch = async evt => {
 };
 
 global.oninstall = evt => {
-  importScripts(TLDJS);
+  // Load tldjs on install to allow on-demand loading later as per SW spec.
+  getDomain('a');
   // Not implemented in some browsers?
   evt.addRoutes?.({
     condition: { urlPattern: `${GET_DATA_URL}*` },

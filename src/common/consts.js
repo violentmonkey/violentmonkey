@@ -58,7 +58,7 @@ export const GLOB_ALL = '*://*/*';
 export const FILE_GLOB_ALL = 'file://*/*';
 export const XHR_COOKIE_RE = /:\W+([-\w]+)/; // extracts ://id in Chrome, ://{id} in Firefox
 /** @type {(str: string, opts?: {}) => Uint8Array} */
-export const U8_fromBase64 = __.INJECTED !== 'injected-web' && Uint8Array.fromBase64;
+export const U8_fromBase64 = !__.WEB && Uint8Array.fromBase64;
 export const UPLOAD = 'upload';
 export const GM_API_NAMES = [
   'GM',
@@ -108,4 +108,8 @@ export const CACHE_KEYS = 'cacheKeys';
 export const REQ_KEYS = 'reqKeys';
 export const VALUE_IDS = 'valueIds';
 export const PROMISE = 'promise';
-export const TLDJS = '/public/lib/tld.js';
+export const TLDJS = __.PUBLIC_LIB + 'tld.js';
+/** No space, just k or M without B, sizes below 1k shown as 0k or 1k rounded */
+export const FMT_SIZE_TIGHT = 1;
+/** Show B in kB and MB unit suffix */
+export const FMT_SIZE_KB_MB = 2;

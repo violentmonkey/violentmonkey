@@ -2,9 +2,9 @@
 import { getScriptPrettyUrl } from '@/common';
 import { ERR_BAD_PATTERN, ESC_GLOB_RE, BLACKLIST, BLACKLIST_NET, ERRORS } from '@/common/consts';
 import initCache from '@/common/cache';
-import { getPublicSuffix } from '@/common/tld';
 import { hookOptionsInit } from './options';
 import storage from './storage';
+import { getPublicSuffix } from './tld';
 
 const matchAlways = { test: () => 1 };
 /**

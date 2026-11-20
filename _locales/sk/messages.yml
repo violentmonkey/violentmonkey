@@ -765,6 +765,9 @@ labelShowOrder:
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: Zobraziť čas poslednej návštevy
+labelSize:
+  description: $1 is a size number like "1.1 MB".
+  message: 'Veľkosť: $1'
 labelSync:
   description: Label for sync options.
   message: Synchronizácia
@@ -1282,24 +1285,29 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * Kláves <kbd>Enter</kbd> pridáva text do histórie automatického dopĺňania
+    * Podmienky sú oddelené medzerami
 
-    * Všetky podmienky nerozlišujú veľkosť písmen
+    * Všetky podmienky sa musia zhodovať
 
-    * Podmienky oddelené medzerou môžu byť kombinované
+    * Rozlišovanie veľkých a malých písmen sa neuplatňuje pri podmienkach, ktoré
+    sú napísané malými písmenami bez úvodzoviek alebo majú predponu
+    <code>re:</code>
 
-    * Vyhľadávanie podľa metadát: <code>"Úžasný skript" "Popis"</code>
+    * Rozlišovanie veľkých a malých písmen sa uplatňuje pri zmiešaných veľkých a
+    malých písmenách, "texte v úvodzovkách" a <code>/re/</code> bez príznaku "i"
 
-    * Vyhľadávanie podľa značiek: <code>#znacka1 #znacka2</code>
+    * Vyhľadávanie podľa metadát: <code>"Awesome Script" "Description"</code>
 
-    * Vyhľadávanie podľa názvu skriptu: <code>name:"úžasný názov"</code>
+    * Vyhľadávanie podľa značiek: <code>#tag1 #tag2</code>
 
-    * Vyhľadávanie podľa kódu skriptu: <code>code:"úžasný kód"</code>
+    * Vyhľadávanie podľa názvu skriptu: <code>name:"awesome name"</code>
 
-    * Záporné vyhľadávanie: <code>!#znacka2 !name:"nechcené"</code>
+    * Vyhľadávanie podľa kódu skriptu: <code>code:"awesome code"</code>
+
+    * Negatívne vyhľadávanie: <code>!#tag2 !name:"unwanted"</code>
 
     * Regulárne výrazy: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re:"\w+? s medzerou"</code>
+    <code>name:/\w+?/</code>, <code>name+re:„\w+? s medzerou“</code>
 titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to

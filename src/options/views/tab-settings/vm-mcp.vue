@@ -76,8 +76,9 @@
 </template>
 
 <script setup>
-import { computed, onActivated, onDeactivated, nextTick, reactive, ref } from 'vue';
+import { computed, onActivated, nextTick, reactive, ref } from 'vue';
 import { i18n, sendCmdDirectly } from '@/common';
+import handlers from '@/common/handlers';
 import Icon from '@/common/ui/icon';
 
 const GUIDE_URL = 'https://violentmonkey.github.io/guide/ai-agent-access/';
@@ -95,7 +96,6 @@ const visibleTabs = computed(() => {
 const grantedCount = computed(() => visibleTabs.value.filter(tab => tab.granted).length);
 const allGranted = computed(() => grantedCount.value > 0 && grantedCount.value === visibleTabs.value.length);
 const someGranted = computed(() => grantedCount.value > 0);
-let timer;
 let scrolled = false;
 
 async function refresh() {
@@ -106,9 +106,18 @@ async function refreshTabs() {
   tabs.value = connected.value ? await sendCmdDirectly('McpGetTabs') : [];
 }
 
+/** Pushed by the background when the connection status changes */
+handlers.McpState = async (data) => {
+  const { status } = state;
+  Object.assign(state, data);
+  // Grants die with the connection, so the list follows the status
+  if (state.status !== status) await refreshTabs();
+};
+
 async function run(cmd) {
   await sendCmdDirectly(cmd);
   await refresh();
+  await refreshTabs();
 }
 
 async function toggle(tabId, granted) {
@@ -134,14 +143,7 @@ onActivated(async () => {
     await nextTick();
     $el.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-  timer = setInterval(async () => {
-    const { status } = state;
-    await refresh();
-    // Grants die with the connection, so the list follows the status
-    if (state.status !== status) await refreshTabs();
-  }, 1000);
 });
-onDeactivated(() => clearInterval(timer));
 </script>
 
 <style>

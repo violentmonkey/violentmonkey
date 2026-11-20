@@ -759,6 +759,9 @@ labelShowOrder:
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: Показать время последнего обращения
+labelSize:
+  description: $1 is a size number like "1.1 MB".
+  message: 'Размер: $1'
 labelSync:
   description: Label for sync options.
   message: Синхронизация
@@ -1279,24 +1282,28 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * Клавиша <kbd>Enter</kbd> добавляет текст в историю автозаполнения
+    * Условия разделяются пробелами
 
-    * Все условия не зависят от регистра
+    * Все условия должны совпадать
 
-    * Условия, разделённые пробелами, можно комбинировать
+    * Без учёта регистра для условий, записанных строчными буквами без кавычек
+    или с префиксом <code>re:</code>
+
+    * С учётом регистра для условий Mixed Case, "quoted text", <code>/re/</code>
+    без флага "i"
 
     * Поиск по метаданным: <code>"Отличный скрипт" "Описание"</code>
 
     * Поиск по тегам: <code>#tag1 #tag2</code>
 
-    * Поиск по имени скрипта: <code>name: "прекрасное имя"</code>
+    * Поиск по имени скрипта: <code>name:"прекрасное имя"</code>
 
-    * Поиск по коду скрипта: <code>code: "замечательный код"</code>
+    * Поиск по коду скрипта: <code>code:"замечательный код"</code>
 
-    * Отрицательный поиск: <code>!#tag2 !name: "нежелательное"</code>
+    * Отрицательный поиск: <code>!#tag2 !name:"нежелательное"</code>
 
     * Регулярные выражения: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re:"\w+? с пробелом"</code>
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
 titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to

@@ -59,7 +59,7 @@ const all = computed(() => {
   const { custom: { pathMap = {} } = {}, meta } = props.value;
   const { require = [], resources = {} } = meta || {};
   return [
-    ...mainUrl ? [[i18n('editNavCode'), mainUrl, code]] : [],
+    ...mainUrl ? [[i18n('editNavCode'), mainUrl, mainUrl, code]] : [],
     ...require.map(url => [
       '@require',
       url,
