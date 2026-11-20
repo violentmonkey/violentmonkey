@@ -204,7 +204,9 @@ import { setRoute, lastRoute } from '@/common/router';
 import { keyboardService, handleTabNavigation, kbdTypable, kbdNavigatable } from '@/common/keyboard';
 import { loadData } from '@/options';
 import { TAB_SETTINGS } from '@/common/safe-globals'; // added as a banner but Vue needs an import
-import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
+import {
+  docElem, EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus,
+} from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';
 import IconAlphaDown from '~icons/mdi/sort-alphabetical-descending';
@@ -873,7 +875,7 @@ watch(() => [filters.sort, filters.showEnabledFirst], lazyOrderUpdate);
 disposables.push(
   watch(() => filters.viewSingleColumn, adjustScriptWidth),
   watch(() => filters.viewSingleColumn, val => {
-    document.documentElement.toggleAttribute('data-single-column', !!val);
+    docElem.toggleAttribute('data-single-column', !!val);
   }, { immediate: true }),
   watch(() => filters.viewTable, adjustNarrowWidth, { immediate: true }),
 );
