@@ -29,6 +29,10 @@
             cache.marks.tail}}</template>
         <template v-else>{{cache.name}}</template>
       </a>
+      <tooltip v-if="canRender && allSites"
+               :content="i18n('titleAllSites')" align="start" class="script-all-sites">
+        <span v-text="i18n('labelAllSites')"/>
+      </tooltip>
       <div class="script-tags" v-if="canRender">
         <a
           v-for="(item, i) in cache[kTag].slice(0, 2)"
@@ -74,7 +78,9 @@
                  v-if="showVisit">
           {{ visit.show }}
         </tooltip>
-        <tooltip class="size hidden-sm" :content="cache.sizes" align="end">
+        <tooltip class="size hidden-sm" :class="{ large: isLarge }"
+                 :content="(isLarge ? i18n('titleLargeScript', cache.size) + '\n\n' : '') + cache.sizes"
+                 align="end">
           {{ cache.size }}
         </tooltip>
         <tooltip class="updated hidden-sm ml-1c" :content="updatedAt.title" align="end">
@@ -159,11 +165,14 @@
 <script>
 import { formatTime, getLocaleString, getScriptHome, getScriptSupportUrl, i18n } from '@/common';
 import { INFERRED, kTag } from '@/common/consts';
+import { runsOnAllSites } from '@/common/script-scope';
 import { EXTERNAL_LINK_PROPS, getActiveElement, showConfirmation } from '@/common/ui';
 import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
 const itemMargin = 8;
+/** Size that gets the "large" color */
+const LARGE_SCRIPT_BYTES = 1024 * 1024;
 const i18nUpdateScriptForced = i18n('updateScriptForced');
 const visitedRecently = new Set();
 const refreshVisited = () => { store.now = Date.now(); };
@@ -186,6 +195,7 @@ const props = defineProps([
   'hotkeys',
   'showHotkeys',
   'showVisit',
+  'showAllSites',
   'activeTags',
 ]);
 const emit = defineEmits([
@@ -211,6 +221,10 @@ const author = computed(() => {
   };
 });
 const cache = computed(() => /**@type{UIScriptCache}*/props.script.$cache);
+/** Total minus settings i.e. code + values + deps, see SIZE_TITLES */
+const isLarge = computed(() => cache.value.sizeNum - cache.value.sizesNum[1] >= LARGE_SCRIPT_BYTES);
+const allSites = computed(() => props.showAllSites && !isRemoved.value
+  && runsOnAllSites(props.script));
 const canUpdate = computed(() => props.script.$canUpdate);
 const notDataUrlRe = /^(?!data:)/;
 const canUpdateDeps = computed(() => {
@@ -513,6 +527,20 @@ $removedItemHeight: calc(
   .visit {
     color: var(--fill-8);
   }
+  &-all-sites {
+    flex: none;
+    padding: 0 .5em;
+    border: 1px solid currentColor;
+    border-radius: 1em;
+    font-size: .8em;
+    line-height: 1.6;
+    white-space: nowrap;
+    color: var(--warn-color, hsl(30, 90%, 38%));
+  }
+  .size.large {
+    color: var(--warn-color, hsl(30, 90%, 38%));
+    font-weight: 500;
+  }
 }
 
 .hotkeys [data-hotkey] {
@@ -560,25 +588,6 @@ $removedItemHeight: calc(
       width: calc(var(--w) - 1px); // subtracting 1px to match margin of `.script`
       content: '';
     }
-    &[data-columns="1"], &[data-columns="3"] {
-      .script:nth-child(even) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="2"] .script {
-      &:nth-child(4n + 2),
-      &:nth-child(4n + 3) {
-        background-color: var(--fill-0-5);
-      }
-    }
-    &[data-columns="4"] .script {
-      &:nth-child(8n + 2),
-      &:nth-child(8n + 4),
-      &:nth-child(8n + 5),
-      &:nth-child(8n + 7) {
-        background-color: var(--fill-0-5);
-      }
-    }
     .script {
       grid-template-columns:
         auto /* main icons */
@@ -592,7 +601,9 @@ $removedItemHeight: calc(
       margin: -1px 0 0 -1px;
       padding: 0 calc(2 * $itemMargin) 0 $itemMargin;
       border-radius: 0;
-      background: none;
+      &:not(.disabled):not(.removed) {
+        background: none;
+      }
       &:hover::after {
         // using a separate element with z-index higher than a sibling's overlapped border
         content: '';
