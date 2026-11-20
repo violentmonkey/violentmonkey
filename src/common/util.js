@@ -64,6 +64,16 @@ export function throttle(func, time) {
 
 export function noop() {}
 
+/** Polyfill for Firefox < 121 */
+export const promiseResolvers = () => {
+  const res = {};
+  res.promise = new Promise((resolve, reject) => {
+    res.resolve = resolve;
+    res.reject = reject;
+  });
+  return res;
+};
+
 export function getUniqId(prefix = 'VM', idSafe) {
   let res = crypto.getRandomValues(new Uint8Array(12));
   if (U8_fromBase64) { // minimum_chrome_version>=140, strict_min_version>=133
@@ -333,7 +343,7 @@ let keepAliveCount = 0;
  */
 export function keepAlive(promise) {
   let res = promise;
-  if (!res) ({ promise, resolve: res } = Promise.withResolvers());
+  if (!res) ({ promise, resolve: res } = promiseResolvers());
   keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 25e3);
   keepAliveCount++;
   if (__.DEV || __.DEBUG) {

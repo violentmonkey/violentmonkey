@@ -1,3 +1,5 @@
+import { promiseResolvers } from './util';
+
 export const handlersSW = { __proto__: null };
 
 /** No `Proxy` in the messaged object so it can be sent as-is */
@@ -27,7 +29,7 @@ export async function sendCmdToSW(cmd, data, fakeSrc) {
  * @return {Promise}
  */
 export function sendCmdTo(cmd, data, target, fakeSrc, mode) {
-  const p = Promise.withResolvers();
+  const p = promiseResolvers();
   if (__.DEBUG) {
     console.log('%cOUT', 'color:#008', location.pathname, ...arguments);
     p.cmd = cmd;
