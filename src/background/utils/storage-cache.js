@@ -12,6 +12,10 @@ import storage, {
 } from './storage';
 import { clearValueOpener } from './values';
 
+/** @type {Promise} */
+export let storageChanging;
+let pendingChangeCount = 0;
+let pendingChangeDone;
 /** Throttling browser API for `storage.value`, processing requests sequentially,
  so that we can supersede an earlier chained request if it's obsolete now,
  e.g. in a chain like [GET:foo, SET:foo=bar] `bar` will be used in GET. */
@@ -96,7 +100,7 @@ export const cachedStorageApi = storage.api = {
       }
     });
     cache.batch(false);
-    if (!isEmpty(toWrite)) await api.set(toWrite);
+    if (!isEmpty(toWrite)) await makeStorageChange('set', toWrite);
     if (undoing) return;
     if (keys.length && (!__.MV3 || !incognitoAllowed)) fireStorageChanged(keys, data);
     flushLater();
@@ -119,7 +123,7 @@ export const cachedStorageApi = storage.api = {
       }
       return ok;
     });
-    if (toDelete.length) await api.remove(toDelete);
+    if (toDelete.length) await makeStorageChange('remove', toDelete);
     if (undoing) return;
     if (keys.length && (!__.MV3 || !incognitoAllowed)) fireStorageChanged(keys);
     flushLater();
@@ -210,9 +214,26 @@ async function flush() {
     }
     updateScriptSizeContributor(key, val);
   });
-  if (!isEmpty(toFlush)) await api.set(toFlush);
-  if (toRemove.length) await api.remove(toRemove);
+  const jobs = [
+    !isEmpty(toFlush) && makeStorageChange('set', toFlush),
+    toRemove.length && makeStorageChange('remove', toRemove),
+  ].filter(Boolean);
+  if (jobs.length) await Promise.all(jobs);
   if (valuesToWatch) setTimeout(notifyWatchers, 0, toFlush, toRemove);
+}
+
+async function makeStorageChange(op, data) {
+  try {
+    pendingChangeCount++;
+    storageChanging ||= new Promise(resolve => { pendingChangeDone = resolve; });
+    return await api[op](data);
+  } finally {
+    pendingChangeCount--;
+    if (!pendingChangeCount) {
+      pendingChangeDone();
+      storageChanging = pendingChangeDone = null;
+    }
+  }
 }
 
 function flushLater() {
@@ -247,6 +268,7 @@ async function undoImport(port) {
     if (__.MV3) resolve();
   });
   port.onMessage.addListener(async () => {
+    if (storageChanging) await storageChanging;
     valuesToFlush = {};
     const cur = await cachedStorageApi.get();
     const toRemove = Object.keys(cur).filter(k => !(k in old));

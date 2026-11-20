@@ -6,6 +6,7 @@ import '@/common/ui/style';
 import App from './views/app';
 import { emptyStore, isFullscreenPopup, store } from './utils';
 
+const CMD_FRAME_IDS = Symbol('frameIds'); // a Symbol doesn't clash with user-specified keys
 let idMapMain, idMapFrames;
 let mutex, mutexResolve, port;
 let hPrev;
@@ -90,11 +91,21 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const cmds = data.menus[id];
     const scope = store[SCRIPTS][isTop || id in idMapMain ? 0 : 1];
     const script = scope.find(({ props }) => props.id === +id) || {};
-    const menu = script.cmds = new Map();
+    const menu = script.cmds ||= new Map();
+    let numAdded = 0;
     for (const cmd in cmds) {
       v = cmds[cmd];
       menu.set(cmd, v);
       loadCommandIcon(v, store);
+      (v[CMD_FRAME_IDS] ||= new Set()).add(frameId);
+      numAdded++;
+    }
+    if (menu.size > numAdded) {
+      menu.forEach(({ [CMD_FRAME_IDS]: frameIds }, key) => {
+        if (!cmds[key] && frameIds.delete(frameId) && !frameIds.size) {
+          menu.delete(key);
+        }
+      });
     }
   }
   if (isTop) mutexResolve(); // resolving at the end after all `await` above are settled
@@ -157,8 +168,6 @@ function onResize(evt) {
   if (!evt
   // ignoring intermediate downsize
   || h > hPrev
-  // ignoring  initial devicePixelRatio which is based on page zoom in this extension's tabs
-    && document.readyState !== 'loading'
   // ignoring off-by-1 e.g. due to clientHeight being fractional
     && document.body.clientHeight - 1 > h
   ) {

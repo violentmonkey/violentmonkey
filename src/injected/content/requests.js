@@ -46,12 +46,6 @@ bridge.onScripts.push(data => {
       }
     }
   }
-  if (IS_FIREFOX && data.info.ua.mobile) {
-    bridge.addHandlers({
-      /** @param {[Blob, string]} args */
-      Download: args => download(args[0], args[1]),
-    });
-  }
 });
 
 // TODO: extract all prop names used across files into consts.js to ensure sameness
@@ -69,8 +63,7 @@ bridge.addHandlers({
     requests[msg.id] = {
       __proto__: null,
       realm,
-      dl: msg.dl,
-      [kFileName]: msg[kFileName],
+      dl: msg[kFileName] != null,
       [kXhrType]: msg[kXhrType],
     };
     // Not using Promise.all as it depends on Iterator which isn't trivial to guard,
@@ -146,9 +139,11 @@ bridge.addBackgroundHandlers({
     } else if (req.p) {
       await req.p;
     }
-    if (IS_FIREFOX) {
-      if (response && req.dl) req[kResponse] = response;
-      if (msg.dl) download(req[kResponse], req[kFileName]);
+    if (IS_FIREFOX && req.dl) {
+      if (response) req[kResponse] = response;
+      // fileName is usually sent both to main_frame (iframe's CSP sometimes block downloads)
+      // or to the original frame if its main_frame doesn't have VM due to policies/settings.
+      if (msg[kFileName]) download(req[kResponse], msg[kFileName]);
     }
     if (msg.type === LOADEND && !msg[UPLOAD]) {
       delete requests[msg.id];
@@ -218,9 +213,9 @@ async function encodeBody(body, mode) {
   });
 }
 
-function download(blob, name) {
+export function download(blob, name) {
   const url = createObjectURL(blob);
-  const a = makeElem('a', { href: url, download: name || '' });
+  const a = makeElem('a', { href: url, download: name });
   a::fire(new SafeMouseEvent('click'));
   sendCmd('SetTimeout', 3000)::then(() => revokeObjectURL(url));
 }

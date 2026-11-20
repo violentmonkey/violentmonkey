@@ -760,6 +760,9 @@ labelShowOrder:
 labelShowVisited:
   description: Label for option in dashboard -> script list
   message: Pokaż czas ostatniej wizyty
+labelSize:
+  description: $1 is a size number like "1.1 MB".
+  message: 'Rozmiar: $1'
 labelSync:
   description: Label for sync options.
   message: Synchronizacja
@@ -1260,25 +1263,7 @@ titleSearchHintV2:
   description: >-
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
-  message: >-
-    * Klawisz <kbd>Enter</kbd> dodaje tekst do historii autouzupełniania
-
-    * We wszystkich warunkach wielkość liter nie jest uwzględniana
-
-    * Warunki oddzielone spacjami można łączyć
-
-    * Szukaj według metadanych: <code>"Awesome Script" "Description"</code>
-
-    * Szukaj według tagów: <code>#tag1 #tag2</code>
-
-    * Szukaj według nazwy skryptu: <code>name:"awesome name"</code>
-
-    * Szukaj według kodu skryptu: <code>code:"awesome code"</code>
-
-    * Pomijanie wyszukiwania: <code>!#tag2 !name:"unwanted"</code>
-
-    * Wyrażenia regularne: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+  message: "* Warunki są oddzielone spacjami\n* Wszystkie warunki muszą zostać spełnione\n* Wielkość liter nie ma znaczenia w\_przypadku warunków zapisanych małymi literami (bez cudzysłowów) lub poprzedzonych przedrostkiem <code>re:</code>\n* Wielkość liter ma znaczenie w\_przypadku zapisów mieszanych, tekstów ujętych w\_cudzysłów oraz wyrażeń typu <code>/re/</code> (bez flagi „i”)\n* Wyszukiwanie według metadanych: <code>\"Awesome Script\" \"Description\"</code>\n* Wyszukiwanie według tagów: <code>tag1 #tag2</code>\n* Wyszukiwanie według nazwy skryptu: <code>name:\"awesome name\"</code>\n* Wyszukiwanie według kodu skryptu: <code>code:\"awesome code\"</code>\n* Wyszukiwanie negatywne: <code>!#tag2 !name:\"unwanted\"</code>\n* Wyrażenia regularne: <code>/\\w+?/</code>, <code>/\\w+?/gi</code>, <code>name:/\\w+?/</code>, <code>name+re:\"\\w+? with space\"</code>"
 titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to

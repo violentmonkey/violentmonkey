@@ -28,33 +28,36 @@
               </a>
             </Tooltip>
           </div>
-          <div v-if="filteredScripts.length" class="btn-group filtered">
-            <Tooltip
-              v-for="({ icon, num, tooltip }, key) in batchActions" :key
-              :content="tooltip[state.batchAction.action === key ? 1 : 0]"
-              placement="bottom"
-              align="start"
-            >
-              <a
-                class="btn-ghost"
-                :class="{
-                  'has-error': state.batchAction.action === key,
-                  disabled: store.batch,
-                }"
-                :data-batch-action="key"
-                tabindex="0"
-                @click.prevent="handleBatchAction"
+          <div v-if="filteredScripts.length || state.batchAction.undo" class="btn-group filtered">
+            <template v-if="filteredScripts.length">
+              <Tooltip
+                v-for="({ icon, num, tooltip }, key) in batchActions" :key
+                :content="tooltip[state.batchAction.action === key ? 1 : 0]"
+                placement="bottom"
+                align="start"
               >
-                <Icon :name="icon" />
-                <sub v-text="num" v-if="num" />
-                <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
-              </a>
-            </Tooltip>
-            <Tooltip :content="state.sizes" placement="bottom">
-              <div class="btn-hint subtle"
-                   v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
-                   :data-size="state.size"/>
-            </Tooltip>
+                <a
+                  class="btn-ghost"
+                  :class="{
+                    'has-error': state.batchAction.action === key,
+                    disabled: store.batch,
+                  }"
+                  :data-batch-action="key"
+                  tabindex="0"
+                  @click.prevent="handleBatchAction"
+                >
+                  <Icon :name="icon" />
+                  <sub v-text="num" v-if="num" />
+                  <span class="ml-1" v-if="state.batchAction.action === key">❗</span>
+                </a>
+              </Tooltip>
+              <Tooltip :content="state.sizes" placement="bottom">
+                <div class="btn-hint subtle"
+                     v-text="i18n('hintForBatchAction', `${filteredScripts.length}`)"
+                     :data-size="state.size"/>
+              </Tooltip>
+            </template>
+            <!-- Shown even with no scripts listed so that removing all of them can be undone -->
             <Tooltip :content="i18n('buttonUndo')" placement="bottom" align="start">
               <a v-if="state.batchAction.undo" class="btn-ghost" tabindex="0" @click.prevent="state.batchAction.undo">
                 <Icon name="undo" />
@@ -65,10 +68,10 @@
         <Tooltip v-else :content="state.sizes" :disabled="!state.sizes" placement="bottom">
           <div class="ml-2" v-text="i18n('headerRecycleBin')" :data-size="state.size" />
         </Tooltip>
-        <div>
+        <div class="hide-ovr">
           <!-- form and id are required for the built-in autocomplete using entered values -->
-          <form class="filter-search hidden-xs" @submit.prevent>
-            <label>
+          <form class="filter-search hidden-xs hide-ovr" @submit.prevent>
+            <label class="flex hide-ovr">
               <input
                 type="search"
                 :class="{'has-error': state.search.error}"
@@ -415,7 +418,7 @@ const ALL_BATCH_ACTIONS = {
     async fn(scripts, el, undo) {
       await Promise.all(scripts.map(s => markRemove(s, !undo)));
       // nuking the ghosts because the user's intent was already confirmed
-      if (!undo) store.scripts = [];
+      if (!undo) store.scripts = store.scripts.filter(s => !scripts.includes(s));
     },
   },
 };
@@ -636,7 +639,7 @@ function scheduleSearch() {
   if (ids?.length) getCodeFromStorage(ids);
   if (!state.search.rules.length) {
     for (const { $cache } of /**@type{UIScript[]}*/store.scripts) {
-      $cache.mark = $cache.show = null;
+      $cache.marks = $cache.show = null;
     }
   }
   onUpdate();
@@ -810,15 +813,15 @@ function bindKeys() {
     ...registerHotkey(() => {
       selectScript(state.focusedIndex - 1);
     }, [
-        ['ctrlcmd-left', conditionAll],
-        ['left', conditionNotSearch],
+        ['ctrlcmd-left', conditionNotNavigatable],
+        ['left', conditionNotNavigatable],
         ['h', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
       selectScript(state.focusedIndex + 1);
     }, [
-        ['ctrlcmd-right', conditionAll],
-        ['right', conditionNotSearch],
+        ['ctrlcmd-right', conditionNotNavigatable],
+        ['right', conditionNotNavigatable],
         ['l', conditionNotSearch, true],
       ]),
     ...registerHotkey(() => {
@@ -978,6 +981,7 @@ onBeforeUnmount(() => {
 $iconSize: 2rem; // from .icon in ui/style.css
 $headerH: 4rem;
 $headerBorder: 1px solid var(--fill-5);
+$minSearchWidth: 5em;
 .tab.tab-installed {
   height: 100vh;
   padding: 0;
@@ -1019,11 +1023,19 @@ $headerBorder: 1px solid var(--fill-5);
       align-items: center;
       display: inline-flex;
     }
+    > :last-child {
+      padding: 0 .5rem;
+    }
     .vl-dropdown-toggle .icon {
       width: 1.25rem;
     }
     .vl-dropdown-menu {
       white-space: nowrap;
+    }
+    .hide-ovr .vl-dropdown-menu {
+      top: auto;
+      right: 1.5rem;
+      position: fixed;
     }
   }
   @media (max-width: 640px) {
@@ -1117,8 +1129,7 @@ $headerBorder: 1px solid var(--fill-5);
   }
 }
 .filter-search {
-  min-width: 5em;
-  flex-basis: 10em;
+  min-width: $minSearchWidth;
   label {
     position: relative;
   }
@@ -1129,7 +1140,9 @@ $headerBorder: 1px solid var(--fill-5);
     right: .5rem;
   }
   input {
-    width: 100%;
+    min-width: $minSearchWidth;
+    max-width: 100%;
+    field-sizing: content;
     height: $iconSize;
     padding-left: .5rem;
     padding-right: $iconSize;

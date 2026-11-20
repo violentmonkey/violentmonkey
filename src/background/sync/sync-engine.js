@@ -1,4 +1,4 @@
-import { createTab, debounce, keepAlive, noop, normalizeKeys } from '@/common';
+import { debounce, keepAlive, noop, normalizeKeys } from '@/common';
 import { kMainFrame, TIMEOUT_HOUR } from '@/common/consts';
 import {
   SYNC_MERGE,
@@ -17,6 +17,7 @@ import { getNameURI, parseMeta } from '../utils/script';
 import { script as pluginScript } from '../plugin';
 import { parseXml } from '@violentmonkey/xml-parser';
 import sessionData from '../utils/session-data';
+import { tabOpen } from '../utils/tabs';
 import {
   events,
   getSyncState,
@@ -216,7 +217,7 @@ export function openAuthPage(url, redirectUri) {
     authResolve = null;
     resolvePromise(null);
   }, 300_000);
-  createTab({ url }).then((tab) => {
+  tabOpen({ url }).then((tab) => {
     const tabId = tab?.id;
     const handler = (info) => {
       if (tabId != null) browser.tabs.remove(tabId);

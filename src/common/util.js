@@ -1,13 +1,15 @@
 // SAFETY WARNING! Exports used by `injected` must make ::safe() calls and use __proto__:null
 
-import { BLOB_LIFE, U8_fromBase64 } from '@/common/consts';
+import { BLOB_LIFE, FMT_SIZE_KB_MB, FMT_SIZE_TIGHT, U8_fromBase64 } from '@/common/consts';
 
-export const i18n = memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
+export const i18n = /*@__PURE__*/memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
 const NON_ASCII_RE = /[\x80-\xFF]/;
+/** @type {Set<Promise>} */
+const alivePromises = (__.DEV || __.DEBUG) && __.SW && (global.alivePromises = new Set());
 
 export function memoize(func) {
-  const cacheMap = /*@__PURE__*/Object.create(null);
+  const cacheMap = Object.create(null);
   function memoized(...args) {
     const key = args.length === 1 ? `${args[0]}` : JSON.stringify(args);
     const res = cacheMap[key];
@@ -198,11 +200,30 @@ export function formatTime(duration) {
   return `${duration | 0}${unitInfo[0]}`;
 }
 
-export function formatByteLength(len, noBytes) {
-  if (!len) return '';
-  if (len < 1024 && !noBytes) return `${len} B`;
-  if ((len /= 1024) < 1024) return `${Math.round(len)} k`;
-  return `${+(len / 1024).toFixed(1)} M`;
+let fractionDot;
+
+export function formatByteLength(len, opts) {
+  let unit;
+  if (!len) {
+    // empty
+  } else if (len < 1024 && !(opts & FMT_SIZE_TIGHT)) {
+    unit = 'B';
+  } else if ((len /= 1024) < 1024) {
+    len = Math.round(len);
+    unit = 'kB';
+  } else {
+    len = Math.round(len * 10/* 1 fractional digit */ / 1024);
+    if (len % 10) {
+      fractionDot ??= (1.1).toLocaleString(chrome.i18n.getUILanguage()).replace(/\d/g, '') || '.';
+      len = (len / 10 | 0) + fractionDot + (len % 10);
+    } else {
+      len /= 10;
+    }
+    unit = 'MB';
+  }
+  return unit
+    ? len + (opts & FMT_SIZE_TIGHT ? '' : ' ') + (opts & FMT_SIZE_KB_MB ? unit : unit[0])
+    : '';
 }
 
 // Used by `injected`
@@ -302,7 +323,8 @@ export function normalizeTag(tag) {
   return tag.replace(/[^\w.-]/g, '');
 }
 
-let keepAliveChain, keepAliveTimer;
+let keepAliveTimer;
+let keepAliveCount = 0;
 
 /**
  * @template T
@@ -312,15 +334,30 @@ let keepAliveChain, keepAliveTimer;
 export function keepAlive(promise) {
   let res = promise;
   if (!res) ({ promise, resolve: res } = Promise.withResolvers());
-  const chain = keepAliveChain = keepAliveChain ? keepAliveChain.finally(() => promise) : promise;
-  keepAliveChain.finally(() => {
-    if (keepAliveChain === chain) {
-      clearInterval(keepAliveTimer);
-      keepAliveChain = keepAliveTimer = 0;
-    }
-  });
   keepAliveTimer ||= setInterval(chrome.runtime.getPlatformInfo, 25e3);
+  keepAliveCount++;
+  if (__.DEV || __.DEBUG) {
+    alivePromises.add(promise);
+    promise.trace = new Error().stack.match(/(?<=^\s*at )\S+/gm).join(' < ');
+    if (__.DEBUG) console.trace('%ckeepAlive +1 (%d):',
+      'color:green', alivePromises.size, promise);
+    promise.finally(() => {
+      onKeepAliveSettled();
+      alivePromises.delete(promise);
+      if (__.DEBUG) console.trace('%ckeepAlive -1 (%d): %o',
+        `color:${keepAliveCount ? 'blue' : 'red'}`, keepAliveCount, promise);
+    });
+  } else {
+    promise.finally(onKeepAliveSettled);
+  }
   return res;
+}
+
+function onKeepAliveSettled() {
+  if (!--keepAliveCount) {
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = 0;
+  }
 }
 
 export function leaseBlobUrl(blob) {

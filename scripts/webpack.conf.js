@@ -2,11 +2,14 @@ const fs = require('node:fs');
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
-const { addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 const { getVersion } = require('./version-helper');
-const { MV3 } = require('./common');
+const { isProd, MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
-const { getBaseConfig, getPageConfig, isProd } = require('./webpack-base');
+const { getBaseConfig, PUBLIC_LIB } = require('./webpack-base');
+const ForbidNamespaceFallbackPlugin = require('./webpack-forbid-ns-fallback-plugin');
+const GroupAssetsPlugin = require('./webpack-group-assets-plugin');
+const { VueLoaderPlugin } = require('vue-loader');
+const { GLOBALS, addWrapperWithGlobals, getCodeMirrorThemes } = require('./webpack-util');
 
 // Avoiding collisions with globals of a content-mode userscript
 const INIT_FUNC_NAME = '**VMInitInjection**';
@@ -14,6 +17,17 @@ const IS_FIREFOX_MV2 = 'IS_FIREFOX_MV2';
 const VAULT_ID = 'VAULT_ID';
 const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
 const VM_VER = getVersion();
+const pgInjected = 'injected';
+const pgInjectedWeb = 'injected-web';
+const pgOffscreen = 'offscreen';
+const pgSW = 'sw';
+const pgZipWorker = 'zip-worker';
+const PAGES = {
+  confirm: true,
+  options: true,
+  popup: true,
+  background: !MV3 && { html: false },
+};
 
 global.localStorage = {}; // workaround for node 25 and HtmlWebpackPlugin's `...global`
 
@@ -49,6 +63,7 @@ const defsObj = {
   ...Object.fromEntries(Object.entries({
     INIT_FUNC_NAME,
     MV3,
+    PUBLIC_LIB: PUBLIC_LIB + '/',
     CODEMIRROR_THEMES: getCodeMirrorThemes(),
     DEBUG: +process.env.DEBUG,
     DEV: !isProd,
@@ -64,33 +79,43 @@ const defsObj = {
 const skipReinjectionHeader = `if (window["${INIT_FUNC_NAME}"] !== 1)`;
 const ownWrappers = (getGlobals) => ({
   header: data => `"use strict"; { const __IS_BG__=${
-    /^(background|sw)/.test(data.chunk.name) ||
-    !MV3 && /common/.test(data.chunk.name) && 'location.href.includes("background")'
+    /^(background|sw)/.test(data.filename) ||
+    !MV3 && /common/.test(data.filename) && 'location.href.includes("background")'
   }; ${getGlobals()}`,
   footer: '}',
   test: /^(?!injected|public).*\.js$/,
 });
 
 const buildConfig = (page, entry, globalsScope, wrap, init) => {
-  const SW = page === 'sw' ? 1 : 0;
+  const SW = page === pgSW ? 1 : 0;
   const vars = {
     ...defsObj,
     '__.BG': SW || !page && '__IS_BG__',
     '__.EXT': SW || !page,
-    '__.INJECTED': JSON.stringify(/injected/.test(page) && page),
+    '__.INJECTED': [pgInjected, pgInjectedWeb, pgZipWorker].includes(page),
     '__.SW': SW,
-    '__.SW_CLIENT': MV3 && (!page || page === 'offscreen'),
+    '__.SW_CLIENT': MV3 && (!page || page === pgOffscreen),
+    '__.WEB': [pgInjectedWeb, pgZipWorker].includes(page),
   };
-  const config = (entry ? getBaseConfig : getPageConfig)(page);
-  config.plugins.push(new webpack.DefinePlugin(vars));
+  const config = getBaseConfig(page);
   if (entry) config.entry = { [page]: entry };
-  if (init) init(config);
+  if (init) init(config, vars);
   if (wrap) addWrapperWithGlobals(globalsScope, config, vars, wrap);
+  config.plugins.push(new webpack.DefinePlugin(vars));
   return config;
 };
 
 module.exports = [
-  buildConfig('', '', 'common', ownWrappers, (config) => {
+  buildConfig('', '', GLOBALS.common, ownWrappers, (config) => {
+    config.plugins.push(
+      new VueLoaderPlugin(),
+      new GroupAssetsPlugin(),
+      require('unplugin-icons/webpack')(),
+    );
+    config.entry = {};
+    for (const [p, opts] of Object.entries(PAGES)) {
+      if (opts) config.entry[p + '/index'] = { import: './src/' + p, ...opts };
+    }
     if (!MV3) config.plugins.push(new ListBackgroundScriptsPlugin({
       minify: false, // keeping readable
     }));
@@ -98,40 +123,52 @@ module.exports = [
       ...config.resolve.alias,
       '../css/css$': resolve('src/common/ui/codemirror-ovr/css.js'),
     };
-    (config.ignoreWarnings ??= []).push({
-      // suppressing a false warning (the HTML spec allows it) as we don't need SSR
-      message: /<tr> cannot be child of <table>/,
-    });
   }),
 
-  MV3 && buildConfig('sw', './src/background/sw', 'common', ownWrappers),
+  MV3 && buildConfig(pgSW, './src/background/sw', GLOBALS.common, ownWrappers, (config) => {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/\/tld-impl$/, (r) => { r.request += '-mv3'; }),
+    );
+  }),
 
-  MV3 && buildConfig('offscreen', './src/offscreen', 'common', ownWrappers, (config) => {
+  MV3 && buildConfig(pgOffscreen, './src/offscreen', GLOBALS.common, ownWrappers, (config) => {
     const dir = `${config.output.path}/offscreen`;
     config.output.filename = 'offscreen/index.js';
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     fs.writeFileSync(`${dir}/index.html`, '<script src=index.js></script>', 'utf8');
   }),
 
-  MV3 && buildConfig('tld', 'tldts', '', null, (config) => {
-    config.output.path += '/public/lib';
+  MV3 && buildConfig('tld', 'tldts', GLOBALS.minimal, null, (config) => {
+    config.output.path += PUBLIC_LIB;
     config.output.library = {
       type: 'global',
       name: 'tld',
     };
   }),
 
-  buildConfig('injected', './src/injected', 'injected/content', (getGlobals) => ({
+  buildConfig(pgInjected, './src/injected', GLOBALS.injectedContent, (getGlobals) => ({
     header: () => `${skipReinjectionHeader} { ${getGlobals()}`,
     footer: '}',
-  })),
+  }), (config) => {
+    config.plugins.push(new ForbidNamespaceFallbackPlugin());
+  }),
 
-  buildConfig('injected-web', './src/injected/web', 'injected/web', (getGlobals) => ({
+  buildConfig(pgInjectedWeb, './src/injected/web', GLOBALS.injectedWeb, (getGlobals) => ({
     header: () => `${skipReinjectionHeader} window["${INIT_FUNC_NAME}"] = ` +
       `(${IS_FIREFOX_MV2}, ${PAGE_MODE_HANDSHAKE},${VAULT_ID}) => { "use strict"; ${getGlobals()}` +
       'let VMInitInjection;\n',
     footer: 'return VMInitInjection};1',
   }), (config) => {
     config.output.iife = false;
+    config.plugins.push(new ForbidNamespaceFallbackPlugin());
+  }),
+
+  buildConfig(pgZipWorker, './src/common/zip-worker.js', GLOBALS.minimal, ownWrappers, (
+    config, vars
+  ) => {
+    config.output.path += PUBLIC_LIB;
+    config.output.iife = false;
+    // Drop async leftovers in fflate as we use sync methods inside a dedicated Worker.
+    vars['typeof queueMicrotask'] = vars['typeof setTimeout'] = 'undefined';
   }),
 ].filter(Boolean);

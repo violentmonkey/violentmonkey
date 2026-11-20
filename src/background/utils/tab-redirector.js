@@ -3,11 +3,11 @@ import browser from '@/common/browser';
 import { executeScript } from '@/common/browser-scripts-api';
 import { FILE_GLOB_ALL, kMainFrame, NO_CACHE } from '@/common/consts';
 import cache from './cache';
-import { addPublicCommands, commands } from './init';
+import { addPublicCommands } from './init';
 import { getOption } from './options';
 import { MCP_CONNECT_URL, openMcpAuthorization, requestMcpConnection } from './mcp';
 import { matchUserScript, parseMeta } from './script';
-import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabsOnUpdated } from './tabs';
+import { fileSchemeRequestable, getTabUrl, NEWTAB_URL_RE, tabOpen, tabsOnUpdated } from './tabs';
 import { FIREFOX } from './ua';
 import { request } from './url';
 
@@ -46,7 +46,7 @@ async function confirmInstall({ code, from, url, fs, parsed }, { tab = {} }) {
   const { [kWindowId]: windowId } = canReplaceCurTab
   // The tab may have been closed already, in which case we'll open a new tab
   && await browser.tabs.update(tabId, { url: confirmUrl }).catch(noop)
-  || await commands.TabOpen({ url: confirmUrl, active: !!active }, { tab });
+  || await tabOpen({ url: confirmUrl, active: !!active }, { tab });
   if (active && windowId !== tab[kWindowId]) {
     await browserWindows?.update(windowId, { focused: true });
   }
