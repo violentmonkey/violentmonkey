@@ -64,8 +64,10 @@ export function throttle(func, time) {
 
 export function noop() {}
 
-/** Polyfill for Firefox < 121 */
-export const promiseResolvers = () => {
+export const promiseResolvers = __.MV3
+? /*@__PURE__*/Promise.withResolvers.bind(Promise)
+: /** @return {{ promise: Promise, resolve: function, reject: function }} */ () => {
+  // MV2 polyfill. TODO: remove when strict_min_version>=121 and minimum_chrome_version>=119
   const res = {};
   res.promise = new Promise((resolve, reject) => {
     res.resolve = resolve;
