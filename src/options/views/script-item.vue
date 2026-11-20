@@ -82,7 +82,7 @@
           {{ visit.show }}
         </tooltip>
         <tooltip class="size hidden-sm" :class="{ large: isLarge }"
-                 :content="isLarge ? i18n('titleLargeScript', cache.size) + '\n\n' + cache.sizes : cache.sizes"
+                 :content="(isLarge ? i18n('titleLargeScript', cache.size) + '\n\n' : '') + cache.sizes"
                  align="end">
           {{ cache.size }}
         </tooltip>
@@ -174,7 +174,7 @@ import { isInput, keyboardService, toggleTip } from '@/common/keyboard';
 import { kDescription, store, TOGGLE_OFF, TOGGLE_ON } from '../utils';
 
 const itemMargin = 8;
-/** Code size that gets the "large" color */
+/** Size that gets the "large" color */
 const LARGE_SCRIPT_BYTES = 1024 * 1024;
 const i18nUpdateScriptForced = i18n('updateScriptForced');
 const visitedRecently = new Set();
@@ -224,7 +224,8 @@ const author = computed(() => {
   };
 });
 const cache = computed(() => /**@type{UIScriptCache}*/props.script.$cache);
-const isLarge = computed(() => cache.value.sizesNum[0] >= LARGE_SCRIPT_BYTES);
+/** Total minus settings i.e. code + values + deps, see SIZE_TITLES */
+const isLarge = computed(() => cache.value.sizeNum - cache.value.sizesNum[1] >= LARGE_SCRIPT_BYTES);
 const allSites = computed(() => props.showAllSites && !isRemoved.value
   && runsOnAllSites(props.script));
 const canUpdate = computed(() => props.script.$canUpdate);

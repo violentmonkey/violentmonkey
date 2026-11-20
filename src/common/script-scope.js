@@ -1,10 +1,10 @@
 /**
  * Detects scripts that run on every website, so the UI can flag them.
- * Excludes are ignored on purpose: a script with a few excludes still
- * runs on almost every site.
+ * Only the host matters. Excludes are ignored on purpose: a script with
+ * a few excludes still runs on almost every site.
  */
 
-const BROAD_GLOBS = ['*', 'http*', 'https*', 'http*://*', '*://*'];
+const BROAD_GLOBS = ['*', 'http*', 'https*'];
 const BROAD_REGEXPS = ['.*', '^.*$', '^https?://.*', '^https?:\\/\\/.*', 'https?://.*'];
 
 /**
@@ -18,12 +18,7 @@ export function isAllSitesPattern(pattern) {
   if (str.length > 2 && str[0] === '/' && str.endsWith('/')) {
     return BROAD_REGEXPS.includes(str.slice(1, -1));
   }
-  const m = str.match(/^([^:/]*):\/\/([^/]*)(.*)$/);
-  if (!m) return false;
-  const [, scheme, host, path] = m;
-  return /^(\*|https?|http\*|https?\*)$/.test(scheme)
-    && host === '*'
-    && (!path || path === '/*' || path === '*');
+  return str.split('/', 3)[2] === '*'; // all hosts
 }
 
 /**
