@@ -160,7 +160,7 @@ export function getFileNameFromXHR(req, xhr) {
   let v = xhr.getResponseHeader('Content-Disposition');
   if ((v &&= // Preferring the newer filename* over filename
     v.match(/;\s*filename\*\s*=\s*UTF-8'([-\w]*)'([^;]+)/i) ||
-    v.match(/;\s*filename\s*=\s*(["']?)(.+[^\\])\2(?=;|$)/i)
+    v.match(/;\s*filename\s*=\s*(["']?)(.+[^\\])\1(?=;|$)/i)
   ) && (v = v[2].trim())) {
     // ok
   } else {
