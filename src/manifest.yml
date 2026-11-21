@@ -9,6 +9,8 @@ icons:
   '48': public/images/icon48.png
   '128': public/images/icon128.png
 default_locale: en
+storage:
+  managed_schema: managed_storage.json
 browser_action:
   browser_style: true
   default_icon:
