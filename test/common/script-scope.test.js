@@ -11,9 +11,6 @@ test('isAllSitesPattern: broad patterns', () => {
     'http*://*',
     'http*://*/*',
     'http*',
-    // the path does not matter
-    'https://*/foo/*',
-    '*://*/recaptcha/api2/*',
     '/.*/',
     '/^https?://.*/',
   ].forEach(p => expect([p, isAllSitesPattern(p)]).toEqual([p, true]));
@@ -23,6 +20,9 @@ test('isAllSitesPattern: narrow patterns', () => {
   [
     '*://*.example.com/*',
     'https://example.com/*',
+    // a specific path is not all sites
+    'https://*/foo/*',
+    '*://*/recaptcha/api2/*',
     'https://bunkr.*/f/*',
     'file:///*',
     'foo/*',
