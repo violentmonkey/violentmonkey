@@ -324,18 +324,18 @@ fileInstallBlockedFF:
     данные», включите «Доступ к локальным файлам на вашем компьютере».
 filterAlphabeticalOrder:
   description: Label for option to sort scripts in alphabetical order.
-  message: алфавиту
+  message: алфавитный порядок
 filterExecutionOrder:
   description: Label for option to sort scripts in execution order.
-  message: порядку выполнения
+  message: порядок выполнения
 filterLastUpdateOrder:
   description: Label for option to sort scripts by last update time.
-  message: времени послед. обновления
+  message: время послед. обновления
 filterLastVisitOrder:
   description: >-
     Label for option to sort scripts by the last time the user visited any site
     targeted by this script.
-  message: времени послед. обращения
+  message: время послед. обращения
 filterLastVisitOrderTooltip:
   description: Tooltip for option to sort scripts.
   message: Последний раз, когда вы посещали любой сайт, на который нацелен этот скрипт.
@@ -353,7 +353,7 @@ filterScopeName:
   touched: false
 filterSize:
   description: Label for option to sort scripts by size.
-  message: размеру
+  message: размер
 genericError:
   description: Label for generic error.
   message: Ошибка
@@ -668,7 +668,7 @@ labelMcpGrantTitle:
   message: Предоставить доступ к вкладке
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: Узнайте, как подключить ИИ-агента
+  message: Узнать, как подключить ИИ-агента
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
   message: Нет ожидающих запросов.
@@ -1259,7 +1259,7 @@ skipScriptsMsg:
     перезагрузите или перейдите на вкладку.
 sortOrder:
   description: Label for the script sort order in dashboard, settings, popup settings.
-  message: 'Сортировка по:'
+  message: 'Сортировка:'
 stopTracking:
   description: Button in a script installation dialog when actually tracking local file.
   message: Прекратить отслеживание
