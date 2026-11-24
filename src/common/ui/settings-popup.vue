@@ -1,31 +1,4 @@
 <template>
-  <div>
-    <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')"/>
-  </div>
-  <div class="ml-2c flex flex-col">
-    <!-- ml-2c indents children after the first one for visual grouping -->
-    <setting-check name="editorWindow" ref="$EW">
-      <tooltip :content="EDITOR_WINDOW_HINT" :disabled="!EDITOR_WINDOW_HINT">
-        <span v-text="i18n('optionEditorWindow')"/>
-      </tooltip>
-    </setting-check>
-    <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
-                   v-show="$EW?.value"/>
-  </div>
-  <setting-check name="pageMenuCommands" :label="i18n('labelPageMenuCommands')"/>
-  <div class="mid">
-    <label>{{ i18n('labelWidth') }}
-      <input v-model="popupWidth" type="range"
-             @mousedown="onMouseDownInRangeInput"
-             :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" />
-    </label>
-    <input v-model="popupWidth" type="number" style="field-sizing:content" class="ml-1"
-           ref="$popupWidthNumber"
-           :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" /> px
-    <button v-text="i18n('buttonReset')" class="ml-1"
-            v-if="popupWidth !== optionsDefaults[kPopupWidth]"
-            @click="popupWidth = optionsDefaults[kPopupWidth]"/>
-  </div>
   <div class="mid ml-2c">
     <label>{{ i18n('sortOrder') }}
       <select v-model="settings[kFPSort]">
@@ -45,6 +18,32 @@
     </label>
     <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
                    v-show="!settings[kFPHideDisabled]"/>
+  </div>
+  <div>
+    <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')"/>
+  </div>
+  <div class="ml-2c flex flex-col">
+    <!-- ml-2c indents children after the first one for visual grouping -->
+    <setting-check name="editorWindow" ref="$EW">
+      <tooltip :content="EDITOR_WINDOW_HINT" :disabled="!EDITOR_WINDOW_HINT">
+        <span v-text="i18n('optionEditorWindow')"/>
+      </tooltip>
+    </setting-check>
+    <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
+                   v-show="$EW?.value"/>
+  </div>
+  <div class="mid">
+    <label>{{ i18n('labelWidth') }}
+      <input v-model="popupWidth" type="range"
+             @mousedown="onMouseDownInRangeInput"
+             :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" />
+    </label>
+    <input v-model="popupWidth" type="number" style="field-sizing:content" class="ml-1"
+           ref="$popupWidthNumber"
+           :min="WIDTH_MIN" :max="WIDTH_MAX" step="1" /> px
+    <button v-text="i18n('buttonReset')" class="ml-1"
+            v-if="popupWidth !== optionsDefaults[kPopupWidth]"
+            @click="popupWidth = optionsDefaults[kPopupWidth]"/>
   </div>
   <div class="mid">
     <label>{{ i18n('labelBadge') }}
