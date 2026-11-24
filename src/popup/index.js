@@ -1,4 +1,4 @@
-import { i18n, sendCmdDirectly } from '@/common';
+import { getScriptName, i18n, sendCmdDirectly } from '@/common';
 import handlers from '@/common/handlers';
 import { loadCommandIcon, loadScriptIcon } from '@/common/load-script-icon';
 import { render } from '@/common/ui';
@@ -55,8 +55,8 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
     const scope = store[SCRIPTS][isTop ? 0 : 1];
     const { grantless } = data;
     const metas = data[SCRIPTS]?.filter(({ props: { id } }) => ids.includes(id))
-      || (Object.assign(data, await sendCmdDirectly('GetData', { ids })))[SCRIPTS];
-    metas.forEach(script => {
+      || Object.assign(data, await sendCmdDirectly('GetData', { ids, sizes: true }))[SCRIPTS];
+    metas.forEach((script, iMeta) => {
       const { id } = script.props;
       const state = idMap[id];
       const content = script.c = state === CONTENT && state;
@@ -73,17 +73,34 @@ async function setPopup(data, { [kFrameId]: frameId, url }) {
           if (i >= 0) frameScripts.splice(i, 1);
         }
       }
+      /** @typedef {VMScript & {
+       * id: number,
+       * excludes?: [string, {}],
+       * failed: boolean,
+       * grantless?: string,
+       * more: boolean,
+       * name: string,
+       * pageUrl: string,
+       * runs: boolean,
+       * runAt?: number,
+       * sizeNum: number,
+       * syntax: boolean,
+       * upd?: string,
+       * }} UIScriptPopup */
+      script.id = id;
+      script.excludes = script.upd = null;
+      script.name = getScriptName(script);
       script.runs = content || state === PAGE;
       script.pageUrl = url; // each frame has its own URL
       script.failed = badRealm || state === ID_INJECTING || more;
-      if (grantless && (v = grantless[id]) && delete v.window && (v = Object.keys(v).join(', '))) {
-        script.grantless = i18n('hintGrantless', v.length > 50 ? v.slice(0, 50) + '...' : v);
-      }
+      script.grantless = grantless
+        && (v = grantless[id])
+        && (delete v.window, v = Object.keys(v).join(', '))
+        && i18n('hintGrantless', v.length > 50 ? v.slice(0, 50) + '...' : v);
       script[MORE] = more;
+      script.sizeNum = data.sizes[iMeta].reduce((sum, x) => sum + x, 0);
       script.syntax = state === ID_INJECTING;
-      if (badRealm && !store.injectionFailure) {
-        store.injectionFailure = { fixable: data[INJECT_INTO] === PAGE };
-      }
+      if (badRealm) store.injectionFailure ||= { fixable: data[INJECT_INTO] === PAGE };
       loadScriptIcon(script, data);
     });
   }

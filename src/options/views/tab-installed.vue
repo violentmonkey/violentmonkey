@@ -100,15 +100,7 @@
                      :content="i18n('sortOrder').trim() + (collapseSorter ? ' ' + (currentSort.text || '') : '')">
               <component :is="currentSort.icon || IconSort"/>
             </Tooltip>
-            <select :value="filters.sort" @change="handleOrderChange" class="h-100">
-              <option
-                v-for="({text, title}, name) in sortModes"
-                v-text="text"
-                :title
-                :key="name"
-                :value="name">
-              </option>
-            </select>
+            <ScriptSortModes v-model="filters.sort" @change="handleOrderChange" class="h-100"/>
           </div>
           <Dropdown align="right" class="settings">
             <Tooltip :content="i18n('labelSettings')" placement="bottom" align="end">
@@ -202,21 +194,11 @@ import { loadData } from '@/options';
 import { TAB_SETTINGS } from '@/common/safe-globals'; // added as a banner but Vue needs an import
 import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import Icon from '@/common/ui/icon';
-import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';
-import IconAlphaDown from '~icons/mdi/sort-alphabetical-descending';
-import IconCalendar from '~icons/mdi/sort-calendar-ascending';
-import IconCalendarDown from '~icons/mdi/sort-calendar-descending';
-import IconClock from '~icons/mdi/sort-clock-ascending-outline';
-import IconClockDown from '~icons/mdi/sort-clock-descending-outline';
-import IconSmallBig from '~icons/tabler/sort-ascending-small-big';
-import IconBigSmall from '~icons/tabler/sort-descending-small-big';
 import IconSort from '~icons/mdi/sort-ascending';
-import IconSortDown from '~icons/mdi/sort-descending';
-import IconUser from '~icons/tdesign/user-arrow-up';
-import IconUserDown from '~icons/tdesign/user-arrow-down';
 import SettingCheck from '@/common/ui/setting-check';
 import { customCssElem, onMediaWidth, NARROW_WIDTH } from '@/common/ui/style';
-import { getSortCollator } from '@/common/ui/util';
+import ScriptSortModes from '@/common/ui/script-sort-modes.vue';
+import { getSortModes } from '@/common/ui/script-sort-modes.vue';
 import {
   createSearchRules, filteredScripts, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
   SIZE_TITLES, sortedScripts, store, TOGGLE_OFF, TOGGLE_ON,
@@ -244,39 +226,7 @@ const RESTORE = 'restore';
 const TOGGLE = 'toggle';
 const UNDO = 'undo';
 const UPDATE = 'update';
-const collator = getSortCollator();
-const cmpName = (a, b) => collator.compare(a.$cache.lowerName, b.$cache.lowerName);
-/** @type {{ [key:string]: SortMode }} */
-const sortModes = [
-  ['exec', i18n('filterExecutionOrder'), IconSort, IconSortDown],
-  ['alpha', i18n('filterAlphabeticalOrder'), IconAlpha, IconAlphaDown, cmpName],
-  ['author',
-    i18n('labelAuthor').replace(/[\s:\u{A789}\u{FE13}\u{FE55}\u{FF1A}]+/u, '').toLowerCase(),
-    IconUser, IconUserDown,
-    (a, b) => collator.compare(a.meta.author || '', b.meta.author || '') || cmpName(a, b)],
-  [UPDATE, i18n('filterLastUpdateOrder'), IconClock, IconClockDown,
-    (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
-  ['visit', i18n('filterLastVisitOrder'), IconCalendar, IconCalendarDown,
-    (a, b) => (b[INFERRED].visit || 0) - (a[INFERRED].visit || 0),
-    i18n('filterLastVisitOrderTooltip')],
-  ['size', i18n('filterSize'), IconSmallBig, IconBigSmall,
-    (a, b) => a.$cache.sizeNum - b.$cache.sizeNum],
-].reduce((res, [key, text, icon, iconRev, compare, title]) => {
-  res[key] = {
-    text,
-    title,
-    icon,
-    compare,
-  };
-  res[key + '-'] = /**@namespace SortMode*/{
-    text: text + ' \u25BC', // ▼
-    title: title,
-    icon: iconRev,
-    reversed: true,
-    compare: compare || ((a, b) => a.props.position - b.props.position),
-  };
-  return res;
-}, {});
+const sortModes = getSortModes();
 const filters = reactive({
   /** @type {Boolean} */ showEnabledFirst: null,
   /** @type {Boolean} */ showOrder: null,
@@ -522,9 +472,7 @@ async function moveScript(from, to) {
   }
 }
 function handleOrderChange(e) {
-  options.set('filters.sort',
-    // Not waiting for debounced options hook to ensure UI always matches <select>
-    filters.sort = e.target.value);
+  options.set('filters.sort', e.target.value);
 }
 function handleEditScript(id) {
   const pathname = [showRecycle.value ? TAB_RECYCLE : SCRIPTS, id]::trueJoin('/');

@@ -79,7 +79,7 @@ export default {
     showOrder: false,
     /** @type {boolean} */
     showVisit: false,
-    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'author'|'author-' | 'update'|'update-' | 'visit'|'visit-'} */
+    /** @type {VMScriptSortMode} */
     sort: 'exec',
     /** @type {boolean} */
     viewSingleColumn: false,
@@ -87,11 +87,11 @@ export default {
     viewTable: false,
   },
   [kFiltersPopup]: {
-    /** @type {'exec' | 'alpha'} */
+    /** @type {VMScriptSortMode} */
     sort: 'exec',
     enabledFirst: false,
     groupRunAt: true,
-    /** @type {'' | 'hide' | 'group'} where '' = show */
+    /** @type {'' | 'hide' | 'group' | boolean} '' = show, boolean = old VM backup */
     hideDisabled: '',
   },
   editor: defaultsEditor,
