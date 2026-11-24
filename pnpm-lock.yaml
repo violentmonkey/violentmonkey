@@ -392,6 +392,9 @@ importers:
       prettier:
         specifier: ^3.10.1
         version: 3.10.1
+      regex:
+        specifier: ^6.1.0
+        version: 6.1.0
       sharp:
         specifier: ^0.35.5
         version: 0.35.5(@types/node@26.6.6)

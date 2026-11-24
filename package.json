@@ -81,6 +81,7 @@
     "postcss-scss": "^4.0.9",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.10.1",
+    "regex": "^6.1.0",
     "sharp": "^0.35.5",
     "string-replace-loader": "^3.3.0",
     "svg-sprite-loader": "^6.0.11",

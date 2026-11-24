@@ -184,9 +184,9 @@ export function onRequestCreate(opts, context, fileName) {
     if (url === location) { url = url.href; } // safe window.location is unforgeable
     else {
       try { url = url::URLToString(); } // safe window.URL getter
-      catch (e) {
+      catch {
         try { url = `${url}`; } // unsafe toString may throw e.g. for Symbol or if spoofed
-        catch (e2) { err = e2; }
+        catch (e) { err = e; }
       }
     }
     opts.url = url;

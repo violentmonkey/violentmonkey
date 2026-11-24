@@ -2,12 +2,22 @@
 
 import { BLOB_LIFE, FMT_SIZE_KB_MB, FMT_SIZE_TIGHT, U8_fromBase64 } from '@/common/consts';
 
-export const i18n = /*@__PURE__*/memoize((name, args) => chrome.i18n.getMessage(name, args) || name);
+export const i18n = /*@__PURE__*/memoize(
+  /** @param {string} name
+   * @param {string|string[]} [args]
+   * @return {string} */
+  (name, args) => chrome.i18n.getMessage(name, args) || name
+);
 const HAS_BASE64_RE = /(^|;)\s*base64\s*(;|$)/;
 const NON_ASCII_RE = /[\x80-\xFF]/;
 /** @type {Set<Promise>} */
 const alivePromises = (__.DEV || __.DEBUG) && __.SW && (global.alivePromises = new Set());
 
+/**
+ * @template {function} T
+ * @param {T} func
+ * @return {T}
+ */
 export function memoize(func) {
   const cacheMap = Object.create(null);
   function memoized(...args) {
