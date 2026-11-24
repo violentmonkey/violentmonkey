@@ -106,7 +106,7 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
       else downloadBlob(response, fileName);
     }
     const shouldSendResponse =
-      !upload && dl !== true && shouldNotify && (!isJson || readyState4) && !sent;
+      !upload && (!dl || fileNameForTabDL) && shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
