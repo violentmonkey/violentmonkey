@@ -15,7 +15,7 @@ import { sortScripts, updateScriptInfo } from '../utils/db';
 import { DNR_ID_IDENTITY, updateSessionRules } from '../utils/dnr';
 import { getNameURI, parseMeta } from '../utils/script';
 import { script as pluginScript } from '../plugin';
-import { parseXml } from '@violentmonkey/xml-parser';
+import { parseXml } from '@usync/xml-parser';
 import sessionData from '../utils/session-data';
 import { tabOpen } from '../utils/tabs';
 import {

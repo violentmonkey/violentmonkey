@@ -1,4 +1,4 @@
-import { isCdnUrlRe, isDataUri, isRemote, keepAlive, makeRaw, tryUrl } from '@/common';
+import { isCdnUrlRe, isDataUri, isRemote, keepAlive, makeRaw, tryUrl, promiseResolvers } from '@/common';
 import { NO_CACHE, VM_HOME } from '@/common/consts';
 import limitConcurrency from '@/common/limit-concurrency';
 import { addOwnCommands } from './init';
@@ -63,7 +63,7 @@ export async function request(url, options = {}) {
       errCheckLock.resolve(info.error);
     }
   });
-  const errCheckLock = errCheck && Promise.withResolvers();
+  const errCheckLock = errCheck && promiseResolvers();
   let status = -1;
   let result = { url };
   if (errCheck) for (const evt of wrqCheckEvents) {

@@ -39,10 +39,12 @@ const LINKS = {
 </script>
 
 <style>
-.current {
-  color: green;
-  @media (prefers-color-scheme: dark) {
-    color: greenyellow;
+.tab-about {
+  .current {
+    color: green;
+    @media (prefers-color-scheme: dark) {
+      color: greenyellow;
+    }
   }
 }
 </style>

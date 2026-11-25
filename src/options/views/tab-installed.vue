@@ -100,15 +100,7 @@
                      :content="i18n('sortOrder').trim() + (collapseSorter ? ' ' + (currentSort.text || '') : '')">
               <component :is="currentSort.icon || IconSort"/>
             </Tooltip>
-            <select :value="filters.sort" @change="handleOrderChange" class="h-100">
-              <option
-                v-for="({text, title}, name) in sortModes"
-                v-text="text"
-                :title
-                :key="name"
-                :value="name">
-              </option>
-            </select>
+            <ScriptSortModes v-model="filters.sort" @change="handleOrderChange" class="h-100"/>
           </div>
           <Dropdown align="right" class="settings">
             <Tooltip :content="i18n('labelSettings')" placement="bottom" align="end">
@@ -157,7 +149,7 @@
           :key="script.props.id"
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
-          :showVisit="filters.showVisit || filters.sort.startsWith('visit')"
+          :showVisit="filters.showVisit || filters.sort.startsWith(kSortVisit)"
           :showAllSites="filters.showAllSites"
           :script
           :draggable
@@ -195,7 +187,7 @@ import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } 
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength, readBlob } from '@/common';
-import { INFERRED } from '@/common/consts';
+import { INFERRED, kSortAlpha, kSortAuthor, kSortExec, kSortSize, kSortUpdate, kSortVisit } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
 import hookSetting from '@/common/hook-setting';
@@ -222,7 +214,8 @@ import IconUser from '~icons/tdesign/user-arrow-up';
 import IconUserDown from '~icons/tdesign/user-arrow-down';
 import SettingCheck from '@/common/ui/setting-check';
 import { customCssElem, onMediaWidth, NARROW_WIDTH } from '@/common/ui/style';
-import { getSortCollator } from '@/common/ui/util';
+import ScriptSortModes from '@/common/ui/script-sort-modes.vue';
+import { getSortModes } from '@/common/ui/script-sort-modes.vue';
 import {
   createSearchRules, filteredScripts, formatSizesStr, markRemove, performSearch, runInBatch, setLocationHash,
   SIZE_TITLES, sortedScripts, store, TOGGLE_OFF, TOGGLE_ON,
@@ -250,39 +243,14 @@ const RESTORE = 'restore';
 const TOGGLE = 'toggle';
 const UNDO = 'undo';
 const UPDATE = 'update';
-const collator = getSortCollator();
-const cmpName = (a, b) => collator.compare(a.$cache.lowerName, b.$cache.lowerName);
-/** @type {{ [key:string]: SortMode }} */
-const sortModes = [
-  ['exec', i18n('filterExecutionOrder'), IconSort, IconSortDown],
-  ['alpha', i18n('filterAlphabeticalOrder'), IconAlpha, IconAlphaDown, cmpName],
-  ['author',
-    i18n('labelAuthor').replace(/[\s:\u{A789}\u{FE13}\u{FE55}\u{FF1A}]+/u, '').toLowerCase(),
-    IconUser, IconUserDown,
-    (a, b) => collator.compare(a.meta.author || '', b.meta.author || '') || cmpName(a, b)],
-  [UPDATE, i18n('filterLastUpdateOrder'), IconClock, IconClockDown,
-    (a, b) => (+b.props.lastUpdated || 0) - (+a.props.lastUpdated || 0)],
-  ['visit', i18n('filterLastVisitOrder'), IconCalendar, IconCalendarDown,
-    (a, b) => (b[INFERRED].visit || 0) - (a[INFERRED].visit || 0),
-    i18n('filterLastVisitOrderTooltip')],
-  ['size', i18n('filterSize'), IconSmallBig, IconBigSmall,
-    (a, b) => a.$cache.sizeNum - b.$cache.sizeNum],
-].reduce((res, [key, text, icon, iconRev, compare, title]) => {
-  res[key] = {
-    text,
-    title,
-    icon,
-    compare,
-  };
-  res[key + '-'] = /**@namespace SortMode*/{
-    text: text + ' \u25BC', // ▼
-    title: title,
-    icon: iconRev,
-    reversed: true,
-    compare: compare || ((a, b) => a.props.position - b.props.position),
-  };
-  return res;
-}, {});
+const sortModes = getSortModes({
+  [kSortExec]: [IconSort, IconSortDown],
+  [kSortAlpha]: [IconAlpha, IconAlphaDown],
+  [kSortAuthor]: [IconUser, IconUserDown],
+  [kSortUpdate]: [IconClock, IconClockDown],
+  [kSortVisit]: [IconCalendar, IconCalendarDown],
+  [kSortSize]: [IconSmallBig, IconBigSmall],
+});
 const filters = reactive({
   /** @type {Boolean} */ showAllSites: null,
   /** @type {Boolean} */ showEnabledFirst: null,
@@ -361,7 +329,7 @@ const state = reactive({
 });
 
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
-const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith('exec'));
+const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith(kSortExec));
 const draggable = computed(() => isTouch && draggableRaw.value);
 const currentSort = computed(() => sortModes[filters.sort] || false/* to avoid ?. for invalid mode */);
 const selectedScript = computed(() => filteredScripts.value[state.focusedIndex]);
@@ -529,9 +497,7 @@ async function moveScript(from, to) {
   }
 }
 function handleOrderChange(e) {
-  options.set('filters.sort',
-    // Not waiting for debounced options hook to ensure UI always matches <select>
-    filters.sort = e.target.value);
+  options.set('filters.sort', e.target.value);
 }
 function handleEditScript(id) {
   const pathname = [showRecycle.value ? TAB_RECYCLE : SCRIPTS, id]::trueJoin('/');
@@ -923,7 +889,7 @@ Object.assign(handlers, {
         if (val) dirty = scr[INFERRED].visit = val;
       }
     }
-    if (dirty && filters.sort.startsWith('visit')) {
+    if (dirty && filters.sort.startsWith(kSortVisit)) {
       sortScripts([...getCurrentList()]);
     }
   },

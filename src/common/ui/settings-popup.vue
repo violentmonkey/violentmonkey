@@ -1,4 +1,21 @@
 <template>
+  <div class="mid ml-2c">
+    <label>{{ i18n('sortOrder') }}
+      <ScriptSortModes v-model="settings[kFPSort]"/>
+    </label>
+    <setting-check name="filtersPopup.groupRunAt" :label="i18n('optionPopupGroupRunAt')"
+                   v-show="/exec/.test(settings[kFPSort])"/>
+  </div>
+  <div class="mid ml-2c">
+    <label>{{ i18n('disabledScriptsSelector') }}
+      <select v-model="settings[kFPHideDisabled]">
+        <option v-for="(title, value) in items[kFPHideDisabled]" :key="value"
+                :value v-text="title"/>
+      </select>
+    </label>
+    <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
+                   v-show="!settings[kFPHideDisabled]"/>
+  </div>
   <div>
     <setting-check name="autoReload" :label="i18n('labelAutoReloadCurrentTab')"/>
   </div>
@@ -12,7 +29,6 @@
     <setting-check name="editorWindowSimple" :label="i18n('optionEditorWindowSimple')"
                    v-show="$EW?.value"/>
   </div>
-  <setting-check name="pageMenuCommands" :label="i18n('labelPageMenuCommands')"/>
   <div class="mid">
     <label>{{ i18n('labelWidth') }}
       <input v-model="popupWidth" type="range"
@@ -25,26 +41,6 @@
     <button v-text="i18n('buttonReset')" class="ml-1"
             v-if="popupWidth !== optionsDefaults[kPopupWidth]"
             @click="popupWidth = optionsDefaults[kPopupWidth]"/>
-  </div>
-  <div class="mid ml-2c">
-    <label>{{ i18n('sortOrder') }}
-      <select v-model="settings[kFPSort]">
-        <option v-for="(title, value) in items[kFPSort]" :key="value"
-                :value v-text="title"/>
-      </select>
-    </label>
-    <setting-check name="filtersPopup.groupRunAt" :label="i18n('optionPopupGroupRunAt')"
-                   v-show="settings[kFPSort] === 'exec'"/>
-  </div>
-  <div class="mid ml-2c">
-    <label>{{ i18n('disabledScriptsSelector') }}
-      <select v-model="settings[kFPHideDisabled]">
-        <option v-for="(title, value) in items[kFPHideDisabled]" :key="value"
-                :value v-text="title"/>
-      </select>
-    </label>
-    <setting-check name="filtersPopup.enabledFirst" :label="i18n('optionPopupEnabledFirst')"
-                   v-show="!settings[kFPHideDisabled]"/>
   </div>
   <div class="mid">
     <label>{{ i18n('labelBadge') }}
@@ -101,10 +97,6 @@ const items = {
     group: i18n('disabledScriptsGroup'),
     hide: i18n('disabledScriptsHide'),
   },
-  [kFPSort]: {
-    exec: i18n('filterExecutionOrder'),
-    alpha: i18n('filterAlphabeticalOrder'),
-  },
   ...badgeColorEnum::mapEntry(() => badgeColorItem),
 };
 </script>
@@ -113,6 +105,8 @@ const items = {
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import Tooltip from 'vueleton/lib/tooltip';
 import SettingCheck from './setting-check.vue';
+import ScriptSortModes from './script-sort-modes.vue';
+import { getSortModes } from './script-sort-modes.vue';
 
 let popupWidthDragging;
 
@@ -146,6 +140,7 @@ const flushPopupWidth = val => {
 const flushPopupWidthLater = debounce(flushPopupWidth, 250);
 
 onMounted(() => {
+  items[kFPSort] ||= getSortModes();
   hookSettingsForUI(items, settings, watch, 0);
   watch(() => settings[kPopupWidth], val => {
     if (!popupWidthDragging) popupWidth.value = val;

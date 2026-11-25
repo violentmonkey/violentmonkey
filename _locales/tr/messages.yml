@@ -772,7 +772,7 @@ labelShowVisited:
   message: Son ziyaret tarihini göster
 labelSize:
   description: $1 is a size number like "1.1 MB".
-  message: ''
+  message: 'Boyut: $1'
 labelSync:
   description: Label for sync options.
   message: Eşitleme
@@ -1290,24 +1290,28 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * <kbd>Enter</kbd> tuşu metni otomatik tamamlama geçmişine ekler
+    * Koşullar boşlukla ayrılır
 
-    * Tüm koşullar büyük-küçük harfe duyarlıdır
+    * Tüm koşullar eşleşmelidir
 
-    * Koşullar boşlukla ayrılarak birlikte kullanılabilir
+    * Tırnak işaretleri olmadan küçük harflerle yazılmış veya <code>re:</code>
+    önekiyle başlayan koşullar için büyük/küçük harf duyarlılığı yoktur
 
-    * Meta verisi arama: <code>"Şahane Betik" "Açıklama"</code>
+    * Karışık büyük/küçük harf kullanımı, “tırnak işaretli metin” ve “i” bayrağı
+    olmadan <code>/re/</code> için büyük/küçük harf duyarlılığı vardır
 
-    * Etiket arama: <code>#etiket1 #etiket2</code>
+    * Meta verilerle arama: <code>“Awesome Script” “Description”</code>
 
-    * Betik ismi arama: <code>name:"şahane isim"</code>
+    * Etiketlerle arama: <code>#tag1 #tag2</code>
 
-    * Betik kodunda arama: <code>code:"şahane kod"</code>
+    * Komut dosyası adına göre arama: <code>name:"harika ad"</code>
 
-    * Negatif arama: <code>!#etiket2 !name:"istenmeyen"</code>
+    * Komut dosyası koduna göre arama: <code>code:"harika kod"</code>
+
+    * Negatif arama: <code>!#tag2 !name:"istenmeyen"</code>
 
     * Düzenli ifadeler: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+    <code>name:/\w+?/</code>, <code>name+re:"\w+? boşluklu"</code>
 titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to

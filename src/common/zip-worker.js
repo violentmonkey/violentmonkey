@@ -3,16 +3,17 @@ import { onClientMessage } from './messaging-sw';
 import { kOptionsJson, kStorageJson, kUserJs, vmZipEntryName } from './zip';
 import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate/browser';
 
-global.onmessage = onClientMessage.bind(null, async ({ data }) => {
+global.onmessage = onClientMessage.bind(null, async ({ data: [data, opts] }) => {
   if (data instanceof Blob) {
     let vm;
     const scriptTimes = new Map();
+    const storageNeeded = opts?.[kStorageJson];
     const buf = await (__.MV3 ? data.arrayBuffer() : data.arrayBuffer?.() || readBlob(data, true));
     const files = unzipSync(new Uint8Array(buf), {
       filter: ({ name: filename, time, originalSize }) => originalSize < 100e6 && (
         filename.toLowerCase() === vmZipEntryName ? vm = filename :
         filename.endsWith(kOptionsJson) ||
-        filename.endsWith(kStorageJson) ||
+        storageNeeded && filename.endsWith(kStorageJson) ||
         filename.endsWith(kUserJs) && scriptTimes.set(filename, time)
       ),
     });

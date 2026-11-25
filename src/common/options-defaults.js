@@ -1,4 +1,4 @@
-import { BLACKLIST, BLACKLIST_NET, FILE_GLOB_ALL } from '@/common/consts';
+import { BLACKLIST, BLACKLIST_NET, FILE_GLOB_ALL, kSortExec } from '@/common/consts';
 import { DEFAULT_UPDATE_CRON } from './cron';
 
 export const kAutocompleteOnTyping = 'autocompleteOnTyping';
@@ -81,19 +81,19 @@ export default {
     showOrder: false,
     /** @type {boolean} */
     showVisit: false,
-    /** @type {'exec'|'exec-' | 'alpha'|'alpha-' | 'author'|'author-' | 'update'|'update-' | 'visit'|'visit-'} */
-    sort: 'exec',
+    /** @type {VMScriptSortMode} */
+    sort: kSortExec,
     /** @type {boolean} */
     viewSingleColumn: false,
     /** @type {boolean} */
     viewTable: false,
   },
   [kFiltersPopup]: {
-    /** @type {'exec' | 'alpha'} */
-    sort: 'exec',
+    /** @type {VMScriptSortMode} */
+    sort: kSortExec,
     enabledFirst: false,
     groupRunAt: true,
-    /** @type {'' | 'hide' | 'group'} where '' = show */
+    /** @type {'' | 'hide' | 'group' | boolean} '' = show, boolean = old VM backup */
     hideDisabled: '',
   },
   editor: defaultsEditor,

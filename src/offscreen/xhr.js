@@ -106,7 +106,7 @@ export function xhrCallbackWrapper(req, events, blobbed, chunked, isJson) {
       else downloadBlob(response, fileName);
     }
     const shouldSendResponse =
-      !upload && dl !== true && shouldNotify && (!isJson || readyState4) && !sent;
+      !upload && (!dl || fileNameForTabDL) && shouldNotify && (!isJson || readyState4) && !sent;
     if (shouldSendResponse) {
       sent = true;
       for (let i = 1; i < numChunks; i += 1) {
@@ -160,7 +160,7 @@ export function getFileNameFromXHR(req, xhr) {
   let v = xhr.getResponseHeader('Content-Disposition');
   if ((v &&= // Preferring the newer filename* over filename
     v.match(/;\s*filename\*\s*=\s*UTF-8'([-\w]*)'([^;]+)/i) ||
-    v.match(/;\s*filename\s*=\s*(["']?)(.+[^\\])\2(?=;|$)/i)
+    v.match(/;\s*filename\s*=\s*(["']?)(.+[^\\])\1(?=;|$)/i)
   ) && (v = v[2].trim())) {
     // ok
   } else {

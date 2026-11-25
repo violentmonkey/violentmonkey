@@ -19,7 +19,7 @@ const makeDataResponse = async url => {
   const res = {
     opts: getAllOptions(),
     [url]: url === 'popup' ? await initPopup()
-      : url === 'options' && await getData({ sizes: true }),
+      : url === 'options' && await getData({ sizes: true, sync: true }),
   };
   return new Response(`var BGDATA=${JSON.stringify(res)}`,
     { headers: { 'cache-control': 'no-cache' } });

@@ -756,7 +756,7 @@ labelShowVisited:
   message: عرض وقت آخر زيارة
 labelSize:
   description: $1 is a size number like "1.1 MB".
-  message: ''
+  message: الحجم:$1
 labelSync:
   description: Label for sync options.
   message: المزامنة
@@ -1267,24 +1267,17 @@ titleSearchHintV2:
     Hover title for search icon in dashboard. Do not translate content between
     <code>...</code>.
   message: >-
-    * مفتاح <kbd>Enter</kbd> يضيف النص إلى سجل الإكمال التلقائي
-
-    * جميع الشروط غير حساسة لحالة الأحرف
-
-    * يمكن دمج الشروط المفصولة بمسافات
-
-    * البحث حسب البيانات الوصفية: <code>"Awesome Script" "Description"</code>
-
-    * البحث حسب الوسوم: <code>#tag1 #tag2</code>
-
-    * البحث حسب اسم السكربت: <code>name:"awesome name"</code>
-
-    * البحث حسب كود السكربت: <code>code:"awesome code"</code>
-
-    * البحث السلبي: <code>!#tag2 !name:"unwanted"</code>
-
-    * التعبيرات النمطية: <code>/\w+?/</code>, <code>/\w+?/gi</code>,
-    <code>name:/\w+?/</code>, <code>name+re:"\w+? with space"</code>
+    * تُفصل الشروط عن بعضها بمسافات.* يجب أن تتحقق جميع الشروط.* لا تُراعى حالة
+    الأحرف (case-insensitive) في الشروط المكتوبة بأحرف صغيرة وغير المحاطة
+    بعلامات اقتباس، أو تلك المسبوقة بـ `re:`.* تُراعى حالة الأحرف
+    (case-sensitive) في النصوص التي تحتوي على مزيج من الأحرف الكبيرة والصغيرة،
+    أو النصوص المحاطة بعلامات اقتباس، أو التعبيرات النمطية (regular expressions)
+    التي لا تتضمن العلم `i`.* البحث عبر البيانات الوصفية (metadata): "Awesome
+    Script" "Description".* البحث عبر الوسوم (tags): #tag1 #tag2.* البحث عبر اسم
+    النص البرمجي: name:"awesome name".* البحث عبر كود النص البرمجي:
+    code:"awesome code".* البحث الاستبعادي (negative search): !#tag2
+    !name:"unwanted".* التعبيرات النمطية (regular expressions): /\w+?/,
+    /\w+?/gi, name:/\w+?/, name+re:"\w+? with space".
 titleSyncGitCreateMethod:
   description: >-
     Hover title for the Git file-creation-method select, explaining when to

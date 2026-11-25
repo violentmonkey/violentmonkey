@@ -197,9 +197,10 @@ export function autoUpdate(runNow = false, forceRun = false) {
 async function runScheduledUpdate(forceRun) {
   const expression = getUpdateSchedule();
   if (!expression) return;
-  // An alarm is only worth acting on while the schedule is behind lastUpdate.
-  // A stale or duplicated alarm therefore reschedules instead of re-checking.
-  if (!getMissedCronTime(expression, getOption('lastUpdate'))) {
+  // A stale or duplicated alarm reschedules instead of re-checking, but only
+  // when there is a previous check time to compare against.
+  const lastUpdate = getOption('lastUpdate');
+  if (lastUpdate && !getMissedCronTime(expression, lastUpdate)) {
     await scheduleAutoUpdate(true);
     return;
   }

@@ -1,33 +1,33 @@
 batchActionDisable:
   description: Tooltip for batch disable (first click).
-  message: ''
+  message: 모든 스크립트 비활성화
 batchActionDisableConfirm:
   description: Tooltip for batch disable (confirm click).
-  message: ''
+  message: 모든 스크립트를 비활성화합니다
 batchActionEnable:
   description: Tooltip for batch enable (first click).
-  message: ''
+  message: 모든 스크립트 활성화
 batchActionEnableConfirm:
   description: Tooltip for batch enable (confirm click).
-  message: ''
+  message: 모든 스크립트를 활성화합니다
 batchActionRemove:
   description: Tooltip for batch remove (first click).
-  message: ''
+  message: 모든 스크립트 삭제
 batchActionRemoveConfirm:
   description: Tooltip for batch remove (confirm click).
-  message: ''
+  message: 모든 스크립트를 삭제합니다
 batchActionUpdate:
   description: Tooltip for batch update (first click).
-  message: ''
+  message: 모든 스크립트 업데이트
 batchActionUpdateConfirm:
   description: Tooltip for batch update (confirm click).
-  message: ''
+  message: 모든 스크립트를 업데이트합니다
 buttonApply:
   description: Apply button on dialog that applies changes without closing the dialog.
   message: 적용
 buttonApprove:
   description: Button to approve a request.
-  message: ''
+  message: 승인
 buttonCancel:
   description: Cancel button on dialog.
   message: 취소
@@ -51,7 +51,7 @@ buttonDisable:
   message: 비활성화
 buttonDisconnect:
   description: Button to disconnect.
-  message: ''
+  message: 연결 해제
 buttonDownloadThemes:
   description: Button in Violentmonkey settings for editor.
   message: ''
@@ -102,7 +102,7 @@ buttonRecycleBin:
   message: 휴지통
 buttonReject:
   description: Button to reject a request.
-  message: ''
+  message: 거부
 buttonRemove:
   description: Button to remove a script.
   message: 삭제
@@ -610,42 +610,42 @@ labelMatch:
   message: '@match 규칙'
 labelMcp:
   description: Title of the MCP (Model Context Protocol) section in settings.
-  message: ''
+  message: AI 에이전트 접근 (MCP)
 labelMcpAll:
   description: Checkbox that grants or revokes every listed tab at once.
-  message: ''
+  message: 전체
 labelMcpCapturing:
   description: Tooltip of the icon shown for a granted tab whose logs are being captured.
-  message: ''
+  message: 로그 수집 중
 labelMcpClosed:
   description: Shown when the MCP server rejected or closed the connection.
-  message: ''
+  message: MCP 서버에서 연결을 종료했습니다. 다시 시도하려면 새 연결 URL을 여세요.
 labelMcpConnected:
   description: Status text for an MCP connection. $1 is the port number.
-  message: ''
+  message: '$1 포트의 MCP 서버: 연결됨'
 labelMcpConnecting:
   description: Status text while connecting to an MCP server. $1 is the port number.
-  message: ''
+  message: $1 포트의 MCP 서버에 연결 중...
 labelMcpGrantTitle:
   description: Small title above the list of tabs that can be granted to an AI agent.
-  message: ''
+  message: 탭 접근 권한 부여
 labelMcpGuide:
   description: Link text pointing to the MCP setup guide.
-  message: ''
+  message: AI 에이전트 연결 방법 알아보기
 labelMcpNoRequests:
   description: Shown when no MCP server is connected and no request is pending.
-  message: ''
+  message: 대기 중인 요청이 없습니다.
 labelMcpNoTabs:
   description: >-
     Shown when no open tab is a web page, so there is nothing an AI agent could
     be granted.
-  message: ''
+  message: 열려 있는 웹 페이지가 없습니다.
 labelMcpPending:
   description: Shown when an MCP server requests a connection. $1 is the port number.
-  message: ''
+  message: 포트 $1의 MCP 서버가 스크립트를 읽고 수정하려고 합니다. 직접 시작한 경우에만 승인하세요.
 labelMcpTabs:
   description: Column header of the tab title in the MCP tab list.
-  message: ''
+  message: 탭
 labelName:
   description: Label of script name.
   message: '이름:'
@@ -722,7 +722,7 @@ labelShowVisited:
   message: 최근 방문 시각 표시
 labelSize:
   description: $1 is a size number like "1.1 MB".
-  message: ''
+  message: '크기: $1'
 labelSync:
   description: Label for sync options.
   message: 동기화

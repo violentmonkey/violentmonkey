@@ -269,7 +269,6 @@ declare interface VMScript {
 declare interface UIScriptCache {
   code?: string;
   desc: string;
-  lowerName: string;
   /** Name search result for highlighting the match */
   marks?: RegExpExecArray[] & { tail: string };
   name: string;
@@ -479,6 +478,13 @@ declare type VMMessageTargetFrame = { frameId?: number } | { documentId?: string
  * 4 = pre-rendered top-page post-reification
  */
 declare type VMTopRenderMode = 0 | 1 | 2 | 3 | 4;
+
+declare type VMScriptSortMode = string
+  | 'exec' | 'exec-'
+  | 'alpha' | 'alpha-'
+  | 'author' | 'author-'
+  | 'update' | 'update-'
+  | 'visit' | 'visit-';
 
 declare var __: {
   BG: boolean,

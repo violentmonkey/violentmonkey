@@ -481,9 +481,8 @@ export function notifyToOpenScripts(title, text, ids) {
 
 /**
  * @desc Get data for dashboard.
- * @return {Promise<{ scripts: VMScript[], cache: Object }>}
  */
-export async function getData({ id, ids, sizes }) {
+export async function getData({ id, ids, sizes, sync }) {
   if (id) ids = [id];
   const res = {};
   const scripts = getScriptsByIdsOrAll(ids);
@@ -493,7 +492,7 @@ export async function getData({ id, ids, sizes }) {
   // Sizes are matched to scripts by index, so they have to come from the same list
   if (sizes) res.sizes = scripts.map(getScriptSize);
   if (!id) res.cache = await getIconCache(scripts);
-  if (!id && sizes) res.sync = commands.SyncGetStates();
+  if (sync) res.sync = commands.SyncGetStates();
   return res;
 }
 
