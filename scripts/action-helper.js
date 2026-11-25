@@ -1,10 +1,9 @@
 const core = require('@actions/core');
-const { getVersion, isBeta } = require('./version-helper');
-const { exec } = require('./common');
+const { getVersion, gitDescribe, isBeta } = require('./version-helper');
+const { isCI } = require('./common');
 
 const version = process.env.VERSION || getVersion();
 const beta = isBeta();
-const ci = process.argv.includes('ci');
 
 const CWS_EXT_ID_BETA = 'opokoaglpekkimldnlggpoagmjegichg';
 const CWS_EXT_ID_RELEASE = 'jinjaccalgkegednnccohejagnlnfdag';
@@ -22,7 +21,7 @@ const envs = {
   PRERELEASE: !!beta,
   TEMP_DIR: 'tmp',
   ASSETS_DIR: 'dist-assets',
-  GIT_DESCRIBE: ci ? exec('git', ['describe', '--abbrev=7']) : `v${version}`,
+  GIT_DESCRIBE: isCI ? gitDescribe() : `v${version}`,
   ACTION_BUILD_URL: process.env.ACTION_BUILD_URL,
   DISCORD_WEBHOOK_RELEASE: process.env.DISCORD_WEBHOOK_RELEASE,
 };

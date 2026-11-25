@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { ListBackgroundScriptsPlugin } = require('./manifest-helper');
-const { getVersion } = require('./version-helper');
+const { getVersion, gitDescribe } = require('./version-helper');
 const { isProd, MV3 } = require('./common');
 const { configLoader } = require('./config-helper');
 const { getBaseConfig, PUBLIC_LIB } = require('./webpack-base');
@@ -16,7 +16,6 @@ const INIT_FUNC_NAME = '**VMInitInjection**';
 const IS_FIREFOX_MV2 = 'IS_FIREFOX_MV2';
 const VAULT_ID = 'VAULT_ID';
 const PAGE_MODE_HANDSHAKE = 'PAGE_MODE_HANDSHAKE';
-const VM_VER = getVersion();
 const pgInjected = 'injected';
 const pgInjectedWeb = 'injected-web';
 const pgOffscreen = 'offscreen';
@@ -39,11 +38,7 @@ configLoader
   // Load from `./.env`
   .envFile()
   // Load from `process.env`
-  .env()
-  // Override values
-  .add({
-    VM_VER,
-  });
+  .env();
 
 const pickEnvs = (items) => {
   return Object.assign({}, ...items.map(key => ({
@@ -53,7 +48,6 @@ const pickEnvs = (items) => {
 
 const defsObj = {
   ...pickEnvs([
-    'VM_VER',
     'SYNC_GOOGLE_DESKTOP_ID',
     'SYNC_GOOGLE_DESKTOP_SECRET',
     'SYNC_ONEDRIVE_CLIENT_ID',
@@ -68,6 +62,8 @@ const defsObj = {
     DEBUG: +process.env.DEBUG,
     DEV: !isProd,
     TEST: process.env.BABEL_ENV === 'test',
+    VM_VER: getVersion(),
+    VM_VER_COMMIT: gitDescribe().replace(/^[^-]+(?:-\d+(-)g)?/, '$1'), // "-6b78bbd" or ""
   }).map(([k, v]) => ['__.' + k, /string|object/.test(typeof v) ? JSON.stringify(v) : v])),
   __VUE_OPTIONS_API__: true,
   __VUE_PROD_DEVTOOLS__: false,

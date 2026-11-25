@@ -1,4 +1,5 @@
 const pkg = require('../package.json');
+const { exec } = require('./common');
 
 /**
  * Derive extension version from pkg.version and pkg.beta fields.
@@ -12,9 +13,14 @@ function getVersion() {
   );
 }
 
+function gitDescribe() {
+  return exec('git', ['describe', '--abbrev=7']) || '';
+}
+
 function isBeta() {
   return process.env.BETA || pkg.beta > 0;
 }
 
 exports.getVersion = getVersion;
+exports.gitDescribe = gitDescribe;
 exports.isBeta = isBeta;

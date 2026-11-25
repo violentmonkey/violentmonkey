@@ -13,7 +13,7 @@
       <div class="logo">
         <img src="/public/images/icon128.png">
       </div>
-      <div class="flex-1 ext-name" v-text="NAME" />
+      <VmVersion class="flex-1 ext-name"/>
       <span
         class="menu-area"
         :data-message="optionsData.isApplied ? i18n('menuScriptEnabled') : i18n('menuScriptDisabled')"
@@ -239,12 +239,12 @@ import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
 import { getSortModes } from '@/common/ui/script-sort-modes.vue';
+import VmVersion from '@/common/ui/vm-version.vue';
 import { handleTabNavigation, isInput, kbdTypable, keyboardService } from '@/common/keyboard';
 import { isFullscreenPopup, store } from '../utils';
 
 let mousedownElement;
 const HOME = extensionManifest.homepage_url.split('/')[2];
-const NAME = `${extensionManifest.name} ${__.VM_VER}${__.MV3 ? ' MV3' : ''}`;
 const TARDY_MATCH = i18n('msgTardyMatch');
 const INJECT_LEARN = IS_FIREFOX
   ? i18n('labelFirefoxPatchCspPopup', ['<content>', i18n('labelFirefoxPatchCsp')])

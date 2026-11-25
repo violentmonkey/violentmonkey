@@ -507,6 +507,7 @@ declare var __: {
   SYNC_ONEDRIVE_CLIENT_ID: string,
   TEST: boolean,
   VM_VER: string,
+  VM_VER_COMMIT: string,
   /** injected-web or zip-worker */
   WEB: boolean,
 };

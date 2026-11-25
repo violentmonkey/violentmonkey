@@ -17,7 +17,9 @@ const ready = (async () => {
   }
   if (res) {
     [vBG, options] = !__.MV3 || Array.isArray(res) ? res : ['*', res];
-    if (__.MV3 && vBG !== (ver = __.VM_VER) && confirm(i18n('msgRestartToUpdate', [vBG, ver]))) {
+    if (__.MV3
+    && vBG !== (ver = __.VM_VER + __.VM_VER_COMMIT)
+    && confirm(i18n('msgRestartToUpdate', [vBG, ver]))) {
       chrome.runtime.reload();
       close();
     }

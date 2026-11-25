@@ -10,7 +10,7 @@ import storage from './storage';
 let changes;
 
 export const getAllOptions = () => [
-  __.VM_VER,
+  __.MV3 && (__.VM_VER + __.VM_VER_COMMIT),
   { ...defaults, ...options },
 ];
 const options = {};
