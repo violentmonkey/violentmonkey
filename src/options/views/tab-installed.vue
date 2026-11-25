@@ -146,7 +146,7 @@
           :key="script.props.id"
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
-          :showVisit="filters.showVisit || filters.sort.startsWith('visit')"
+          :showVisit="filters.showVisit || filters.sort.startsWith(kSortVisit)"
           :script
           :draggable
           :visible="index < state.batchRender.limit"
@@ -183,7 +183,7 @@ import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } 
 import Dropdown from 'vueleton/lib/dropdown';
 import Tooltip from 'vueleton/lib/tooltip';
 import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength, readBlob } from '@/common';
-import { INFERRED } from '@/common/consts';
+import { INFERRED, kSortAlpha, kSortAuthor, kSortExec, kSortSize, kSortUpdate, kSortVisit } from '@/common/consts';
 import handlers from '@/common/handlers';
 import options from '@/common/options';
 import hookSetting from '@/common/hook-setting';
@@ -194,7 +194,18 @@ import { loadData } from '@/options';
 import { TAB_SETTINGS } from '@/common/safe-globals'; // added as a banner but Vue needs an import
 import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
 import Icon from '@/common/ui/icon';
+import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';
+import IconAlphaDown from '~icons/mdi/sort-alphabetical-descending';
+import IconCalendar from '~icons/mdi/sort-calendar-ascending';
+import IconCalendarDown from '~icons/mdi/sort-calendar-descending';
+import IconClock from '~icons/mdi/sort-clock-ascending-outline';
+import IconClockDown from '~icons/mdi/sort-clock-descending-outline';
+import IconSmallBig from '~icons/tabler/sort-ascending-small-big';
+import IconBigSmall from '~icons/tabler/sort-descending-small-big';
 import IconSort from '~icons/mdi/sort-ascending';
+import IconSortDown from '~icons/mdi/sort-descending';
+import IconUser from '~icons/tdesign/user-arrow-up';
+import IconUserDown from '~icons/tdesign/user-arrow-down';
 import SettingCheck from '@/common/ui/setting-check';
 import { customCssElem, onMediaWidth, NARROW_WIDTH } from '@/common/ui/style';
 import ScriptSortModes from '@/common/ui/script-sort-modes.vue';
@@ -226,7 +237,14 @@ const RESTORE = 'restore';
 const TOGGLE = 'toggle';
 const UNDO = 'undo';
 const UPDATE = 'update';
-const sortModes = getSortModes();
+const sortModes = getSortModes({
+  [kSortExec]: [IconSort, IconSortDown],
+  [kSortAlpha]: [IconAlpha, IconAlphaDown],
+  [kSortAuthor]: [IconUser, IconUserDown],
+  [kSortUpdate]: [IconClock, IconClockDown],
+  [kSortVisit]: [IconCalendar, IconCalendarDown],
+  [kSortSize]: [IconSmallBig, IconBigSmall],
+});
 const filters = reactive({
   /** @type {Boolean} */ showEnabledFirst: null,
   /** @type {Boolean} */ showOrder: null,
@@ -304,7 +322,7 @@ const state = reactive({
 });
 
 const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
-const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith('exec'));
+const draggableRaw = computed(() => !showRecycle.value && filters.sort.startsWith(kSortExec));
 const draggable = computed(() => isTouch && draggableRaw.value);
 const currentSort = computed(() => sortModes[filters.sort] || false/* to avoid ?. for invalid mode */);
 const selectedScript = computed(() => filteredScripts.value[state.focusedIndex]);
@@ -861,7 +879,7 @@ Object.assign(handlers, {
         if (val) dirty = scr[INFERRED].visit = val;
       }
     }
-    if (dirty && filters.sort.startsWith('visit')) {
+    if (dirty && filters.sort.startsWith(kSortVisit)) {
       sortScripts([...getCurrentList()]);
     }
   },

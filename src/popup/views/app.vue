@@ -224,7 +224,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue';
-import { VM_DOCS_INJECT_INTO, VM_DOCS_MATCHING } from '@/common/consts';
+import { kSortExec, VM_DOCS_INJECT_INTO, VM_DOCS_MATCHING } from '@/common/consts';
 import options from '@/common/options';
 import optionsDefaults, {
   kFiltersPopup, kPopupWidth, kUpdateEnabledScriptsOnly,
@@ -328,7 +328,7 @@ function makeInjectionScopes() {
   const { enabledFirst, hideDisabled: hideDisabledRaw } = opts;
   const { compare, reversed } = sortModes[sort = opts.sort]
     || sortModes[sort = Object.keys(sortModes)[0]];
-  const groupRunAt = sort.startsWith('exec') && opts.groupRunAt;
+  const groupRunAt = sort.startsWith(kSortExec) && opts.groupRunAt;
   const groupDisabled = hideDisabledRaw === 'group';
   const hideDisabled = hideDisabledRaw === 'hide' || hideDisabledRaw === true/*from an old VM backup*/;
   const [topList, frameList] = store[SCRIPTS];
