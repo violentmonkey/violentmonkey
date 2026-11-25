@@ -2,19 +2,22 @@
   <div ref="$el" class="tab-settings" :data-show-advanced="settings.showAdvanced">
     <h1 v-text="i18n('labelSettings')"></h1>
     <section>
-      <tooltip :content="i18n('labelHttpOnlyCookieHint')">
-        <setting-check :name="kGmCookieHttpOnly">
-          <span>{{
-            i18n('labelHttpOnlyCookie')
-          }} <ruby v-text="i18n('labelScriptOptionRequired')"/></span>
-        </setting-check>
-      </tooltip>
       <tooltip :content="i18n('labelGmDownloadViaApiHint')">
         <setting-check
           :name="kGmDownloadViaApi" :label="i18n('labelGmDownloadViaApi')" ref="$dlApi"
           :data-needs-grant="!store[kDownloads] && $dlApi?.value && !granting ? 1 : 0" />
         <button class="ml-1" v-text="i18n('labelGrantPermission')"
                 @click="requestDownloadsPermission" />
+      </tooltip>
+      <div>
+        <setting-check name="pageMenuCommands" :label="i18n('labelPageMenuCommands')"/>
+      </div>
+      <tooltip :content="i18n('labelHttpOnlyCookieHint')">
+        <setting-check :name="kGmCookieHttpOnly">
+          <span>{{
+            i18n('labelHttpOnlyCookie')
+          }} <ruby v-text="i18n('labelScriptOptionRequired')"/></span>
+        </setting-check>
       </tooltip>
     </section>
     <section class="mb-1c">

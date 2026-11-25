@@ -84,7 +84,7 @@
       </div>
       <div class="submenu">
         <div
-          v-for="item in /** @type {(VMScript & ScopeListItem)[]} */scope.list"
+          v-for="item in scope.list"
           :key="item.id"
           :class="{
             disabled: !item.config.enabled,
@@ -224,13 +224,13 @@
 
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue';
-import { VM_DOCS_INJECT_INTO, VM_DOCS_MATCHING } from '@/common/consts';
+import { kSortExec, VM_DOCS_INJECT_INTO, VM_DOCS_MATCHING } from '@/common/consts';
 import options from '@/common/options';
 import optionsDefaults, {
   kFiltersPopup, kPopupWidth, kUpdateEnabledScriptsOnly,
 } from '@/common/options-defaults';
 import {
-  getScriptHome, getScriptName, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl, i18n, makePause,
+  getScriptHome, getScriptRunAt, getScriptSupportUrl, getScriptUpdateUrl, i18n, makePause,
   sendCmdDirectly, sendTabCmd,
 } from '@/common';
 import handlers from '@/common/handlers';
@@ -238,7 +238,7 @@ import { objectPick } from '@/common/object';
 import { EXTERNAL_LINK_PROPS, getActiveElement } from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import SettingsPopup from '@/common/ui/settings-popup.vue';
-import { getSortCollator } from '@/common/ui/util';
+import { getSortModes } from '@/common/ui/script-sort-modes.vue';
 import { handleTabNavigation, isInput, kbdTypable, keyboardService } from '@/common/keyboard';
 import { isFullscreenPopup, store } from '../utils';
 
@@ -253,7 +253,6 @@ const SCRIPT_CLS = '.script';
 const RUN_AT_ORDER = ['start', 'body', 'end', 'idle'];
 const kNoCmdNames = 'noCmdNames';
 const needsReload = reactive({});
-const collator = getSortCollator();
 const $extras = ref();
 const $footer = ref();
 const $topExtras = ref();
@@ -263,6 +262,7 @@ const optionsData = reactive(objectPick(optionsDefaults, [
   kPopupWidth,
   kUpdateEnabledScriptsOnly,
 ]));
+const sortModes = getSortModes();
 const activeMenu = ref(SCRIPTS);
 const showSettings = ref();
 const extras = ref();
@@ -272,7 +272,7 @@ const note = ref();
 const topExtras = ref();
 
 const activeLinks = computed(makeActiveLinks);
-const injectionScopes = computed(makeInjectionScopes);
+const injectionScopes = computed(/**@type{()=>InjectionScope[]}*/makeInjectionScopes);
 const findUrls = computed(makeFindUrls);
 const reloadHint = computed(makeReloadHint);
 const tabIndex = computed(() => extras.value ? -1 : 0);
@@ -320,59 +320,58 @@ function makeActiveLinks() {
   ].filter(Boolean);
 }
 function makeInjectionScopes() {
-  const { sort, enabledFirst, groupRunAt, hideDisabled } = optionsData[kFiltersPopup];
-  const { injectable } = store;
-  const groupDisabled = hideDisabled === 'group';
-  const enabledOnly = optionsData[kUpdateEnabledScriptsOnly];
+  let numScopes = 0;
+  let sort;
+  let updOpts;
   let updatableScripts;
-  return [
-    injectable && [0, SCRIPTS, i18n('menuMatchedScripts'), groupDisabled || null],
-    injectable && groupDisabled && [0, 'disabled', i18n('menuMatchedDisabledScripts'), false],
-    [1, 'frameScripts', i18n('menuMatchedFrameScripts')],
-  ]
-  .filter(Boolean)
-  .map(([depth, name, title, groupByEnabled]) => {
-    let list = store[SCRIPTS][depth];
-    if (groupByEnabled != null) {
-      list = list.filter(script => !script.config.enabled === !groupByEnabled);
+  const opts = optionsData[kFiltersPopup];
+  const { enabledFirst, hideDisabled: hideDisabledRaw } = opts;
+  const { compare, reversed } = sortModes[sort = opts.sort]
+    || sortModes[sort = Object.keys(sortModes)[0]];
+  const groupRunAt = sort.startsWith(kSortExec) && opts.groupRunAt;
+  const groupDisabled = hideDisabledRaw === 'group';
+  const hideDisabled = hideDisabledRaw === 'hide' || hideDisabledRaw === true/*from an old VM backup*/;
+  const [topList, frameList] = store[SCRIPTS];
+  const scopes = [];
+  if (topList.length) {
+    scopes.push([topList, SCRIPTS, i18n('menuMatchedScripts'), groupDisabled || null]);
+    if (groupDisabled) scopes.push([topList, 'disabled', i18n('menuMatchedDisabledScripts'), false]);
+  }
+  if (frameList.length) {
+    scopes.push([frameList, 'frameScripts', i18n('menuMatchedFrameScripts')]);
+  }
+  for (const [listRaw, name, title, enabledState] of scopes) {
+    let numEnabled = 0;
+    let numTotal = 0;
+    let list = /**@type{UIScriptPopup[]}*/ listRaw;
+    if (enabledState != null || hideDisabled) {
+      list = list.filter(({ config: { enabled } }) => (
+        (enabledState == null || !enabled === !enabledState) && ++numTotal &&
+        (!hideDisabled || enabled) && ++numEnabled
+      ));
+      if (!numTotal) continue;
+    } else {
+      numEnabled = numTotal = list.length;
     }
-    const numTotal = list.length;
-    const numEnabled = groupByEnabled == null
-      ? list.reduce((num, script) => num + script.config.enabled, 0)
-      : numTotal;
-    if (hideDisabled === 'hide' || hideDisabled === true) {
-      list = list.filter(script => script.config.enabled);
-    }
-    list = list.map(script => {
-      const scriptName = getScriptName(script);
-      const { id } = script.props;
-      const { enabled, removed, shouldUpdate } = script.config;
-      const upd = !removed && getScriptUpdateUrl(script, { enabledOnly });
-      /** @namespace ScopeListItem */
-      const item = {
-        ...script,
-        id,
-        name: scriptName,
-        key: `${
-          enabledFirst && +!enabled
-        }${
-          sort === 'alpha'
-            ? scriptName.toLowerCase()
-            : groupRunAt && RUN_AT_ORDER.indexOf(getScriptRunAt(script))
-        }${
-          1e6 + script.props.position
-        }`,
-        excludes: null,
-      };
-      if (upd) item.upd = null;
-      if (upd && shouldUpdate) {
-        if (!updatableScripts) updatableScripts = store.updatableScripts = {};
-        updatableScripts[id] = item;
+    for (const script of list) {
+      if (groupRunAt) {
+        script[RUN_AT] = RUN_AT_ORDER.indexOf(getScriptRunAt(script));
       }
-      return item;
-    }).sort((a, b) => collator.compare(a.key, b.key));
-    return numTotal && /** @namespace Scope */{
-      depth,
+      if (!script.config.removed
+      && script.config.shouldUpdate
+      && getScriptUpdateUrl(script, updOpts ||= { enabledOnly: optionsData[kUpdateEnabledScriptsOnly] })) {
+        (updatableScripts ||= store.updatableScripts = {})[script.props.id] = script;
+      }
+    }
+    list.sort(!enabledFirst && !groupRunAt && !reversed
+      ? compare
+      : (a, b) =>
+        enabledFirst && (b.config.enabled - a.config.enabled) ||
+        groupRunAt && (b[RUN_AT] - a[RUN_AT]) ||
+        (reversed ? compare(b, a) : compare(a, b))
+    );
+    /** @namespace InjectionScope */
+    scopes[numScopes++] = {
       name,
       title,
       list,
@@ -380,7 +379,9 @@ function makeInjectionScopes() {
         ? `${numEnabled} / ${numTotal}`
         : `${numTotal}`,
     };
-  }).filter(Boolean);
+  }
+  scopes.length = numScopes;
+  return scopes;
 }
 function makeFindUrls() {
   const query = encodeURIComponent(store.domain);

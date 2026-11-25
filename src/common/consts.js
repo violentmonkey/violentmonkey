@@ -113,3 +113,10 @@ export const TLDJS = __.PUBLIC_LIB + 'tld.js';
 export const FMT_SIZE_TIGHT = 1;
 /** Show B in kB and MB unit suffix */
 export const FMT_SIZE_KB_MB = 2;
+
+export const kSortAlpha = 'alpha';
+export const kSortAuthor = 'author';
+export const kSortExec = 'exec';
+export const kSortSize = 'size';
+export const kSortUpdate = 'update';
+export const kSortVisit = 'visit';

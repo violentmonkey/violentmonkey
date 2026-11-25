@@ -75,11 +75,13 @@ async function importBackup(file) {
 /** @param {File} fileBlob */
 async function doImportBackup(fileBlob) {
   reports.length = 0;
+  /** Current value before import, also used to skip .storage.json while unzipping */
+  const importScriptData = options.get('importScriptData');
   let vm;
   let files;
   let /**@type{Map}*/scriptTimes;
   try {
-    [vm, files, scriptTimes] = await zipOrUnzip(fileBlob);
+    [vm, files, scriptTimes] = await zipOrUnzip(fileBlob, { [kStorageJson]: importScriptData });
   } catch (err) {
     report(err.message || err);
     return;
@@ -138,7 +140,7 @@ async function doImportBackup(fileBlob) {
   for (const nameAndTime of scriptTimes) {
     await readScript(...nameAndTime);
   }
-  if (options.get('importScriptData')) {
+  if (importScriptData) {
     storageNames.forEach(readScriptStorage);
     sendCmdDirectly('SetValueStores', values);
   }

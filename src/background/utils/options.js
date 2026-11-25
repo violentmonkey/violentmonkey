@@ -1,4 +1,5 @@
 import { compareVersion, debounce, initHooks, normalizeKeys } from '@/common';
+import { kSortExec } from '@/common/consts';
 import { deepCopy, deepEqual, objectGet, objectSet } from '@/common/object';
 import defaults, { kScriptTemplate, kUpdateCron } from '@/common/options-defaults';
 import { migrateAutoUpdate, normalizeUpdateCron } from '@/common/cron';
@@ -75,7 +76,7 @@ export function initOptions(data, lastVersion, versionChanged) {
     && compareVersion(lastVersion, '2.45.4') <= 0) {
       options[key] = false; // In older VM it was enabled by default but used only in Firefox
     }
-    if ((val = options.filters) && val[key = 'sort'] === 'exec'
+    if ((val = options.filters) && val[key = 'sort'] === kSortExec
     && compareVersion(lastVersion, '2.31.2') <= 0) {
       val[key] += '-'; // Until reverse sort was implemented, 'size' was reversed by design
     }

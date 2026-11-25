@@ -72,7 +72,7 @@ async function augmentSetPopup(data, src, key) {
   const ids = data[IDS];
   const moreIds = getScriptsByURL(src.url, src[kTop], null, ids);
   Object.assign(ids, moreIds);
-  Object.assign(data, await getData({ [IDS]: Object.keys(ids) }));
+  Object.assign(data, await getData({ [IDS]: Object.keys(ids), sizes: true }));
   data = [data, src];
   if (!key) return data;
   (cache.get(key) || cache.put(key, {}))[src[kFrameId]] = data;

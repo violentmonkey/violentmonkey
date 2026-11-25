@@ -45,7 +45,6 @@ function initScript(script, sizes, code) {
   });
   $cache.desc = desc;
   $cache.name = name;
-  $cache.lowerName = name.toLocaleLowerCase();
   $cache.size = formatByteLength(total, FMT_SIZE_TIGHT);
   $cache.sizes = formatSizesStr(str);
   $cache.sizeNum = total;
@@ -70,7 +69,9 @@ export function loadData() {
 async function requestData(id) {
   const allData = BGDATA.options;
   // Using await on the literal data to give Vue a breath to avoid a long white frame
-  const data = await (allData || sendCmdDirectly('GetData', { id, sizes: true }, { retry: true }));
+  const data = await (
+    allData || sendCmdDirectly('GetData', { id, sizes: true, sync: true }, { retry: true })
+  );
   const { [SCRIPTS]: allScripts, sizes, ...auxData } = data;
   Object.assign(store, auxData); // initScripts needs `cache` in store
   const scripts = [];

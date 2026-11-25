@@ -256,8 +256,9 @@ onMounted(async () => {
 });
 
 async function initScript() {
-  await loadData();
-  if (!await parseMeta()) return;
+  if (!await loadData() || !await parseMeta()) {
+    return;
+  }
   await Promise.all([
     checkSameCode(),
     (async () => {
@@ -306,7 +307,7 @@ async function loadData(changedOnly) {
     ? await new Promise(pingFilePort)
     : await getScript(infoVal.url);
   if (newCode == null || changedOnly && code.value === newCode) {
-    throw 0;
+    return;
   }
   const cm = $externals.value?.$code.cm;
   const lines = cm && newCode.split(/\r?\n/);
@@ -319,6 +320,7 @@ async function loadData(changedOnly) {
     cm.setCursor(i);
     cm.scrollIntoView(null, cm.display.lastWrapHeight / 3);
   }
+  return true;
 }
 async function parseMeta() {
   const res = await sendCmdDirectly('ParseMeta', code.value);
@@ -517,7 +519,7 @@ async function trackLocalFile() {
 }
 async function onFileChanged() {
   try {
-    await loadData(true);
+    if (!await loadData(true)) return;
     const parsedMeta = await parseMeta();
     await loadDeps();
     await installScript(null, parsedMeta);

@@ -1,4 +1,4 @@
-import { makePause } from '@/common';
+import { makePause, promiseResolvers } from '@/common';
 import { sendCmd } from '@/common/messaging';
 import { broadcaster } from '@/common/messaging-sw';
 import { incognitoAllowed, inIncognitoContext, init } from './init';
@@ -53,7 +53,7 @@ async function broadcastToSplit(msg) {
 }
 
 async function send(key, val) {
-  const p = Promise.withResolvers();
+  const p = promiseResolvers();
   resolveAck = p.resolve;
   await apiSession.set({ [key]: val });
   return Promise.race([p.promise, makePause(100)]);
