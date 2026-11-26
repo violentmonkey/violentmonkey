@@ -106,23 +106,26 @@ function onBeforeSendHeaders({ [kRequestHeaders]: headers, requestId, tabId, url
     if (__.MV3) return;
     const headersMap = {};
     const headers2 = headersToInject[reqId];
-    const toCook = new URL(url).origin === req[kCookie];
+    const cookieOrigin = req[kCookie];
+    let isCookieOrigin;
     let cookieParts;
     let h2 = !headers2;
     for (const h of headers) {
       let name = h.name.toLowerCase();
       if (name === 'origin' && h.value === extensionOrigin
-      || toCook && name === kCookie && !req[kCookie]) {
+      || !cookieOrigin && name === kCookie) {
         continue;
       }
-      if (toCook && !h2 && name === kCookie && (h2 = headers2[name])) {
+      if (!h2 && cookieOrigin && name === kCookie
+      && (isCookieOrigin ??= cookieOrigin === new URL(url).origin)
+      && (h2 = headers2[name])) {
         (cookieParts ||= new Set([trimCookieValue(h)])).add(trimCookieValue(h2));
       } else {
         headersMap[name] = h;
       }
     }
     if (cookieParts) {
-      headersMap[kCookie] = [...cookieParts].join('; ');
+      headersMap[kCookie] = { name: kCookie, value: [...cookieParts].join('; ') };
     }
     return {
       [kRequestHeaders]: Object.values({ ...headers2, ...headersMap })
