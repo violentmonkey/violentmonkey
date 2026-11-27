@@ -977,7 +977,7 @@ $minSearchWidth: 5em;
     svg {
       width: $iconSize;
       height: $iconSize;
-      padding: 2px;
+      padding: 4px; // decreasing the size to approximate apparent weight of other icons in header
       pointer-events: none;
     }
     &.btn-ghost {
