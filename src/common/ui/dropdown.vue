@@ -22,7 +22,7 @@
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue';
 
-const props = defineProps({
+defineProps({
   /** Close the menu when it's clicked. */
   closeAfterClick: Boolean,
   /** Open the menu when the toggle is focused. */
@@ -39,14 +39,12 @@ const props = defineProps({
   },
   /** Content of the menu, can be overridden by `#content` slot. */
   content: String,
-  modelValue: Boolean,
 });
-const emit = defineEmits(['update:modelValue']);
+/** Whether the menu is open, optionally bound via `v-model`. */
+const open = defineModel({ type: Boolean, default: false });
 
 const $el = ref();
-const open = ref(props.modelValue);
 
-watch(() => props.modelValue, val => { open.value = val; });
 watch(open, val => {
   if (val) document.addEventListener('mousedown', close, false);
   else document.removeEventListener('mousedown', close, false);
@@ -55,7 +53,6 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', close, false));
 
 function toggle() {
   open.value = !open.value;
-  emit('update:modelValue', open.value);
 }
 function close() {
   if (open.value) toggle();
