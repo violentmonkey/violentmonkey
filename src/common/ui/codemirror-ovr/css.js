@@ -46,7 +46,7 @@ const keywords = {
   propertyKeywords: new Set(cssData.propertyKeywords),
   valueKeywords: new Set(cssData.valueKeywords),
 };
-const rxColon = /(?:\s+|\/\*(?:[^*]+|\*(?!\/))*(?:\*\/|$))*:/y;
+export const rxColon = /\s*(?:\/\*(?:[^*]|\*(?!\/))*(?:\*\/|$)\s*)*:/y;
 const rxDashLetter = /[-a-z\\]+/yi;
 const rxHexColor = /#[\da-f]{3}(?:[\da-f](?:[\da-f]{2}(?:[\da-f]{2})?)?)?/yi;
 const rxImportant = /\s*\w*/y;
