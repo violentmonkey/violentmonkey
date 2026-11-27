@@ -66,7 +66,7 @@ const getBaseConfig = (page) => /** @type {import('webpack/types').Configuration
         test: /\.m?[jt]sx?$/,
         loader: 'babel-loader',
         exclude: file => /node_modules/.test(file) &&
-          !/vueleton|@vue[/\\]shared|@usync|@violentmonkey/.test(file),
+          !/@vue[/\\]shared|@usync|@violentmonkey/.test(file),
       },
       // CSS including .module.css
       {

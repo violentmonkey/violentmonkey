@@ -12,7 +12,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import { i18n, sendCmdDirectly } from '@/common';
 import options from '@/common/options';
 import defaults from '@/common/options-defaults';

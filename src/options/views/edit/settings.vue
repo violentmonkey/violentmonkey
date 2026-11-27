@@ -105,7 +105,7 @@
 
 <script setup>
 import { computed, nextTick, onActivated, onDeactivated, ref, shallowRef } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import { getScriptHome, i18n } from '@/common';
 import { ESC_STR_RE, KNOWN_INJECT_INTO, kOrigTag, kTag } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';

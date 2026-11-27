@@ -140,7 +140,7 @@ import { kEditAsString, kValueEditor } from '@/common/options-defaults';
 import { WATCH_STORAGE } from '@/common/consts';
 import hookSetting from '@/common/hook-setting';
 import CodeMirror from 'codemirror';
-import Dropdown from 'vueleton/lib/dropdown';
+import Dropdown from '@/common/ui/dropdown';
 import VmCode from '@/common/ui/code';
 import Icon from '@/common/ui/icon';
 import LocaleGroup from '@/common/ui/locale-group';

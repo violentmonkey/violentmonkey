@@ -103,7 +103,7 @@ const items = {
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import SettingCheck from './setting-check.vue';
 import ScriptSortModes from './script-sort-modes.vue';
 import { getSortModes } from './script-sort-modes.vue';

@@ -116,7 +116,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import {
   debounce, formatByteLength, getFullUrl, getLocaleString, getScriptHome, i18n, isRemote,
   makePause, sendCmdDirectly, trueJoin,

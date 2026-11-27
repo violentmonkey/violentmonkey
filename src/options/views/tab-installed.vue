@@ -180,8 +180,8 @@
 
 <script setup>
 import { computed, reactive, nextTick, onMounted, watch, ref, onBeforeUnmount } from 'vue';
-import Dropdown from 'vueleton/lib/dropdown';
-import Tooltip from 'vueleton/lib/tooltip';
+import Dropdown from '@/common/ui/dropdown';
+import Tooltip from '@/common/ui/tooltip';
 import { i18n, sendCmdDirectly, debounce, ensureArray, trueJoin, formatByteLength, readBlob } from '@/common';
 import { INFERRED, kSortAlpha, kSortAuthor, kSortExec, kSortSize, kSortUpdate, kSortVisit } from '@/common/consts';
 import handlers from '@/common/handlers';

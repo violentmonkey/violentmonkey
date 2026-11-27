@@ -160,7 +160,7 @@ const CAN_FAST_INJECT = __.MV3 || browser.contentScripts;
 import { noop, sendCmdDirectly } from '@/common';
 import { DEFAULT_UPDATE_CRON } from '@/common/cron';
 import { onActivated, onDeactivated, reactive, ref, watch } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import LocaleGroup from '@/common/ui/locale-group';
 import SettingCheck from '@/common/ui/setting-check';
 import SettingCron from '@/common/ui/setting-cron.vue';

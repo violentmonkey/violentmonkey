@@ -260,7 +260,7 @@ import {
 import hookSetting from '@/common/hook-setting';
 import options from '@/common/options';
 import { computed, ref, watchEffect } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import SettingCheck from '@/common/ui/setting-check';
 import { store } from '../../utils';
 import {

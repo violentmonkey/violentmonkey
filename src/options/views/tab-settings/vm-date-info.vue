@@ -14,6 +14,6 @@ const DATE_HELP_URL = 'https://momentjs.com/docs/#/displaying/format/';
 </script>
 
 <script setup>
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import Icon from '@/common/ui/icon';
 </script>

@@ -1,5 +1,5 @@
-import { createApp, h } from 'vue';
-import Modal from 'vueleton/lib/modal';
+import { createApp, h, reactive } from 'vue';
+import Modal from './modal';
 import { trueJoin } from '@/common';
 import { i18n } from '@/common/util';
 import Message from './message';
@@ -46,8 +46,32 @@ export function showUnhandledError(a, b, c, d, err = a?.reason || a) {
   parent.appendChild(el);
 }
 
+/**
+ * @param {import('vue').Component} childComponent
+ * @param {Object} [props] - props for Modal
+ * @return {{ close: () => void }}
+ */
+export function showModal(childComponent, props) {
+  const container = document.createElement('div');
+  const data = reactive({
+    ...props,
+    show: true,
+    onClose: () => { data.show = false; },
+    onAfterLeave: () => {
+      app.unmount();
+      container.remove();
+    },
+  });
+  const app = createApp({
+    render: () => h(Modal, data, () => [h(childComponent)]),
+  });
+  document.body.append(container);
+  app.mount(container);
+  return { close: data.onClose };
+}
+
 export function showMessage(message) {
-  const modal = Modal.show(() => h(Message, {
+  const modal = showModal(() => h(Message, {
     message,
     onDismiss() {
       modal.close();

@@ -123,7 +123,7 @@ CodeMirror.registerHelper('hint', 'autoHintWithFallback', (cm, ...args) => {
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, watchEffect } from 'vue';
-import Tooltip from 'vueleton/lib/tooltip';
+import Tooltip from '@/common/ui/tooltip';
 import ToggleButton from '@/common/ui/toggle-button';
 import { HINT_OPTIONS } from './code-autocomplete';
 
