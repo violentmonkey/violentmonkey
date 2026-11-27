@@ -49,8 +49,8 @@ describe('getItemFilenameV3', () => {
   });
 
   test('drops zero-width and bidi-override characters', () => {
-    expect(vm3('A‍B')).toMatch(/^vm3-A-B-/);
-    expect(vm3('a‮b')).toMatch(/^vm3-a-b-/);
+    expect(vm3('A‍B')).toMatch(/^vm3-A-B-/); // eslint-disable-line secure-coding/no-homoglyph-identifiers
+    expect(vm3('a‮b')).toMatch(/^vm3-a-b-/); // eslint-disable-line secure-coding/no-homoglyph-identifiers
   });
 
   test('handles a name with nothing sluggable', () => {

@@ -1,3 +1,4 @@
+const secureCoding = require('eslint-plugin-secure-coding');
 const { readGlobalsFile, restrictedSyntax } = require('./scripts/webpack-util');
 const ovr = makeOverrides();
 
@@ -18,7 +19,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['jest'],
+  plugins: ['jest', 'secure-coding'],
   rules: {
     'prettier/prettier': 'off',
     'no-constant-condition': 'off',
@@ -38,6 +39,9 @@ module.exports = {
       ExportDeclaration: { minProperties: 8, multiline: true, consistent: true },
     }],
     'semi': ['error'],
+    ...secureCoding.configs.recommended.rules,
+    'secure-coding/no-hardcoded-credentials': [0],
+    'secure-coding/no-unsafe-regex-construction': [0],
   },
   overrides: [{
     // `browser` is a local variable since we remove the global `chrome` and `browser` in injected*

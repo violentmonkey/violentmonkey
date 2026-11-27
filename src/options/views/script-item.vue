@@ -204,10 +204,10 @@ const showRecycle = computed(() => store.route.paths[0] === TAB_RECYCLE);
 const author = computed(() => {
   const text = props.script.meta.author;
   if (!text) return;
-  const matches = text.match(/^(.*?)\s<(\S*?@\S*?)>$/);
+  const m = text.match(/\s*<([^@<>\s]*@[^>\s]*)>$/);
   return {
-    email: matches && matches[2],
-    name: matches ? matches[1] : text,
+    email: m?.[1] || '',
+    name: m ? text.slice(0, m.index) : text,
   };
 });
 const cache = computed(() => /**@type{UIScriptCache}*/props.script.$cache);

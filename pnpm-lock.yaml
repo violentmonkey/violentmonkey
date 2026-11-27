@@ -332,6 +332,9 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.5.7
         version: 5.5.7(eslint-config-prettier@10.1.8(eslint@8.57.1(supports-color@8.1.1)))(eslint@8.57.1(supports-color@8.1.1))(prettier@3.10.1)
+      eslint-plugin-secure-coding:
+        specifier: ^6.5.5
+        version: 6.5.5(eslint@8.57.1(supports-color@8.1.1))(typescript@6.0.3)
       eslint-plugin-vue:
         specifier: ^9.33.0
         version: 9.33.0(eslint@8.57.1(supports-color@8.1.1))(supports-color@8.1.1)
@@ -1761,6 +1764,21 @@ packages:
     engines: {node: '>=20.9.0'}
     cpu: [x64]
     os: [win32]
+
+  '@interlace/eslint-devkit@2.5.1':
+    resolution: {integrity: sha512-p1x5ctSYhkXAKa7pB/+UMGLYU9qyGpTUTdNxVtaVEN7aCRmxi1QcPTl0jzYG1AFeGI9UCP6F3RvE5LyB42QFUA==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+    peerDependencies:
+      eslint: ^8.40.0 || ^9.0.0 || ^10.0.0
+      oxc-resolver: ^11.24.2
+      typescript: '>=4.8.4'
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+      oxc-resolver:
+        optional: true
+      typescript:
+        optional: true
 
   '@isaacs/nonrecursive-glob-match@1.1.0':
     resolution: {integrity: sha512-GPm/Dbvk5RLmhRnxXIa7nTpK0xtl4E0wj0MslsuNiJ1FIROU+2+9lgUC/dgF7Ey4QCWhfEsgxilMRMCdHPfDfw==}
@@ -3401,6 +3419,18 @@ packages:
       '@types/eslint':
         optional: true
       eslint-config-prettier:
+        optional: true
+
+  eslint-plugin-secure-coding@6.5.5:
+    resolution: {integrity: sha512-MXYzI68lN0L4kQ4+2GXW9hJU4P2EKA8LT3jf+w1PPLYA3zs8Y4LgXwKIRWLZiKJWieUdwsFHdRZN4OZQ2W5/Fg==}
+    engines: {node: '>=22.13.0'}
+    peerDependencies:
+      eslint: ^8.40.0 || ^9.0.0 || ^10.0.0
+      recheck: ^4.6.2
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+      recheck:
         optional: true
 
   eslint-plugin-vue@9.33.0:
@@ -7801,6 +7831,11 @@ snapshots:
   '@img/sharp-win32-x64@0.35.5':
     optional: true
 
+  '@interlace/eslint-devkit@2.5.1(eslint@8.57.1(supports-color@8.1.1))(typescript@6.0.3)':
+    optionalDependencies:
+      eslint: 8.57.1(supports-color@8.1.1)
+      typescript: 6.0.3
+
   '@isaacs/nonrecursive-glob-match@1.1.0': {}
 
   '@istanbuljs/load-nyc-config@1.1.0':
@@ -9671,6 +9706,15 @@ snapshots:
       synckit: 0.12.3
     optionalDependencies:
       eslint-config-prettier: 10.1.8(eslint@8.57.1(supports-color@8.1.1))
+
+  eslint-plugin-secure-coding@6.5.5(eslint@8.57.1(supports-color@8.1.1))(typescript@6.0.3):
+    dependencies:
+      '@interlace/eslint-devkit': 2.5.1(eslint@8.57.1(supports-color@8.1.1))(typescript@6.0.3)
+    optionalDependencies:
+      eslint: 8.57.1(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - oxc-resolver
+      - typescript
 
   eslint-plugin-vue@9.33.0(eslint@8.57.1(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
