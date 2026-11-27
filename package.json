@@ -51,6 +51,7 @@
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
     "babel-plugin-transform-regex": "^6.1.0",
+    "cm5-css-mode-mod": "github:openstyles/cm5-css-mode-mod#semver:v1.0.22",
     "cross-env": "^10.1.0",
     "cross-spawn": "^7.0.3",
     "crx3": "^2.0.0",

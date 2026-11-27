@@ -299,6 +299,9 @@ importers:
       babel-plugin-transform-regex:
         specifier: ^6.1.0
         version: 6.1.0
+      cm5-css-mode-mod:
+        specifier: github:openstyles/cm5-css-mode-mod#semver:v1.0.22
+        version: https://codeload.github.com/openstyles/cm5-css-mode-mod/tar.gz/654e6b3b8bad2c7f6c132ebf53bfd6c4c01619be(codemirror@5.65.20)
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -2961,6 +2964,13 @@ packages:
   clone@2.1.2:
     resolution: {integrity: sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==}
     engines: {node: '>=0.8'}
+
+  cm5-css-mode-mod@https://codeload.github.com/openstyles/cm5-css-mode-mod/tar.gz/654e6b3b8bad2c7f6c132ebf53bfd6c4c01619be:
+    resolution: {gitHosted: true, integrity: sha512-sgk5NXmQawE6mTUv/4P2idhu1Otbpy3PWJCvUYGfecj5nKwTsYX7/sY6zwaikHvrCvNf/vFX+swP+YAOZO+bag==, tarball: https://codeload.github.com/openstyles/cm5-css-mode-mod/tar.gz/654e6b3b8bad2c7f6c132ebf53bfd6c4c01619be}
+    version: 1.0.22
+    engines: {node: '>=24'}
+    peerDependencies:
+      codemirror: ^5.65.20
 
   co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
@@ -9218,6 +9228,10 @@ snapshots:
       shallow-clone: 3.0.1
 
   clone@2.1.2: {}
+
+  cm5-css-mode-mod@https://codeload.github.com/openstyles/cm5-css-mode-mod/tar.gz/654e6b3b8bad2c7f6c132ebf53bfd6c4c01619be(codemirror@5.65.20):
+    dependencies:
+      codemirror: 5.65.20
 
   co@4.6.0: {}
 

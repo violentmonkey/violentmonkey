@@ -117,7 +117,9 @@ module.exports = [
     }));
     config.resolve.alias = {
       ...config.resolve.alias,
-      '../css/css$': resolve('src/common/ui/codemirror-ovr/css.js'),
+      '../css/css$': 'cm5-css-mode-mod',
+      // for local build when using "link:../cm5-css-mode-mod"
+      codemirror: resolve('./node_modules/codemirror'),
     };
   }),
 
