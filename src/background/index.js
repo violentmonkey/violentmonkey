@@ -7,6 +7,7 @@ import { addPublicCommands, commands, init } from './utils';
 import './sync';
 import './utils/cookies';
 import './utils/notifications';
+import './utils/policy';
 import './utils/preinject';
 import './utils/script';
 import './utils/storage-fetch';

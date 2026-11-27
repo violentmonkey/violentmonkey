@@ -35,6 +35,7 @@ addOwnCommands({
  * @return {Promise<VMReq.Response>}
  */
 export async function request(url, options = {}) {
+  if (options.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   // fetch supports file:// since Chrome 99 but we use XHR for consistency
   if (!__.MV3 && url.startsWith('file:')) return requestLocalFile(url, options);
   const { body, headers, [kResponseType]: responseType } = options;
