@@ -121,6 +121,7 @@ const getBaseConfig = (page) => /** @type {import('webpack/types').Configuration
         codemirror: {
           name: PUBLIC_LIB.slice(1) + '/codemirror',
           test: makePathTester([
+            'cm5-css-mode-mod',
             '/codemirror',
             '/src/common/ui/code.*css$',
           ]),
