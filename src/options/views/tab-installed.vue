@@ -119,6 +119,9 @@
               <div>
                 <SettingCheck name="filters.showVisit" :label="i18n('labelShowVisited')" />
               </div>
+              <div>
+                <SettingCheck name="filters.showAllSites" :label="i18n('labelShowAllSites')" />
+              </div>
               <div class="mr-2c">
                 <SettingCheck name="filters.viewTable" :label="i18n('labelViewTable')" />
                 <SettingCheck name="filters.viewSingleColumn" :label="i18n('labelViewSingleColumn')" />
@@ -147,6 +150,7 @@
           :focused="selectedScript === script"
           :showHotkeys="state.showHotkeys"
           :showVisit="filters.showVisit || filters.sort.startsWith(kSortVisit)"
+          :showAllSites="filters.showAllSites"
           :script
           :draggable
           :visible="index < state.batchRender.limit"
@@ -192,7 +196,9 @@ import { setRoute, lastRoute } from '@/common/router';
 import { keyboardService, handleTabNavigation, kbdTypable, kbdNavigatable } from '@/common/keyboard';
 import { loadData } from '@/options';
 import { TAB_SETTINGS } from '@/common/safe-globals'; // added as a banner but Vue needs an import
-import { EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus } from '@/common/ui';
+import {
+  docElem, EXTERNAL_LINK_PROPS, getActiveElement, isTouch, showConfirmation, showMessage, vFocus,
+} from '@/common/ui';
 import Icon from '@/common/ui/icon';
 import IconAlpha from '~icons/mdi/sort-alphabetical-ascending';
 import IconAlphaDown from '~icons/mdi/sort-alphabetical-descending';
@@ -246,6 +252,7 @@ const sortModes = getSortModes({
   [kSortSize]: [IconSmallBig, IconBigSmall],
 });
 const filters = reactive({
+  /** @type {Boolean} */ showAllSites: null,
   /** @type {Boolean} */ showEnabledFirst: null,
   /** @type {Boolean} */ showOrder: null,
   /** @type {Boolean} */ showVisit: null,
@@ -833,6 +840,9 @@ watch(() => state.search.value, debouncedSearch);
 watch(() => [filters.sort, filters.showEnabledFirst], lazyOrderUpdate);
 disposables.push(
   watch(() => filters.viewSingleColumn, adjustScriptWidth),
+  watch(() => filters.viewSingleColumn, val => {
+    docElem.toggleAttribute('data-single-column', !!val);
+  }, { immediate: true }),
   watch(() => filters.viewTable, adjustNarrowWidth, { immediate: true }),
 );
 onMediaWidth(700, false, val => {
@@ -927,8 +937,12 @@ $headerBorder: 1px solid var(--fill-5);
 $minSearchWidth: 5em;
 .tab.tab-installed {
   height: 100vh;
-  padding: 0;
+  padding: 0 0 var(--banner-h, 0); /* --banner-h: see app.vue */
   overflow: auto;
+  /* Dark theme colors; the light ones are the fallbacks in var() */
+  @media (prefers-color-scheme: dark) {
+    --warn-color: hsl(35, 90%, 62%);
+  }
   header {
     position: sticky;
     top: 0;
